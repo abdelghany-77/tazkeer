@@ -910,22 +910,26 @@ function loadTheme() {
   const themeText =
     themeToggle.querySelector("span") || themeToggle.childNodes[2];
 
-  if (savedTheme === "dark") {
+  // Default to dark mode if no theme is saved, only use light mode if explicitly set
+  if (savedTheme === "light") {
+    document.body.classList.remove("dark-mode");
+    document.body.classList.add("light-mode");
+    themeIcon.className = "fas fa-moon";
+    if (themeText && themeText.textContent) {
+      themeText.textContent = " الوضع الليلي";
+    } else {
+      themeToggle.innerHTML = '<i class="fas fa-moon"></i> الوضع الليلي';
+    }
+  } else {
+    // Default to dark mode (includes both null and "dark" cases)
     document.body.classList.add("dark-mode");
+    document.body.classList.remove("light-mode");
     themeIcon.className = "fas fa-sun";
     if (themeText && themeText.textContent) {
       themeText.textContent = " الوضع النهاري";
     } else {
       // If no text node exists, update the button text content
       themeToggle.innerHTML = '<i class="fas fa-sun"></i> الوضع النهاري';
-    }
-  } else {
-    document.body.classList.remove("dark-mode");
-    themeIcon.className = "fas fa-moon";
-    if (themeText && themeText.textContent) {
-      themeText.textContent = " الوضع الليلي";
-    } else {
-      themeToggle.innerHTML = '<i class="fas fa-moon"></i> الوضع الليلي';
     }
   }
 }
@@ -940,12 +944,14 @@ function toggleTheme() {
   if (document.body.classList.contains("dark-mode")) {
     // Switch to light mode
     document.body.classList.remove("dark-mode");
+    document.body.classList.add("light-mode");
     themeIcon.className = "fas fa-moon";
     themeToggle.innerHTML = '<i class="fas fa-moon"></i> الوضع الليلي';
     localStorage.setItem("adhkar-theme", "light");
   } else {
     // Switch to dark mode
     document.body.classList.add("dark-mode");
+    document.body.classList.remove("light-mode");
     themeIcon.className = "fas fa-sun";
     themeToggle.innerHTML = '<i class="fas fa-sun"></i> الوضع النهاري';
     localStorage.setItem("adhkar-theme", "dark");
@@ -963,7 +969,160 @@ document.addEventListener("DOMContentLoaded", function () {
   loadProgress();
   showHomePage();
   setupEventListeners();
+  showInstallPrompt(); // Show install prompt for first-time users
 });
+
+// PWA Install prompt functionality
+let deferredPrompt;
+let installPromptShown = false;
+
+// Listen for the beforeinstallprompt event
+window.addEventListener("beforeinstallprompt", (e) => {
+  // Prevent the mini-infobar from appearing on mobile
+  e.preventDefault();
+  // Save the event so it can be triggered later
+  deferredPrompt = e;
+});
+
+function showInstallPrompt() {
+  // Check if this is the first visit
+  const isFirstVisit = !localStorage.getItem("adhkar-visited");
+
+  if (isFirstVisit && !installPromptShown) {
+    // Mark as visited
+    localStorage.setItem("adhkar-visited", "true");
+
+    // Show install prompt after a short delay
+    setTimeout(() => {
+      showInstallModal();
+      installPromptShown = true;
+    }, 2000);
+  }
+}
+
+function showInstallModal() {
+  // Create install modal
+  const installModal = document.createElement("div");
+  installModal.className = "modal";
+  installModal.id = "installModal";
+  installModal.style.display = "block";
+
+  installModal.innerHTML = `
+    <div class="modal-content install-modal-content">
+      <span class="close" id="installClose">&times;</span>
+      <div class="install-content">
+        <div class="install-icon">
+          <i class="fas fa-download"></i>
+        </div>
+        <h3>إضافة التطبيق للشاشة الرئيسية</h3>
+        <p>للوصول السريع للأذكار الإسلامية، يمكنك إضافة هذا التطبيق إلى الشاشة الرئيسية لهاتفك.</p>
+        <div class="install-buttons">
+          <button id="installApp" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            إضافة للشاشة الرئيسية
+          </button>
+          <button id="installLater" class="btn btn-secondary">
+            ربما لاحقاً
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(installModal);
+
+  // Add event listeners
+  document
+    .getElementById("installClose")
+    .addEventListener("click", closeInstallModal);
+  document.getElementById("installApp").addEventListener("click", installApp);
+  document
+    .getElementById("installLater")
+    .addEventListener("click", closeInstallModal);
+
+  // Close when clicking outside
+  installModal.addEventListener("click", (e) => {
+    if (e.target === installModal) {
+      closeInstallModal();
+    }
+  });
+}
+
+function installApp() {
+  if (deferredPrompt) {
+    // Show the install prompt
+    deferredPrompt.prompt();
+
+    // Wait for the user to respond to the prompt
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === "accepted") {
+        console.log("User accepted the install prompt");
+      }
+      deferredPrompt = null;
+    });
+  } else {
+    // Show manual installation instructions
+    showManualInstallInstructions();
+  }
+
+  closeInstallModal();
+}
+
+function showManualInstallInstructions() {
+  const instructionsModal = document.createElement("div");
+  instructionsModal.className = "modal";
+  instructionsModal.style.display = "block";
+
+  const userAgent = navigator.userAgent;
+  let instructions = "";
+
+  if (userAgent.includes("iPhone") || userAgent.includes("iPad")) {
+    instructions = `
+      <h4>إضافة للشاشة الرئيسية على iOS:</h4>
+      <ol>
+        <li>اضغط على أيقونة "المشاركة" <i class="fas fa-share"></i> في شريط Safari</li>
+        <li>اختر "إضافة إلى الشاشة الرئيسية"</li>
+        <li>اضغط "إضافة" في الزاوية العلوية</li>
+      </ol>
+    `;
+  } else if (userAgent.includes("Android")) {
+    instructions = `
+      <h4>إضافة للشاشة الرئيسية على Android:</h4>
+      <ol>
+        <li>اضغط على القائمة الثلاث نقاط في Chrome</li>
+        <li>اختر "إضافة إلى الشاشة الرئيسية"</li>
+        <li>اضغط "إضافة"</li>
+      </ol>
+    `;
+  } else {
+    instructions = `
+      <h4>إضافة للشاشة الرئيسية:</h4>
+      <p>يمكنك إضافة هذا الموقع كاختصار على جهازك من خلال خيارات المتصفح.</p>
+    `;
+  }
+
+  instructionsModal.innerHTML = `
+    <div class="modal-content install-modal-content">
+      <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+      <div class="install-content">
+        <div class="install-icon">
+          <i class="fas fa-info-circle"></i>
+        </div>
+        ${instructions}
+        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="btn btn-primary">حسناً</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(instructionsModal);
+}
+
+function closeInstallModal() {
+  const installModal = document.getElementById("installModal");
+  if (installModal) {
+    installModal.remove();
+  }
+}
 
 // Setup event listeners
 function setupEventListeners() {
