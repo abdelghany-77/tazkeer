@@ -1,0 +1,72 @@
+{
+  "name": "الأذكار الإسلامية - تذكير",
+  "short_name": "الأذكار",
+  "description": "تطبيق الأذكار الإسلامية - أذكار الصباح والمساء وأذكار النوم والطعام وغيرها",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#667eea",
+  "background_color": "#1a202c",
+  "lang": "ar",
+  "dir": "rtl",
+  "scope": "/",
+  "categories": ["lifestyle", "education"],
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPCEtLSBCYWNrZ3JvdW5kIGNpcmNsZSB3aXRoIGdyYWRpZW50IC0tPgogIDxkZWZzPgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJiZ0dyYWRpZW50IiBjeD0iNTAlIiBjeT0iMzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzY2N2VlYTtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNzY0YmEyO3N0b3Atb3BhY2l0eToxIiAvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0idGV4dEdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MC45IiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmN2ZhZmM7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8IS0tIEJhY2tncm91bmQgLS0+CiAgPGNpcmNsZSBjeD0iOTYiIGN5PSI5NiIgcj0iOTYiIGZpbGw9InVybCgjYmdHcmFkaWVudCkiIC8+CiAgPCEtLSBDcmVzY2VudCBtb29uIChJc2xhbWljIHN5bWJvbCkgLS0+CiAgPHBhdGggZD0iTTcyIDM2Yy0yNi40IDAtNDggMjEuNi00OCA0OHMyMS42IDQ4IDQ4IDQ4YzkgMCAxNy40LTIuNCAyNC42LTcuMkM4Mi40IDEyOS42IDU0LjQgMTI5LjIgNDMuOCAxMTIuOGMtOS42LTE1LjYtNi42LTM2IDcuMi00OC42QzU3LjIgMzcuOCA2NC42IDM2LjYgNzIgMzZ6IiBmaWxsPSJ1cmwoI3RleHRHcmFkaWVudCkiIG9wYWNpdHk9IjAuOCIvPgogIDwhLS0gVGFzYmloIGJlYWRzIChwcmF5ZXIgYmVhZHMpIC0tPgogIDxjaXJjbGUgY3g9IjEzMiIgY3k9IjYwIiByPSIxMiIgZmlsbD0idXJsKCN0ZXh0R3JhZGllbnQpIiBvcGFjaXR5PSIwLjciLz4KICA8Y2lyY2xlIGN4PSIxNDQiIGN5PSI5NiIgcj0iOSIgZmlsbD0idXJsKCN0ZXh0R3JhZGllbnQpIiBvcGFjaXR5PSIwLjYiLz4KICA8Y2lyY2xlIGN4PSIxMzIiIGN5PSIxMzIiIHI9IjkiIGZpbGw9InVybCgjdGV4dEdyYWRpZW50KSIgb3BhY2l0eT0iMC42Ii8+CiAgPCEtLSBBcmFiaWMtc3R5bGUgZGVjb3JhdGl2ZSBlbGVtZW50IC0tPgogIDxwYXRoIGQ9Ik00OCA5NmMwLTYgNi0xMiAxMi0xMnMxMiA2IDEyIDEyLTYgMTItMTIgMTItMTItNi0xMi0xMnogTTk2IDcyYzAtMyAzLTYgNi02czYgMyA2IDYtMyA2LTYgNi02LTMtNi02eiIgZmlsbD0idXJsKCN0ZXh0R3JhZGllbnQpIiBvcGFjaXR5PSIwLjUiLz4KPC9zdmc+",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPCEtLSBCYWNrZ3JvdW5kIGNpcmNsZSB3aXRoIGdyYWRpZW50IC0tPgogIDxkZWZzPgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJiZ0dyYWRpZW50IiBjeD0iNTAlIiBjeT0iMzAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzY2N2VlYTtzdG9wLW9wYWNpdHk6MSIgLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNzY0YmEyO3N0b3Atb3BhY2l0eToxIiAvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0idGV4dEdyYWRpZW50IiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6I2ZmZmZmZjtzdG9wLW9wYWNpdHk6MC45IiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNmN2ZhZmM7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8IS0tIEJhY2tncm91bmQgLS0+CiAgPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIyNTYiIGZpbGw9InVybCgjYmdHcmFkaWVudCkiIC8+CiAgPCEtLSBDcmVzY2VudCBtb29uIChJc2xhbWljIHN5bWJvbCkgLS0+CiAgPHBhdGggZD0iTTE5MiA5NmMtNzAuNCAwLTEyOCA1Ny42LTEyOCAxMjhzNTcuNiAxMjggMTI4IDEyOGMyNCAwIDQ2LjQtNi40IDY1LjYtMTkuMkMyMjAuOCAzNDUuNiAxNDQuNCAzNDQuMiAxMTYuOCAzMDEuNmMtMjUuNi00MS42LTE3LjYtOTYgMTkuMi0xMjkuNkMxNTIuMiAxMDAuOCAxNzEuNiA5Ni42IDE5MiA5NnoiIGZpbGw9InVybCgjdGV4dEdyYWRpZW50KSIgb3BhY2l0eT0iMC44Ii8+CiAgPCEtLSBUYXNiaWggYmVhZHMgKHByYXllciBiZWFkcykgLS0+CiAgPGNpcmNsZSBjeD0iMzUyIiBjeT0iMTYwIiByPSIzMiIgZmlsbD0idXJsKCN0ZXh0R3JhZGllbnQpIiBvcGFjaXR5PSIwLjciLz4KICA8Y2lyY2xlIGN4PSIzODQiIGN5PSIyNTYiIHI9IjI0IiBmaWxsPSJ1cmwoI3RleHRHcmFkaWVudCkiIG9wYWNpdHk9IjAuNiIvPgogIDxjaXJjbGUgY3g9IjM1MiIgY3k9IjM1MiIgcj0iMjQiIGZpbGw9InVybCgjdGV4dEdyYWRpZW50KSIgb3BhY2l0eT0iMC42Ii8+CiAgPCEtLSBBcmFiaWMtc3R5bGUgZGVjb3JhdGl2ZSBlbGVtZW50IC0tPgogIDxwYXRoIGQ9Ik0xMjggMjU2YzAtMTYgMTYtMzIgMzItMzJzMzIgMTYgMzIgMzItMTYgMzItMzIgMzItMzItMTYtMzItMzJ6IE0yNTYgMTkyYzAtOCA4LTE2IDE2LTE2czE2IDggMTYgMTYtOCAxNi0xNiAxNi0xNi04LTE2LTE2eiIgZmlsbD0idXJsKCN0ZXh0R3JhZGllbnQpIiBvcGFjaXR5PSIwLjUiLz4KPC9zdmc+",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "أذكار الصباح",
+      "short_name": "الصباح",
+      "description": "أذكار الصباح من الكتاب والسنة",
+      "url": "/?category=morning",
+      "icons": [
+        {
+          "src": "favicon.svg",
+          "sizes": "any"
+        }
+      ]
+    },
+    {
+      "name": "أذكار المساء",
+      "short_name": "المساء",
+      "description": "أذكار المساء من الكتاب والسنة",
+      "url": "/?category=evening",
+      "icons": [
+        {
+          "src": "favicon.svg",
+          "sizes": "any"
+        }
+      ]
+    },
+    {
+      "name": "أذكار النوم",
+      "short_name": "النوم",
+      "description": "أذكار النوم والاستيقاظ",
+      "url": "/?category=sleep",
+      "icons": [
+        {
+          "src": "favicon.svg",
+          "sizes": "any"
+        }
+      ]
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
