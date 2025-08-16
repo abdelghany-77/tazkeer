@@ -2,10 +2,6 @@
 
 A comprehensive Islamic Adhkar (remembrance of Allah) web application featuring authentic supplications from the Quran and Sunnah with educational benefits and modern UI/UX design.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![Islamic Content](https://img.shields.io/badge/Content-Islamic%20Authentic-brightgreen)](https://github.com)
-[![Arabic Support](https://img.shields.io/badge/Language-Arabic%20RTL-blue)](https://github.com)
-
 ## ✨ Features
 
 ### 📿 Comprehensive Adhkar Categories
@@ -44,38 +40,6 @@ A comprehensive Islamic Adhkar (remembrance of Allah) web application featuring 
 - **🎭 Smooth Animations** - Professional user experience
 - **🎯 Islamic Aesthetics** - Beautiful Islamic-themed design
 
-## 🚀 Demo
-
-![Adhkar App Screenshot](https://via.placeholder.com/800x400?text=Islamic+Adhkar+App+Screenshot)
-
-## 📦 Installation
-
-### Option 1: Direct Download
-
-1. Download or clone this repository
-2. Open `index.html` in your web browser
-3. Start using the app immediately!
-
-```bash
-git clone https://github.com/yourusername/islamic-adhkar-app.git
-cd islamic-adhkar-app
-# Open index.html in your browser
-```
-
-### Option 2: Local Server (Recommended)
-
-```bash
-# Using Python 3
-python -m http.server 8000
-
-# Using Node.js
-npx http-server
-
-# Using PHP
-php -S localhost:8000
-
-# Then open: http://localhost:8000
-```
 
 ## 🛠️ Technologies Used
 
@@ -86,17 +50,6 @@ php -S localhost:8000
 - **Font Awesome** - Beautiful icons
 - **Google Fonts** - Arabic typography (Amiri, Cairo)
 
-## 📁 Project Structure
-
-```
-islamic-adhkar-app/
-├── 📄 index.html          # Main HTML structure
-├── 🎨 styles.css          # CSS styling (light & dark themes)
-├── ⚡ script.js           # JavaScript functionality
-├── 🌙 favicon.svg         # Islamic-themed favicon
-├── 📋 .hintrc            # Development hints
-└── 📖 README.md          # This file
-```
 
 ## 🔧 Usage
 
@@ -168,67 +121,6 @@ Each adhkar includes detailed information about its spiritual benefits:
 - **Parents teaching children** Islamic supplications
 - **Converts to Islam** learning essential prayers
 - **Anyone interested** in Islamic spirituality
-
-## 🤝 Contributing
-
-We welcome contributions to improve this Islamic project:
-
-### How to Contribute
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### Contribution Guidelines
-
-- ✅ Verify Islamic content accuracy
-- ✅ Test on multiple devices
-- ✅ Follow existing code style
-- ✅ Add appropriate comments
-- ✅ Respect Islamic values and etiquette
-
-### Areas for Contribution
-
-- 🌐 **Translations** - More language support
-- 📚 **Content** - Additional authentic adhkar
-- 🎨 **Design** - UI/UX improvements
-- 🔧 **Features** - New functionality ideas
-- 🐛 **Bug Fixes** - Issue resolution
-- 📱 **Accessibility** - Better accessibility support
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-**Islamic Content Disclaimer**: The Islamic content (Quranic verses, Hadith, and supplications) in this application are considered sacred and are provided for religious and educational purposes. Please treat them with appropriate respect.
-
-## 🙏 Acknowledgments
-
-- **Allah (SWT)** - For guidance and blessing
-- **Prophet Muhammad (ﷺ)** - For teaching us these beautiful supplications
-- **Islamic Scholars** - For preserving and authenticating these teachings
-- **Contributors** - For helping improve this application
-- **Muslim Community** - For feedback and support
-
-## 📞 Support
-
-If you find this project helpful, please:
-
-- ⭐ **Star this repository**
-- 🤲 **Make dua** for the developers
-- 🔄 **Share** with other Muslims
-- 🐛 **Report bugs** via GitHub issues
-- 💡 **Suggest features** for improvement
-
-## 📱 Mobile App
-
-This web application works perfectly on mobile devices, but if you're interested in native mobile apps, please star this repository and let us know!
-
----
-
-### 🤲 Dua for Developers
 
 > رَبَّنَا تَقَبَّلْ مِنَّا ۖ إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ
 
