@@ -910,17 +910,7 @@ function loadTheme() {
   const themeText =
     themeToggle.querySelector("span") || themeToggle.childNodes[2];
 
-  // Set dark mode as default if no preference is saved
-  if (savedTheme === "light") {
-    document.body.classList.remove("dark-mode");
-    themeIcon.className = "fas fa-moon";
-    if (themeText && themeText.textContent) {
-      themeText.textContent = " الوضع الليلي";
-    } else {
-      themeToggle.innerHTML = '<i class="fas fa-moon"></i> الوضع الليلي';
-    }
-  } else {
-    // Default to dark mode (when savedTheme is "dark" or null/undefined)
+  if (savedTheme === "dark") {
     document.body.classList.add("dark-mode");
     themeIcon.className = "fas fa-sun";
     if (themeText && themeText.textContent) {
@@ -929,9 +919,13 @@ function loadTheme() {
       // If no text node exists, update the button text content
       themeToggle.innerHTML = '<i class="fas fa-sun"></i> الوضع النهاري';
     }
-    // Save dark mode as preference if no preference exists
-    if (!savedTheme) {
-      localStorage.setItem("adhkar-theme", "dark");
+  } else {
+    document.body.classList.remove("dark-mode");
+    themeIcon.className = "fas fa-moon";
+    if (themeText && themeText.textContent) {
+      themeText.textContent = " الوضع الليلي";
+    } else {
+      themeToggle.innerHTML = '<i class="fas fa-moon"></i> الوضع الليلي';
     }
   }
 }
@@ -963,279 +957,12 @@ function toggleTheme() {
   }, 300);
 }
 
-// PWA Installation functionality
-let deferredPrompt;
-let installButton;
-
-function setupPWAInstallation() {
-  // Create install button
-  installButton = document.createElement("button");
-  installButton.classList.add("nav-btn", "install-btn");
-  installButton.innerHTML =
-    '<i class="fas fa-download"></i> إضافة للشاشة الرئيسية';
-  installButton.style.display = "none";
-
-  // Add to navigation
-  const nav = document.getElementById("nav");
-  nav.insertBefore(installButton, nav.firstChild);
-
-  // Listen for the beforeinstallprompt event
-  window.addEventListener("beforeinstallprompt", (e) => {
-    // Prevent the mini-infobar from appearing on mobile
-    e.preventDefault();
-    // Stash the event so it can be triggered later
-    deferredPrompt = e;
-    // Show the install button
-    installButton.style.display = "block";
-  });
-
-  // Handle install button click
-  installButton.addEventListener("click", async () => {
-    if (!deferredPrompt) {
-      showInstallInstructions();
-      return;
-    }
-
-    // Show the install prompt
-    deferredPrompt.prompt();
-
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-
-    if (outcome === "accepted") {
-      console.log("User accepted the install prompt");
-    } else {
-      console.log("User dismissed the install prompt");
-    }
-
-    // Clear the deferredPrompt
-    deferredPrompt = null;
-    installButton.style.display = "none";
-  });
-
-  // Hide install button if already installed
-  window.addEventListener("appinstalled", () => {
-    console.log("PWA was installed");
-    installButton.style.display = "none";
-    deferredPrompt = null;
-  });
-
-  // Show installation instructions for iOS and other browsers
-  if (
-    isIOSDevice() ||
-    !window.matchMedia("(display-mode: standalone)").matches
-  ) {
-    setTimeout(() => {
-      if (!isAppInstalled()) {
-        showInstallBanner();
-      }
-    }, 3000); // Show after 3 seconds
-  }
-}
-
-function isIOSDevice() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent);
-}
-
-function isAppInstalled() {
-  return (
-    window.matchMedia("(display-mode: standalone)").matches ||
-    window.navigator.standalone === true
-  );
-}
-
-function showInstallBanner() {
-  if (localStorage.getItem("installBannerDismissed") === "true") {
-    return;
-  }
-
-  const banner = document.createElement("div");
-  banner.className = "install-banner";
-  banner.innerHTML = `
-    <div class="install-banner-content">
-      <div class="install-banner-icon">
-        <i class="fas fa-mobile-alt"></i>
-      </div>
-      <div class="install-banner-text">
-        <h3>إضافة التطبيق للشاشة الرئيسية</h3>
-        <p>احصل على وصول سريع للأذكار من شاشتك الرئيسية</p>
-      </div>
-      <div class="install-banner-actions">
-        <button class="install-banner-btn primary" onclick="showInstallInstructions()">
-          كيفية الإضافة
-        </button>
-        <button class="install-banner-btn secondary" onclick="dismissInstallBanner()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(banner);
-
-  // Animate in
-  setTimeout(() => {
-    banner.classList.add("show");
-  }, 100);
-}
-
-function dismissInstallBanner() {
-  const banner = document.querySelector(".install-banner");
-  if (banner) {
-    banner.classList.remove("show");
-    setTimeout(() => {
-      banner.remove();
-    }, 300);
-    localStorage.setItem("installBannerDismissed", "true");
-  }
-}
-
-function showInstallInstructions() {
-  const modal = document.createElement("div");
-  modal.className = "modal install-modal";
-  modal.innerHTML = `
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>إضافة التطبيق للشاشة الرئيسية</h3>
-        <span class="close-install">&times;</span>
-      </div>
-      <div class="modal-body">
-        <div class="install-instructions">
-          ${getInstallInstructions()}
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-  modal.style.display = "block";
-
-  // Close modal handlers
-  const closeBtn = modal.querySelector(".close-install");
-  closeBtn.addEventListener("click", () => {
-    modal.style.display = "none";
-    setTimeout(() => modal.remove(), 300);
-  });
-
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      modal.style.display = "none";
-      setTimeout(() => modal.remove(), 300);
-    }
-  });
-
-  // Dismiss install banner if shown
-  dismissInstallBanner();
-}
-
-function getInstallInstructions() {
-  const userAgent = navigator.userAgent.toLowerCase();
-
-  if (isIOSDevice()) {
-    return `
-      <div class="install-step">
-        <div class="install-step-icon">
-          <i class="fas fa-share"></i>
-        </div>
-        <div class="install-step-text">
-          <h4>خطوة 1</h4>
-          <p>اضغط على زر المشاركة <i class="fas fa-share" style="margin: 0 5px;"></i> في شريط العنوان</p>
-        </div>
-      </div>
-      <div class="install-step">
-        <div class="install-step-icon">
-          <i class="fas fa-plus-square"></i>
-        </div>
-        <div class="install-step-text">
-          <h4>خطوة 2</h4>
-          <p>اختر "إضافة إلى الشاشة الرئيسية" من القائمة</p>
-        </div>
-      </div>
-      <div class="install-step">
-        <div class="install-step-icon">
-          <i class="fas fa-check"></i>
-        </div>
-        <div class="install-step-text">
-          <h4>خطوة 3</h4>
-          <p>اضغط "إضافة" لإنهاء التثبيت</p>
-        </div>
-      </div>
-    `;
-  } else if (userAgent.includes("chrome")) {
-    return `
-      <div class="install-step">
-        <div class="install-step-icon">
-          <i class="fas fa-ellipsis-v"></i>
-        </div>
-        <div class="install-step-text">
-          <h4>خطوة 1</h4>
-          <p>اضغط على القائمة الرئيسية (ثلاث نقاط) في المتصفح</p>
-        </div>
-      </div>
-      <div class="install-step">
-        <div class="install-step-icon">
-          <i class="fas fa-download"></i>
-        </div>
-        <div class="install-step-text">
-          <h4>خطوة 2</h4>
-          <p>اختر "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية"</p>
-        </div>
-      </div>
-      <div class="install-step">
-        <div class="install-step-icon">
-          <i class="fas fa-check"></i>
-        </div>
-        <div class="install-step-text">
-          <h4>خطوة 3</h4>
-          <p>اضغط "تثبيت" لإضافة التطبيق</p>
-        </div>
-      </div>
-    `;
-  } else {
-    return `
-      <div class="install-step">
-        <div class="install-step-icon">
-          <i class="fas fa-bookmark"></i>
-        </div>
-        <div class="install-step-text">
-          <h4>إضافة إشارة مرجعية</h4>
-          <p>يمكنك إضافة الموقع كإشارة مرجعية للوصول السريع إليه</p>
-        </div>
-      </div>
-      <div class="install-step">
-        <div class="install-step-icon">
-          <i class="fas fa-home"></i>
-        </div>
-        <div class="install-step-text">
-          <h4>إضافة للشاشة الرئيسية</h4>
-          <p>استخدم خيارات المتصفح لإضافة اختصار للشاشة الرئيسية</p>
-        </div>
-      </div>
-    `;
-  }
-}
-
 // Initialize the app
 document.addEventListener("DOMContentLoaded", function () {
   loadTheme(); // Load saved theme preference
-  setupPWAInstallation(); // Setup PWA installation
   loadProgress();
   showHomePage();
   setupEventListeners();
-
-  // Register service worker
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then((registration) => {
-          console.log("SW registered: ", registration);
-        })
-        .catch((registrationError) => {
-          console.log("SW registration failed: ", registrationError);
-        });
-    });
-  }
 });
 
 // Setup event listeners
