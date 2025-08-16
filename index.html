@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tazkeer</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8IS0tIEJhY2tncm91bmQgY2lyY2xlIHdpdGggZ3JhZGllbnQgLS0+CiAgPGRlZnM+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImJnR3JhZGllbnQiIGN4PSI1MCUiIGN5PSIzMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNjY3ZWVhO3N0b3Atb3BhY2l0eToxIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM3NjRiYTI7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ0ZXh0R3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojZmZmZmZmO3N0b3Atb3BhY2l0eTowLjkiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2Y3ZmFmYztzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDwhLS0gQmFja2dyb3VuZCAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0idXJsKCNiZ0dyYWRpZW50KSIgLz4KICA8IS0tIENyZXNjZW50IG1vb24gKElzbGFtaWMgc3ltYm9sKSAtLT4KICA8cGF0aCBkPSJNMTIgNmMtNC40IDAtOCAzLjYtOCA4czMuNiA4IDggOGMxLjUgMCAyLjktMC40IDQuMS0xLjItMi40IDAuOC01LjEtMC4yLTYuNy0yLjgtMS42LTIuNi0xLjEtNiAxLjItOC4xQzExLjIgNi4zIDExLjYgNi4xIDEyIDZ6IiBmaWxsPSJ1cmwoI3RleHRHcmFkaWVudCkiIG9wYWNpdHk9IjAuOCIvPgogIDwhLS0gVGFzYmloIGJlYWRzIChwcmF5ZXIgYmVhZHMpIC0tPgogIDxjaXJjbGUgY3g9IjIyIiBjeT0iMTAiIHI9IjIiIGZpbGw9InVybCgjdGV4dEdyYWRpZW50KSIgb3BhY2l0eT0iMC43Ii8+CiAgPGNpcmNsZSBjeD0iMjQiIGN5PSIxNiIgcj0iMS41IiBmaWxsPSJ1cmwoI3RleHRHcmFkaWVudCkiIG9wYWNpdHk9IjAuNiIvPgogIDxjaXJjbGUgY3g9IjIyIiBjeT0iMjIiIHI9IjEuNSIgZmlsbD0idXJsKCN0ZXh0R3JhZGllbnQpIiBvcGFjaXR5PSIwLjYiLz4KICA8IS0tIEFyYWJpYy1zdHlsZSBkZWNvcmF0aXZlIGVsZW1lbnQgLS0+CiAgPHBhdGggZD0iTTggMTZjMC0xIDEtMiAyLTJzMiAxIDIgMi0xIDItMiAyLTItMS0yLTJ6IE0xNiAxMmMwLTAuNSAwLjUtMSAxLTFzMSAwLjUgMSAxLTAuNSAxLTEgMS0xLTAuNS0xLTF6IiBmaWxsPSJ1cmwoI3RleHRHcmFkaWVudCkiIG9wYWNpdHk9IjAuNSIvPgo8L3N2Zz4="
+    />
+    <link rel="apple-touch-icon" href="favicon.svg" />
+    <meta name="theme-color" content="#667eea" />
+
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <h1 class="logo">
+            <i class="fas fa-moon"></i>
+            الأذكار الإسلامية
+          </h1>
+          <nav class="nav" id="nav">
+            <button class="nav-btn theme-toggle-btn" id="themeToggle">
+              <i class="fas fa-moon"></i>
+              الوضع الليلي
+            </button>
+            <button class="nav-btn" id="homeBtn">
+              <i class="fas fa-home"></i>
+              الرئيسية
+            </button>
+            <button class="nav-btn back-btn hidden" id="backBtn">
+              <i class="fas fa-arrow-right"></i>
+              العودة
+            </button>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <div class="container">
+        <!-- Home Page -->
+        <div id="homePage">
+          <!-- Welcome Section -->
+          <div class="welcome-section">
+            <h2 class="welcome-title">أهلاً وسهلاً بك في تطبيق الأذكار</h2>
+            <p class="welcome-description">
+              اختر نوع الأذكار التي تريد قراءتها
+            </p>
+          </div>
+
+          <!-- Categories Container -->
+          <div class="categories-container" id="categoriesContainer">
+            <!-- Category cards will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Category Details Page -->
+        <div id="categoryPage" class="hidden">
+          <!-- Search Bar -->
+          <div class="search-container">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="ابحث في الأذكار..."
+              />
+            </div>
+          </div>
+
+          <!-- Category Title -->
+          <div class="category-header">
+            <h2 id="categoryTitle">أذكار الصباح</h2>
+            <p id="categoryDescription">أذكار الصباح من الكتاب والسنة</p>
+            <button class="reset-all-btn" id="resetAllBtn">
+              <i class="fas fa-refresh"></i>
+              إعادة تعيين جميع الأذكار
+            </button>
+          </div>
+
+          <!-- Adhkar Container -->
+          <div class="adhkar-container" id="adhkarContainer">
+            <!-- Adhkar cards will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p>اللهم اغفر لنا ذنوبنا وإسرافنا في أمرنا</p>
+      </div>
+    </footer>
+
+    <!-- Counter Modal -->
+    <div id="counterModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">العداد</h3>
+          <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="counter-display">
+            <div class="count-number" id="countNumber">0</div>
+            <div class="count-total">من <span id="totalCount">0</span></div>
+          </div>
+
+          <div class="fadl-section" id="fadlSection">
+            <div class="fadl-header">
+              <i class="fas fa-star"></i>
+              <!-- <span>فضل هذا الذكر</span> -->
+            </div>
+            <p class="fadl-text" id="fadlText"></p>
+          </div>
+
+          <div class="counter-controls">
+            <button class="count-btn" id="countBtn">
+              <i class="fas fa-plus"></i>
+            </button>
+            <button class="reset-btn" id="resetBtn">
+              <i class="fas fa-redo"></i>
+              إعادة تعيين
+            </button>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
