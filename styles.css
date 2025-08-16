@@ -518,96 +518,6 @@ body {
   text-align: center;
 }
 
-/* Install Modal Styles */
-.install-modal-content {
-  text-align: center;
-}
-
-.install-content {
-  padding: 2rem;
-}
-
-.install-icon {
-  font-size: 3rem;
-  color: #667eea;
-  margin-bottom: 1rem;
-}
-
-.install-content h3 {
-  font-size: 1.5rem;
-  color: #2d3748;
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
-
-.install-content p {
-  font-size: 1rem;
-  color: #4a5568;
-  line-height: 1.6;
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.install-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.install-buttons .btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.install-buttons .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.install-buttons .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-.install-buttons .btn-secondary {
-  background: #f7fafc;
-  color: #4a5568;
-  border: 2px solid #e2e8f0;
-}
-
-.install-buttons .btn-secondary:hover {
-  background: #edf2f7;
-  border-color: #cbd5e0;
-}
-
-.install-content ol {
-  text-align: right;
-  direction: rtl;
-  margin: 1rem 0;
-  padding-right: 1rem;
-}
-
-.install-content ol li {
-  margin-bottom: 0.5rem;
-  line-height: 1.6;
-}
-
-.install-content h4 {
-  color: #2d3748;
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
-}
-
 .counter-display {
   margin-bottom: 2rem;
 }
@@ -1102,34 +1012,6 @@ body.dark-mode .category-count {
 
 body.dark-mode .adhkar-count {
   background: #1a365d;
-  color: #81e6d9;
-}
-
-/* Dark Mode Install Modal */
-body.dark-mode .install-content h3 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .install-content p {
-  color: #cbd5e0;
-}
-
-body.dark-mode .install-content h4 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .install-buttons .btn-secondary {
-  background: #4a5568;
-  color: #e2e8f0;
-  border-color: #718096;
-}
-
-body.dark-mode .install-buttons .btn-secondary:hover {
-  background: #2d3748;
-  border-color: #4a5568;
-}
-
-body.dark-mode .install-icon {
   color: #81e6d9;
 }
 
