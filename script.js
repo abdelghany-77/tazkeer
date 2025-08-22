@@ -1088,7 +1088,7 @@ function setFontSize(size, showNotif = true) {
 // Quick access functions
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
-  showNotification("تم الانتقال إلى أعلى الصفحة");
+  // showNotification("تم الانتقال إلى أعلى الصفحة");
 }
 
 function showFavorites() {
@@ -2018,7 +2018,7 @@ setInterval(saveProgress, 10000); // Save every 10 seconds
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("/sw.js")
+      .register("./sw.js")
       .then((registration) => {
         console.log("SW registered: ", registration);
       })
