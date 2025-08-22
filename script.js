@@ -881,6 +881,321 @@ let totalCount = 0;
 let currentZikrText = "";
 let currentZikrIndex = null;
 
+// Enhanced global variables for UX improvements
+let favorites = JSON.parse(localStorage.getItem("zekrFavorites")) || [];
+let userPreferences = JSON.parse(localStorage.getItem("userPreferences")) || {
+  fontSize: "medium",
+  autoPlay: false,
+  showFadl: true,
+  soundEnabled: true,
+  lastCategory: "all",
+};
+let dailyProgress = JSON.parse(localStorage.getItem("dailyProgress")) || {
+  date: new Date().toDateString(),
+  completedZekr: [],
+  streak: parseInt(localStorage.getItem("dailyStreak")) || 0,
+  totalCompletions: parseInt(localStorage.getItem("totalCompletions")) || 0,
+};
+
+// Check and update daily progress
+function checkDailyProgress() {
+  const today = new Date().toDateString();
+  if (dailyProgress.date !== today) {
+    // New day - reset daily progress but maintain streak
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (
+      dailyProgress.date === yesterday.toDateString() &&
+      dailyProgress.completedZekr.length > 0
+    ) {
+      dailyProgress.streak++;
+    } else if (dailyProgress.completedZekr.length === 0) {
+      dailyProgress.streak = 0;
+    }
+
+    dailyProgress.date = today;
+    dailyProgress.completedZekr = [];
+    saveDailyProgress();
+  }
+  updateProgressStats();
+}
+
+function saveDailyProgress() {
+  localStorage.setItem("dailyProgress", JSON.stringify(dailyProgress));
+  localStorage.setItem("dailyStreak", dailyProgress.streak.toString());
+  localStorage.setItem(
+    "totalCompletions",
+    dailyProgress.totalCompletions.toString()
+  );
+}
+
+function getWeeklyCompletions() {
+  const now = new Date();
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  // For now, return a simple calculation based on daily progress
+  // This can be enhanced later with more detailed tracking
+  return Math.min(
+    dailyProgress.completedZekr.length * 7,
+    dailyProgress.totalCompletions
+  );
+}
+
+function updateProgressStats() {
+  console.log("updateProgressStats called");
+  const totalZekr = Object.values(adhkarData).reduce(
+    (sum, category) => sum + category.adhkar.length,
+    0
+  );
+  const completedToday = dailyProgress.completedZekr.length;
+  console.log(
+    `Stats: ${completedToday} completed today, ${totalZekr} total adhkar`
+  );
+  const completionRate =
+    totalZekr > 0 ? Math.round((completedToday / totalZekr) * 100) : 0;
+  const favoritesCount = favorites.length;
+
+  // Update stats in the DOM if elements exist (matching HTML IDs)
+  const dailyStreakEl = document.getElementById("dailyStreak");
+  const totalCompletionsEl = document.getElementById("totalCompletions");
+  const todayCompletionsEl = document.getElementById("todayCompletions");
+  const weekCompletionsEl = document.getElementById("weekCompletions");
+
+  if (dailyStreakEl) {
+    dailyStreakEl.textContent = dailyProgress.streak || 0;
+    console.log(`Updated streak: ${dailyProgress.streak || 0}`);
+  }
+  if (totalCompletionsEl) {
+    totalCompletionsEl.textContent = dailyProgress.totalCompletions;
+    console.log(`Updated total completions: ${dailyProgress.totalCompletions}`);
+  }
+  if (todayCompletionsEl) {
+    todayCompletionsEl.textContent = completedToday;
+    console.log(`Updated today completions: ${completedToday}`);
+  }
+  if (weekCompletionsEl) {
+    weekCompletionsEl.textContent = getWeeklyCompletions();
+    console.log(`Updated weekly completions: ${getWeeklyCompletions()}`);
+  }
+}
+
+// Notification system
+function showNotification(message, type = "success") {
+  const notification = document.querySelector(".notification");
+  if (!notification) return;
+
+  const icon = notification.querySelector("i");
+  const textSpan = notification.querySelector("span");
+
+  // Update icon based on type
+  if (icon) {
+    icon.className =
+      type === "success"
+        ? "fas fa-check-circle"
+        : type === "warning"
+        ? "fas fa-exclamation-triangle"
+        : "fas fa-info-circle";
+  }
+
+  // Update message
+  if (textSpan) textSpan.textContent = message;
+
+  // Update colors
+  if (type === "success") {
+    notification.style.background = "#38a169";
+  } else if (type === "info") {
+    notification.style.background = "#667eea";
+  } else if (type === "warning") {
+    notification.style.background = "#ed8936";
+  }
+
+  notification.classList.add("show");
+
+  setTimeout(() => {
+    notification.classList.remove("show");
+  }, 3000);
+}
+
+// Celebration modal
+function showCelebration(title, message, isComplete = false) {
+  const celebration = document.querySelector(".celebration");
+  if (!celebration) return;
+
+  const icon = celebration.querySelector(".celebration-icon");
+  const titleEl = celebration.querySelector("h3");
+  const messageEl = celebration.querySelector("p");
+
+  if (titleEl) titleEl.textContent = title;
+  if (messageEl) messageEl.textContent = message;
+
+  if (icon) {
+    icon.innerHTML = isComplete ? "🎉" : "⭐";
+  }
+
+  if (isComplete) {
+    celebration.style.background = "linear-gradient(135deg, #38a169, #48bb78)";
+  } else {
+    celebration.style.background = "linear-gradient(135deg, #667eea, #764ba2)";
+  }
+
+  celebration.classList.add("show");
+}
+
+function hideCelebration() {
+  const celebration = document.querySelector(".celebration");
+  if (celebration) celebration.classList.remove("show");
+}
+
+// Font size controls
+function setFontSize(size, showNotif = true) {
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll(".font-btn");
+
+  // Remove active class from all buttons
+  buttons.forEach((btn) => btn.classList.remove("active"));
+
+  // Add active class to selected button
+  const activeBtn = document.querySelector(
+    `[onclick*="setFontSize('${size}')"]`
+  );
+  if (activeBtn) activeBtn.classList.add("active");
+
+  // Set CSS variable
+  switch (size) {
+    case "small":
+      root.style.setProperty("--adhkar-font-size", "1.1rem");
+      break;
+    case "medium":
+      root.style.setProperty("--adhkar-font-size", "1.3rem");
+      break;
+    case "large":
+      root.style.setProperty("--adhkar-font-size", "1.6rem");
+      break;
+  }
+
+  // Save preference
+  userPreferences.fontSize = size;
+  localStorage.setItem("userPreferences", JSON.stringify(userPreferences));
+
+  // Only show notification if explicitly requested (user click)
+  if (showNotif) {
+    const sizeNames = { small: "صغير", medium: "متوسط", large: "كبير" };
+    showNotification(`تم تغيير حجم الخط إلى ${sizeNames[size]}`);
+  }
+}
+
+// Quick access functions
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  showNotification("تم الانتقال إلى أعلى الصفحة");
+}
+
+function showFavorites() {
+  if (favorites.length === 0) {
+    showNotification("لم تضف أي أذكار إلى المفضلة بعد", "info");
+    return;
+  }
+
+  // Create favorites display
+  const favoriteZekr = [];
+  Object.keys(adhkarData).forEach((categoryKey) => {
+    const category = adhkarData[categoryKey];
+    category.adhkar.forEach((zekr, index) => {
+      const zekrId = `${categoryKey}_${index}`;
+      if (favorites.includes(zekrId)) {
+        favoriteZekr.push({
+          category: category.title,
+          zekr: zekr,
+          categoryKey: categoryKey,
+          index: index,
+        });
+      }
+    });
+  });
+
+  showNotification(`عرض ${favorites.length} من الأذكار المفضلة`);
+}
+
+function toggleStats() {
+  const stats = document.querySelector(".progress-stats");
+  if (stats) {
+    const isHidden = stats.style.display === "none";
+    stats.style.display = isHidden ? "block" : "none";
+    showNotification(isHidden ? "تم عرض الإحصائيات" : "تم إخفاء الإحصائيات");
+  }
+}
+
+// Favorites system
+function toggleFavorite(categoryKey, zekrIndex, event) {
+  if (event) event.stopPropagation();
+
+  const zekrId = `${categoryKey}_${zekrIndex}`;
+  const index = favorites.indexOf(zekrId);
+  const button = event ? event.target.closest(".favorite-btn") : null;
+
+  if (index > -1) {
+    favorites.splice(index, 1);
+    if (button) button.classList.remove("active");
+    showNotification("تم إزالة الذكر من المفضلة");
+  } else {
+    favorites.push(zekrId);
+    if (button) button.classList.add("active");
+    showNotification("تم إضافة الذكر إلى المفضلة");
+  }
+
+  localStorage.setItem("zekrFavorites", JSON.stringify(favorites));
+  updateProgressStats();
+}
+
+function getCategoryDisplayName(category) {
+  if (!category || !adhkarData[category]) return "غير محدد";
+  return adhkarData[category].title;
+}
+
+// Enhanced completion tracking
+function markZekrCompleted(categoryKey, zekrIndex) {
+  const zekrId = `${categoryKey}_${zekrIndex}`;
+  console.log(`markZekrCompleted called with: ${zekrId}`);
+
+  if (!dailyProgress.completedZekr.includes(zekrId)) {
+    dailyProgress.completedZekr.push(zekrId);
+    dailyProgress.totalCompletions++;
+    console.log(
+      `Added to dailyProgress. Total completions: ${dailyProgress.totalCompletions}`
+    );
+    saveDailyProgress();
+    updateProgressStats();
+
+    // Check for completion milestones
+    const completed = dailyProgress.completedZekr.length;
+    const total = Object.values(adhkarData).reduce(
+      (sum, category) => sum + category.adhkar.length,
+      0
+    );
+
+    if (completed === total) {
+      showCelebration(
+        "مبروك! 🎉",
+        "لقد أكملت جميع الأذكار اليوم! جزاك الله خيراً",
+        true
+      );
+    } else if (completed === Math.floor(total / 2)) {
+      showCelebration(
+        "إنجاز رائع! ⭐",
+        "لقد أكملت نصف الأذكار اليوم، استمر بارك الله فيك"
+      );
+    } else if (completed % 5 === 0 && completed > 0) {
+      showCelebration(
+        "أحسنت! 🌟",
+        `أكملت ${completed} من الأذكار، استمر في ذكر الله`
+      );
+    }
+  } else {
+    console.log(`${zekrId} already marked as completed`);
+  }
+}
+
 // DOM Elements
 const homePage = document.getElementById("homePage");
 const categoryPage = document.getElementById("categoryPage");
@@ -1126,13 +1441,6 @@ function closeInstallModal() {
 
 // Setup event listeners
 function setupEventListeners() {
-  // Navigation buttons
-  homeBtn.addEventListener("click", showHomePage);
-  backBtn.addEventListener("click", showHomePage);
-
-  // Search functionality
-  searchInput.addEventListener("input", handleSearch);
-
   // Modal events
   closeModal.addEventListener("click", closeCounterModal);
   window.addEventListener("click", function (e) {
@@ -1143,13 +1451,6 @@ function setupEventListeners() {
 
   countBtn.addEventListener("click", incrementCounter);
   resetBtn.addEventListener("click", resetCounter);
-
-  // Reset all button
-  resetAllBtn.addEventListener("click", resetAllAdhkar);
-
-  // Theme toggle button
-  const themeToggle = document.getElementById("themeToggle");
-  themeToggle.addEventListener("click", toggleTheme);
 
   // Keyboard shortcuts
   document.addEventListener("keydown", function (e) {
@@ -1345,10 +1646,21 @@ function incrementZikrCount(category, index) {
     // Update the specific card progress without reloading the entire page
     updateCardProgress(category, index);
 
-    // Show completion message if completed
+    // Check if this individual zikr is completed and mark it
     if (zikr.currentCount === zikr.count) {
+      console.log(`Completing zikr: ${category}_${index}`);
+      markZekrCompleted(category, index);
+    }
+
+    // Check if all adhkar in the category are completed
+    const categoryData = adhkarData[category];
+    const allCompleted = categoryData.adhkar.every(
+      (adhkar) => adhkar.currentCount === adhkar.count
+    );
+
+    if (allCompleted) {
       setTimeout(() => {
-        showNotification("تم إكمال الذكر! بارك الله فيك");
+        showNotification("تم إكمال الاذكار! بارك الله فيك");
       }, 300);
     }
   }
@@ -1487,8 +1799,16 @@ function incrementCounter() {
     // Save progress
     saveProgress();
 
+    // Update statistics
+    updateProgressStats();
+
     // Check if completed
     if (currentCount === totalCount) {
+      // Mark as completed for daily progress
+      if (currentCategory && currentZikrIndex !== null) {
+        markZekrCompleted(currentCategory, currentZikrIndex);
+      }
+
       setTimeout(() => {
         showCompletionMessage();
       }, 300);
@@ -1707,3 +2027,252 @@ if ("serviceWorker" in navigator) {
       });
   });
 }
+
+// Hide suggestions when clicking outside
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".search-container")) {
+    const suggestions = document.querySelector(".search-suggestions");
+    if (suggestions) suggestions.style.display = "none";
+  }
+});
+
+// Enhanced initialization
+function initializeEnhancedFeatures() {
+  // Load user preferences without showing notification
+  if (userPreferences.fontSize) {
+    setFontSize(userPreferences.fontSize, false);
+  }
+
+  // Check daily progress
+  checkDailyProgress();
+
+  // Update stats
+  updateProgressStats();
+
+  // Remove search functionality since search is removed
+
+  // Add quick access button listeners
+  const scrollTopBtn = document.getElementById("scrollTopBtn");
+  const statsBtn = document.getElementById("statsBtn");
+  const resetAllBtn = document.getElementById("resetAllBtn");
+  const themeToggle = document.getElementById("themeToggle");
+  const homeBtn = document.getElementById("homeBtn");
+  const backBtn = document.getElementById("backBtn");
+
+  if (scrollTopBtn) scrollTopBtn.addEventListener("click", scrollToTop);
+  if (statsBtn) statsBtn.addEventListener("click", toggleStats);
+  if (resetAllBtn) resetAllBtn.addEventListener("click", resetAllAdhkar);
+  if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
+  if (homeBtn) homeBtn.addEventListener("click", showHomePage);
+  if (backBtn) backBtn.addEventListener("click", showHomePage);
+
+  // Initialize enhanced theme
+  initializeEnhancedTheme();
+
+  // Show install prompt on first visit
+  showInstallPrompt();
+}
+
+// Enhanced theme initialization
+function initializeEnhancedTheme() {
+  // Add transition class after theme is set
+  setTimeout(() => {
+    document.body.classList.add("theme-transition");
+  }, 100);
+}
+
+// Enhanced counter modal opening
+const originalOpenCounterModal = openCounterModal;
+function openCounterModal(category, index) {
+  // Call original function
+  originalOpenCounterModal(category, index);
+
+  // Add favorite button to modal
+  addFavoriteButtonToModal(category, index);
+}
+
+function addFavoriteButtonToModal(category, index) {
+  const modal = document.getElementById("counterModal");
+  if (!modal) return;
+
+  const zekrId = `${category}_${index}`;
+  const isFavorite = favorites.includes(zekrId);
+
+  // Remove existing favorite button if any
+  const existingBtn = modal.querySelector(".modal-favorite-btn");
+  if (existingBtn) existingBtn.remove();
+
+  // Add favorite button
+  const favoriteBtn = document.createElement("button");
+  favoriteBtn.className = `modal-favorite-btn ${isFavorite ? "active" : ""}`;
+  favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
+  favoriteBtn.style.cssText = `
+    position: absolute;
+    top: 20px;
+    right: 60px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 1001;
+    color: ${isFavorite ? "#e53e3e" : "#e2e8f0"};
+  `;
+
+  favoriteBtn.onclick = (e) => toggleFavorite(category, index, e);
+
+  modal.querySelector(".modal-content").appendChild(favoriteBtn);
+}
+
+// Enhanced count function with completion tracking
+const originalCount = count;
+function count() {
+  // Call original count function
+  originalCount();
+
+  // Check if zikr is completed and mark it
+  if (currentZikrIndex !== null && currentCategory) {
+    const zikr = adhkarData[currentCategory].adhkar[currentZikrIndex];
+    if (zikr && zikr.currentCount === zikr.count) {
+      markZekrCompleted(currentCategory, currentZikrIndex);
+    }
+  }
+}
+
+// Install Prompt Functions
+function showInstallPrompt() {
+  // Check if user has already seen the prompt
+  const hasSeenPrompt = localStorage.getItem("hasSeenInstallPrompt");
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+  const isInWebAppiOS = window.navigator.standalone == true;
+
+  // Don't show if already seen, already installed, or in app mode
+  if (hasSeenPrompt || isStandalone || isInWebAppiOS) {
+    return;
+  }
+
+  // Show after a short delay for better UX
+  setTimeout(() => {
+    const prompt = document.getElementById("installPrompt");
+    if (prompt) {
+      prompt.classList.add("show");
+    }
+  }, 3000);
+}
+
+function hideInstallPrompt(dontShowAgain = false) {
+  const prompt = document.getElementById("installPrompt");
+  if (prompt) {
+    prompt.classList.remove("show");
+  }
+
+  if (dontShowAgain) {
+    localStorage.setItem("hasSeenInstallPrompt", "true");
+  }
+}
+
+// Category favorite functions
+function toggleCategoryFavorite(categoryKey, event) {
+  if (event) event.stopPropagation();
+
+  const categoryFavorites =
+    JSON.parse(localStorage.getItem("categoryFavorites")) || [];
+  const index = categoryFavorites.indexOf(categoryKey);
+  const button = event ? event.target.closest(".category-favorite-btn") : null;
+
+  if (index > -1) {
+    categoryFavorites.splice(index, 1);
+    if (button) button.classList.remove("active");
+    showNotification("تم إزالة التصنيف من المفضلة");
+  } else {
+    categoryFavorites.push(categoryKey);
+    if (button) button.classList.add("active");
+    showNotification("تم إضافة التصنيف إلى المفضلة");
+  }
+
+  localStorage.setItem("categoryFavorites", JSON.stringify(categoryFavorites));
+}
+
+function isCategoryFavorite(categoryKey) {
+  const categoryFavorites =
+    JSON.parse(localStorage.getItem("categoryFavorites")) || [];
+  return categoryFavorites.includes(categoryKey);
+}
+
+// Enhanced displayCategories function to add favorite buttons
+const originalDisplayCategories = displayCategories;
+function displayCategories() {
+  originalDisplayCategories();
+
+  // Add favorite buttons to category cards after they're created
+  setTimeout(() => {
+    const categoryCards = document.querySelectorAll(".category-card");
+    categoryCards.forEach((card, index) => {
+      const categoryKey = Object.keys(adhkarData)[index];
+      if (categoryKey) {
+        addFavoriteButtonToCategory(card, categoryKey);
+      }
+    });
+  }, 100);
+}
+
+function addFavoriteButtonToCategory(card, categoryKey) {
+  // Remove existing button if any
+  const existingBtn = card.querySelector(".category-favorite-btn");
+  if (existingBtn) existingBtn.remove();
+
+  // Create favorite button
+  const favoriteBtn = document.createElement("button");
+  favoriteBtn.className = `category-favorite-btn ${
+    isCategoryFavorite(categoryKey) ? "active" : ""
+  }`;
+  favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
+  favoriteBtn.onclick = (e) => toggleCategoryFavorite(categoryKey, e);
+
+  // Add to card
+  card.style.position = "relative";
+  card.appendChild(favoriteBtn);
+}
+
+// Install Prompt Functions
+function showInstallPrompt() {
+  // Check if user has already seen the prompt
+  const hasSeenPrompt = localStorage.getItem("hasSeenInstallPrompt");
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+  const isInWebAppiOS = window.navigator.standalone == true;
+
+  // Don't show if already seen, already installed, or in app mode
+  if (hasSeenPrompt || isStandalone || isInWebAppiOS) {
+    return;
+  }
+
+  // Show after a short delay for better UX
+  setTimeout(() => {
+    const prompt = document.getElementById("installPrompt");
+    if (prompt) {
+      prompt.classList.add("show");
+    }
+  }, 3000);
+}
+
+function hideInstallPrompt(dontShowAgain = false) {
+  const prompt = document.getElementById("installPrompt");
+  if (prompt) {
+    prompt.classList.remove("show");
+  }
+
+  if (dontShowAgain) {
+    localStorage.setItem("hasSeenInstallPrompt", "true");
+  }
+}
+
+// Initialize enhanced features when DOM is loaded
+document.addEventListener("DOMContentLoaded", function () {
+  // Wait for the original initialization to complete
+  setTimeout(() => {
+    initializeEnhancedFeatures();
+    // Show install prompt on first visit
+    showInstallPrompt();
+  }, 500);
+});

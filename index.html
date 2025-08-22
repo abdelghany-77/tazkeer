@@ -3,7 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tazkeer</title>
+    <title>ذَكِّرْ</title>
+
+    <!-- SEO and Accessibility -->
+    <meta
+      name="description"
+      content="تطبيق الأذكار الإسلامية الشامل - أذكار الصباح والمساء والنوم والاستيقاظ من الكتاب والسنة النبوية مع الفوائد والأحكام"
+    />
+    <meta
+      name="keywords"
+      content="أذكار, إسلامية, صباح, مساء, نوم, استيقاظ, قرآن, سنة, دعاء, تسبيح"
+    />
+    <meta name="author" content="Islamic Adhkar App" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph for sharing -->
+    <meta property="og:title" content="الأذكار الإسلامية - Tazkeer" />
+    <meta
+      property="og:description"
+      content="تطبيق شامل للأذكار الإسلامية من الكتاب والسنة"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ar_SA" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
@@ -59,9 +80,32 @@
       <div class="container">
         <!-- Home Page -->
         <div id="homePage">
+          <!-- Progress Stats Section -->
+          <div class="progress-stats" id="progressStats">
+            <h3>إحصائيات تقدمك</h3>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-number" id="dailyStreak">0</div>
+                <div>أيام متتالية</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="totalCompletions">0</div>
+                <div>إجمالي المكتمل</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="todayCompletions">0</div>
+                <div>اليوم</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number" id="weekCompletions">0</div>
+                <div>هذا الأسبوع</div>
+              </div>
+            </div>
+          </div>
+
           <!-- Welcome Section -->
           <div class="welcome-section">
-            <h2 class="welcome-title">أهلاً وسهلاً بك في تطبيق الأذكار</h2>
+            <h2 class="welcome-title">أهلاً وسهلاً بك في تطبيق ذَكِّرْ</h2>
             <p class="welcome-description">
               اختر نوع الأذكار التي تريد قراءتها
             </p>
@@ -75,16 +119,20 @@
 
         <!-- Category Details Page -->
         <div id="categoryPage" class="hidden">
-          <!-- Search Bar -->
-          <div class="search-container">
-            <div class="search-box">
-              <i class="fas fa-search"></i>
-              <input
-                type="text"
-                id="searchInput"
-                placeholder="ابحث في الأذكار..."
-              />
-            </div>
+          <!-- Font Size Controls -->
+          <div class="font-controls">
+            <button class="font-btn" onclick="setFontSize('small', true)">
+              <i class="fas fa-font" style="font-size: 0.8rem"></i> صغير
+            </button>
+            <button
+              class="font-btn active"
+              onclick="setFontSize('medium', true)"
+            >
+              <i class="fas fa-font"></i> متوسط
+            </button>
+            <button class="font-btn" onclick="setFontSize('large', true)">
+              <i class="fas fa-font" style="font-size: 1.2rem"></i> كبير
+            </button>
           </div>
 
           <!-- Category Title -->
@@ -145,6 +193,110 @@
           <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Access Toolbar -->
+    <div class="quick-access">
+      <button class="quick-btn" id="scrollTopBtn" title="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+      </button>
+      <button class="quick-btn" id="statsBtn" title="الإحصائيات">
+        <i class="fas fa-chart-bar"></i>
+      </button>
+    </div>
+
+    <!-- Floating Notification -->
+    <div class="notification" id="notification">
+      <i class="fas fa-check-circle"></i>
+      <span id="notificationText">تم النسخ بنجاح!</span>
+    </div>
+
+    <!-- Install Prompt Modal -->
+    <div class="install-prompt" id="installPrompt">
+      <div class="install-content">
+        <div class="install-icon">📱</div>
+        <h3>إضافة التطبيق إلى الشاشة الرئيسية</h3>
+        <p>
+          للوصول السريع إلى الأذكار، يمكنك إضافة هذا التطبيق إلى الشاشة الرئيسية
+          لهاتفك
+        </p>
+
+        <div class="install-steps">
+          <div class="install-step">
+            <div class="step-icon">🔽</div>
+            <p>اضغط على أيقونة المشاركة في متصفحك</p>
+          </div>
+          <div class="install-step">
+            <div class="step-icon">➕</div>
+            <p>اختر "إضافة إلى الشاشة الرئيسية"</p>
+          </div>
+          <div class="install-step">
+            <div class="step-icon">✅</div>
+            <p>استمتع بسهولة الوصول للأذكار</p>
+          </div>
+        </div>
+
+        <div class="install-buttons">
+          <button class="install-btn primary" onclick="hideInstallPrompt(true)">
+            فهمت، شكراً
+          </button>
+          <button
+            class="install-btn secondary"
+            onclick="hideInstallPrompt(false)"
+          >
+            تذكيرني لاحقاً
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Install Prompt Modal -->
+    <div class="install-prompt" id="installPrompt">
+      <div class="install-content">
+        <div class="install-icon">📱</div>
+        <h3>اجعل الأذكار في متناول يدك</h3>
+        <p>
+          أضف تطبيق الأذكار إلى الشاشة الرئيسية لهاتفك للوصول السريع والسهل إلى
+          أذكارك اليومية في أي وقت
+        </p>
+
+        <div class="install-steps">
+          <div class="install-step">
+            <div class="step-icon">📲</div>
+            <p>
+              اضغط على زر المشاركة <i class="fas fa-share-alt"></i> في المتصفح
+            </p>
+          </div>
+          <div class="install-step">
+            <div class="step-icon">🏠</div>
+            <p>اختر "إضافة إلى الشاشة الرئيسية" أو "Add to Home Screen"</p>
+          </div>
+          <div class="install-step">
+            <div class="step-icon">🤲</div>
+            <p>استمتع بسهولة الوصول لأذكارك اليومية</p>
+          </div>
+        </div>
+
+        <div class="install-benefits">
+          <div class="benefit">⚡ وصول فوري</div>
+          <div class="benefit">🔔 تذكير يومي</div>
+          <div class="benefit">📱 تجربة تطبيق كامل</div>
+        </div>
+
+        <div class="install-buttons">
+          <button class="install-btn primary" onclick="hideInstallPrompt(true)">
+            <i class="fas fa-check"></i>
+            فهمت، شكراً
+          </button>
+          <button
+            class="install-btn secondary"
+            onclick="hideInstallPrompt(false)"
+          >
+            <i class="fas fa-clock"></i>
+            تذكيرني لاحقاً
+          </button>
         </div>
       </div>
     </div>
