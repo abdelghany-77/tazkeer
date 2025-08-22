@@ -1,5 +1,7 @@
 {
-  "extends": ["development"],
+  "extends": [
+    "development"
+  ],
   "hints": {
     "axe/name-role-value": [
       "default",
@@ -10,14 +12,19 @@
     "compat-api/css": [
       "default",
       {
-        "ignore": ["backdrop-filter"]
+        "ignore": [
+          "backdrop-filter"
+        ]
       }
     ],
     "compat-api/html": [
       "default",
       {
-        "ignore": ["meta[name=theme-color]"]
+        "ignore": [
+          "meta[name=theme-color]"
+        ]
       }
-    ]
+    ],
+    "no-inline-styles": "off"
   }
 }
