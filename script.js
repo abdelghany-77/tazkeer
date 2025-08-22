@@ -1297,11 +1297,40 @@ window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   // Save the event so it can be triggered later
   deferredPrompt = e;
+  // Show the install button
+  const installBtn = document.getElementById("installBtn");
+  if (installBtn) {
+    installBtn.style.display = "block";
+  }
+});
+
+// Listen for the app being installed
+window.addEventListener("appinstalled", () => {
+  // Hide the install button after installation
+  const installBtn = document.getElementById("installBtn");
+  if (installBtn) {
+    installBtn.style.display = "none";
+  }
+  // Clear the deferredPrompt
+  deferredPrompt = null;
+  console.log("PWA was installed successfully");
 });
 
 function showInstallPrompt() {
   // Check if this is the first visit
   const isFirstVisit = !localStorage.getItem("adhkar-visited");
+
+  // Hide install button if app is already installed (running in standalone mode)
+  const installBtn = document.getElementById("installBtn");
+  if (
+    window.matchMedia &&
+    window.matchMedia("(display-mode: standalone)").matches
+  ) {
+    if (installBtn) {
+      installBtn.style.display = "none";
+    }
+    return; // Don't show install prompt if already installed
+  }
 
   if (isFirstVisit && !installPromptShown) {
     // Mark as visited
@@ -1372,6 +1401,11 @@ function installApp() {
     deferredPrompt.userChoice.then((choiceResult) => {
       if (choiceResult.outcome === "accepted") {
         console.log("User accepted the install prompt");
+        // Hide the install button after successful installation
+        const installBtn = document.getElementById("installBtn");
+        if (installBtn) {
+          installBtn.style.display = "none";
+        }
       }
       deferredPrompt = null;
     });
@@ -2058,6 +2092,7 @@ function initializeEnhancedFeatures() {
   const themeToggle = document.getElementById("themeToggle");
   const homeBtn = document.getElementById("homeBtn");
   const backBtn = document.getElementById("backBtn");
+  const installBtn = document.getElementById("installBtn");
 
   if (scrollTopBtn) scrollTopBtn.addEventListener("click", scrollToTop);
   if (statsBtn) statsBtn.addEventListener("click", toggleStats);
@@ -2065,6 +2100,7 @@ function initializeEnhancedFeatures() {
   if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
   if (homeBtn) homeBtn.addEventListener("click", showHomePage);
   if (backBtn) backBtn.addEventListener("click", showHomePage);
+  if (installBtn) installBtn.addEventListener("click", showInstallModal);
 
   // Initialize enhanced theme
   initializeEnhancedTheme();

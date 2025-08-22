@@ -81,6 +81,20 @@ body {
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
+/* Install Button Specific Styles */
+.nav-btn.install-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.nav-btn.install-btn:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
 /* Main Content */
 .main {
   padding: 2rem 0;
@@ -887,6 +901,17 @@ body.dark-mode .nav-btn:hover {
   background: #667eea;
   color: white;
   border-color: #667eea;
+}
+
+/* Dark Mode Install Button */
+body.dark-mode .nav-btn.install-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+}
+
+body.dark-mode .nav-btn.install-btn:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
 
 body.dark-mode .nav-btn.active {
