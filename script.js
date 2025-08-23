@@ -1297,19 +1297,16 @@ window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   // Save the event so it can be triggered later
   deferredPrompt = e;
-  // Show the install button
-  const installBtn = document.getElementById("installBtn");
-  if (installBtn) {
-    installBtn.style.display = "block";
-  }
+  // Install button is already visible, so no need to show it
 });
 
 // Listen for the app being installed
 window.addEventListener("appinstalled", () => {
-  // Hide the install button after installation
+  // Keep the install button visible but maybe change its text
   const installBtn = document.getElementById("installBtn");
   if (installBtn) {
-    installBtn.style.display = "none";
+    installBtn.innerHTML = '<i class="fas fa-check"></i> تم التثبيت';
+    installBtn.style.opacity = "0.7";
   }
   // Clear the deferredPrompt
   deferredPrompt = null;
@@ -1320,16 +1317,18 @@ function showInstallPrompt() {
   // Check if this is the first visit
   const isFirstVisit = !localStorage.getItem("adhkar-visited");
 
-  // Hide install button if app is already installed (running in standalone mode)
+  // Keep install button visible for easy access
   const installBtn = document.getElementById("installBtn");
+  if (installBtn) {
+    installBtn.style.display = "block";
+  }
+
+  // Don't show automatic install prompt if already installed
   if (
     window.matchMedia &&
     window.matchMedia("(display-mode: standalone)").matches
   ) {
-    if (installBtn) {
-      installBtn.style.display = "none";
-    }
-    return; // Don't show install prompt if already installed
+    return; // Don't show install prompt if already installed, but keep button visible
   }
 
   if (isFirstVisit && !installPromptShown) {
@@ -1401,10 +1400,11 @@ function installApp() {
     deferredPrompt.userChoice.then((choiceResult) => {
       if (choiceResult.outcome === "accepted") {
         console.log("User accepted the install prompt");
-        // Hide the install button after successful installation
+        // Update the install button after successful installation
         const installBtn = document.getElementById("installBtn");
         if (installBtn) {
-          installBtn.style.display = "none";
+          installBtn.innerHTML = '<i class="fas fa-check"></i> تم التثبيت';
+          installBtn.style.opacity = "0.7";
         }
       }
       deferredPrompt = null;
