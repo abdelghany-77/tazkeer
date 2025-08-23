@@ -1722,57 +1722,268 @@ body.dark-mode .font-btn.active {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(15px);
   display: none;
   justify-content: center;
   align-items: center;
   z-index: 5000;
   padding: 20px;
+  animation: modalFadeIn 0.3s ease;
 }
 
 .install-prompt.show {
   display: flex;
 }
 
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .install-content {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 2.5rem;
+  padding: 0;
   border-radius: 25px;
   text-align: center;
-  max-width: 450px;
+  max-width: 500px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
   position: relative;
+  animation: modalSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalSlideUp {
+  from {
+    transform: translateY(100px) scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Close Button */
+.install-close-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+.install-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* Header Section */
+.install-header {
+  padding: 2.5rem 2rem 1rem;
+  text-align: center;
 }
 
 .install-icon {
   font-size: 4rem;
-  margin-bottom: 1.5rem;
-  animation: bounce 2s infinite;
+  margin-bottom: 1rem;
+  animation: bounceGlow 2s infinite;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
 }
 
-.install-content h3 {
-  font-size: 1.4rem;
+@keyframes bounceGlow {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+  }
+  40% {
+    transform: translateY(-10px) scale(1.05);
+    filter: drop-shadow(0 5px 25px rgba(255, 255, 255, 0.5));
+  }
+  60% {
+    transform: translateY(-5px) scale(1.02);
+    filter: drop-shadow(0 3px 22px rgba(255, 255, 255, 0.4));
+  }
+}
+
+.install-header h3 {
+  font-size: 1.6rem;
   margin-bottom: 1rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.install-subtitle {
+  opacity: 0.9;
+  line-height: 1.7;
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+/* Benefits Section */
+.install-benefits {
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  margin: 0;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: right;
+  direction: rtl;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideInUp 0.6s ease forwards;
+}
+
+.benefit-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.benefit-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.benefit-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes slideInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.benefit-item:last-child {
+  margin-bottom: 0;
+}
+
+.benefit-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+}
+
+.benefit-item h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.3rem 0;
+  color: #fff;
+}
+
+.benefit-item p {
+  font-size: 0.9rem;
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+/* Steps Container */
+.install-steps-container {
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.steps-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: white;
+  text-align: center;
+}
+
+/* Device Tabs */
+.device-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.device-tab {
+  padding: 0.7rem 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Cairo", serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.device-tab:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+}
+
+.device-tab.active {
+  background: rgba(255, 255, 255, 0.9);
+  color: #667eea;
+  border-color: white;
   font-weight: 600;
 }
 
-.install-content p {
-  opacity: 0.9;
-  line-height: 1.6;
-  margin-bottom: 2rem;
-  font-size: 0.95rem;
+.device-tab i {
+  font-size: 1rem;
 }
 
+/* Install Steps */
 .install-steps {
+  display: none;
+  gap: 1rem;
+  text-align: right;
+  direction: rtl;
+}
+
+.install-steps.active {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-  margin-bottom: 2.5rem;
-  text-align: right;
 }
 
 .install-step {
@@ -1783,6 +1994,35 @@ body.dark-mode .font-btn.active {
   padding: 1rem;
   border-radius: 15px;
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.install-step:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-5px);
+}
+
+.step-number {
+  background: rgba(255, 255, 255, 0.9);
+  color: #667eea;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
+}
+
+.step-content {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 1;
 }
 
 .step-icon {
@@ -1790,13 +2030,21 @@ body.dark-mode .font-btn.active {
   flex-shrink: 0;
 }
 
-.install-step p {
+.step-content p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   text-align: right;
+  line-height: 1.5;
 }
 
+.step-content i {
+  color: #ffd700;
+  margin: 0 5px;
+}
+
+/* Install Buttons */
 .install-buttons {
+  padding: 2rem;
   display: flex;
   gap: 1rem;
   justify-content: center;
@@ -1804,26 +2052,36 @@ body.dark-mode .font-btn.active {
 }
 
 .install-btn {
-  padding: 12px 24px;
+  padding: 15px 30px;
   border: 2px solid white;
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: "Cairo", serif;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 1rem;
   backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 150px;
+  justify-content: center;
+}
+
+.install-btn i {
+  font-size: 1.1rem;
 }
 
 .install-btn.primary {
   background: white;
   color: #667eea;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
 }
 
 .install-btn.primary:hover {
-  background: rgba(255, 255, 255, 0.9);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
 }
 
 .install-btn.secondary {
@@ -1833,7 +2091,216 @@ body.dark-mode .font-btn.active {
 
 .install-btn.secondary:hover {
   background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+}
+
+/* Dark Mode Support */
+body.dark-mode .install-content {
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  border: 1px solid #4a5568;
+}
+
+body.dark-mode .install-close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+
+body.dark-mode .install-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .install-benefits {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .benefit-icon {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .install-steps-container {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .device-tab {
+  border-color: #4a5568;
+  background: rgba(255, 255, 255, 0.05);
+  color: #a0aec0;
+}
+
+body.dark-mode .device-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #718096;
+  color: #e2e8f0;
+}
+
+body.dark-mode .device-tab.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+body.dark-mode .install-step {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .install-step:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .step-number {
+  background: #667eea;
+  color: white;
+}
+
+body.dark-mode .install-btn.primary {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+body.dark-mode .install-btn.primary:hover {
+  background: #5a67d8;
+}
+
+body.dark-mode .install-btn.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  border-color: #4a5568;
+}
+
+body.dark-mode .install-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #718096;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .install-content {
+    max-width: 95%;
+    margin: 0 10px;
+    max-height: 95vh;
+  }
+
+  .install-header {
+    padding: 2rem 1.5rem 1rem;
+  }
+
+  .install-header h3 {
+    font-size: 1.4rem;
+  }
+
+  .install-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .install-benefits,
+  .install-steps-container,
+  .install-buttons {
+    padding: 1.5rem;
+  }
+
+  .benefit-item {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .benefit-icon {
+    margin-bottom: 0.5rem;
+  }
+
+  .device-tabs {
+    gap: 0.3rem;
+  }
+
+  .device-tab {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.75rem;
+    min-width: 90px;
+  }
+
+  .install-step {
+    padding: 0.8rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.8rem;
+  }
+
+  .step-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .install-buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .install-btn {
+    width: 100%;
+    padding: 12px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .install-content {
+    border-radius: 15px;
+  }
+
+  .install-header {
+    padding: 1.5rem 1rem 0.5rem;
+  }
+
+  .install-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .install-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .install-benefits,
+  .install-steps-container,
+  .install-buttons {
+    padding: 1rem;
+  }
+
+  .benefit-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+
+  .device-tab {
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.5rem;
+    min-width: 80px;
+  }
+
+  .device-tab i {
+    font-size: 0.9rem;
+  }
+
+  .install-step {
+    padding: 0.6rem;
+  }
+
+  .step-number {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .step-icon {
+    font-size: 1.2rem;
+  }
+
+  .step-content p {
+    font-size: 0.85rem;
+  }
 }
 
 /* Category Favorite Button */
@@ -1872,35 +2339,4 @@ body.dark-mode .font-btn.active {
 .category-favorite-btn.active:hover {
   background: #e53e3e;
   color: white;
-}
-
-/* Install Prompt Responsive */
-@media (max-width: 480px) {
-  .install-content {
-    padding: 2rem 1.5rem;
-    margin: 0 10px;
-  }
-
-  .install-content h3 {
-    font-size: 1.2rem;
-  }
-
-  .install-steps {
-    gap: 1rem;
-  }
-
-  .install-step {
-    padding: 0.8rem;
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .install-buttons {
-    flex-direction: column;
-    gap: 0.8rem;
-  }
-
-  .install-btn {
-    width: 100%;
-  }
 }

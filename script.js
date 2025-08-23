@@ -2303,11 +2303,110 @@ function hideInstallPrompt(dontShowAgain = false) {
   }
 }
 
+// Function to show different device steps
+function showDeviceSteps(device) {
+  // Remove active class from all tabs
+  const tabs = document.querySelectorAll(".device-tab");
+  tabs.forEach((tab) => {
+    tab.classList.remove("active");
+  });
+
+  // Hide all step sections
+  const stepSections = document.querySelectorAll(".install-steps");
+  stepSections.forEach((section) => {
+    section.classList.remove("active");
+  });
+
+  // Show selected tab and steps
+  const selectedTab = document.querySelector(`[data-device="${device}"]`);
+  const selectedSteps = document.getElementById(`${device}Steps`);
+
+  if (selectedTab) {
+    selectedTab.classList.add("active");
+  }
+
+  if (selectedSteps) {
+    selectedSteps.classList.add("active");
+  }
+}
+
+// Function to detect device and show appropriate steps
+function detectAndShowDeviceSteps() {
+  let deviceType = "desktop"; // default
+
+  // Detect iOS
+  if (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  ) {
+    deviceType = "ios";
+  }
+  // Detect Android
+  else if (/Android/.test(navigator.userAgent)) {
+    deviceType = "android";
+  }
+  // Desktop includes all other devices
+  else {
+    deviceType = "desktop";
+  }
+
+  showDeviceSteps(deviceType);
+}
+
+// Initialize device detection when install prompt is shown
+function initializeInstallPrompt() {
+  // Set up device detection when modal is shown
+  const installPrompt = document.getElementById("installPrompt");
+  if (installPrompt) {
+    // Create observer to detect when modal is shown
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === "class"
+        ) {
+          if (installPrompt.classList.contains("show")) {
+            detectAndShowDeviceSteps();
+          }
+        }
+      });
+    });
+
+    observer.observe(installPrompt, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    // Close modal when clicking on backdrop
+    installPrompt.addEventListener("click", (e) => {
+      if (e.target === installPrompt) {
+        hideInstallPrompt(false);
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && installPrompt.classList.contains("show")) {
+        hideInstallPrompt(false);
+      }
+    });
+
+    // Development helper: press Ctrl+Shift+I to reset install prompt
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === "I") {
+        localStorage.removeItem("hasSeenInstallPrompt");
+        console.log("Install prompt reset - refresh page to see it again");
+      }
+    });
+  }
+}
+
 // Initialize enhanced features when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
   // Wait for the original initialization to complete
   setTimeout(() => {
     initializeEnhancedFeatures();
+    initializeInstallPrompt();
     // Show install prompt on first visit
     showInstallPrompt();
   }, 500);

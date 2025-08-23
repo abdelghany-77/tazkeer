@@ -59,10 +59,10 @@
             ذَكِّرْ
           </h1>
           <nav class="nav" id="nav">
-            <button class="nav-btn install-btn" id="installBtn">
+            <!-- <button class="nav-btn install-btn" id="installBtn">
               <i class="fas fa-download"></i>
               تثبيت التطبيق
-            </button>
+            </button> -->
             <button class="nav-btn theme-toggle-btn" id="themeToggle">
               <i class="fas fa-sun"></i>
               الوضع النهاري
@@ -221,34 +221,152 @@
     <!-- Install Prompt Modal -->
     <div class="install-prompt" id="installPrompt">
       <div class="install-content">
-        <div class="install-icon">📱</div>
-        <h3>اجعل الأذكار في متناول يدك</h3>
-        <p>
-          أضف تطبيق الأذكار إلى الشاشة الرئيسية لهاتفك للوصول السريع والسهل إلى
-          أذكارك اليومية في أي وقت
-        </p>
+        <!-- Close button -->
+        <button
+          class="install-close-btn"
+          onclick="hideInstallPrompt(false)"
+          aria-label="إغلاق"
+        >
+          <i class="fas fa-times"></i>
+        </button>
 
-        <div class="install-steps">
-          <div class="install-step">
-            <div class="step-icon">📲</div>
-            <p>
-              اضغط على زر المشاركة <i class="fas fa-share-alt"></i> في المتصفح
-            </p>
-          </div>
-          <div class="install-step">
-            <div class="step-icon">🏠</div>
-            <p>اختر "إضافة إلى الشاشة الرئيسية" أو "Add to Home Screen"</p>
-          </div>
-          <div class="install-step">
-            <div class="step-icon">🤲</div>
-            <p>استمتع بسهولة الوصول لأذكارك اليومية</p>
-          </div>
+        <div class="install-header">
+          <div class="install-icon">📱</div>
+          <h3>اجعل الأذكار في متناول يدك</h3>
+          <p class="install-subtitle">
+            أضف تطبيق الأذكار إلى الشاشة الرئيسية لهاتفك للوصول السريع والسهل
+            إلى أذكارك اليومية في أي وقت
+          </p>
         </div>
 
         <div class="install-benefits">
-          <div class="benefit">⚡ وصول فوري</div>
-          <div class="benefit">🔔 تذكير يومي</div>
-          <div class="benefit">📱 تجربة تطبيق كامل</div>
+          <div class="benefit-item">
+            <div class="benefit-icon">⚡</div>
+            <div>
+              <h4>وصول فوري</h4>
+              <p>افتح التطبيق بنقرة واحدة من الشاشة الرئيسية</p>
+            </div>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-icon">🔔</div>
+            <div>
+              <h4>تذكير يومي</h4>
+              <p>لا تفوت أذكارك مع التنبيهات التلقائية</p>
+            </div>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-icon">📱</div>
+            <div>
+              <h4>تجربة تطبيق كامل</h4>
+              <p>يعمل بدون إنترنت ومع إمكانيات متقدمة</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="install-steps-container">
+          <h4 class="steps-title">كيفية الإضافة للشاشة الرئيسية:</h4>
+
+          <!-- Steps for different devices -->
+          <div class="device-tabs">
+            <button
+              class="device-tab active"
+              data-device="ios"
+              onclick="showDeviceSteps('ios')"
+            >
+              <i class="fab fa-apple"></i> iPhone/iPad
+            </button>
+            <button
+              class="device-tab"
+              data-device="android"
+              onclick="showDeviceSteps('android')"
+            >
+              <i class="fab fa-android"></i> Android
+            </button>
+            <button
+              class="device-tab"
+              data-device="desktop"
+              onclick="showDeviceSteps('desktop')"
+            >
+              <i class="fas fa-desktop"></i> الكمبيوتر
+            </button>
+          </div>
+
+          <!-- iOS Steps -->
+          <div class="install-steps ios-steps active" id="iosSteps">
+            <div class="install-step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <div class="step-icon">📲</div>
+                <p>
+                  اضغط على زر المشاركة <i class="fas fa-share"></i> في Safari
+                </p>
+              </div>
+            </div>
+            <div class="install-step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <div class="step-icon">🏠</div>
+                <p>اختر "إضافة إلى الشاشة الرئيسية" أو "Add to Home Screen"</p>
+              </div>
+            </div>
+            <div class="install-step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <div class="step-icon">✅</div>
+                <p>اضغط "إضافة" لتأكيد التثبيت</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Android Steps -->
+          <div class="install-steps android-steps" id="androidSteps">
+            <div class="install-step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <div class="step-icon">⋮</div>
+                <p>اضغط على قائمة المتصفح (ثلاث نقاط) في Chrome</p>
+              </div>
+            </div>
+            <div class="install-step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <div class="step-icon">🏠</div>
+                <p>اختر "إضافة إلى الشاشة الرئيسية" أو "Add to Home Screen"</p>
+              </div>
+            </div>
+            <div class="install-step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <div class="step-icon">✅</div>
+                <p>اضغط "إضافة" لتأكيد التثبيت</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop Steps -->
+          <div class="install-steps desktop-steps" id="desktopSteps">
+            <div class="install-step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <div class="step-icon">🔗</div>
+                <p>ابحث عن أيقونة التثبيت في شريط العناوين</p>
+              </div>
+            </div>
+            <div class="install-step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <div class="step-icon">�</div>
+                <p>اضغط عليها واختر "تثبيت" أو "Install"</p>
+              </div>
+            </div>
+            <div class="install-step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <div class="step-icon">�</div>
+                <p>يمكنك الآن الوصول للتطبيق من سطح المكتب</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="install-buttons">
