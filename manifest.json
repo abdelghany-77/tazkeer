@@ -2,7 +2,7 @@
   "name": "ذَكِّرْ",
   "short_name": "ذَكِّرْ",
   "description": "تطبيق الأذكار الإسلامية من الكتاب والسنة",
-  "start_url": "./",
+  "start_url": "/tazkeer/",
   "display": "standalone",
   "background_color": "#2d3748",
   "theme_color": "#2d3748",
