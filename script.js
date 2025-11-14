@@ -2401,12 +2401,561 @@ function initializeInstallPrompt() {
   }
 }
 
+// Enhanced UX Features
+let isOnline = navigator.onLine;
+let keyboardShortcutsVisible = false;
+
+// Initialize enhanced UX features
+function initializeEnhancedUX() {
+  setupOfflineDetection();
+  setupKeyboardShortcuts();
+  setupTouchFeedback();
+  setupSmoothAnimations();
+  setupAccessibilityFeatures();
+  setupPerformanceOptimizations();
+}
+
+// Offline Detection
+function setupOfflineDetection() {
+  const offlineIndicator = document.createElement("div");
+  offlineIndicator.className = "offline-indicator";
+  offlineIndicator.innerHTML =
+    '<i class="fas fa-wifi-slash"></i> أنت غير متصل بالإنترنت';
+  offlineIndicator.style.display = "none";
+  document.body.appendChild(offlineIndicator);
+
+  window.addEventListener("online", () => {
+    isOnline = true;
+    offlineIndicator.style.display = "none";
+    showEnhancedNotification("تم استعادة الاتصال بالإنترنت", "success");
+  });
+
+  window.addEventListener("offline", () => {
+    isOnline = false;
+    offlineIndicator.style.display = "block";
+    showEnhancedNotification("فقد الاتصال بالإنترنت", "warning");
+  });
+}
+
+// Keyboard Shortcuts
+function setupKeyboardShortcuts() {
+  const shortcutsDiv = document.createElement("div");
+  shortcutsDiv.className = "keyboard-shortcuts";
+  shortcutsDiv.innerHTML = `
+    <h4>اختصارات لوحة المفاتيح</h4>
+    <div class="shortcut"><span>الرئيسية</span><span class="key">H</span></div>
+    <div class="shortcut"><span>البحث</span><span class="key">/</span></div>
+    <div class="shortcut"><span>الوضع المظلم</span><span class="key">D</span></div>
+    <div class="shortcut"><span>تكبير الخط</span><span class="key">+</span></div>
+    <div class="shortcut"><span>تصغير الخط</span><span class="key">-</span></div>
+    <div class="shortcut"><span>الأعلى</span><span class="key">↑</span></div>
+    <div class="shortcut"><span>الأسفل</span><span class="key">↓</span></div>
+  `;
+  shortcutsDiv.style.display = "none";
+  document.body.appendChild(shortcutsDiv);
+
+  document.addEventListener("keydown", (e) => {
+    // Toggle shortcuts visibility with ?
+    if (e.key === "?") {
+      keyboardShortcutsVisible = !keyboardShortcutsVisible;
+      shortcutsDiv.style.display = keyboardShortcutsVisible ? "block" : "none";
+      return;
+    }
+
+    // Hide shortcuts on any other key
+    if (keyboardShortcutsVisible && e.key !== "?") {
+      keyboardShortcutsVisible = false;
+      shortcutsDiv.style.display = "none";
+    }
+
+    // Navigation shortcuts
+    if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+      switch (e.key.toLowerCase()) {
+        case "h":
+          e.preventDefault();
+          showHomePage();
+          break;
+        case "/":
+          e.preventDefault();
+          const searchInput = document.getElementById("searchInput");
+          if (searchInput) {
+            searchInput.focus();
+            searchInput.select();
+          }
+          break;
+        case "d":
+          e.preventDefault();
+          toggleTheme();
+          break;
+        case "+":
+        case "=":
+          e.preventDefault();
+          changeFontSize("increase");
+          break;
+        case "-":
+          e.preventDefault();
+          changeFontSize("decrease");
+          break;
+        case "arrowup":
+          e.preventDefault();
+          scrollToTop();
+          break;
+        case "arrowdown":
+          e.preventDefault();
+          scrollToBottom();
+          break;
+      }
+    }
+  });
+}
+
+// Touch Feedback
+function setupTouchFeedback() {
+  // Add haptic feedback for mobile devices
+  const addHapticFeedback = (element, type = "light") => {
+    element.addEventListener("touchstart", () => {
+      if (navigator.vibrate) {
+        navigator.vibrate(type === "heavy" ? 50 : 20);
+      }
+    });
+  };
+
+  // Add haptic feedback to interactive elements
+  document
+    .querySelectorAll(".count-btn, .action-btn, .nav-btn")
+    .forEach((btn) => {
+      addHapticFeedback(btn, "light");
+    });
+
+  document.querySelectorAll(".category-card, .adhkar-card").forEach((card) => {
+    addHapticFeedback(card, "light");
+  });
+}
+
+// Smooth Animations
+function setupSmoothAnimations() {
+  // Intersection Observer for scroll animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: "0px 0px -50px 0px",
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.style.animationDelay = "0s";
+        entry.target.style.animationPlayState = "running";
+      }
+    });
+  }, observerOptions);
+
+  // Add animation classes to elements
+  document
+    .querySelectorAll(".category-card, .adhkar-card, .stat-item")
+    .forEach((el, index) => {
+      el.style.animation = "slideInUp 0.6s ease forwards";
+      el.style.animationDelay = `${index * 0.1}s`;
+      el.style.animationPlayState = "paused";
+      observer.observe(el);
+    });
+}
+
+// Accessibility Features
+function setupAccessibilityFeatures() {
+  // Add ARIA labels and roles
+  document.querySelectorAll(".count-btn").forEach((btn) => {
+    btn.setAttribute("aria-label", "زيادة العداد");
+  });
+
+  document.querySelectorAll(".reset-btn").forEach((btn) => {
+    btn.setAttribute("aria-label", "إعادة تعيين العداد");
+  });
+
+  // Add skip links for screen readers
+  const skipLink = document.createElement("a");
+  skipLink.href = "#main";
+  skipLink.className = "skip-link";
+  skipLink.textContent = "تخطي إلى المحتوى الرئيسي";
+  document.body.insertBefore(skipLink, document.body.firstChild);
+
+  // Add skip link styles
+  const style = document.createElement("style");
+  style.textContent = `
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 6px;
+      background: #667eea;
+      color: white;
+      padding: 8px;
+      text-decoration: none;
+      border-radius: 4px;
+      z-index: 1000;
+      transition: top 0.3s;
+    }
+    .skip-link:focus {
+      top: 6px;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// Performance Optimizations
+function setupPerformanceOptimizations() {
+  // Debounce search input
+  const searchInput = document.getElementById("searchInput");
+  if (searchInput) {
+    let searchTimeout;
+    const originalOnInput = searchInput.oninput;
+    searchInput.oninput = (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        if (originalOnInput) originalOnInput.call(searchInput, e);
+      }, 300);
+    };
+  }
+
+  // Lazy load images if any
+  const images = document.querySelectorAll("img[data-src]");
+  if (images.length > 0) {
+    const imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.classList.remove("lazy");
+          imageObserver.unobserve(img);
+        }
+      });
+    });
+
+    images.forEach((img) => imageObserver.observe(img));
+  }
+}
+
+// Enhanced Notification System
+function showEnhancedNotification(message, type = "success", duration = 3000) {
+  // Remove existing notifications
+  document
+    .querySelectorAll(".enhanced-notification")
+    .forEach((n) => n.remove());
+
+  const notification = document.createElement("div");
+  notification.className = `enhanced-notification ${type}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      <i class="fas ${getNotificationIcon(type)}"></i>
+      <span>${message}</span>
+    </div>
+    <button class="notification-close" onclick="this.parentElement.remove()">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
+
+  // Add notification styles
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${getNotificationColor(type)};
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 10000;
+    max-width: 400px;
+    animation: slideInRight 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  `;
+
+  document.body.appendChild(notification);
+
+  // Auto remove after duration
+  if (duration > 0) {
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.style.animation = "slideOutRight 0.3s ease";
+        setTimeout(() => notification.remove(), 300);
+      }
+    }, duration);
+  }
+
+  // Add slideOutRight animation if not exists
+  if (!document.querySelector("#notification-styles")) {
+    const style = document.createElement("style");
+    style.id = "notification-styles";
+    style.textContent = `
+      @keyframes slideOutRight {
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+      .enhanced-notification .notification-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .enhanced-notification .notification-close {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 5px;
+        opacity: 0.7;
+        transition: opacity 0.3s;
+      }
+      .enhanced-notification .notification-close:hover {
+        opacity: 1;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+function getNotificationIcon(type) {
+  const icons = {
+    success: "fa-check-circle",
+    error: "fa-exclamation-circle",
+    warning: "fa-exclamation-triangle",
+    info: "fa-info-circle",
+  };
+  return icons[type] || icons.info;
+}
+
+function getNotificationColor(type) {
+  const colors = {
+    success: "#38a169",
+    error: "#e53e3e",
+    warning: "#d69e2e",
+    info: "#667eea",
+  };
+  return colors[type] || colors.info;
+}
+
+// Enhanced Loading States
+function showLoadingState(element, text = "جاري التحميل...") {
+  if (typeof element === "string") {
+    element = document.querySelector(element);
+  }
+
+  if (!element) return;
+
+  element.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 20px;">
+      <div class="loading-spinner"></div>
+      <span>${text}</span>
+    </div>
+  `;
+  element.style.opacity = "0.7";
+}
+
+function hideLoadingState(element) {
+  if (typeof element === "string") {
+    element = document.querySelector(element);
+  }
+
+  if (!element) return;
+
+  element.style.opacity = "1";
+}
+
+// Skeleton Loading
+function showSkeletonLoading(container, count = 3) {
+  if (typeof container === "string") {
+    container = document.querySelector(container);
+  }
+
+  if (!container) return;
+
+  container.innerHTML = "";
+  for (let i = 0; i < count; i++) {
+    const skeleton = document.createElement("div");
+    skeleton.className = "skeleton-card skeleton";
+    skeleton.innerHTML = `
+      <div class="skeleton skeleton-text long"></div>
+      <div class="skeleton skeleton-text medium"></div>
+      <div class="skeleton skeleton-text short"></div>
+    `;
+    container.appendChild(skeleton);
+  }
+}
+
+// Enhanced Completion Celebration
+function showCompletionCelebration(message = "مبروك! تم إكمال الأذكار") {
+  const celebration = document.createElement("div");
+  celebration.className = "completion-celebration";
+  celebration.innerHTML = `
+    <div class="icon">🎉</div>
+    <h3>مبروك!</h3>
+    <p>${message}</p>
+    <button onclick="this.parentElement.remove()" style="
+      background: rgba(255,255,255,0.2);
+      border: 2px solid white;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      margin-top: 15px;
+    ">حسناً</button>
+  `;
+
+  document.body.appendChild(celebration);
+
+  // Play celebration sound if available
+  playSound("celebration");
+
+  // Remove after 5 seconds
+  setTimeout(() => {
+    if (celebration.parentElement) {
+      celebration.style.animation = "fadeOut 0.5s ease";
+      setTimeout(() => celebration.remove(), 500);
+    }
+  }, 5000);
+}
+
+// Sound Effects (optional)
+function playSound(type) {
+  // Only play if user has interacted (browsers block autoplay)
+  if (!document.hasUserInteracted) return;
+
+  try {
+    const audioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    switch (type) {
+      case "celebration":
+        oscillator.frequency.setValueAtTime(523, audioContext.currentTime);
+        oscillator.frequency.setValueAtTime(
+          659,
+          audioContext.currentTime + 0.1
+        );
+        oscillator.frequency.setValueAtTime(
+          784,
+          audioContext.currentTime + 0.2
+        );
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + 0.5
+        );
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+        break;
+      case "click":
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + 0.1
+        );
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.1);
+        break;
+    }
+  } catch (e) {
+    // Silently fail if Web Audio API is not supported
+  }
+}
+
+// Utility Functions
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function scrollToBottom() {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+}
+
+function changeFontSize(direction) {
+  const body = document.body;
+  const currentSize = parseFloat(getComputedStyle(body).fontSize);
+  let newSize;
+
+  if (direction === "increase" && currentSize < 24) {
+    newSize = currentSize + 2;
+  } else if (direction === "decrease" && currentSize > 14) {
+    newSize = currentSize - 2;
+  } else {
+    return;
+  }
+
+  body.style.fontSize = newSize + "px";
+  localStorage.setItem("fontSize", newSize);
+
+  showEnhancedNotification(
+    direction === "increase" ? "تم تكبير الخط" : "تم تصغير الخط",
+    "info",
+    2000
+  );
+}
+
+// Enhanced Search with Highlighting
+function highlightSearchResults(text, query) {
+  if (!query) return text;
+
+  const regex = new RegExp(`(${query})`, "gi");
+  return text.replace(regex, '<span class="search-highlight">$1</span>');
+}
+
+// Progress Ring Animation
+function animateProgressRing(ringElement, progress) {
+  const circle = ringElement.querySelector(".progress-ring-circle-fill");
+  if (circle) {
+    const circumference = 188.4; // 2 * π * r (r = 30)
+    const offset = circumference - (progress / 100) * circumference;
+    circle.style.strokeDashoffset = offset;
+  }
+}
+
+// Enhanced Error Handling
+function handleError(error, context = "general") {
+  console.error(`Error in ${context}:`, error);
+
+  const errorMessages = {
+    network: "خطأ في الشبكة. يرجى التحقق من الاتصال بالإنترنت.",
+    storage: "خطأ في حفظ البيانات. قد تفقد بعض التغييرات.",
+    general: "حدث خطأ غير متوقع. يرجى إعادة تحميل الصفحة.",
+  };
+
+  showEnhancedNotification(
+    errorMessages[context] || errorMessages.general,
+    "error",
+    5000
+  );
+}
+
 // Initialize enhanced features when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
+  // Mark that user has interacted (for audio)
+  document.hasUserInteracted = false;
+  document.addEventListener(
+    "click",
+    () => {
+      document.hasUserInteracted = true;
+    },
+    { once: true }
+  );
+
+  // Restore font size preference
+  const savedFontSize = localStorage.getItem("fontSize");
+  if (savedFontSize) {
+    document.body.style.fontSize = savedFontSize + "px";
+  }
+
   // Wait for the original initialization to complete
   setTimeout(() => {
     initializeEnhancedFeatures();
     initializeInstallPrompt();
+    initializeEnhancedUX(); // Add enhanced UX features
     // Show install prompt on first visit
     showInstallPrompt();
   }, 500);
