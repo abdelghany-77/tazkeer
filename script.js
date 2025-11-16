@@ -1314,12 +1314,47 @@ document.addEventListener("DOMContentLoaded", function () {
   loadProgress();
   showHomePage();
   setupEventListeners();
+
+  // Show install instructions on first visit
+  checkAndShowInstallInstructions();
 });
+
+function checkAndShowInstallInstructions() {
+  const dismissed = localStorage.getItem("installInstructionsDismissed");
+  const dismissedDate = localStorage.getItem(
+    "installInstructionsDismissedDate"
+  );
+  const remindLater = localStorage.getItem("installInstructionsRemindLater");
+
+  // If user clicked "understood", don't show again for 30 days
+  if (dismissed && dismissedDate) {
+    const daysSinceDismissed =
+      (Date.now() - parseInt(dismissedDate)) / (1000 * 60 * 60 * 24);
+    if (daysSinceDismissed < 30) {
+      return; // Don't show
+    }
+  }
+
+  // If user clicked "remind later", don't show for 3 days
+  if (remindLater) {
+    const daysSinceRemind =
+      (Date.now() - parseInt(remindLater)) / (1000 * 60 * 60 * 24);
+    if (daysSinceRemind < 3) {
+      return; // Don't show
+    }
+  }
+
+  // Show instructions after a short delay for better UX
+  setTimeout(() => {
+    showManualInstallInstructions();
+  }, 1000);
+}
 
 function showManualInstallInstructions() {
   const instructionsModal = document.createElement("div");
   instructionsModal.className = "modal";
   instructionsModal.style.display = "block";
+  instructionsModal.id = "installInstructionsModal";
 
   const userAgent = navigator.userAgent;
   let instructions = "";
@@ -1364,21 +1399,43 @@ function showManualInstallInstructions() {
 
   instructionsModal.innerHTML = `
     <div class="modal-content install-modal-content">
-      <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+      <span class="close" onclick="dismissInstallModal(true)">&times;</span>
       <div class="install-content">
         <div class="install-icon" style="font-size: 3rem; margin-bottom: 1rem;">
           📱
         </div>
         <h3 style="color: #667eea; margin-bottom: 1.5rem;">أضف التطبيق للشاشة الرئيسية</h3>
         ${instructions}
-        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="btn btn-primary" style="margin-top: 1.5rem; width: 100%; padding: 0.75rem;">
-          <i class="fas fa-check"></i> فهمت
-        </button>
+        <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
+          <button onclick="dismissInstallModal(true)" class="btn btn-primary" style="flex: 1; padding: 0.75rem;">
+            <i class="fas fa-check"></i> فهمت شكراً
+          </button>
+          <button onclick="dismissInstallModal(false)" class="btn btn-secondary" style="flex: 1; padding: 0.75rem; background: #e2e8f0; color: #4a5568;">
+            <i class="fas fa-clock"></i> ذكرني لاحقاً
+          </button>
+        </div>
       </div>
     </div>
   `;
 
   document.body.appendChild(instructionsModal);
+}
+
+function dismissInstallModal(understood) {
+  const modal = document.getElementById("installInstructionsModal");
+  if (modal) {
+    modal.remove();
+  }
+
+  // If user clicked "understood", don't show again for 30 days
+  if (understood) {
+    localStorage.setItem("installInstructionsDismissed", "true");
+    localStorage.setItem("installInstructionsDismissedDate", Date.now());
+  }
+  // If "remind me later", don't show for 3 days
+  else {
+    localStorage.setItem("installInstructionsRemindLater", Date.now());
+  }
 }
 
 // Setup event listeners
