@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="/tazkeer/" />
+    <!-- <base href="/tazkeer/" /> -->
+    <!-- Base href commented out for local development. Uncomment before deploying to GitHub Pages -->
     <title>ذَكِّرْ</title>
 
     <!-- SEO and Accessibility -->
@@ -85,29 +86,6 @@
       <div class="container">
         <!-- Home Page -->
         <div id="homePage">
-          <!-- Progress Stats Section -->
-          <div class="progress-stats" id="progressStats">
-            <h3>إحصائيات تقدمك</h3>
-            <div class="stats-grid">
-              <div class="stat-item">
-                <div class="stat-number" id="dailyStreak">0</div>
-                <div>أيام متتالية</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-number" id="totalCompletions">0</div>
-                <div>إجمالي المكتمل</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-number" id="todayCompletions">0</div>
-                <div>اليوم</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-number" id="weekCompletions">0</div>
-                <div>هذا الأسبوع</div>
-              </div>
-            </div>
-          </div>
-
           <!-- Welcome Section -->
           <div class="welcome-section">
             <h2 class="welcome-title">أهلاً وسهلاً بك في تطبيق ذَكِّرْ</h2>
@@ -127,7 +105,7 @@
           <!-- Font Size Controls -->
           <div class="font-controls">
             <button class="font-btn" onclick="setFontSize('small', true)">
-              <i class="fas fa-font" style="font-size: 0.8rem"></i> صغير
+              <i class="fas fa-font font-small"></i> صغير
             </button>
             <button
               class="font-btn active"
@@ -136,7 +114,7 @@
               <i class="fas fa-font"></i> متوسط
             </button>
             <button class="font-btn" onclick="setFontSize('large', true)">
-              <i class="fas fa-font" style="font-size: 1.2rem"></i> كبير
+              <i class="fas fa-font font-large"></i> كبير
             </button>
           </div>
 
@@ -204,22 +182,26 @@
 
     <!-- Quick Access Toolbar -->
     <div class="quick-access">
-      <button class="quick-btn" id="scrollTopBtn" title="العودة للأعلى">
+      <button class="quick-btn" id="scrollTopBtn" title="العودة للأعلى" aria-label="العودة للأعلى">
         <i class="fas fa-arrow-up"></i>
-      </button>
-      <button class="quick-btn" id="statsBtn" title="الإحصائيات">
-        <i class="fas fa-chart-bar"></i>
+        <span class="quick-btn-label">أعلى</span>
       </button>
     </div>
 
     <!-- Floating Notification -->
     <div class="notification" id="notification">
       <i class="fas fa-check-circle"></i>
-      <span id="notificationText">تم النسخ بنجاح!</span>
+            <span id="notificationText">تم النسخ بنجاح!</span>
     </div>
 
-    <!-- Install Prompt Modal -->
-    <div class="install-prompt" id="installPrompt">
+    <script src="script.js"></script>
+  </body>
+</html>
+
+    </div>
+
+    <!-- Install Prompt Modal Removed -->
+    <!-- <div class="install-prompt" id="installPrompt">
       <div class="install-content">
         <!-- Close button -->
         <button

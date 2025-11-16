@@ -1117,6 +1117,35 @@ function showFavorites() {
   showNotification(`عرض ${favorites.length} من الأذكار المفضلة`);
 }
 
+function showFavoritesPage() {
+  if (favorites.length === 0) {
+    showNotification("لم تضف أي أذكار إلى المفضلة بعد", "info");
+    return;
+  }
+
+  // Navigate to favorites section
+  const navBtns = document.querySelectorAll(".nav-btn");
+  navBtns.forEach((btn) => {
+    if (btn.dataset.category === "favorites") {
+      btn.click();
+    }
+  });
+
+  showNotification(`عرض ${favorites.length} من الأذكار المفضلة`);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function updateFavoritesButton() {
+  const favoritesBtn = document.getElementById("favoritesBtn");
+  if (favoritesBtn) {
+    if (favorites.length > 0) {
+      favoritesBtn.classList.add("has-favorites");
+    } else {
+      favoritesBtn.classList.remove("has-favorites");
+    }
+  }
+}
+
 function toggleStats() {
   const stats = document.querySelector(".progress-stats");
   if (stats) {
@@ -1146,6 +1175,7 @@ function toggleFavorite(categoryKey, zekrIndex, event) {
 
   localStorage.setItem("zekrFavorites", JSON.stringify(favorites));
   updateProgressStats();
+  updateFavoritesButton();
 }
 
 function getCategoryDisplayName(category) {
@@ -1284,138 +1314,7 @@ document.addEventListener("DOMContentLoaded", function () {
   loadProgress();
   showHomePage();
   setupEventListeners();
-  showInstallPrompt(); // Show install prompt for first-time users
 });
-
-// PWA Install prompt functionality
-let deferredPrompt;
-let installPromptShown = false;
-
-// Listen for the beforeinstallprompt event
-window.addEventListener("beforeinstallprompt", (e) => {
-  // Prevent the mini-infobar from appearing on mobile
-  e.preventDefault();
-  // Save the event so it can be triggered later
-  deferredPrompt = e;
-  // Install button is already visible, so no need to show it
-});
-
-// Listen for the app being installed
-window.addEventListener("appinstalled", () => {
-  // Keep the install button visible but maybe change its text
-  const installBtn = document.getElementById("installBtn");
-  if (installBtn) {
-    installBtn.innerHTML = '<i class="fas fa-check"></i> تم التثبيت';
-    installBtn.style.opacity = "0.7";
-  }
-  // Clear the deferredPrompt
-  deferredPrompt = null;
-  console.log("PWA was installed successfully");
-});
-
-function showInstallPrompt() {
-  // Check if this is the first visit
-  const isFirstVisit = !localStorage.getItem("adhkar-visited");
-
-  // Keep install button visible for easy access
-  const installBtn = document.getElementById("installBtn");
-  if (installBtn) {
-    installBtn.style.display = "block";
-  }
-
-  // Don't show automatic install prompt if already installed
-  if (
-    window.matchMedia &&
-    window.matchMedia("(display-mode: standalone)").matches
-  ) {
-    return; // Don't show install prompt if already installed, but keep button visible
-  }
-
-  if (isFirstVisit && !installPromptShown) {
-    // Mark as visited
-    localStorage.setItem("adhkar-visited", "true");
-
-    // Show install prompt after a short delay
-    setTimeout(() => {
-      showInstallModal();
-      installPromptShown = true;
-    }, 2000);
-  }
-}
-
-function showInstallModal() {
-  // Create install modal
-  const installModal = document.createElement("div");
-  installModal.className = "modal";
-  installModal.id = "installModal";
-  installModal.style.display = "block";
-
-  installModal.innerHTML = `
-    <div class="modal-content install-modal-content">
-      <span class="close" id="installClose">&times;</span>
-      <div class="install-content">
-        <div class="install-icon">
-          <i class="fas fa-download"></i>
-        </div>
-        <h3>إضافة التطبيق للشاشة الرئيسية</h3>
-        <p>للوصول السريع للأذكار الإسلامية، يمكنك إضافة هذا التطبيق إلى الشاشة الرئيسية لهاتفك.</p>
-        <div class="install-buttons">
-          <button id="installApp" class="btn btn-primary">
-            <i class="fas fa-plus"></i>
-            إضافة للشاشة الرئيسية
-          </button>
-          <button id="installLater" class="btn btn-secondary">
-            ربما لاحقاً
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(installModal);
-
-  // Add event listeners
-  document
-    .getElementById("installClose")
-    .addEventListener("click", closeInstallModal);
-  document.getElementById("installApp").addEventListener("click", installApp);
-  document
-    .getElementById("installLater")
-    .addEventListener("click", closeInstallModal);
-
-  // Close when clicking outside
-  installModal.addEventListener("click", (e) => {
-    if (e.target === installModal) {
-      closeInstallModal();
-    }
-  });
-}
-
-function installApp() {
-  if (deferredPrompt) {
-    // Show the install prompt
-    deferredPrompt.prompt();
-
-    // Wait for the user to respond to the prompt
-    deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === "accepted") {
-        console.log("User accepted the install prompt");
-        // Update the install button after successful installation
-        const installBtn = document.getElementById("installBtn");
-        if (installBtn) {
-          installBtn.innerHTML = '<i class="fas fa-check"></i> تم التثبيت';
-          installBtn.style.opacity = "0.7";
-        }
-      }
-      deferredPrompt = null;
-    });
-  } else {
-    // Show manual installation instructions
-    showManualInstallInstructions();
-  }
-
-  closeInstallModal();
-}
 
 function showManualInstallInstructions() {
   const instructionsModal = document.createElement("div");
@@ -1429,24 +1328,37 @@ function showManualInstallInstructions() {
     instructions = `
       <h4>إضافة للشاشة الرئيسية على iOS:</h4>
       <ol>
-        <li>اضغط على أيقونة "المشاركة" <i class="fas fa-share"></i> في شريط Safari</li>
-        <li>اختر "إضافة إلى الشاشة الرئيسية"</li>
+        <li>اضغط على أيقونة "المشاركة" <i class="fas fa-share"></i> في شريط Safari السفلي</li>
+        <li>مرّر للأسفل واختر "إضافة إلى الشاشة الرئيسية" <i class="fas fa-plus-square"></i></li>
         <li>اضغط "إضافة" في الزاوية العلوية</li>
       </ol>
+      <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
+        <i class="fas fa-info-circle"></i> تأكد من استخدام متصفح Safari
+      </p>
     `;
   } else if (userAgent.includes("Android")) {
     instructions = `
       <h4>إضافة للشاشة الرئيسية على Android:</h4>
       <ol>
-        <li>اضغط على القائمة الثلاث نقاط في Chrome</li>
-        <li>اختر "إضافة إلى الشاشة الرئيسية"</li>
-        <li>اضغط "إضافة"</li>
+        <li>اضغط على القائمة (⋮) في أعلى Chrome</li>
+        <li>اختر "إضافة إلى الشاشة الرئيسية" <i class="fas fa-plus-square"></i></li>
+        <li>اضغط "إضافة" أو "Install"</li>
       </ol>
+      <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
+        <i class="fas fa-info-circle"></i> يمكنك الآن الوصول للتطبيق من شاشتك الرئيسية
+      </p>
     `;
   } else {
     instructions = `
       <h4>إضافة للشاشة الرئيسية:</h4>
-      <p>يمكنك إضافة هذا الموقع كاختصار على جهازك من خلال خيارات المتصفح.</p>
+      <ol>
+        <li>ابحث عن أيقونة <i class="fas fa-plus"></i> أو "تثبيت" في شريط العنوان</li>
+        <li>أو استخدم قائمة المتصفح واختر "إضافة إلى الشاشة الرئيسية"</li>
+        <li>اتبع التعليمات التي تظهر لك</li>
+      </ol>
+      <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
+        <i class="fas fa-info-circle"></i> بعد الإضافة يمكنك الوصول للتطبيق بسهولة
+      </p>
     `;
   }
 
@@ -1454,23 +1366,19 @@ function showManualInstallInstructions() {
     <div class="modal-content install-modal-content">
       <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
       <div class="install-content">
-        <div class="install-icon">
-          <i class="fas fa-info-circle"></i>
+        <div class="install-icon" style="font-size: 3rem; margin-bottom: 1rem;">
+          📱
         </div>
+        <h3 style="color: #667eea; margin-bottom: 1.5rem;">أضف التطبيق للشاشة الرئيسية</h3>
         ${instructions}
-        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="btn btn-primary">حسناً</button>
+        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="btn btn-primary" style="margin-top: 1.5rem; width: 100%; padding: 0.75rem;">
+          <i class="fas fa-check"></i> فهمت
+        </button>
       </div>
     </div>
   `;
 
   document.body.appendChild(instructionsModal);
-}
-
-function closeInstallModal() {
-  const installModal = document.getElementById("installModal");
-  if (installModal) {
-    installModal.remove();
-  }
 }
 
 // Setup event listeners
@@ -2087,7 +1995,7 @@ function initializeEnhancedFeatures() {
 
   // Add quick access button listeners
   const scrollTopBtn = document.getElementById("scrollTopBtn");
-  const statsBtn = document.getElementById("statsBtn");
+  const favoritesBtn = document.getElementById("favoritesBtn");
   const resetAllBtn = document.getElementById("resetAllBtn");
   const themeToggle = document.getElementById("themeToggle");
   const homeBtn = document.getElementById("homeBtn");
@@ -2095,7 +2003,10 @@ function initializeEnhancedFeatures() {
   const installBtn = document.getElementById("installBtn");
 
   if (scrollTopBtn) scrollTopBtn.addEventListener("click", scrollToTop);
-  if (statsBtn) statsBtn.addEventListener("click", toggleStats);
+  if (favoritesBtn) {
+    favoritesBtn.addEventListener("click", showFavoritesPage);
+    updateFavoritesButton();
+  }
   if (resetAllBtn) resetAllBtn.addEventListener("click", resetAllAdhkar);
   if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
   if (homeBtn) homeBtn.addEventListener("click", showHomePage);
