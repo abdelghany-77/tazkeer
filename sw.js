@@ -1,4 +1,4 @@
-const CACHE_NAME = "tazkeer-v1";
+const CACHE_NAME = "tazkeer-v2.0";
 const urlsToCache = [
   "./",
   "./index.html",
@@ -12,6 +12,9 @@ const urlsToCache = [
 
 // Install event - cache resources
 self.addEventListener("install", function (event) {
+  // Force the waiting service worker to become the active service worker
+  self.skipWaiting();
+
   event.waitUntil(
     caches
       .open(CACHE_NAME)
@@ -24,33 +27,45 @@ self.addEventListener("install", function (event) {
   );
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - Network first, fallback to cache (better for dynamic content)
 self.addEventListener("fetch", function (event) {
   event.respondWith(
-    caches
-      .match(event.request)
+    fetch(event.request)
       .then(function (response) {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
+        // Clone the response
+        const responseClone = response.clone();
+
+        // Update cache with new version
+        caches.open(CACHE_NAME).then(function (cache) {
+          cache.put(event.request, responseClone);
+        });
+
+        return response;
       })
-      .catch(function (error) {
-        console.log("Fetch failed:", error);
-        // You could return a fallback page here
+      .catch(function () {
+        // If network fails, try cache
+        return caches.match(event.request);
       })
   );
 });
 
 // Activate event - clean up old caches
 self.addEventListener("activate", function (event) {
+  // Take control of all pages immediately
   event.waitUntil(
-    caches.keys().then(function (cacheNames) {
-      return Promise.all(
-        cacheNames.map(function (cacheName) {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches
+      .keys()
+      .then(function (cacheNames) {
+        return Promise.all(
+          cacheNames.map(function (cacheName) {
+            if (cacheName !== CACHE_NAME) {
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+      .then(function () {
+        return self.clients.claim();
+      })
   );
 });
