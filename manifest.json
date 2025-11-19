@@ -4,7 +4,7 @@
   "description": "تطبيق الأذكار الإسلامية من الكتاب والسنة",
   "start_url": "https://abdelghany-77.github.io/tazkeer/",
   "scope": "https://abdelghany-77.github.io/tazkeer/",
-  "display": "standalone",
+  "display": "browser",
   "background_color": "#2d3748",
   "theme_color": "#2d3748",
   "orientation": "portrait",
@@ -16,12 +16,6 @@
       "src": "favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
-    },
-    {
-      "src": "favicon.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
     }
   ]
 }
