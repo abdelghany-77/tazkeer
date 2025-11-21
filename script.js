@@ -1356,44 +1356,114 @@ function showManualInstallInstructions() {
   instructionsModal.style.display = "block";
   instructionsModal.id = "installInstructionsModal";
 
-  const userAgent = navigator.userAgent;
+  const userAgent = navigator.userAgent.toLowerCase();
   let instructions = "";
+  let deviceIcon = "";
+  let deviceName = "";
 
-  if (userAgent.includes("iPhone") || userAgent.includes("iPad")) {
+  // Better device detection
+  const isIOS =
+    /iphone|ipad|ipod/.test(userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const isAndroid = /android/.test(userAgent);
+
+  console.log("Device Detection:", { userAgent, isIOS, isAndroid });
+
+  if (isIOS) {
+    deviceIcon = "🍎";
+    deviceName = "iOS";
     instructions = `
-      <h4>إضافة للشاشة الرئيسية على iOS:</h4>
-      <ol>
-        <li>اضغط على أيقونة "المشاركة" <i class="fas fa-share"></i> في شريط Safari السفلي</li>
-        <li>مرّر للأسفل واختر "إضافة إلى الشاشة الرئيسية" <i class="fas fa-plus-square"></i></li>
-        <li>اضغط "إضافة" في الزاوية العلوية</li>
-      </ol>
-      <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
-        <i class="fas fa-info-circle"></i> تأكد من استخدام متصفح Safari
-      </p>
+      <div class="install-steps">
+        <div class="install-step">
+          <div class="step-icon">📲</div>
+          <div class="step-content">
+            <h5>الخطوة 1</h5>
+            <p>اضغط على زر <strong>المشاركة</strong> <i class="fas fa-share" style="color: #007AFF;"></i> في الأسفل</p>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-icon">➕</div>
+          <div class="step-content">
+            <h5>الخطوة 2</h5>
+            <p>مرّر للأسفل واختر "<strong>إضافة إلى الشاشة الرئيسية</strong>"</p>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-icon">✅</div>
+          <div class="step-content">
+            <h5>الخطوة 3</h5>
+            <p>اضغط "<strong>إضافة</strong>" في الأعلى للتأكيد</p>
+          </div>
+        </div>
+      </div>
+      <div class="install-note">
+        <i class="fas fa-info-circle"></i>
+        <span>تأكد من استخدام متصفح <strong>Safari</strong></span>
+      </div>
     `;
-  } else if (userAgent.includes("Android")) {
+  } else if (isAndroid) {
+    deviceIcon = "🤖";
+    deviceName = "Android";
     instructions = `
-      <h4>إضافة للشاشة الرئيسية على Android:</h4>
-      <ol>
-        <li>اضغط على القائمة (⋮) في أعلى Chrome</li>
-        <li>اختر "إضافة إلى الشاشة الرئيسية" <i class="fas fa-plus-square"></i></li>
-        <li>اضغط "إضافة" أو "Install"</li>
-      </ol>
-      <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
-        <i class="fas fa-info-circle"></i> يمكنك الآن الوصول للتطبيق من شاشتك الرئيسية
-      </p>
+      <div class="install-steps">
+        <div class="install-step">
+          <div class="step-icon">⋮</div>
+          <div class="step-content">
+            <h5>الخطوة 1</h5>
+            <p>اضغط على <strong>القائمة</strong> (⋮) في أعلى المتصفح</p>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-icon">🏠</div>
+          <div class="step-content">
+            <h5>الخطوة 2</h5>
+            <p>اختر "<strong>إضافة إلى الشاشة الرئيسية</strong>" أو "<strong>Add to Home screen</strong>"</p>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-icon">✅</div>
+          <div class="step-content">
+            <h5>الخطوة 3</h5>
+            <p>اضغط "<strong>إضافة</strong>" أو "<strong>Add</strong>" للتأكيد</p>
+          </div>
+        </div>
+      </div>
+      <div class="install-note">
+        <i class="fas fa-check-circle"></i>
+        <span>الآن يمكنك الوصول للتطبيق بسرعة من شاشتك الرئيسية 🎉</span>
+      </div>
     `;
   } else {
+    deviceIcon = "💻";
+    deviceName = "الحاسوب";
     instructions = `
-      <h4>إضافة للشاشة الرئيسية:</h4>
-      <ol>
-        <li>ابحث عن أيقونة <i class="fas fa-plus"></i> أو "تثبيت" في شريط العنوان</li>
-        <li>أو استخدم قائمة المتصفح واختر "إضافة إلى الشاشة الرئيسية"</li>
-        <li>اتبع التعليمات التي تظهر لك</li>
-      </ol>
-      <p style="font-size: 0.9rem; color: #666; margin-top: 1rem;">
-        <i class="fas fa-info-circle"></i> بعد الإضافة يمكنك الوصول للتطبيق بسهولة
-      </p>
+      <div class="install-steps">
+        <div class="install-step">
+          <div class="step-icon">🔍</div>
+          <div class="step-content">
+            <h5>الخطوة 1</h5>
+            <p>ابحث عن أيقونة <strong>التثبيت</strong> <i class="fas fa-plus-circle"></i> في شريط العنوان</p>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-icon">⚙️</div>
+          <div class="step-content">
+            <h5>الخطوة 2</h5>
+            <p>أو استخدم <strong>قائمة المتصفح</strong> واختر "إضافة إلى الشاشة الرئيسية"</p>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-icon">✅</div>
+          <div class="step-content">
+            <h5>الخطوة 3</h5>
+            <p>اتبع التعليمات التي تظهر لك</p>
+          </div>
+        </div>
+      </div>
+      <div class="install-note">
+        <i class="fas fa-lightbulb"></i>
+        <span>يمكنك الوصول للتطبيق من سطح المكتب أو شريط المهام</span>
+      </div>
     `;
   }
 
@@ -1401,16 +1471,21 @@ function showManualInstallInstructions() {
     <div class="modal-content install-modal-content">
       <span class="close" onclick="dismissInstallModal(true)">&times;</span>
       <div class="install-content">
-        <div class="install-icon" style="font-size: 3rem; margin-bottom: 1rem;">
-          📱
+        <div class="install-header">
+          <div class="install-icon-badge">${deviceIcon}</div>
+          <h3>أضف التطبيق للشاشة الرئيسية</h3>
+          <p class="install-subtitle">للوصول السريع والسهل لأذكارك اليومية</p>
         </div>
-        <h3 style="color: #667eea; margin-bottom: 1.5rem;">أضف التطبيق للشاشة الرئيسية</h3>
+        
+        <div class="device-badge">${deviceName}</div>
+        
         ${instructions}
-        <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
-          <button onclick="dismissInstallModal(true)" class="btn btn-primary" style="flex: 1; padding: 0.75rem;">
+        
+        <div class="install-buttons">
+          <button onclick="dismissInstallModal(true)" class="install-btn primary">
             <i class="fas fa-check"></i> فهمت شكراً
           </button>
-          <button onclick="dismissInstallModal(false)" class="btn btn-secondary" style="flex: 1; padding: 0.75rem; background: #e2e8f0; color: #4a5568;">
+          <button onclick="dismissInstallModal(false)" class="install-btn secondary">
             <i class="fas fa-clock"></i> ذكرني لاحقاً
           </button>
         </div>
