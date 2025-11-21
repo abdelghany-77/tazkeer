@@ -1357,7 +1357,7 @@ function showManualInstallInstructions() {
     deviceIcon = "🍎";
     deviceName = "iOS";
     instructions = `
-      <div class="install-steps">
+      <div class="install-steps active">
         <div class="install-step">
           <div class="step-icon">📲</div>
           <div class="step-content">
@@ -1389,7 +1389,7 @@ function showManualInstallInstructions() {
     deviceIcon = "🤖";
     deviceName = "Android";
     instructions = `
-      <div class="install-steps">
+      <div class="install-steps active">
         <div class="install-step">
           <div class="step-icon">⋮</div>
           <div class="step-content">
@@ -1421,7 +1421,7 @@ function showManualInstallInstructions() {
     deviceIcon = "💻";
     deviceName = "الحاسوب";
     instructions = `
-      <div class="install-steps">
+      <div class="install-steps active">
         <div class="install-step">
           <div class="step-icon">🔍</div>
           <div class="step-content">
@@ -1444,10 +1444,6 @@ function showManualInstallInstructions() {
           </div>
         </div>
       </div>
-      <div class="install-note">
-        <i class="fas fa-lightbulb"></i>
-        <span>يمكنك الوصول للتطبيق من سطح المكتب أو شريط المهام</span>
-      </div>
     `;
   }
 
@@ -1456,7 +1452,6 @@ function showManualInstallInstructions() {
       <span class="close" onclick="dismissInstallModal(true)">&times;</span>
       <div class="install-content">
         <div class="install-header">
-          <div class="install-icon-badge">${deviceIcon}</div>
           <h3>أضف التطبيق للشاشة الرئيسية</h3>
           <p class="install-subtitle">للوصول السريع والسهل لأذكارك اليومية</p>
         </div>
