@@ -1354,7 +1354,6 @@ function showManualInstallInstructions() {
   const isAndroid = /android/.test(userAgent);
 
   if (isIOS) {
-    deviceIcon = "🍎";
     deviceName = "iOS";
     instructions = `
       <div class="install-steps active">
@@ -1386,7 +1385,6 @@ function showManualInstallInstructions() {
       </div>
     `;
   } else if (isAndroid) {
-    deviceIcon = "🤖";
     deviceName = "Android";
     instructions = `
       <div class="install-steps active">
@@ -1411,10 +1409,6 @@ function showManualInstallInstructions() {
             <p>اضغط "<strong>إضافة</strong>" أو "<strong>Add</strong>" للتأكيد</p>
           </div>
         </div>
-      </div>
-      <div class="install-note">
-        <i class="fas fa-check-circle"></i>
-        <span>الآن يمكنك الوصول للتطبيق بسرعة من شاشتك الرئيسية 🎉</span>
       </div>
     `;
   } else {
