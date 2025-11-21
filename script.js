@@ -943,15 +943,11 @@ function getWeeklyCompletions() {
 }
 
 function updateProgressStats() {
-  console.log("updateProgressStats called");
   const totalZekr = Object.values(adhkarData).reduce(
     (sum, category) => sum + category.adhkar.length,
     0
   );
   const completedToday = dailyProgress.completedZekr.length;
-  console.log(
-    `Stats: ${completedToday} completed today, ${totalZekr} total adhkar`
-  );
   const completionRate =
     totalZekr > 0 ? Math.round((completedToday / totalZekr) * 100) : 0;
   const favoritesCount = favorites.length;
@@ -964,19 +960,15 @@ function updateProgressStats() {
 
   if (dailyStreakEl) {
     dailyStreakEl.textContent = dailyProgress.streak || 0;
-    console.log(`Updated streak: ${dailyProgress.streak || 0}`);
   }
   if (totalCompletionsEl) {
     totalCompletionsEl.textContent = dailyProgress.totalCompletions;
-    console.log(`Updated total completions: ${dailyProgress.totalCompletions}`);
   }
   if (todayCompletionsEl) {
     todayCompletionsEl.textContent = completedToday;
-    console.log(`Updated today completions: ${completedToday}`);
   }
   if (weekCompletionsEl) {
     weekCompletionsEl.textContent = getWeeklyCompletions();
-    console.log(`Updated weekly completions: ${getWeeklyCompletions()}`);
   }
 }
 
@@ -1186,14 +1178,10 @@ function getCategoryDisplayName(category) {
 // Enhanced completion tracking
 function markZekrCompleted(categoryKey, zekrIndex) {
   const zekrId = `${categoryKey}_${zekrIndex}`;
-  console.log(`markZekrCompleted called with: ${zekrId}`);
 
   if (!dailyProgress.completedZekr.includes(zekrId)) {
     dailyProgress.completedZekr.push(zekrId);
     dailyProgress.totalCompletions++;
-    console.log(
-      `Added to dailyProgress. Total completions: ${dailyProgress.totalCompletions}`
-    );
     saveDailyProgress();
     updateProgressStats();
 
@@ -1221,8 +1209,6 @@ function markZekrCompleted(categoryKey, zekrIndex) {
         `أكملت ${completed} من الأذكار، استمر في ذكر الله`
       );
     }
-  } else {
-    console.log(`${zekrId} already marked as completed`);
   }
 }
 
@@ -1366,8 +1352,6 @@ function showManualInstallInstructions() {
     /iphone|ipad|ipod/.test(userAgent) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const isAndroid = /android/.test(userAgent);
-
-  console.log("Device Detection:", { userAgent, isIOS, isAndroid });
 
   if (isIOS) {
     deviceIcon = "🍎";
@@ -1722,7 +1706,6 @@ function incrementZikrCount(category, index) {
 
     // Check if this individual zikr is completed and mark it
     if (zikr.currentCount === zikr.count) {
-      console.log(`Completing zikr: ${category}_${index}`);
       markZekrCompleted(category, index);
     }
 
@@ -2080,7 +2063,7 @@ function loadProgress() {
         }
       });
     } catch (error) {
-      console.log("Error loading progress:", error);
+      console.error("Error loading progress:", error);
     }
   }
 }
@@ -2094,10 +2077,10 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker
       .register("./sw.js")
       .then((registration) => {
-        console.log("SW registered: ", registration);
+        // Service worker registered successfully
       })
       .catch((registrationError) => {
-        console.log("SW registration failed: ", registrationError);
+        console.error("Service worker registration failed:", registrationError);
       });
   });
 }
@@ -2438,7 +2421,6 @@ function initializeInstallPrompt() {
     document.addEventListener("keydown", (e) => {
       if (e.ctrlKey && e.shiftKey && e.key === "I") {
         localStorage.removeItem("hasSeenInstallPrompt");
-        console.log("Install prompt reset - refresh page to see it again");
       }
     });
   }

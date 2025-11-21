@@ -1,4 +1,4 @@
-const CACHE_NAME = "tazkeer-v2.2";
+const CACHE_NAME = "tazkeer-v2.3";
 const urlsToCache = [
   "./",
   "./index.html",
@@ -22,7 +22,7 @@ self.addEventListener("install", function (event) {
         return cache.addAll(urlsToCache);
       })
       .catch(function (error) {
-        console.log("Cache install failed:", error);
+        console.error("Cache install failed:", error);
       })
   );
 });
