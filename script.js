@@ -2130,8 +2130,12 @@ function initializeEnhancedFeatures() {
     const quickAccessBtn = document.querySelector(".quick-access");
     const quickHomeBtn = document.querySelector(".quick-home");
 
-    // Show buttons when near the bottom of the page (within 200px)
-    if (scrollPosition + windowHeight >= documentHeight - 200) {
+    // Calculate how far from bottom (percentage)
+    const scrolledPercentage =
+      ((scrollPosition + windowHeight) / documentHeight) * 100;
+
+    // Show buttons only when scrolled 90% or more of the page (very near the end)
+    if (scrolledPercentage >= 90) {
       if (quickAccessBtn) quickAccessBtn.style.display = "flex";
       if (quickHomeBtn) quickHomeBtn.style.display = "flex";
     } else {
