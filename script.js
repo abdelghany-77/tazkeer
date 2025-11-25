@@ -2122,22 +2122,23 @@ function initializeEnhancedFeatures() {
   if (backBtn) backBtn.addEventListener("click", showHomePage);
   if (installBtn) installBtn.addEventListener("click", showInstallModal);
 
-  // Show/hide quick access buttons on scroll
+  // Show/hide quick access buttons at end of page
   window.addEventListener("scroll", () => {
     const scrollPosition = window.pageYOffset;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
     const quickAccessBtn = document.querySelector(".quick-access");
     const quickHomeBtn = document.querySelector(".quick-home");
 
-    if (scrollPosition > 300) {
+    // Show buttons when near the bottom of the page (within 200px)
+    if (scrollPosition + windowHeight >= documentHeight - 200) {
       if (quickAccessBtn) quickAccessBtn.style.display = "flex";
       if (quickHomeBtn) quickHomeBtn.style.display = "flex";
     } else {
       if (quickAccessBtn) quickAccessBtn.style.display = "none";
       if (quickHomeBtn) quickHomeBtn.style.display = "none";
     }
-  });
-
-  // Initialize enhanced theme
+  }); // Initialize enhanced theme
   initializeEnhancedTheme();
 
   // Show install prompt on first visit
