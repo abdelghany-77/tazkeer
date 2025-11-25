@@ -2102,6 +2102,7 @@ function initializeEnhancedFeatures() {
 
   // Add quick access button listeners
   const scrollTopBtn = document.getElementById("scrollTopBtn");
+  const quickHomeBtn = document.getElementById("quickHomeBtn");
   const favoritesBtn = document.getElementById("favoritesBtn");
   const resetAllBtn = document.getElementById("resetAllBtn");
   const themeToggle = document.getElementById("themeToggle");
@@ -2110,6 +2111,7 @@ function initializeEnhancedFeatures() {
   const installBtn = document.getElementById("installBtn");
 
   if (scrollTopBtn) scrollTopBtn.addEventListener("click", scrollToTop);
+  if (quickHomeBtn) quickHomeBtn.addEventListener("click", showHomePage);
   if (favoritesBtn) {
     favoritesBtn.addEventListener("click", showFavoritesPage);
     updateFavoritesButton();
@@ -2119,6 +2121,21 @@ function initializeEnhancedFeatures() {
   if (homeBtn) homeBtn.addEventListener("click", showHomePage);
   if (backBtn) backBtn.addEventListener("click", showHomePage);
   if (installBtn) installBtn.addEventListener("click", showInstallModal);
+
+  // Show/hide quick access buttons on scroll
+  window.addEventListener("scroll", () => {
+    const scrollPosition = window.pageYOffset;
+    const quickAccessBtn = document.querySelector(".quick-access");
+    const quickHomeBtn = document.querySelector(".quick-home");
+
+    if (scrollPosition > 300) {
+      if (quickAccessBtn) quickAccessBtn.style.display = "flex";
+      if (quickHomeBtn) quickHomeBtn.style.display = "flex";
+    } else {
+      if (quickAccessBtn) quickAccessBtn.style.display = "none";
+      if (quickHomeBtn) quickHomeBtn.style.display = "none";
+    }
+  });
 
   // Initialize enhanced theme
   initializeEnhancedTheme();
