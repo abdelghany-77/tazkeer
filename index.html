@@ -88,10 +88,56 @@
         <div id="homePage">
           <!-- Welcome Section -->
           <div class="welcome-section">
-            <h2 class="welcome-title">أهلاً وسهلاً بك في تطبيق ذَكِّرْ</h2>
+            <h2 class="welcome-title">أهلاً وسهلاً بك في تطبيق ذَكِّرْ</h2>
             <p class="welcome-description">
               اختر نوع الأذكار التي تريد قراءتها
             </p>
+          </div>
+
+          <!-- Prayer Times Section -->
+          <div class="prayer-times-section" id="prayerTimesSection">
+            <div class="prayer-times-header">
+              <h3 class="prayer-times-title">
+                <i class="fas fa-mosque"></i>
+                مواعيد الصلاة
+              </h3>
+              <button
+                class="location-btn"
+                id="locationBtn"
+                title="تحديث الموقع"
+              >
+                <i class="fas fa-location-crosshairs"></i>
+              </button>
+            </div>
+
+            <div class="prayer-times-location" id="prayerLocation">
+              <i class="fas fa-map-marker-alt"></i>
+              <span id="cityName">جاري تحديد الموقع...</span>
+            </div>
+
+            <div class="next-prayer-countdown" id="nextPrayerCountdown">
+              <div class="countdown-label">الصلاة القادمة</div>
+              <div class="countdown-prayer" id="nextPrayerName">—</div>
+              <div class="countdown-time" id="countdownTime">—</div>
+            </div>
+
+            <div class="prayer-times-grid" id="prayerTimesGrid">
+              <!-- Prayer cards will be populated by JavaScript -->
+            </div>
+
+            <div class="prayer-times-loading" id="prayerTimesLoading">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>جاري تحميل مواقيت الصلاة...</p>
+            </div>
+
+            <div class="prayer-times-error hidden" id="prayerTimesError">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p>تعذر تحميل مواقيت الصلاة</p>
+              <button class="retry-btn" id="retryPrayerTimes">
+                <i class="fas fa-redo"></i>
+                إعادة المحاولة
+              </button>
+            </div>
           </div>
 
           <!-- Categories Container -->
@@ -139,7 +185,7 @@
     <!-- Footer -->
     <footer class="footer">
       <div class="container">
-        <p>صدقة جارية على روح احمد عبدالغنى وجميع موتى المسلمين  </p>
+        <p>صدقة جارية على روح احمد عبدالغنى وجميع موتى المسلمين</p>
       </div>
     </footer>
 
@@ -182,7 +228,12 @@
 
     <!-- Quick Access Toolbar -->
     <div class="quick-access">
-      <button class="quick-btn" id="scrollTopBtn" title="العودة للأعلى" aria-label="العودة للأعلى">
+      <button
+        class="quick-btn"
+        id="scrollTopBtn"
+        title="العودة للأعلى"
+        aria-label="العودة للأعلى"
+      >
         <i class="fas fa-arrow-up"></i>
         <span class="quick-btn-label">أعلى</span>
       </button>

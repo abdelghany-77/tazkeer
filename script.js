@@ -2947,6 +2947,292 @@ function handleError(error, context = "general") {
   );
 }
 
+// ==================== Prayer Times Section ====================
+
+let prayerTimesData = null;
+let countdownInterval = null;
+
+// Prayer names mapping
+const prayerNames = {
+  Fajr: "الفجر",
+  Sunrise: "الشروق",
+  Dhuhr: "الظهر",
+  Asr: "العصر",
+  Sunset: "المغرب",
+  Maghrib: "المغرب",
+  Isha: "العشاء",
+  Imsak: "الإمساك",
+  Midnight: "منتصف الليل",
+};
+
+// Prayer icons
+const prayerIcons = {
+  Fajr: "fa-cloud-moon",
+  Sunrise: "fa-sun",
+  Dhuhr: "fa-sun",
+  Asr: "fa-cloud-sun",
+  Maghrib: "fa-moon",
+  Isha: "fa-moon",
+};
+
+// Initialize Prayer Times
+async function initializePrayerTimes() {
+  const section = document.getElementById("prayerTimesSection");
+  if (!section) return;
+
+  // Get saved location or request new one
+  const savedLocation = localStorage.getItem("prayerLocation");
+
+  if (savedLocation) {
+    const location = JSON.parse(savedLocation);
+    await fetchPrayerTimes(
+      location.latitude,
+      location.longitude,
+      location.city
+    );
+  } else {
+    await requestLocation();
+  }
+
+  // Setup event listeners
+  const locationBtn = document.getElementById("locationBtn");
+  const retryBtn = document.getElementById("retryPrayerTimes");
+
+  if (locationBtn) {
+    locationBtn.addEventListener("click", requestLocation);
+  }
+
+  if (retryBtn) {
+    retryBtn.addEventListener("click", requestLocation);
+  }
+}
+
+// Request user location
+async function requestLocation() {
+  const loading = document.getElementById("prayerTimesLoading");
+  const error = document.getElementById("prayerTimesError");
+  const grid = document.getElementById("prayerTimesGrid");
+
+  if (loading) loading.style.display = "block";
+  if (error) error.classList.add("hidden");
+  if (grid) grid.innerHTML = "";
+
+  if (!navigator.geolocation) {
+    showPrayerTimesError("المتصفح لا يدعم تحديد الموقع");
+    return;
+  }
+
+  try {
+    const position = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        timeout: 10000,
+        enableHighAccuracy: true,
+      });
+    });
+
+    const { latitude, longitude } = position.coords;
+
+    // Get city name from reverse geocoding
+    const cityName = await getCityName(latitude, longitude);
+
+    // Save location
+    localStorage.setItem(
+      "prayerLocation",
+      JSON.stringify({
+        latitude,
+        longitude,
+        city: cityName,
+      })
+    );
+
+    await fetchPrayerTimes(latitude, longitude, cityName);
+  } catch (err) {
+    console.error("Location error:", err);
+    showPrayerTimesError("تعذر تحديد الموقع. يرجى السماح بالوصول إلى الموقع.");
+  }
+}
+
+// Get city name from coordinates
+async function getCityName(latitude, longitude) {
+  try {
+    const response = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=ar`
+    );
+    const data = await response.json();
+    return data.city || data.locality || data.principalSubdivision || "موقعك";
+  } catch (err) {
+    console.error("Geocoding error:", err);
+    return "موقعك";
+  }
+}
+
+// Fetch prayer times from API
+async function fetchPrayerTimes(latitude, longitude, cityName) {
+  const loading = document.getElementById("prayerTimesLoading");
+  const error = document.getElementById("prayerTimesError");
+
+  try {
+    const today = new Date();
+    const timestamp = Math.floor(today.getTime() / 1000);
+
+    const response = await fetch(
+      `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}&method=5`
+    );
+
+    if (!response.ok) throw new Error("API request failed");
+
+    const data = await response.json();
+
+    if (data.code === 200 && data.data) {
+      prayerTimesData = data.data.timings;
+      displayPrayerTimes(cityName);
+      startCountdown();
+
+      if (loading) loading.style.display = "none";
+      if (error) error.classList.add("hidden");
+    } else {
+      throw new Error("Invalid API response");
+    }
+  } catch (err) {
+    console.error("Prayer times fetch error:", err);
+    showPrayerTimesError("تعذر تحميل مواقيت الصلاة");
+  }
+}
+
+// Display prayer times cards
+function displayPrayerTimes(cityName) {
+  const grid = document.getElementById("prayerTimesGrid");
+  const locationEl = document.getElementById("cityName");
+
+  if (locationEl) {
+    locationEl.textContent = cityName;
+  }
+
+  if (!grid || !prayerTimesData) return;
+
+  // Main prayers to display
+  const mainPrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
+  grid.innerHTML = mainPrayers
+    .map((prayer) => {
+      const time = prayerTimesData[prayer];
+      const formattedTime = formatTo12Hour(time);
+      const name = prayerNames[prayer];
+      const icon = prayerIcons[prayer];
+
+      return `
+        <div class="prayer-card" data-prayer="${prayer}">
+          <div class="prayer-icon">
+            <i class="fas ${icon}"></i>
+          </div>
+          <div class="prayer-info">
+            <div class="prayer-name">${name}</div>
+            <div class="prayer-time">${formattedTime}</div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+// Convert 24-hour time to 12-hour AM/PM format
+function formatTo12Hour(time24) {
+  const [hours, minutes] = time24.split(":");
+  let hour = parseInt(hours);
+  const period = hour >= 12 ? "PM" : "AM";
+
+  hour = hour % 12 || 12; // Convert 0 to 12 for midnight
+
+  return `${hour}:${minutes} ${period}`;
+}
+
+// Start countdown to next prayer
+function startCountdown() {
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+  }
+
+  updateCountdown();
+  countdownInterval = setInterval(updateCountdown, 1000);
+}
+
+// Update countdown display
+function updateCountdown() {
+  if (!prayerTimesData) return;
+
+  const now = new Date();
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+
+  // Main prayers only
+  const prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
+  let nextPrayer = null;
+  let nextPrayerTime = null;
+
+  for (const prayer of prayers) {
+    const [hours, minutes] = prayerTimesData[prayer].split(":").map(Number);
+    const prayerTimeInMinutes = hours * 60 + minutes;
+
+    if (prayerTimeInMinutes > currentTime) {
+      nextPrayer = prayer;
+      nextPrayerTime = prayerTimeInMinutes;
+      break;
+    }
+  }
+
+  // If no prayer found today, next is Fajr tomorrow
+  if (!nextPrayer) {
+    nextPrayer = "Fajr";
+    const [hours, minutes] = prayerTimesData.Fajr.split(":").map(Number);
+    nextPrayerTime = hours * 60 + minutes + 24 * 60; // Add 24 hours
+  }
+
+  const timeDiff = nextPrayerTime - currentTime;
+  const hours = Math.floor(timeDiff / 60);
+  const minutes = timeDiff % 60;
+
+  const nextPrayerNameEl = document.getElementById("nextPrayerName");
+  const countdownTimeEl = document.getElementById("countdownTime");
+
+  if (nextPrayerNameEl) {
+    nextPrayerNameEl.textContent = prayerNames[nextPrayer];
+  }
+
+  if (countdownTimeEl) {
+    if (hours > 0) {
+      countdownTimeEl.textContent = `${hours} ساعة و ${minutes} دقيقة`;
+    } else {
+      countdownTimeEl.textContent = `${minutes} دقيقة`;
+    }
+  }
+
+  // Highlight next prayer card
+  document.querySelectorAll(".prayer-card").forEach((card) => {
+    card.classList.remove("next-prayer");
+  });
+
+  const nextCard = document.querySelector(`[data-prayer="${nextPrayer}"]`);
+  if (nextCard) {
+    nextCard.classList.add("next-prayer");
+  }
+}
+
+// Show prayer times error
+function showPrayerTimesError(message) {
+  const loading = document.getElementById("prayerTimesLoading");
+  const error = document.getElementById("prayerTimesError");
+
+  if (loading) loading.style.display = "none";
+
+  if (error) {
+    error.classList.remove("hidden");
+    const errorText = error.querySelector("p");
+    if (errorText) {
+      errorText.textContent = message;
+    }
+  }
+}
+
 // Initialize enhanced features when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
   // Mark that user has interacted (for audio)
@@ -2970,6 +3256,7 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeEnhancedFeatures();
     initializeInstallPrompt();
     initializeEnhancedUX(); // Add enhanced UX features
+    initializePrayerTimes(); // Initialize prayer times
     // Show install prompt on first visit
     showInstallPrompt();
   }, 500);
