@@ -3048,7 +3048,22 @@ async function requestLocation() {
     await fetchPrayerTimes(latitude, longitude, cityName);
   } catch (err) {
     console.error("Location error:", err);
-    showPrayerTimesError("تعذر تحديد الموقع. يرجى السماح بالوصول إلى الموقع.");
+    // Use Cairo as default location if geolocation fails or is denied
+    const cairoLat = 30.0444;
+    const cairoLng = 31.2357;
+    const cairoName = "القاهرة";
+
+    // Save Cairo as default location
+    localStorage.setItem(
+      "prayerLocation",
+      JSON.stringify({
+        latitude: cairoLat,
+        longitude: cairoLng,
+        city: cairoName,
+      })
+    );
+
+    await fetchPrayerTimes(cairoLat, cairoLng, cairoName);
   }
 }
 
