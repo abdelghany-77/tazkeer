@@ -1533,6 +1533,9 @@ function showHomePage() {
   Object.keys(adhkarData).forEach((categoryKey, index) => {
     createCategoryCard(categoryKey, adhkarData[categoryKey], index);
   });
+
+  // Scroll to top of page
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Show category page with adhkar
@@ -2473,6 +2476,11 @@ function setupOfflineDetection() {
     isOnline = false;
     offlineIndicator.style.display = "block";
     showEnhancedNotification("فقد الاتصال بالإنترنت", "warning");
+
+    // Hide the offline indicator after 3 seconds
+    setTimeout(() => {
+      offlineIndicator.style.display = "none";
+    }, 3000);
   });
 }
 
