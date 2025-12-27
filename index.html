@@ -1,265 +1,236 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="/tazkeer/" />
-    <!-- Base href commented out for local development. Uncomment before deploying to GitHub Pages -->
-    <title>ذَكِّرْ</title>
 
-    <!-- SEO and Accessibility -->
-    <meta
-      name="description"
-      content="تطبيق الأذكار الإسلامية الشامل - أذكار الصباح والمساء والنوم والاستيقاظ من الكتاب والسنة النبوية مع الفوائد والأحكام"
-    />
-    <meta
-      name="keywords"
-      content="أذكار, إسلامية, صباح, مساء, نوم, استيقاظ, قرآن, سنة, دعاء, تسبيح"
-    />
-    <meta name="author" content="Islamic Adhkar App" />
-    <meta name="robots" content="index, follow" />
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Open Graph for sharing -->
-    <meta property="og:title" content="ذَكِّرْ" />
-    <meta
-      property="og:description"
-      content="تطبيق شامل للأذكار الإسلامية من الكتاب والسنة"
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="ar_SA" />
+  <title>ذَكِّرْ | أذكار الصباح والمساء ومواقيت الصلاة</title>
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8IS0tIEJhY2tncm91bmQgY2lyY2xlIHdpdGggZ3JhZGllbnQgLS0+CiAgPGRlZnM+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImJnR3JhZGllbnQiIGN4PSI1MCUiIGN5PSIzMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNjY3ZWVhO3N0b3Atb3BhY2l0eToxIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM3NjRiYTI7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ0ZXh0R3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojZmZmZmZmO3N0b3Atb3BhY2l0eTowLjkiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2Y3ZmFmYztzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDwhLS0gQmFja2dyb3VuZCAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0idXJsKCNiZ0dyYWRpZW50KSIgLz4KICA8IS0tIENyZXNjZW50IG1vb24gKElzbGFtaWMgc3ltYm9sKSAtLT4KICA8cGF0aCBkPSJNMTIgNmMtNC40IDAtOCAzLjYtOCA4czMuNiA4IDggOGMxLjUgMCAyLjktMC40IDQuMS0xLjItMi40IDAuOC01LjEtMC4yLTYuNy0yLjgtMS42LTIuNi0xLjEtNiAxLjItOC4xQzExLjIgNi4zIDExLjYgNi4xIDEyIDZ6IiBmaWxsPSJ1cmwoI3RleHRHcmFkaWVudCkiIG9wYWNpdHk9IjAuOCIvPgogIDwhLS0gVGFzYmloIGJlYWRzIChwcmF5ZXIgYmVhZHMpIC0tPgogIDxjaXJjbGUgY3g9IjIyIiBjeT0iMTAiIHI9IjIiIGZpbGw9InVybCgjdGV4dEdyYWRpZW50KSIgb3BhY2l0eT0iMC43Ii8+CiAgPGNpcmNsZSBjeD0iMjQiIGN5PSIxNiIgcj0iMS41IiBmaWxsPSJ1cmwoI3RleHRHcmFkaWVudCkiIG9wYWNpdHk9IjAuNiIvPgogIDxjaXJjbGUgY3g9IjIyIiBjeT0iMjIiIHI9IjEuNSIgZmlsbD0idXJsKCN0ZXh0R3JhZGllbnQpIiBvcGFjaXR5PSIwLjYiLz4KICA8IS0tIEFyYWJpYy1zdHlsZSBkZWNvcmF0aXZlIGVsZW1lbnQgLS0+CiAgPHBhdGggZD0iTTggMTZjMC0xIDEtMiAyLTJzMiAxIDIgMi0xIDItMiAyLTItMS0yLTJ6IE0xNiAxMmMwLTAuNSAwLjUtMSAxLTFzMSAwLjUgMSAxLTAuNSAxLTEgMS0xLTAuNS0xLTF6IiBmaWxsPSJ1cmwoI3RleHRHcmFkaWVudCkiIG9wYWNpdHk9IjAuNSIvPgo8L3N2Zz4="
-    />
-    <link rel="apple-touch-icon" href="favicon.svg" />
-    <meta name="theme-color" content="#667eea" />
-    <link rel="manifest" href="manifest.json" />
+  <meta name="description"
+    content="تطبيق ذَكِّرْ - رفيقك اليومي لأذكار الصباح والمساء من الكتاب والسنة، مع مواقيت الصلاة واتجاه القبلة وعداد للتسبيح. صدقة جارية." />
+  <meta name="keywords"
+    content="أذكار الصباح, أذكار المساء, مواقيت الصلاة, اتجاه القبلة, تسبيح, أذكار النوم, تطبيق إسلامي, tazkeer, أذكار, إسلامية" />
+  <meta name="author" content="Abdelghany-77" />
+  <meta name="robots" content="index, follow" />
 
-    <link rel="stylesheet" href="styles.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-  </head>
-  <body>
-    <!-- Header -->
-    <header class="header">
-      <div class="container">
-        <div class="header-content">
-          <h1 class="logo">
-            <i class="fas fa-moon"></i>
-            ذَكِّرْ
-          </h1>
-          <nav class="nav" id="nav">
-            <!-- <button class="nav-btn install-btn" id="installBtn">
+  <meta property="og:title" content="تطبيق ذَكِّرْ | أذكار ومواقيت الصلاة" />
+  <meta property="og:description" content="تطبيق شامل للأذكار الإسلامية من الكتاب والسنة ومواقيت الصلاة" />
+  <meta property="og:image" content="https://abdelghany-77.github.io/tazkeer/images/og-image.jpg" />
+  <meta property="og:url" content="https://abdelghany-77.github.io/tazkeer/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ar_SA" />
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32"
+    href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8IS0tIEJhY2tncm91bmQgY2lyY2xlIHdpdGggZ3JhZGllbnQgLS0+CiAgPGRlZnM+CiAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImJnR3JhZGllbnQiIGN4PSI1MCUiIGN5PSIzMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNjY3ZWVhO3N0b3Atb3BhY2l0eToxIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM3NjRiYTI7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICA8L3JhZGlhbEdyYWRpZW50PgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ0ZXh0R3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojZmZmZmZmO3N0b3Atb3BhY2l0eTowLjkiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I2Y3ZmFmYztzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDwhLS0gQmFja2dyb3VuZCAtLT4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0idXJsKCNiZ0dyYWRpZW50KSIgLz4KICA8IS0tIENyZXNjZW50IG1vb24gKElzbGFtaWMgc3ltYm9sKSAtLT4KICA8cGF0aCBkPSJNMTIgNmMtNC40IDAtOCAzLjYtOCA4czMuNiA4IDggOGMxLjUgMCAyLjktMC40IDQuMS0xLjItMi40IDAuOC01LjEtMC4yLTYuNy0yLjgtMS42LTIuNi0xLjEtNiAxLjItOC4xQzExLjIgNi4zIDExLjYgNi4xIDEyIDZ6IiBmaWxsPSJ1cmwoI3RleHRHcmFkaWVudCkiIG9wYWNpdHk9IjAuOCIvPgogIDwhLS0gVGFzYmloIGJlYWRzIChwcmF5ZXIgYmVhZHMpIC0tPgogIDxjaXJjbGUgY3g9IjIyIiBjeT0iMTAiIHI9IjIiIGZpbGw9InVybCgjdGV4dEdyYWRpZW50KSIgb3BhY2l0eT0iMC43Ii8+CiAgPGNpcmNsZSBjeD0iMjQiIGN5PSIxNiIgcj0iMS41IiBmaWxsPSJ1cmwoI3RleHRHcmFkaWVudCkiIG9wYWNpdHk9IjAuNiIvPgogIDxjaXJjbGUgY3g9IjIyIiBjeT0iMjIiIHI9IjEuNSIgZmlsbD0idXJsKCN0ZXh0R3JhZGllbnQpIiBvcGFjaXR5PSIwLjYiLz4KICA8IS0tIEFyYWJpYy1zdHlsZSBkZWNvcmF0aXZlIGVsZW1lbnQgLS0+CiAgPHBhdGggZD0iTTggMTZjMC0xIDEtMiAyLTJzMiAxIDIgMi0xIDItMiAyLTItMS0yLTJ6IE0xNiAxMmMwLTAuNSAwLjUtMSAxLTFzMSAwLjUgMSAxLTAuNSAxLTEgMS0xLTAuNS0xLTF6IiBmaWxsPSJ1cmwoI3RleHRHcmFkaWVudCkiIG9wYWNpdHk9IjAuNSIvPgo8L3N2Zz4=" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+  <meta name="theme-color" content="#667eea" />
+  <link rel="manifest" href="manifest.json" />
+
+  <link rel="stylesheet" href="styles.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <h1 class="logo">
+          <i class="fas fa-moon"></i>
+          ذَكِّرْ
+        </h1>
+        <nav class="nav" id="nav">
+          <!-- <button class="nav-btn install-btn" id="installBtn">
               <i class="fas fa-download"></i>
               تثبيت التطبيق
             </button> -->
-            <button class="nav-btn theme-toggle-btn" id="themeToggle">
-              <i class="fas fa-sun"></i>
-              الوضع النهاري
-            </button>
-            <button class="nav-btn" id="homeBtn">
-              <i class="fas fa-home"></i>
-              الرئيسية
-            </button>
-            <button class="nav-btn back-btn hidden" id="backBtn">
-              <i class="fas fa-arrow-right"></i>
-              العودة
-            </button>
-          </nav>
-        </div>
+          <button class="nav-btn theme-toggle-btn" id="themeToggle">
+            <i class="fas fa-sun"></i>
+            الوضع النهاري
+          </button>
+          <button class="nav-btn" id="homeBtn">
+            <i class="fas fa-home"></i>
+            الرئيسية
+          </button>
+          <button class="nav-btn back-btn hidden" id="backBtn">
+            <i class="fas fa-arrow-right"></i>
+            العودة
+          </button>
+        </nav>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <!-- Main Content -->
-    <main class="main">
-      <div class="container">
-        <!-- Home Page -->
-        <div id="homePage">
-          <!-- Welcome Section -->
-          <div class="welcome-section">
-            <h2 class="welcome-title">أهلاً وسهلاً بك في تطبيق ذَكِّرْ</h2>
-            <p class="welcome-description">
-              اختر نوع الأذكار التي تريد قراءتها
-            </p>
-          </div>
-
-          <!-- Prayer Times Section -->
-          <div class="prayer-times-section" id="prayerTimesSection">
-            <div class="prayer-times-header">
-              <h3 class="prayer-times-title">
-                <i class="fas fa-mosque"></i>
-                مواعيد الصلاة
-              </h3>
-              <button
-                class="location-btn"
-                id="locationBtn"
-                title="تحديث الموقع"
-              >
-                <i class="fas fa-location-crosshairs"></i>
-              </button>
-            </div>
-
-            <div class="prayer-times-location" id="prayerLocation">
-              <i class="fas fa-map-marker-alt"></i>
-              <span id="cityName">جاري تحديد الموقع...</span>
-            </div>
-
-            <div class="next-prayer-countdown" id="nextPrayerCountdown">
-              <div class="countdown-label">الصلاة القادمة</div>
-              <div class="countdown-prayer" id="nextPrayerName">—</div>
-              <div class="countdown-time" id="countdownTime">—</div>
-            </div>
-
-            <div class="prayer-times-grid" id="prayerTimesGrid">
-              <!-- Prayer cards will be populated by JavaScript -->
-            </div>
-
-            <div class="prayer-times-loading" id="prayerTimesLoading">
-              <i class="fas fa-spinner fa-spin"></i>
-              <p>جاري تحميل مواقيت الصلاة...</p>
-            </div>
-
-            <div class="prayer-times-error hidden" id="prayerTimesError">
-              <i class="fas fa-exclamation-triangle"></i>
-              <p>تعذر تحميل مواقيت الصلاة</p>
-              <button class="retry-btn" id="retryPrayerTimes">
-                <i class="fas fa-redo"></i>
-                إعادة المحاولة
-              </button>
-            </div>
-          </div>
-
-          <!-- Categories Container -->
-          <div class="categories-container" id="categoriesContainer">
-            <!-- Category cards will be populated by JavaScript -->
-          </div>
+  <!-- Main Content -->
+  <main class="main">
+    <div class="container">
+      <!-- Home Page -->
+      <div id="homePage">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+          <h2 class="welcome-title">أهلاً وسهلاً بك في تطبيق ذَكِّرْ</h2>
+          <p class="welcome-description">
+            اختر نوع الأذكار التي تريد قراءتها
+          </p>
         </div>
 
-        <!-- Category Details Page -->
-        <div id="categoryPage" class="hidden">
-          <!-- Font Size Controls -->
-          <div class="font-controls">
-            <button class="font-btn" onclick="setFontSize('small', true)">
-              <i class="fas fa-font font-small"></i> صغير
-            </button>
-            <button
-              class="font-btn active"
-              onclick="setFontSize('medium', true)"
-            >
-              <i class="fas fa-font"></i> متوسط
-            </button>
-            <button class="font-btn" onclick="setFontSize('large', true)">
-              <i class="fas fa-font font-large"></i> كبير
+        <!-- Prayer Times Section -->
+        <div class="prayer-times-section" id="prayerTimesSection">
+          <div class="prayer-times-header">
+            <h3 class="prayer-times-title">
+              <i class="fas fa-mosque"></i>
+              مواعيد الصلاة
+            </h3>
+            <button class="location-btn" id="locationBtn" title="تحديث الموقع">
+              <i class="fas fa-location-crosshairs"></i>
             </button>
           </div>
 
-          <!-- Category Title -->
-          <div class="category-header">
-            <h2 id="categoryTitle">أذكار الصباح</h2>
-            <p id="categoryDescription">أذكار الصباح من الكتاب والسنة</p>
-            <button class="reset-all-btn" id="resetAllBtn">
-              <i class="fas fa-refresh"></i>
-              إعادة تعيين جميع الأذكار
-            </button>
+          <div class="prayer-times-location" id="prayerLocation">
+            <i class="fas fa-map-marker-alt"></i>
+            <span id="cityName">جاري تحديد الموقع...</span>
           </div>
 
-          <!-- Adhkar Container -->
-          <div class="adhkar-container" id="adhkarContainer">
-            <!-- Adhkar cards will be populated by JavaScript -->
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <p>
-          اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد
-          عَبْدالغَنِي أَحْمَد وَجَمِيعِ أَمْوَاتِ المُسْلِمِينَ
-        </p>
-      </div>
-    </footer>
-
-    <!-- Counter Modal -->
-    <div id="counterModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="modalTitle">عَدَّادُ الذِّكْر</h3>
-          <span class="close">&times;</span>
-        </div>
-        <div class="modal-body">
-          <div class="counter-display">
-            <div class="count-number" id="countNumber">٠</div>
-            <div class="count-total">مِن <span id="totalCount">٠</span></div>
+          <div class="next-prayer-countdown" id="nextPrayerCountdown">
+            <div class="countdown-label">الصلاة القادمة</div>
+            <div class="countdown-prayer" id="nextPrayerName">—</div>
+            <div class="countdown-time" id="countdownTime">—</div>
           </div>
 
-          <div class="fadl-section" id="fadlSection">
-            <div class="fadl-header">
-              <i class="fas fa-star"></i>
-              <!-- <span>فضل هذا الذكر</span> -->
-            </div>
-            <p class="fadl-text" id="fadlText"></p>
+          <div class="prayer-times-grid" id="prayerTimesGrid">
+            <!-- Prayer cards will be populated by JavaScript -->
           </div>
 
-          <div class="counter-controls">
-            <button class="count-btn" id="countBtn">
-              <i class="fas fa-plus"></i>
-            </button>
-            <button class="reset-btn" id="resetBtn">
+          <div class="prayer-times-loading" id="prayerTimesLoading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>جاري تحميل مواقيت الصلاة...</p>
+          </div>
+
+          <div class="prayer-times-error hidden" id="prayerTimesError">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>تعذر تحميل مواقيت الصلاة</p>
+            <button class="retry-btn" id="retryPrayerTimes">
               <i class="fas fa-redo"></i>
-              إعادة تعيين
+              إعادة المحاولة
             </button>
           </div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-          </div>
+        </div>
+
+        <!-- Categories Container -->
+        <div class="categories-container" id="categoriesContainer">
+          <!-- Category cards will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Category Details Page -->
+      <div id="categoryPage" class="hidden">
+        <!-- Font Size Controls -->
+        <div class="font-controls">
+          <button class="font-btn" onclick="setFontSize('small', true)">
+            <i class="fas fa-font font-small"></i> صغير
+          </button>
+          <button class="font-btn active" onclick="setFontSize('medium', true)">
+            <i class="fas fa-font"></i> متوسط
+          </button>
+          <button class="font-btn" onclick="setFontSize('large', true)">
+            <i class="fas fa-font font-large"></i> كبير
+          </button>
+        </div>
+
+        <!-- Category Title -->
+        <div class="category-header">
+          <h2 id="categoryTitle">أذكار الصباح</h2>
+          <p id="categoryDescription">أذكار الصباح من الكتاب والسنة</p>
+          <button class="reset-all-btn" id="resetAllBtn">
+            <i class="fas fa-refresh"></i>
+            إعادة تعيين جميع الأذكار
+          </button>
+        </div>
+
+        <!-- Adhkar Container -->
+        <div class="adhkar-container" id="adhkarContainer">
+          <!-- Adhkar cards will be populated by JavaScript -->
         </div>
       </div>
     </div>
+  </main>
 
-    <!-- Quick Access Toolbar -->
-    <div class="quick-access">
-      <button
-        class="quick-btn"
-        id="scrollTopBtn"
-        title="العودة للأعلى"
-        aria-label="العودة للأعلى"
-      >
-        <i class="fas fa-arrow-up"></i>
-        <span class="quick-btn-label">أعلى</span>
-      </button>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>
+        اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد
+        عَبْدالغَنِي أَحْمَد وَجَمِيعِ أَمْوَاتِ المُسْلِمِينَ
+      </p>
     </div>
+  </footer>
 
-    <!-- Home Quick Button -->
-    <div class="quick-home">
-      <button
-        class="quick-btn"
-        id="quickHomeBtn"
-        title="العودة للرئيسية"
-        aria-label="العودة للرئيسية"
-      >
-        <i class="fas fa-home"></i>
-      </button>
+  <!-- Counter Modal -->
+  <div id="counterModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">عَدَّادُ الذِّكْر</h3>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="counter-display">
+          <div class="count-number" id="countNumber">٠</div>
+          <div class="count-total">مِن <span id="totalCount">٠</span></div>
+        </div>
+
+        <div class="fadl-section" id="fadlSection">
+          <div class="fadl-header">
+            <i class="fas fa-star"></i>
+            <!-- <span>فضل هذا الذكر</span> -->
+          </div>
+          <p class="fadl-text" id="fadlText"></p>
+        </div>
+
+        <div class="counter-controls">
+          <button class="count-btn" id="countBtn">
+            <i class="fas fa-plus"></i>
+          </button>
+          <button class="reset-btn" id="resetBtn">
+            <i class="fas fa-redo"></i>
+            إعادة تعيين
+          </button>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Floating Notification -->
-    <div class="notification" id="notification">
-      <i class="fas fa-check-circle"></i>
-      <span id="notificationText">تم النسخ بنجاح!</span>
-    </div>
+  <!-- Quick Access Toolbar -->
+  <div class="quick-access">
+    <button class="quick-btn" id="scrollTopBtn" title="العودة للأعلى" aria-label="العودة للأعلى">
+      <i class="fas fa-arrow-up"></i>
+      <span class="quick-btn-label">أعلى</span>
+    </button>
+  </div>
 
-    <script src="script.js"></script>
-  </body>
+  <!-- Home Quick Button -->
+  <div class="quick-home">
+    <button class="quick-btn" id="quickHomeBtn" title="العودة للرئيسية" aria-label="العودة للرئيسية">
+      <i class="fas fa-home"></i>
+    </button>
+  </div>
+
+  <!-- Floating Notification -->
+  <div class="notification" id="notification">
+    <i class="fas fa-check-circle"></i>
+    <span id="notificationText">تم النسخ بنجاح!</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
 </html>
