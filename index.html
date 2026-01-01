@@ -81,6 +81,95 @@
           </p>
         </div>
 
+        <!-- Statistics Dashboard -->
+        <div class="stats-dashboard" id="statsDashboard">
+          <div class="stats-header">
+            <h3><i class="fas fa-chart-line"></i> إحصائياتك</h3>
+            <button class="stats-toggle-btn" id="statsToggleBtn" title="إظهار/إخفاء">
+              <i class="fas fa-chevron-up"></i>
+            </button>
+          </div>
+          <div class="stats-content" id="statsContent">
+            <div class="stats-cards">
+              <div class="stat-card streak">
+                <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                <div class="stat-value" id="streakCount">0</div>
+                <div class="stat-label">أيام متتالية</div>
+              </div>
+              <div class="stat-card today">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-value" id="todayCount">0</div>
+                <div class="stat-label">أذكار اليوم</div>
+              </div>
+              <div class="stat-card week">
+                <div class="stat-icon"><i class="fas fa-calendar-week"></i></div>
+                <div class="stat-value" id="weekCount">0</div>
+                <div class="stat-label">هذا الأسبوع</div>
+              </div>
+              <div class="stat-card total">
+                <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">إجمالي الإنجاز</div>
+              </div>
+            </div>
+            <!-- Weekly Progress Chart -->
+            <div class="weekly-chart">
+              <h4><i class="fas fa-chart-bar"></i> نشاط الأسبوع</h4>
+              <div class="chart-bars" id="weeklyBars">
+                <div class="chart-day">
+                  <div class="bar" data-day="6"></div><span>السبت</span>
+                </div>
+                <div class="chart-day">
+                  <div class="bar" data-day="0"></div><span>الأحد</span>
+                </div>
+                <div class="chart-day">
+                  <div class="bar" data-day="1"></div><span>الإثنين</span>
+                </div>
+                <div class="chart-day">
+                  <div class="bar" data-day="2"></div><span>الثلاثاء</span>
+                </div>
+                <div class="chart-day">
+                  <div class="bar" data-day="3"></div><span>الأربعاء</span>
+                </div>
+                <div class="chart-day">
+                  <div class="bar" data-day="4"></div><span>الخميس</span>
+                </div>
+                <div class="chart-day">
+                  <div class="bar" data-day="5"></div><span>الجمعة</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Qibla Compass -->
+        <div class="qibla-section" id="qiblaSection">
+          <div class="qibla-header">
+            <h3><i class="fas fa-compass"></i> اتجاه القبلة</h3>
+            <button class="qibla-calibrate-btn" id="qiblaCalibrateBtn" title="معايرة البوصلة">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+          <div class="qibla-compass-container">
+            <div class="compass" id="compass">
+              <div class="compass-dial">
+                <div class="compass-needle" id="compassNeedle"></div>
+                <div class="compass-kaaba">
+                  <i class="fas fa-kaaba"></i>
+                </div>
+                <div class="compass-direction north">N</div>
+                <div class="compass-direction east">E</div>
+                <div class="compass-direction south">S</div>
+                <div class="compass-direction west">W</div>
+              </div>
+            </div>
+            <div class="qibla-info">
+              <p class="qibla-degrees" id="qiblaDegrees">—°</p>
+              <p class="qibla-status" id="qiblaStatus">جاري تحديد الاتجاه...</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Prayer Times Section -->
         <div class="prayer-times-section" id="prayerTimesSection">
           <div class="prayer-times-header">
@@ -141,6 +230,19 @@
           </button>
           <button class="font-btn" onclick="setFontSize('large', true)">
             <i class="fas fa-font font-large"></i> كبير
+          </button>
+        </div>
+
+        <!-- Reading Mode Controls -->
+        <div class="reading-mode-controls">
+          <button class="reading-btn" id="autoScrollBtn" onclick="toggleAutoScroll()">
+            <i class="fas fa-scroll"></i> التمرير التلقائي
+          </button>
+          <button class="reading-btn" id="focusModeBtn" onclick="enterFocusMode()">
+            <i class="fas fa-expand"></i> وضع التركيز
+          </button>
+          <button class="reading-btn" id="nightReadingBtn" onclick="toggleNightReading()">
+            <i class="fas fa-moon"></i> القراءة الليلية
           </button>
         </div>
 
@@ -228,6 +330,58 @@
   <div class="notification" id="notification">
     <i class="fas fa-check-circle"></i>
     <span id="notificationText">تم النسخ بنجاح!</span>
+  </div>
+
+  <!-- Focus Mode Overlay -->
+  <div class="focus-mode-overlay hidden" id="focusModeOverlay">
+    <div class="focus-mode-content">
+      <button class="focus-close-btn" id="focusCloseBtn" onclick="exitFocusMode()">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="focus-navigation">
+        <button class="focus-nav-btn" id="focusPrevBtn" onclick="focusPrev()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="focus-counter" id="focusCounter">1/10</div>
+        <button class="focus-nav-btn" id="focusNextBtn" onclick="focusNext()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      <div class="focus-zikr">
+        <p class="focus-text" id="focusText">الذكر يظهر هنا...</p>
+        <p class="focus-source" id="focusSource">المصدر</p>
+        <p class="focus-fadl" id="focusFadl">الفضل</p>
+      </div>
+      <div class="focus-progress">
+        <div class="focus-progress-bar">
+          <div class="focus-progress-fill" id="focusProgressFill"></div>
+        </div>
+        <span class="focus-count-text" id="focusCountText">0/3</span>
+      </div>
+      <button class="focus-count-btn" id="focusCountBtn" onclick="incrementFocusCount()">
+        <i class="fas fa-plus"></i> عدّ
+      </button>
+    </div>
+  </div>
+
+  <!-- Auto-Scroll Speed Control -->
+  <div class="auto-scroll-control hidden" id="autoScrollControl">
+    <button class="scroll-speed-btn" onclick="changeScrollSpeed(-1)">
+      <i class="fas fa-minus"></i>
+    </button>
+    <span id="scrollSpeedLabel">سرعة: متوسطة</span>
+    <button class="scroll-speed-btn" onclick="changeScrollSpeed(1)">
+      <i class="fas fa-plus"></i>
+    </button>
+    <button class="stop-scroll-btn" onclick="toggleAutoScroll()">
+      <i class="fas fa-stop"></i> إيقاف
+    </button>
+  </div>
+
+  <!-- Offline Indicator -->
+  <div class="offline-banner hidden" id="offlineBanner">
+    <i class="fas fa-wifi-slash"></i>
+    <span>لا يوجد اتصال بالإنترنت - التطبيق يعمل بدون اتصال</span>
   </div>
 
   <script src="script.js"></script>

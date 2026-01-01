@@ -871,6 +871,153 @@ const adhkarData = {
       },
     ],
   },
+  rain: {
+    title: "أذكار المطر",
+    description: "أذكار وأدعية عند نزول المطر",
+    icon: "fas fa-cloud-rain",
+    adhkar: [
+      {
+        text: "اللَّهُمَّ صَيِّبًا نَافِعًا",
+        source: "البخاري",
+        fadl: "دعاء النبي ﷺ عند نزول المطر، يُستحب قوله عند رؤية المطر طلباً لأن يكون المطر نافعاً مباركاً.",
+        count: 3,
+        currentCount: 0,
+      },
+      {
+        text: "مُطِرْنَا بِفَضْلِ اللَّهِ وَرَحْمَتِهِ",
+        source: "البخاري ومسلم",
+        fadl: "هذا القول من الشكر لله على نعمة المطر، ومن قاله فقد نسب النعمة لصاحبها سبحانه وتعالى.",
+        count: 1,
+        currentCount: 0,
+      },
+      {
+        text: "اللَّهُمَّ حَوَالَيْنَا وَلَا عَلَيْنَا، اللَّهُمَّ عَلَى الْآكَامِ وَالظِّرَابِ، وَبُطُونِ الْأَوْدِيَةِ، وَمَنَابِتِ الشَّجَرِ",
+        source: "البخاري ومسلم",
+        fadl: "دعاء الاستصحاء إذا كثر المطر وخُشي منه الضرر، طلباً لصرف المطر عن المباني والطرق إلى الأماكن النافعة.",
+        count: 1,
+        currentCount: 0,
+      },
+      {
+        text: "اللَّهُمَّ اسْقِنَا غَيْثًا مُغِيثًا مَرِيئًا مَرِيعًا، نَافِعًا غَيْرَ ضَارٍّ، عَاجِلًا غَيْرَ آجِلٍ",
+        source: "أبو داود",
+        fadl: "دعاء الاستسقاء، يُقال عند الحاجة للمطر، جامع لطلب الغيث النافع المبارك.",
+        count: 1,
+        currentCount: 0,
+      },
+      {
+        text: "سُبْحَانَ الَّذِي يُسَبِّحُ الرَّعْدُ بِحَمْدِهِ وَالْمَلَائِكَةُ مِنْ خِيفَتِهِ",
+        source: "الموطأ",
+        fadl: "يُقال عند سماع الرعد، وهو تسبيح لله وإقرار بعظمته، كان عبدالله بن الزبير يقوله.",
+        count: 1,
+        currentCount: 0,
+      },
+    ],
+  },
+  anxiety: {
+    title: "أذكار الكرب والهم",
+    description: "أدعية لتفريج الهم والكرب والحزن",
+    icon: "fas fa-heart-pulse",
+    adhkar: [
+      {
+        text: "لَا إِلَهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ",
+        source: "البخاري ومسلم",
+        fadl: "دعاء الكرب، كان النبي ﷺ يدعو به عند الكرب، وهو توحيد وتمجيد لله بأسمائه العظيمة.",
+        count: 3,
+        currentCount: 0,
+      },
+      {
+        text: "اللَّهُمَّ رَحْمَتَكَ أَرْجُو فَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ، وَأَصْلِحْ لِي شَأْنِي كُلَّهُ، لَا إِلَهَ إِلَّا أَنْتَ",
+        source: "أبو داود",
+        fadl: "دعاء عظيم للاستعانة بالله وطلب إصلاح الحال، من دعا به أُصلح شأنه ولم يُوكل لنفسه.",
+        count: 3,
+        currentCount: 0,
+      },
+      {
+        text: "لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ",
+        source: "الترمذي",
+        fadl: "دعاء ذي النون (يونس عليه السلام) في بطن الحوت، ما دعا به مسلم في شيء قط إلا استجاب الله له.",
+        count: 7,
+        currentCount: 0,
+      },
+      {
+        text: "اللَّهُمَّ إِنِّي عَبْدُكَ، ابْنُ عَبْدِكَ، ابْنُ أَمَتِكَ، نَاصِيَتِي بِيَدِكَ، مَاضٍ فِيَّ حُكْمُكَ، عَدْلٌ فِيَّ قَضَاؤُكَ، أَسْأَلُكَ بِكُلِّ اسْمٍ هُوَ لَكَ، سَمَّيْتَ بِهِ نَفْسَكَ، أَوْ أَنْزَلْتَهُ فِي كِتَابِكَ، أَوْ عَلَّمْتَهُ أَحَدًا مِنْ خَلْقِكَ، أَوِ اسْتَأْثَرْتَ بِهِ فِي عِلْمِ الْغَيْبِ عِنْدَكَ، أَنْ تَجْعَلَ الْقُرْآنَ رَبِيعَ قَلْبِي، وَنُورَ صَدْرِي، وَجَلَاءَ حُزْنِي، وَذَهَابَ هَمِّي",
+        source: "أحمد",
+        fadl: "من أعظم أدعية الكرب والهم، من قاله أذهب الله همه وأبدله مكانه فرحاً. دعاء شامل جامع.",
+        count: 1,
+        currentCount: 0,
+      },
+      {
+        text: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَأَعُوذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ، وَأَعُوذُ بِكَ مِنَ الْجُبْنِ وَالْبُخْلِ، وَأَعُوذُ بِكَ مِنْ غَلَبَةِ الدَّيْنِ وَقَهْرِ الرِّجَالِ",
+        source: "البخاري",
+        fadl: "كان النبي ﷺ يُكثر من هذا الدعاء، استعاذة جامعة من جميع أسباب الهم والضيق.",
+        count: 3,
+        currentCount: 0,
+      },
+      {
+        text: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
+        source: "البخاري",
+        fadl: "قالها إبراهيم عليه السلام حين ألقي في النار، وقالها المسلمون في غزوة أحد. كلمة التوكل والاعتماد على الله.",
+        count: 7,
+        currentCount: 0,
+      },
+      {
+        text: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ",
+        source: "الترمذي",
+        fadl: "استغاثة بالله باسميه العظيمين الحي القيوم، من أنفع الأدعية عند الكرب والشدة.",
+        count: 3,
+        currentCount: 0,
+      },
+      {
+        text: "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+        source: "البخاري ومسلم",
+        fadl: "كنز من كنوز الجنة، دواء من تسعة وتسعين داء أيسرها الهم. قالها النبي ﷺ كثيراً.",
+        count: 10,
+        currentCount: 0,
+      },
+    ],
+  },
+  home: {
+    title: "أذكار الدخول والخروج",
+    description: "أذكار دخول المنزل والخروج منه",
+    icon: "fas fa-house-user",
+    adhkar: [
+      {
+        text: "بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى رَبِّنَا تَوَكَّلْنَا",
+        source: "أبو داود",
+        fadl: "دعاء دخول المنزل، من قاله عند الدخول قيل له: كُفيت وهُديت ووُقيت، ويتنحى الشيطان.",
+        count: 1,
+        currentCount: 0,
+      },
+      {
+        text: "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلَجِ وَخَيْرَ الْمَخْرَجِ، بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا",
+        source: "أبو داود",
+        fadl: "دعاء شامل لخير الدخول والخروج مع التوكل على الله، يُقال عند دخول المنزل.",
+        count: 1,
+        currentCount: 0,
+      },
+      {
+        text: "بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+        source: "أبو داود والترمذي",
+        fadl: "دعاء الخروج من المنزل، من قاله يُقال له: هُديت وكُفيت ووُقيت، ويتنحى عنه الشيطان.",
+        count: 1,
+        currentCount: 0,
+      },
+      {
+        text: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أَضِلَّ أَوْ أُضَلَّ، أَوْ أَزِلَّ أَوْ أُزَلَّ، أَوْ أَظْلِمَ أَوْ أُظْلَمَ، أَوْ أَجْهَلَ أَوْ يُجْهَلَ عَلَيَّ",
+        source: "أبو داود والترمذي",
+        fadl: "دعاء شامل عند الخروج من المنزل للحفظ من الضلال والزلل والظلم والجهل.",
+        count: 1,
+        currentCount: 0,
+      },
+      {
+        text: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+        source: "صحيح مسلم",
+        fadl: "من قالها حين يخرج لم يضره شيء حتى يرجع، استعاذة شاملة من كل شر.",
+        count: 3,
+        currentCount: 0,
+      },
+    ],
+  },
 };
 
 // Global variables
@@ -3305,7 +3452,545 @@ document.addEventListener("DOMContentLoaded", function () {
     initializeInstallPrompt();
     initializeEnhancedUX(); // Add enhanced UX features
     initializePrayerTimes(); // Initialize prayer times
+    initializeNewFeatures(); // Initialize all new features
     // Show install prompt on first visit
     showInstallPrompt();
   }, 500);
+});
+
+// ========================================
+// NEW FEATURES INITIALIZATION
+// ========================================
+
+function initializeNewFeatures() {
+  initializeStatsDashboard();
+  initializeQiblaCompass();
+  initializeReadingModes();
+  initializeOfflineDetection();
+}
+
+// ========================================
+// STATISTICS DASHBOARD
+// ========================================
+
+// Weekly progress data stored in localStorage
+let weeklyProgress = JSON.parse(localStorage.getItem("weeklyProgress")) || {};
+
+function initializeStatsDashboard() {
+  // Stats toggle functionality
+  const statsToggle = document.getElementById("statsToggleBtn");
+  const statsContent = document.getElementById("statsContent");
+
+  if (statsToggle && statsContent) {
+    statsToggle.addEventListener("click", () => {
+      statsContent.classList.toggle("hidden");
+      statsToggle.classList.toggle("collapsed");
+    });
+  }
+
+  // Update stats on load
+  updateStatsDashboard();
+  updateWeeklyChart();
+}
+
+function updateStatsDashboard() {
+  const today = new Date().toDateString();
+
+  // Get or initialize today's progress
+  if (!weeklyProgress[today]) {
+    weeklyProgress[today] = 0;
+  }
+
+  // Calculate streak
+  let streak = calculateStreak();
+
+  // Get today's count
+  let todayCount = dailyProgress.completedZekr
+    ? dailyProgress.completedZekr.length
+    : 0;
+  weeklyProgress[today] = todayCount;
+  localStorage.setItem("weeklyProgress", JSON.stringify(weeklyProgress));
+
+  // Get weekly count
+  let weekCount = calculateWeeklyCount();
+
+  // Get total count
+  let totalCount = dailyProgress.totalCompletions || 0;
+
+  // Update UI
+  const streakEl = document.getElementById("streakCount");
+  const todayEl = document.getElementById("todayCount");
+  const weekEl = document.getElementById("weekCount");
+  const totalEl = document.getElementById("totalCount");
+
+  if (streakEl) streakEl.textContent = streak;
+  if (todayEl) todayEl.textContent = todayCount;
+  if (weekEl) weekEl.textContent = weekCount;
+  if (totalEl) totalEl.textContent = totalCount;
+}
+
+function calculateStreak() {
+  let streak = 0;
+  let currentDate = new Date();
+
+  // Check consecutive days
+  while (true) {
+    const dateStr = currentDate.toDateString();
+    const count = weeklyProgress[dateStr] || 0;
+
+    if (count > 0) {
+      streak++;
+      currentDate.setDate(currentDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
+
+function calculateWeeklyCount() {
+  let count = 0;
+  const today = new Date();
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    const dateStr = date.toDateString();
+    count += weeklyProgress[dateStr] || 0;
+  }
+
+  return count;
+}
+
+function updateWeeklyChart() {
+  const bars = document.querySelectorAll(".chart-day .bar");
+  const today = new Date();
+  const maxHeight = 100;
+
+  // Find max value for scaling
+  let maxVal = 1;
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - (6 - i));
+    const dateStr = date.toDateString();
+    const val = weeklyProgress[dateStr] || 0;
+    if (val > maxVal) maxVal = val;
+  }
+
+  bars.forEach((bar, index) => {
+    const dayOffset = parseInt(bar.getAttribute("data-day"));
+    const date = new Date(today);
+    // Adjust to get correct day of week
+    const currentDay = today.getDay();
+    const diff = dayOffset - currentDay;
+    date.setDate(date.getDate() + diff);
+    const dateStr = date.toDateString();
+    const val = weeklyProgress[dateStr] || 0;
+
+    const height = Math.max(10, (val / maxVal) * maxHeight);
+    bar.style.height = height + "px";
+
+    // Highlight today
+    if (date.toDateString() === today.toDateString()) {
+      bar.style.background = "linear-gradient(to top, #48bb78, #38a169)";
+    }
+  });
+}
+
+// ========================================
+// QIBLA COMPASS
+// ========================================
+
+let userLocation = null;
+let compassHeading = 0;
+const KAABA_LAT = 21.4225;
+const KAABA_LNG = 39.8262;
+
+function initializeQiblaCompass() {
+  const calibrateBtn = document.getElementById("qiblaCalibrateBtn");
+
+  if (calibrateBtn) {
+    calibrateBtn.addEventListener("click", () => {
+      requestQiblaPermissions();
+    });
+  }
+
+  // Auto-initialize if possible
+  initQibla();
+}
+
+function initQibla() {
+  // Get user location
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        userLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        calculateQiblaDirection();
+        setupCompass();
+      },
+      (error) => {
+        updateQiblaStatus("يرجى السماح بالوصول للموقع");
+        console.log("Geolocation error:", error);
+      }
+    );
+  } else {
+    updateQiblaStatus("المتصفح لا يدعم تحديد الموقع");
+  }
+}
+
+function requestQiblaPermissions() {
+  // Request compass permission on iOS 13+
+  if (
+    typeof DeviceOrientationEvent !== "undefined" &&
+    typeof DeviceOrientationEvent.requestPermission === "function"
+  ) {
+    DeviceOrientationEvent.requestPermission()
+      .then((response) => {
+        if (response === "granted") {
+          setupCompass();
+        }
+      })
+      .catch(console.error);
+  } else {
+    initQibla();
+  }
+}
+
+function calculateQiblaDirection() {
+  if (!userLocation) return 0;
+
+  const lat1 = userLocation.lat * (Math.PI / 180);
+  const lng1 = userLocation.lng * (Math.PI / 180);
+  const lat2 = KAABA_LAT * (Math.PI / 180);
+  const lng2 = KAABA_LNG * (Math.PI / 180);
+
+  const dLng = lng2 - lng1;
+
+  const x = Math.sin(dLng) * Math.cos(lat2);
+  const y =
+    Math.cos(lat1) * Math.sin(lat2) -
+    Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+
+  let qibla = Math.atan2(x, y) * (180 / Math.PI);
+  qibla = (qibla + 360) % 360;
+
+  return qibla;
+}
+
+function setupCompass() {
+  if ("DeviceOrientationEvent" in window) {
+    window.addEventListener(
+      "deviceorientationabsolute",
+      handleOrientation,
+      true
+    );
+    window.addEventListener("deviceorientation", handleOrientation, true);
+    updateQiblaStatus("البوصلة تعمل");
+  } else {
+    // Fallback for devices without compass
+    updateQiblaStatus("البوصلة غير متوفرة");
+    displayStaticQibla();
+  }
+}
+
+function handleOrientation(event) {
+  let heading;
+
+  if (event.webkitCompassHeading) {
+    // iOS
+    heading = event.webkitCompassHeading;
+  } else if (event.alpha) {
+    // Android
+    heading = 360 - event.alpha;
+  } else {
+    return;
+  }
+
+  compassHeading = heading;
+  updateCompassDisplay();
+}
+
+function updateCompassDisplay() {
+  const needle = document.getElementById("compassNeedle");
+  const degreesEl = document.getElementById("qiblaDegrees");
+
+  if (!needle || !userLocation) return;
+
+  const qiblaDirection = calculateQiblaDirection();
+  const rotation = qiblaDirection - compassHeading;
+
+  needle.style.transform = `translate(-50%, -100%) rotate(${rotation}deg)`;
+
+  if (degreesEl) {
+    degreesEl.textContent = Math.round(qiblaDirection) + "°";
+  }
+}
+
+function displayStaticQibla() {
+  if (!userLocation) return;
+
+  const qiblaDirection = calculateQiblaDirection();
+  const degreesEl = document.getElementById("qiblaDegrees");
+
+  if (degreesEl) {
+    degreesEl.textContent = Math.round(qiblaDirection) + "°";
+  }
+}
+
+function updateQiblaStatus(message) {
+  const statusEl = document.getElementById("qiblaStatus");
+  if (statusEl) {
+    statusEl.textContent = message;
+  }
+}
+
+// ========================================
+// READING MODES
+// ========================================
+
+let autoScrollInterval = null;
+let autoScrollSpeed = 2; // 1=slow, 2=medium, 3=fast
+let isAutoScrolling = false;
+let focusModeIndex = 0;
+let focusModeAdhkar = [];
+let isNightReading = false;
+
+function initializeReadingModes() {
+  // Load saved preferences
+  isNightReading = localStorage.getItem("nightReading") === "true";
+  if (isNightReading) {
+    document.body.classList.add("night-reading");
+    updateNightReadingButton();
+  }
+}
+
+function toggleAutoScroll() {
+  const btn = document.getElementById("autoScrollBtn");
+  const control = document.getElementById("autoScrollControl");
+
+  if (isAutoScrolling) {
+    // Stop auto-scroll
+    clearInterval(autoScrollInterval);
+    isAutoScrolling = false;
+    if (btn) btn.classList.remove("active");
+    if (control) control.classList.add("hidden");
+  } else {
+    // Start auto-scroll
+    isAutoScrolling = true;
+    if (btn) btn.classList.add("active");
+    if (control) control.classList.remove("hidden");
+    startAutoScroll();
+  }
+}
+
+function startAutoScroll() {
+  const speeds = [30, 50, 80]; // pixels per second
+  const pixelsPerTick = speeds[autoScrollSpeed - 1] / 60;
+
+  if (autoScrollInterval) {
+    clearInterval(autoScrollInterval);
+  }
+
+  autoScrollInterval = setInterval(() => {
+    window.scrollBy(0, pixelsPerTick);
+
+    // Stop at bottom
+    if (
+      window.innerHeight + window.scrollY >=
+      document.body.offsetHeight - 100
+    ) {
+      toggleAutoScroll();
+    }
+  }, 16); // ~60fps
+}
+
+function changeScrollSpeed(delta) {
+  autoScrollSpeed = Math.max(1, Math.min(3, autoScrollSpeed + delta));
+
+  const labels = ["بطيء", "متوسط", "سريع"];
+  const label = document.getElementById("scrollSpeedLabel");
+  if (label) {
+    label.textContent = "سرعة: " + labels[autoScrollSpeed - 1];
+  }
+
+  // Restart scroll with new speed
+  if (isAutoScrolling) {
+    startAutoScroll();
+  }
+}
+
+function enterFocusMode() {
+  if (!currentCategory || !adhkarData[currentCategory]) {
+    showNotification("يرجى اختيار قسم الأذكار أولاً", "info");
+    return;
+  }
+
+  focusModeAdhkar = adhkarData[currentCategory].adhkar;
+  focusModeIndex = 0;
+
+  const overlay = document.getElementById("focusModeOverlay");
+  if (overlay) {
+    overlay.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+    updateFocusDisplay();
+  }
+}
+
+function exitFocusMode() {
+  const overlay = document.getElementById("focusModeOverlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+    document.body.style.overflow = "auto";
+  }
+}
+
+function focusPrev() {
+  if (focusModeIndex > 0) {
+    focusModeIndex--;
+    updateFocusDisplay();
+  }
+}
+
+function focusNext() {
+  if (focusModeIndex < focusModeAdhkar.length - 1) {
+    focusModeIndex++;
+    updateFocusDisplay();
+  }
+}
+
+function updateFocusDisplay() {
+  const zikr = focusModeAdhkar[focusModeIndex];
+  if (!zikr) return;
+
+  const textEl = document.getElementById("focusText");
+  const sourceEl = document.getElementById("focusSource");
+  const fadlEl = document.getElementById("focusFadl");
+  const counterEl = document.getElementById("focusCounter");
+  const countTextEl = document.getElementById("focusCountText");
+  const progressEl = document.getElementById("focusProgressFill");
+
+  if (textEl) textEl.textContent = zikr.text;
+  if (sourceEl) sourceEl.textContent = zikr.source;
+  if (fadlEl) fadlEl.textContent = zikr.fadl || "";
+  if (counterEl)
+    counterEl.textContent = `${focusModeIndex + 1}/${focusModeAdhkar.length}`;
+  if (countTextEl)
+    countTextEl.textContent = `${zikr.currentCount}/${zikr.count}`;
+
+  const progress = (zikr.currentCount / zikr.count) * 100;
+  if (progressEl) progressEl.style.width = progress + "%";
+
+  // Update prev/next buttons
+  const prevBtn = document.getElementById("focusPrevBtn");
+  const nextBtn = document.getElementById("focusNextBtn");
+  if (prevBtn) prevBtn.disabled = focusModeIndex === 0;
+  if (nextBtn) nextBtn.disabled = focusModeIndex === focusModeAdhkar.length - 1;
+}
+
+function incrementFocusCount() {
+  const zikr = focusModeAdhkar[focusModeIndex];
+  if (!zikr || zikr.currentCount >= zikr.count) return;
+
+  zikr.currentCount++;
+  saveProgress();
+  updateFocusDisplay();
+  updateCardProgress(currentCategory, focusModeIndex);
+
+  // Vibration feedback
+  if (navigator.vibrate) {
+    navigator.vibrate(50);
+  }
+
+  // Check completion
+  if (zikr.currentCount === zikr.count) {
+    markZekrCompleted(currentCategory, focusModeIndex);
+    updateStatsDashboard();
+    updateWeeklyChart();
+
+    // Auto-advance after completion
+    setTimeout(() => {
+      if (focusModeIndex < focusModeAdhkar.length - 1) {
+        focusNext();
+      } else {
+        showNotification("مبروك! أكملت جميع الأذكار");
+        exitFocusMode();
+      }
+    }, 500);
+  }
+}
+
+function toggleNightReading() {
+  isNightReading = !isNightReading;
+  localStorage.setItem("nightReading", isNightReading);
+
+  if (isNightReading) {
+    document.body.classList.add("night-reading");
+  } else {
+    document.body.classList.remove("night-reading");
+  }
+
+  updateNightReadingButton();
+  showNotification(
+    isNightReading
+      ? "تم تفعيل وضع القراءة الليلية"
+      : "تم إلغاء وضع القراءة الليلية"
+  );
+}
+
+function updateNightReadingButton() {
+  const btn = document.getElementById("nightReadingBtn");
+  if (btn) {
+    btn.classList.toggle("active", isNightReading);
+  }
+}
+
+// ========================================
+// OFFLINE DETECTION
+// ========================================
+
+function initializeOfflineDetection() {
+  const banner = document.getElementById("offlineBanner");
+
+  function updateOnlineStatus() {
+    if (navigator.onLine) {
+      if (banner) banner.classList.add("hidden");
+    } else {
+      if (banner) banner.classList.remove("hidden");
+    }
+  }
+
+  window.addEventListener("online", updateOnlineStatus);
+  window.addEventListener("offline", updateOnlineStatus);
+
+  // Check initial status
+  updateOnlineStatus();
+}
+
+// Update stats when zikr is completed
+const originalMarkZekrCompleted = markZekrCompleted;
+markZekrCompleted = function (categoryKey, zekrIndex) {
+  originalMarkZekrCompleted(categoryKey, zekrIndex);
+  updateStatsDashboard();
+  updateWeeklyChart();
+};
+
+// Keyboard shortcuts for focus mode
+document.addEventListener("keydown", function (e) {
+  const focusOverlay = document.getElementById("focusModeOverlay");
+  if (focusOverlay && !focusOverlay.classList.contains("hidden")) {
+    if (e.key === "Escape") {
+      exitFocusMode();
+    } else if (e.key === "ArrowRight") {
+      focusPrev();
+    } else if (e.key === "ArrowLeft") {
+      focusNext();
+    } else if (e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      incrementFocusCount();
+    }
+  }
 });
