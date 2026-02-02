@@ -1352,16 +1352,22 @@ body.dark-mode .install-icon {
 
 /* Theme Toggle Animation */
 .theme-transition {
-  transition: background-color 0.3s ease, color 0.3s ease,
-    border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 body.theme-transition,
 body.theme-transition *,
 body.theme-transition *:before,
 body.theme-transition *:after {
-  transition: background-color 0.3s ease, color 0.3s ease,
-    border-color 0.3s ease, box-shadow 0.3s ease !important;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease !important;
 }
 
 /* CSS Variables for Dynamic Font Sizing */
@@ -1403,7 +1409,9 @@ body.theme-transition *:after {
   padding: 1rem;
   border-radius: 15px;
   backdrop-filter: blur(10px);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .stat-item:hover {
@@ -1571,7 +1579,9 @@ body.theme-transition *:after {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.3);
   transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
+  transition:
+    width 0.6s,
+    height 0.6s;
 }
 
 .quick-btn:hover::before {
@@ -1640,7 +1650,8 @@ body.theme-transition *:after {
     box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
   }
   50% {
-    box-shadow: 0 4px 30px rgba(102, 126, 234, 0.8),
+    box-shadow:
+      0 4px 30px rgba(102, 126, 234, 0.8),
       0 0 20px rgba(102, 126, 234, 0.5);
   }
 }
@@ -3543,7 +3554,9 @@ body.dark-mode .retry-btn:hover {
   padding: 1.2rem;
   text-align: center;
   color: white;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .stat-card:hover {
@@ -3700,7 +3713,8 @@ body.dark-mode .retry-btn:hover {
   height: 100%;
   border-radius: 50%;
   background: linear-gradient(145deg, #f0f0f0, #ffffff);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15),
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.15),
     inset 0 2px 10px rgba(255, 255, 255, 0.8);
   position: relative;
   border: 4px solid #e2e8f0;
@@ -4255,4 +4269,124 @@ body.dark-mode #scrollSpeedLabel {
     padding: 10px 15px;
     gap: 10px;
   }
+}
+
+/* Date and Daily Duaa Section */
+.daily-info-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.date-card,
+.duaa-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.date-card:hover,
+.duaa-card:hover {
+  transform: translateY(-5px);
+}
+
+.date-card::before,
+.duaa-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.date-header,
+.duaa-header {
+  font-size: 1.1rem;
+  color: #718096;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.day-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+}
+
+.hijri-date {
+  font-size: 1.4rem;
+  color: #667eea;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.gregorian-date {
+  font-size: 1rem;
+  color: #a0aec0;
+  font-family: "Cairo", sans-serif;
+}
+
+.duaa-content {
+  position: relative;
+  padding: 1rem;
+}
+
+.duaa-text {
+  font-family: "Amiri", serif;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #4a5568;
+  margin-bottom: 1rem;
+}
+
+.quote-icon {
+  font-size: 1.5rem;
+  color: rgba(102, 126, 234, 0.1);
+  position: absolute;
+  top: -10px;
+  right: 0;
+}
+
+@media (max-width: 768px) {
+  .daily-info-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark Mode Support for Date and Duaa Section */
+body.dark-mode .date-card,
+body.dark-mode .duaa-card {
+  background: rgba(45, 55, 72, 0.95);
+  border: 1px solid #4a5568;
+}
+
+body.dark-mode .date-header,
+body.dark-mode .duaa-header,
+body.dark-mode .gregorian-date {
+  color: #a0aec0;
+}
+
+body.dark-mode .day-name {
+  color: #e2e8f0;
+}
+
+body.dark-mode .hijri-date {
+  color: #90cdf4;
+}
+
+body.dark-mode .duaa-text {
+  color: #e2e8f0;
+}
+
+body.dark-mode .quote-icon {
+  color: rgba(144, 205, 244, 0.1);
 }

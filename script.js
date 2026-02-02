@@ -1073,7 +1073,7 @@ function saveDailyProgress() {
   localStorage.setItem("dailyStreak", dailyProgress.streak.toString());
   localStorage.setItem(
     "totalCompletions",
-    dailyProgress.totalCompletions.toString()
+    dailyProgress.totalCompletions.toString(),
   );
 }
 
@@ -1085,14 +1085,14 @@ function getWeeklyCompletions() {
   // This can be enhanced later with more detailed tracking
   return Math.min(
     dailyProgress.completedZekr.length * 7,
-    dailyProgress.totalCompletions
+    dailyProgress.totalCompletions,
   );
 }
 
 function updateProgressStats() {
   const totalZekr = Object.values(adhkarData).reduce(
     (sum, category) => sum + category.adhkar.length,
-    0
+    0,
   );
   const completedToday = dailyProgress.completedZekr.length;
   const completionRate =
@@ -1133,8 +1133,8 @@ function showNotification(message, type = "success") {
       type === "success"
         ? "fas fa-check-circle"
         : type === "warning"
-        ? "fas fa-exclamation-triangle"
-        : "fas fa-info-circle";
+          ? "fas fa-exclamation-triangle"
+          : "fas fa-info-circle";
   }
 
   // Update message
@@ -1196,7 +1196,7 @@ function setFontSize(size, showNotif = true) {
 
   // Add active class to selected button
   const activeBtn = document.querySelector(
-    `[onclick*="setFontSize('${size}')"]`
+    `[onclick*="setFontSize('${size}')"]`,
   );
   if (activeBtn) activeBtn.classList.add("active");
 
@@ -1336,24 +1336,24 @@ function markZekrCompleted(categoryKey, zekrIndex) {
     const completed = dailyProgress.completedZekr.length;
     const total = Object.values(adhkarData).reduce(
       (sum, category) => sum + category.adhkar.length,
-      0
+      0,
     );
 
     if (completed === total) {
       showCelebration(
         "مبروك! 🎉",
         "لقد أكملت جميع الأذكار اليوم! جزاك الله خيراً",
-        true
+        true,
       );
     } else if (completed === Math.floor(total / 2)) {
       showCelebration(
         "إنجاز رائع! ⭐",
-        "لقد أكملت نصف الأذكار اليوم، استمر بارك الله فيك"
+        "لقد أكملت نصف الأذكار اليوم، استمر بارك الله فيك",
       );
     } else if (completed % 5 === 0 && completed > 0) {
       showCelebration(
         "أحسنت! 🌟",
-        `أكملت ${completed} من الأذكار، استمر في ذكر الله`
+        `أكملت ${completed} من الأذكار، استمر في ذكر الله`,
       );
     }
   }
@@ -1455,7 +1455,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function checkAndShowInstallInstructions() {
   const dismissed = localStorage.getItem("installInstructionsDismissed");
   const dismissedDate = localStorage.getItem(
-    "installInstructionsDismissedDate"
+    "installInstructionsDismissedDate",
   );
   const remindLater = localStorage.getItem("installInstructionsRemindLater");
 
@@ -1715,8 +1715,8 @@ function createCategoryCard(categoryKey, categoryData, index) {
     <h3 class="category-title">${categoryData.title}</h3>
     <p class="category-description">${categoryData.description}</p>
     <div class="category-count">${adhkarCount} ${
-    adhkarCount === 1 ? "ذكر" : "أذكار"
-  }</div>
+      adhkarCount === 1 ? "ذكر" : "أذكار"
+    }</div>
   `;
 
   card.addEventListener("click", () => showCategoryPage(categoryKey));
@@ -1756,8 +1756,8 @@ function createAdhkarCard(zikr, index, category) {
         <div class="adhkar-info">
             <div class="adhkar-source">${zikr.source}</div>
             <div class="adhkar-count">${zikr.count}${
-    zikr.count === 1 ? " مرة" : " مرات"
-  }</div>
+              zikr.count === 1 ? " مرة" : " مرات"
+            }</div>
         </div>
         ${
           zikr.fadl
@@ -1771,19 +1771,19 @@ function createAdhkarCard(zikr, index, category) {
         <div class="adhkar-progress">
             <div class="progress-bar">
                 <div class="progress-fill" style="width: ${progressPercent}%; background: ${
-    isCompleted
-      ? "linear-gradient(90deg, #38a169, #48bb78)"
-      : "linear-gradient(90deg, #667eea, #764ba2)"
-  }"></div>
+                  isCompleted
+                    ? "linear-gradient(90deg, #38a169, #48bb78)"
+                    : "linear-gradient(90deg, #667eea, #764ba2)"
+                }"></div>
             </div>
             <span class="progress-text">${zikr.currentCount}/${
-    zikr.count
-  }</span>
+              zikr.count
+            }</span>
         </div>
         <div class="adhkar-actions">
             <button class="action-btn count-action-btn" onclick="incrementZikrCount('${category}', ${index})" ${
-    isCompleted ? 'style="background: #38a169;"' : ""
-  }>
+              isCompleted ? 'style="background: #38a169;"' : ""
+            }>
                 <i class="fas fa-plus"></i>
                 ${isCompleted ? "مكتمل" : "عدّ"}
             </button>
@@ -1795,7 +1795,7 @@ function createAdhkarCard(zikr, index, category) {
             </button>
             <button class="action-btn copy-btn" onclick="copyText('${zikr.text.replace(
               /'/g,
-              "\\'"
+              "\\'",
             )}')">
                 <i class="fas fa-copy"></i>
                 نسخ
@@ -1854,7 +1854,7 @@ function incrementZikrCount(category, index) {
     // Check if all adhkar in the category are completed
     const categoryData = adhkarData[category];
     const allCompleted = categoryData.adhkar.every(
-      (adhkar) => adhkar.currentCount === adhkar.count
+      (adhkar) => adhkar.currentCount === adhkar.count,
     );
 
     if (allCompleted) {
@@ -2983,7 +2983,6 @@ function showCompletionCelebration(message = "مبروك! تم إكمال الأ
   const celebration = document.createElement("div");
   celebration.className = "completion-celebration";
   celebration.innerHTML = `
-    <div class="icon">🎉</div>
     <h3>مبروك!</h3>
     <p>${message}</p>
     <button onclick="this.parentElement.remove()" style="
@@ -3017,8 +3016,9 @@ function playSound(type) {
   if (!document.hasUserInteracted) return;
 
   try {
-    const audioContext = new (window.AudioContext ||
-      window.webkitAudioContext)();
+    const audioContext = new (
+      window.AudioContext || window.webkitAudioContext
+    )();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
 
@@ -3030,16 +3030,16 @@ function playSound(type) {
         oscillator.frequency.setValueAtTime(523, audioContext.currentTime);
         oscillator.frequency.setValueAtTime(
           659,
-          audioContext.currentTime + 0.1
+          audioContext.currentTime + 0.1,
         );
         oscillator.frequency.setValueAtTime(
           784,
-          audioContext.currentTime + 0.2
+          audioContext.currentTime + 0.2,
         );
         gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(
           0.01,
-          audioContext.currentTime + 0.5
+          audioContext.currentTime + 0.5,
         );
         oscillator.start(audioContext.currentTime);
         oscillator.stop(audioContext.currentTime + 0.5);
@@ -3049,7 +3049,7 @@ function playSound(type) {
         gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(
           0.01,
-          audioContext.currentTime + 0.1
+          audioContext.currentTime + 0.1,
         );
         oscillator.start(audioContext.currentTime);
         oscillator.stop(audioContext.currentTime + 0.1);
@@ -3088,7 +3088,7 @@ function changeFontSize(direction) {
   showEnhancedNotification(
     direction === "increase" ? "تم تكبير الخط" : "تم تصغير الخط",
     "info",
-    2000
+    2000,
   );
 }
 
@@ -3123,7 +3123,7 @@ function handleError(error, context = "general") {
   showEnhancedNotification(
     errorMessages[context] || errorMessages.general,
     "error",
-    5000
+    5000,
   );
 }
 
@@ -3168,7 +3168,7 @@ async function initializePrayerTimes() {
     await fetchPrayerTimes(
       location.latitude,
       location.longitude,
-      location.city
+      location.city,
     );
   } else {
     await requestLocation();
@@ -3222,7 +3222,7 @@ async function requestLocation() {
         latitude,
         longitude,
         city: cityName,
-      })
+      }),
     );
 
     await fetchPrayerTimes(latitude, longitude, cityName);
@@ -3240,7 +3240,7 @@ async function requestLocation() {
         latitude: cairoLat,
         longitude: cairoLng,
         city: cairoName,
-      })
+      }),
     );
 
     await fetchPrayerTimes(cairoLat, cairoLng, cairoName);
@@ -3251,7 +3251,7 @@ async function requestLocation() {
 async function getCityName(latitude, longitude) {
   try {
     const response = await fetch(
-      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=ar`
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=ar`,
     );
     const data = await response.json();
     return data.city || data.locality || data.principalSubdivision || "موقعك";
@@ -3271,7 +3271,7 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
     const timestamp = Math.floor(today.getTime() / 1000);
 
     const response = await fetch(
-      `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}&method=5`
+      `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${latitude}&longitude=${longitude}&method=5`,
     );
 
     if (!response.ok) throw new Error("API request failed");
@@ -3437,7 +3437,7 @@ document.addEventListener("DOMContentLoaded", function () {
     () => {
       document.hasUserInteracted = true;
     },
-    { once: true }
+    { once: true },
   );
 
   // Restore font size preference
@@ -3635,7 +3635,7 @@ function initQibla() {
       (error) => {
         updateQiblaStatus("يرجى السماح بالوصول للموقع");
         console.log("Geolocation error:", error);
-      }
+      },
     );
   } else {
     updateQiblaStatus("المتصفح لا يدعم تحديد الموقع");
@@ -3686,7 +3686,7 @@ function setupCompass() {
     window.addEventListener(
       "deviceorientationabsolute",
       handleOrientation,
-      true
+      true,
     );
     window.addEventListener("deviceorientation", handleOrientation, true);
     updateQiblaStatus("البوصلة تعمل");
@@ -3937,7 +3937,7 @@ function toggleNightReading() {
   showNotification(
     isNightReading
       ? "تم تفعيل وضع القراءة الليلية"
-      : "تم إلغاء وضع القراءة الليلية"
+      : "تم إلغاء وضع القراءة الليلية",
   );
 }
 
@@ -3993,4 +3993,151 @@ document.addEventListener("keydown", function (e) {
       incrementFocusCount();
     }
   }
+});
+
+// ========================================
+// DATE AND DAILY DUAA FEATURE
+// ========================================
+
+/**
+ * Updates the date section with current Hijri and Gregorian dates
+ * and displays a daily random Duaa.
+ */
+function updateDailyInfo() {
+  const dateOptions = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  const now = new Date();
+
+  // 1. Update Day Name
+  const dayNameElement = document.getElementById("dayName");
+  if (dayNameElement) {
+    dayNameElement.textContent = new Intl.DateTimeFormat("ar-SA", {
+      weekday: "long",
+    }).format(now);
+  }
+
+  // 2. Update Gregorian Date
+  const gregorianMonthElement = document.getElementById("gregorianMonth");
+  const gregorianDateElement = document.getElementById("gregorianDate");
+  if (gregorianMonthElement && gregorianDateElement) {
+    const gregorianFormatter = new Intl.DateTimeFormat("ar-SA", {
+      month: "long",
+      year: "numeric",
+    });
+    const gregorianDayFormatter = new Intl.DateTimeFormat("en-US", {
+      day: "2-digit",
+    }); // Use English digits for consistency or Arabic if preferred
+
+    // Customize to display "YYYY-MM-DD" or similar format per user request visualization
+    // Request: 2026-02-02 (YYYY-MM-DD)
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+
+    gregorianDateElement.textContent = `${yyyy}-${mm}-${dd}`;
+
+    // Month Name - Year (e.g. فبراير - شباط)
+    // Using standard locale data
+    gregorianMonthElement.textContent = new Intl.DateTimeFormat("ar-LB", {
+      month: "long",
+    }).format(now);
+  }
+
+  // 3. Update Hijri Date
+  const hijriMonthElement = document.getElementById("hijriMonth");
+  const hijriDateElement = document.getElementById("hijriDate");
+
+  if (hijriMonthElement && hijriDateElement) {
+    const hijriFormatter = new Intl.DateTimeFormat(
+      "ar-SA-u-ca-islamic-umalqura",
+      {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      },
+    );
+
+    const parts = hijriFormatter.formatToParts(now);
+    const hijriDay = parts.find((p) => p.type === "day")?.value;
+    const hijriMonth = parts.find((p) => p.type === "month")?.value;
+    const hijriYear = parts.find((p) => p.type === "year")?.value;
+
+    hijriMonthElement.textContent = hijriMonth;
+    // Format: 1447-08-14
+    // We need numerical month for the YYYY-MM-DD format
+    const hijriNumericFormatter = new Intl.DateTimeFormat(
+      "en-US-u-ca-islamic-umalqura",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      },
+    );
+    const numericParts = hijriNumericFormatter.formatToParts(now);
+    const hYear = numericParts.find((p) => p.type === "year")?.value;
+    const hMonth = numericParts.find((p) => p.type === "month")?.value;
+    const hDay = numericParts.find((p) => p.type === "day")?.value;
+
+    hijriDateElement.textContent = `${hYear}-${hMonth}-${hDay}`;
+
+    // Update Header with Hijri Date for Duaa
+    const duaaHeader = document.getElementById("duaaHeader");
+    if (duaaHeader) {
+      duaaHeader.textContent = `دعاء اليوم ${hDay}-${hijriMonth}`;
+    }
+  }
+
+  // 4. Update Daily Duaa
+  updateDailyDuaa(now);
+}
+
+/**
+ * Selects a random Duaa based on the current date (seeded randomness).
+ * This ensures the Duaa stays the same for the entire day.
+ */
+function updateDailyDuaa(date) {
+  // Combine all appropriate sources for the daily duaa
+  // User requested "الأدعية من الكتاب والسنة" which corresponds to adhkarData.dua
+  let allDuaas = [];
+
+  if (adhkarData.dua && adhkarData.dua.adhkar) allDuaas = adhkarData.dua.adhkar;
+
+  // Use current date string as seed: "YYYY-MM-DD"
+  const seedString = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+  const seed = stringToSeed(seedString);
+
+  if (allDuaas.length > 0) {
+    const randomIndex = Math.floor(random(seed) * allDuaas.length);
+    const selectedDuaa = allDuaas[randomIndex];
+
+    const duaaTextElement = document.getElementById("dailyDuaaText");
+    if (duaaTextElement) {
+      duaaTextElement.textContent = `"${selectedDuaa.text}"`;
+    }
+  }
+}
+
+// Simple pseudo-random number generator seeded with a string
+function stringToSeed(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+}
+
+function random(seed) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+// Initialize on load
+document.addEventListener("DOMContentLoaded", () => {
+  updateDailyInfo();
 });
