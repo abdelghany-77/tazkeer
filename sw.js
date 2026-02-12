@@ -125,5 +125,5 @@ self.addEventListener("push", function (event) {
 // Handle notification click
 self.addEventListener("notificationclick", function (event) {
   event.notification.close();
-  event.waitUntil(clients.openWindow("/"));
+  event.waitUntil(clients.openWindow("./"));
 });

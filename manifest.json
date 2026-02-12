@@ -2,9 +2,10 @@
   "name": "ذَكِّرْ",
   "short_name": "ذَكِّرْ",
   "description": "تطبيق الأذكار الإسلامية من الكتاب والسنة",
-  "start_url": "https://abdelghany-77.github.io/tazkeer/",
-  "scope": "https://abdelghany-77.github.io/tazkeer/",
-  "display": "browser",
+  "id": "/tazkeer/",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
   "background_color": "#2d3748",
   "theme_color": "#2d3748",
   "orientation": "portrait",
@@ -13,6 +14,12 @@
   "dir": "rtl",
   "icons": [
     {
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "images/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
@@ -20,9 +27,9 @@
     },
     {
       "src": "images/icon-512.png",
-      "sizes": "192x192",
+      "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable"
     },
     {
       "src": "favicon.svg",
