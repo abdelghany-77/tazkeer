@@ -29,7 +29,7 @@ self.addEventListener("install", function (event) {
       })
       .catch(function (error) {
         console.error("Cache install failed:", error);
-      })
+      }),
   );
 });
 
@@ -50,7 +50,7 @@ self.addEventListener("fetch", function (event) {
         })
         .catch(function () {
           return caches.match(event.request);
-        })
+        }),
     );
   } else {
     // For static assets, use cache first
@@ -82,7 +82,7 @@ self.addEventListener("fetch", function (event) {
 
           return networkResponse;
         });
-      })
+      }),
     );
   }
 });
@@ -99,12 +99,12 @@ self.addEventListener("activate", function (event) {
               console.log("Deleting old cache:", cacheName);
               return caches.delete(cacheName);
             }
-          })
+          }),
         );
       })
       .then(function () {
         return self.clients.claim();
-      })
+      }),
   );
 });
 
