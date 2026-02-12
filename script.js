@@ -2590,6 +2590,78 @@ function initializeInstallPrompt() {
   }
 }
 
+let deferredInstallPrompt = null;
+
+function isStandaloneMode() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  );
+}
+
+function isIOSDevice() {
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  );
+}
+
+function updateInstallButtonVisibility() {
+  const installBtn = document.getElementById("installBtn");
+  if (!installBtn) return;
+
+  if (isStandaloneMode()) {
+    installBtn.classList.add("hidden");
+    return;
+  }
+
+  if (deferredInstallPrompt || isIOSDevice()) {
+    installBtn.classList.remove("hidden");
+  } else {
+    installBtn.classList.add("hidden");
+  }
+}
+
+async function showInstallModal() {
+  if (isStandaloneMode()) {
+    showNotification("التطبيق مثبت بالفعل على جهازك");
+    updateInstallButtonVisibility();
+    return;
+  }
+
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    const choiceResult = await deferredInstallPrompt.userChoice;
+
+    if (choiceResult.outcome === "accepted") {
+      showNotification("تم بدء تثبيت التطبيق");
+    }
+
+    deferredInstallPrompt = null;
+    updateInstallButtonVisibility();
+    return;
+  }
+
+  showManualInstallInstructions();
+}
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  updateInstallButtonVisibility();
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  localStorage.setItem("hasSeenInstallPrompt", "true");
+  showNotification("تم تثبيت التطبيق بنجاح");
+  updateInstallButtonVisibility();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateInstallButtonVisibility();
+});
+
 // Enhanced UX Features
 let isOnline = navigator.onLine;
 let keyboardShortcutsVisible = false;
