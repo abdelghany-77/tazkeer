@@ -1,8 +1,9 @@
-const CACHE_NAME = "tazkeer-v3.4";
+const CACHE_NAME = "tazkeer-v3.6";
 const urlsToCache = [
   "./",
   "./index.html",
   "./styles.css",
+  "./dailyDuas.js",
   "./script.js",
   "./manifest.json",
   "./favicon.svg",

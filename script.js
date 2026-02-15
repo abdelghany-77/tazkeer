@@ -2849,7 +2849,7 @@ function setupAccessibilityFeatures() {
   style.textContent = `
     .skip-link {
       position: absolute;
-      top: -40px;
+      top: -60px;
       left: 6px;
       background: #667eea;
       color: white;
@@ -4167,16 +4167,19 @@ function updateDailyInfo() {
   updateDailyDuaa(now);
 }
 
-/**
- * Selects a random Duaa based on the current date (seeded randomness).
- * This ensures the Duaa stays the same for the entire day.
- */
 function updateDailyDuaa(date) {
-  // Combine all appropriate sources for the daily duaa
-  // User requested "الأدعية من الكتاب والسنة" which corresponds to adhkarData.dua
+  // Use the comprehensive dailyDuasCollection (60 duas from Quran & Sunnah)
+  // Falls back to adhkarData.dua if dailyDuasCollection is not available
   let allDuaas = [];
 
-  if (adhkarData.dua && adhkarData.dua.adhkar) allDuaas = adhkarData.dua.adhkar;
+  if (
+    typeof dailyDuasCollection !== "undefined" &&
+    dailyDuasCollection.length > 0
+  ) {
+    allDuaas = dailyDuasCollection;
+  } else if (adhkarData.dua && adhkarData.dua.adhkar) {
+    allDuaas = adhkarData.dua.adhkar;
+  }
 
   // Use current date string as seed: "YYYY-MM-DD"
   const seedString = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
