@@ -4124,6 +4124,10 @@ function updateDailyInfo() {
   const hijriDateElement = document.getElementById("hijriDate");
 
   if (hijriMonthElement && hijriDateElement) {
+    // Offset by -1 day to match actual moon sighting (umalqura is 1 day ahead)
+    const hijriNow = new Date(now);
+    hijriNow.setDate(hijriNow.getDate() - 1);
+
     const hijriFormatter = new Intl.DateTimeFormat(
       "ar-SA-u-ca-islamic-umalqura",
       {
@@ -4133,7 +4137,7 @@ function updateDailyInfo() {
       },
     );
 
-    const parts = hijriFormatter.formatToParts(now);
+    const parts = hijriFormatter.formatToParts(hijriNow);
     const hijriDay = parts.find((p) => p.type === "day")?.value;
     const hijriMonth = parts.find((p) => p.type === "month")?.value;
     const hijriYear = parts.find((p) => p.type === "year")?.value;
@@ -4149,7 +4153,7 @@ function updateDailyInfo() {
         year: "numeric",
       },
     );
-    const numericParts = hijriNumericFormatter.formatToParts(now);
+    const numericParts = hijriNumericFormatter.formatToParts(hijriNow);
     const hYear = numericParts.find((p) => p.type === "year")?.value;
     const hMonth = numericParts.find((p) => p.type === "month")?.value;
     const hDay = numericParts.find((p) => p.type === "day")?.value;
