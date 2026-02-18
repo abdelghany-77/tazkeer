@@ -4114,7 +4114,7 @@ function updateDailyInfo() {
 
     // Month Name - Year (e.g. فبراير - شباط)
     // Using standard locale data
-    gregorianMonthElement.textContent = new Intl.DateTimeFormat("ar-LB", {
+    gregorianMonthElement.textContent = new Intl.DateTimeFormat("ar-EG", {
       month: "long",
     }).format(now);
   }
