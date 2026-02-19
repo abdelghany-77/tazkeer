@@ -1,4 +1,4 @@
-// Islamic Adhkar Data
+﻿// Islamic Adhkar Data
 const adhkarData = {
   morning: {
     title: "أذكار الصباح",
@@ -1163,9 +1163,9 @@ function showNotification(message, type = "success") {
 
   // Update colors
   if (type === "success") {
-    notification.style.background = "#38a169";
+    notification.style.background = "#b8860b";
   } else if (type === "info") {
-    notification.style.background = "#667eea";
+    notification.style.background = "#1a8a5c";
   } else if (type === "warning") {
     notification.style.background = "#ed8936";
   }
@@ -1194,9 +1194,9 @@ function showCelebration(title, message, isComplete = false) {
   }
 
   if (isComplete) {
-    celebration.style.background = "linear-gradient(135deg, #38a169, #48bb78)";
+    celebration.style.background = "linear-gradient(135deg, #b8860b, #48bb78)";
   } else {
-    celebration.style.background = "linear-gradient(135deg, #667eea, #764ba2)";
+    celebration.style.background = "linear-gradient(135deg, #1a8a5c, #d4a847)";
   }
 
   celebration.classList.add("show");
@@ -1793,8 +1793,8 @@ function createAdhkarCard(zikr, index, category) {
             <div class="progress-bar">
                 <div class="progress-fill" style="width: ${progressPercent}%; background: ${
                   isCompleted
-                    ? "linear-gradient(90deg, #38a169, #48bb78)"
-                    : "linear-gradient(90deg, #667eea, #764ba2)"
+                    ? "linear-gradient(90deg, #b8860b, #48bb78)"
+                    : "linear-gradient(90deg, #1a8a5c, #d4a847)"
                 }"></div>
             </div>
             <span class="progress-text">${zikr.currentCount}/${
@@ -1803,7 +1803,7 @@ function createAdhkarCard(zikr, index, category) {
         </div>
         <div class="adhkar-actions">
             <button class="action-btn count-action-btn" onclick="incrementZikrCount('${category}', ${index})" ${
-              isCompleted ? 'style="background: #38a169;"' : ""
+              isCompleted ? 'style="background: #b8860b;"' : ""
             }>
                 <i class="fas fa-plus"></i>
                 ${isCompleted ? "مكتمل" : "عدّ"}
@@ -2061,11 +2061,11 @@ function updateCounterDisplay() {
 
   // Change color based on progress
   if (progress === 100) {
-    countNumber.style.color = "#38a169";
-    progressFill.style.background = "linear-gradient(90deg, #38a169, #48bb78)";
+    countNumber.style.color = "#b8860b";
+    progressFill.style.background = "linear-gradient(90deg, #b8860b, #48bb78)";
   } else {
-    countNumber.style.color = "#667eea";
-    progressFill.style.background = "linear-gradient(90deg, #667eea, #764ba2)";
+    countNumber.style.color = "#1a8a5c";
+    progressFill.style.background = "linear-gradient(90deg, #1a8a5c, #d4a847)";
   }
 }
 
@@ -2089,8 +2089,8 @@ function updateCardProgress(category, index) {
     if (progressBar) {
       progressBar.style.width = `${progressPercent}%`;
       progressBar.style.background = isCompleted
-        ? "linear-gradient(90deg, #38a169, #48bb78)"
-        : "linear-gradient(90deg, #667eea, #764ba2)";
+        ? "linear-gradient(90deg, #b8860b, #48bb78)"
+        : "linear-gradient(90deg, #1a8a5c, #d4a847)";
     }
 
     // Update progress text
@@ -2101,10 +2101,10 @@ function updateCardProgress(category, index) {
     // Update count button appearance
     if (countBtn) {
       if (isCompleted) {
-        countBtn.style.background = "#38a169";
+        countBtn.style.background = "#b8860b";
         countBtn.innerHTML = '<i class="fas fa-plus"></i> مكتمل';
       } else {
-        countBtn.style.background = "#667eea";
+        countBtn.style.background = "#1a8a5c";
         countBtn.innerHTML = '<i class="fas fa-plus"></i> عدّ';
       }
     }
@@ -2115,11 +2115,11 @@ function updateCardProgress(category, index) {
 function showCompletionMessage() {
   const originalText = countBtn.innerHTML;
   countBtn.innerHTML = '<i class="fas fa-check"></i> تم الإكمال';
-  countBtn.style.background = "#38a169";
+  countBtn.style.background = "#b8860b";
 
   setTimeout(() => {
     countBtn.innerHTML = originalText;
-    countBtn.style.background = "#667eea";
+    countBtn.style.background = "#1a8a5c";
   }, 2000);
 }
 
@@ -2131,7 +2131,7 @@ function showNotification(message) {
     position: fixed;
     top: 20px;
     right: 20px;
-    background: #38a169;
+    background: #b8860b;
     color: white;
     padding: 15px 20px;
     border-radius: 10px;
@@ -2872,7 +2872,7 @@ function setupAccessibilityFeatures() {
       position: absolute;
       top: -60px;
       left: 6px;
-      background: #667eea;
+      background: #1a8a5c;
       color: white;
       padding: 8px;
       text-decoration: none;
@@ -3015,10 +3015,10 @@ function getNotificationIcon(type) {
 
 function getNotificationColor(type) {
   const colors = {
-    success: "#38a169",
+    success: "#b8860b",
     error: "#e53e3e",
     warning: "#d69e2e",
-    info: "#667eea",
+    info: "#1a8a5c",
   };
   return colors[type] || colors.info;
 }
@@ -3686,7 +3686,7 @@ function updateWeeklyChart() {
 
     // Highlight today
     if (date.toDateString() === today.toDateString()) {
-      bar.style.background = "linear-gradient(to top, #48bb78, #38a169)";
+      bar.style.background = "linear-gradient(to top, #48bb78, #b8860b)";
     }
   });
 }
