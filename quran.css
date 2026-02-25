@@ -1921,3 +1921,38 @@ body.dark-mode .mushaf-page-image {
 .dark-mode .surah-list-back {
   border-color: rgba(212, 168, 71, 0.3);
 }
+
+/* ===== FULLSCREEN READING MODE ===== */
+.mushaf-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+  max-width: none;
+  margin: 0;
+}
+
+.mushaf-fullscreen .mushaf-header {
+  border-radius: 0;
+  flex-shrink: 0;
+}
+
+.mushaf-fullscreen .mushaf-page-container {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mushaf-fullscreen .mushaf-page-content {
+  min-height: 100%;
+}
+
+.mushaf-fullscreen .mushaf-page-footer {
+  border-radius: 0;
+  flex-shrink: 0;
+}

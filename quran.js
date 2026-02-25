@@ -893,8 +893,12 @@ function renderMushafViewer() {
       ? getKhatmahProgress(khatmahState)
       : Math.round((page / TOTAL_QURAN_PAGES) * 100);
 
+  // Hide bottom nav for immersive reading
+  var bottomNav = document.getElementById("bottomNav");
+  if (bottomNav) bottomNav.style.display = "none";
+
   container.innerHTML = `
-    <div class="mushaf-viewer">
+    <div class="mushaf-viewer mushaf-fullscreen">
       <!-- Header Bar (Screenshot Style) -->
       <div class="mushaf-header">
         <div class="mushaf-header-right">
@@ -956,31 +960,8 @@ function renderMushafViewer() {
         </div>
       </div>
 
-      <!-- Page Footer with Nav & Progress -->
+      <!-- Page Footer with Progress -->
       <div class="mushaf-page-footer">
-        <div class="mushaf-nav">
-          <button class="mushaf-nav-btn" onclick="mushafNextPage()" ${
-            page >= navEnd ? "disabled" : ""
-          }>
-            <i class="fas fa-chevron-right"></i>
-            \u0627\u0644\u062a\u0627\u0644\u064a
-          </button>
-          <span class="mushaf-nav-current">${isKhatmahMode ? `${page - navStart + 1} / ${navEnd - navStart + 1}` : `${page} / ${TOTAL_QURAN_PAGES}`}</span>
-          <button class="mushaf-nav-btn" onclick="mushafPrevPage()" ${
-            page <= navStart ? "disabled" : ""
-          }>
-            \u0627\u0644\u0633\u0627\u0628\u0642
-            <i class="fas fa-chevron-left"></i>
-          </button>
-        </div>
-        ${
-          isKhatmahMode && page >= navEnd
-            ? `
-        <button class="wird-complete-btn" onclick="completeWirdAndReturn()">
-          <i class="fas fa-check-circle"></i> \u0623\u062a\u0645\u0645\u062a \u0627\u0644\u0648\u0631\u062f
-        </button>`
-            : ""
-        }
         <div class="mushaf-progress">
           <div class="mushaf-progress-fill" style="width: ${wirdProgress}%"></div>
         </div>
@@ -1228,6 +1209,10 @@ function openMushafViewer(page) {
  * Exit Mushaf Viewer back to appropriate screen
  */
 function exitMushafViewer() {
+  // Restore bottom nav visibility
+  var bottomNav = document.getElementById("bottomNav");
+  if (bottomNav) bottomNav.style.display = "";
+
   if (quranViewerState.mode === "khatmah" && khatmahState.isActive) {
     renderKhatmahDashboard();
   } else {

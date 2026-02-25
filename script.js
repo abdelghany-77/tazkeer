@@ -1415,6 +1415,11 @@ function switchTab(tabId) {
   document.querySelectorAll(".bottom-nav-item").forEach(function (btn) {
     btn.classList.toggle("active", btn.getAttribute("data-tab") === tabId);
   });
+  // Show header only on the home tab
+  var header = document.querySelector(".header");
+  if (header) {
+    header.style.display = tabId === "tab-home" ? "" : "none";
+  }
   // Persist
   localStorage.setItem("activeTab", tabId);
   // Tab-specific init

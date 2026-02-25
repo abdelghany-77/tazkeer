@@ -2082,12 +2082,6 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Enhanced Focus States */
-*:focus {
-  outline: 2px solid #1a8a5c;
-  outline-offset: 2px;
-}
-
 .nav-btn:focus,
 .action-btn:focus,
 .count-btn:focus {
