@@ -4379,3 +4379,332 @@ body.dark-mode .duaa-text {
 body.dark-mode .quote-icon {
   color: rgba(144, 205, 244, 0.1);
 }
+
+/* ================================================================
+   BOTTOM NAVIGATION & TAB SYSTEM
+   ================================================================ */
+
+/* Tab Content Sections */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active-tab {
+  display: block;
+  animation: tabFadeIn 0.3s ease;
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Give main enough bottom padding so content is never hidden behind bottom nav */
+.main {
+  padding-bottom: 80px !important;
+}
+
+/* Hide the old footer (content moved to profile tab) */
+.footer {
+  display: none !important;
+}
+
+/* ── Bottom Navigation Bar ── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.97);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.06);
+  z-index: 9999;
+  padding: 0 4px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #a0aec0;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.bottom-nav-item svg {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.25s ease;
+}
+
+.bottom-nav-item span {
+  line-height: 1;
+}
+
+.bottom-nav-item.active {
+  color: #1a8a5c;
+}
+
+.bottom-nav-item.active svg {
+  transform: scale(1.12);
+}
+
+.bottom-nav-item.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 25%;
+  right: 25%;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: #1a8a5c;
+}
+
+/* ── Raise floating buttons above bottom nav ── */
+.quick-access {
+  bottom: 80px !important;
+}
+
+.quick-home {
+  bottom: 80px !important;
+}
+
+/* ── Dark Mode: Bottom Nav ── */
+body.dark-mode .bottom-nav {
+  background: rgba(26, 32, 44, 0.97);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .bottom-nav-item {
+  color: #718096;
+}
+
+body.dark-mode .bottom-nav-item.active {
+  color: #68d391;
+}
+
+body.dark-mode .bottom-nav-item.active::before {
+  background: #68d391;
+}
+
+/* ================================================================
+   PROFILE TAB STYLES
+   ================================================================ */
+
+.profile-section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 0;
+}
+
+.profile-avatar-wrapper {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a8a5c, #0d6b4e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 16px rgba(26, 138, 92, 0.35);
+}
+
+.profile-section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+body.dark-mode .profile-section-header h2 {
+  color: #e2e8f0;
+}
+
+/* Profile Cards */
+.profile-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+body.dark-mode .profile-card {
+  background: rgba(45, 55, 72, 0.95);
+  border: 1px solid #4a5568;
+}
+
+.profile-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+  color: #1a8a5c;
+}
+
+.profile-card-title h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+body.dark-mode .profile-card-title h3 {
+  color: #e2e8f0;
+}
+
+.profile-card-title i {
+  font-size: 1.15rem;
+}
+
+.profile-empty-state {
+  text-align: center;
+  color: #a0aec0;
+  padding: 1rem 0;
+  font-size: 0.95rem;
+}
+
+body.dark-mode .profile-empty-state {
+  color: #718096;
+}
+
+/* Profile Reading Stats Grid */
+.profile-reading-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  text-align: center;
+}
+
+.profile-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.profile-stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1a8a5c;
+}
+
+body.dark-mode .profile-stat-value {
+  color: #68d391;
+}
+
+.profile-stat-label {
+  font-size: 0.78rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+body.dark-mode .profile-stat-label {
+  color: #a0aec0;
+}
+
+/* Sadaqa Card */
+.profile-sadaqa {
+  text-align: center;
+  font-family: "Amiri", serif;
+  line-height: 2;
+  font-size: 1.05rem;
+  color: #4a5568;
+  background: linear-gradient(
+    135deg,
+    rgba(26, 138, 92, 0.07),
+    rgba(212, 168, 71, 0.07)
+  );
+}
+
+body.dark-mode .profile-sadaqa {
+  color: #cbd5e0;
+  background: linear-gradient(
+    135deg,
+    rgba(26, 138, 92, 0.12),
+    rgba(212, 168, 71, 0.12)
+  );
+}
+
+/* Khatmah progress in profile */
+.profile-khatmah-progress {
+  margin-top: 0.5rem;
+}
+
+.profile-khatmah-bar {
+  width: 100%;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+body.dark-mode .profile-khatmah-bar {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.profile-khatmah-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1a8a5c, #d4a847);
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+.profile-khatmah-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+body.dark-mode .profile-khatmah-info {
+  color: #a0aec0;
+}
+
+/* Responsive tweaks for bottom nav & profile */
+@media (max-width: 480px) {
+  .bottom-nav-item {
+    font-size: 0.6rem;
+  }
+  .bottom-nav-item svg {
+    width: 22px;
+    height: 22px;
+  }
+  .profile-reading-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  .profile-stat-value {
+    font-size: 1.3rem;
+  }
+}

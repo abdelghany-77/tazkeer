@@ -1381,7 +1381,8 @@ function markZekrCompleted(categoryKey, zekrIndex) {
 }
 
 // DOM Elements
-const homePage = document.getElementById("homePage");
+const homePage = document.getElementById("tab-home");
+const azkarListView = document.getElementById("azkarListView");
 const categoryPage = document.getElementById("categoryPage");
 const categoriesContainer = document.getElementById("categoriesContainer");
 const categoryTitle = document.getElementById("categoryTitle");
@@ -1400,6 +1401,36 @@ const fadlText = document.getElementById("fadlText");
 const homeBtn = document.getElementById("homeBtn");
 const backBtn = document.getElementById("backBtn");
 const resetAllBtn = document.getElementById("resetAllBtn");
+
+/* ─── Tab Switching System ─── */
+function switchTab(tabId) {
+  // Hide all tab sections
+  document.querySelectorAll(".tab-content").forEach(function (section) {
+    section.classList.remove("active-tab");
+  });
+  // Show target
+  var target = document.getElementById(tabId);
+  if (target) target.classList.add("active-tab");
+  // Update bottom nav active state
+  document.querySelectorAll(".bottom-nav-item").forEach(function (btn) {
+    btn.classList.toggle("active", btn.getAttribute("data-tab") === tabId);
+  });
+  // Persist
+  localStorage.setItem("activeTab", tabId);
+  // Tab-specific init
+  if (tabId === "tab-azkar") {
+    // Make sure we show azkar list, not detail
+    if (azkarListView) azkarListView.classList.remove("hidden");
+    if (categoryPage) categoryPage.classList.add("hidden");
+    showHomePage(); // populate categories
+  } else if (tabId === "tab-quran") {
+    if (typeof initQuranTab === "function") initQuranTab();
+  } else if (tabId === "tab-profile") {
+    if (typeof updateProfileTab === "function") updateProfileTab();
+  }
+  // Scroll top
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
 // Theme management functions
 function loadTheme() {
@@ -1466,7 +1497,9 @@ function toggleTheme() {
 document.addEventListener("DOMContentLoaded", function () {
   loadTheme(); // Load saved theme preference
   loadProgress();
-  showHomePage();
+  // Initialise tab system
+  var savedTab = localStorage.getItem("activeTab") || "tab-home";
+  switchTab(savedTab);
   setupEventListeners();
 
   // Show install instructions on first visit
@@ -1682,17 +1715,17 @@ function setupEventListeners() {
   });
 }
 
-// Show home page with category cards
+// Show azkar list (populate categories)
 function showHomePage() {
   // Reset all counters when leaving any category
   if (currentCategory) {
     resetCategoryCounters(currentCategory);
   }
 
-  homePage.classList.remove("hidden");
-  categoryPage.classList.add("hidden");
-  backBtn.classList.add("hidden");
-  homeBtn.classList.remove("active");
+  // Toggle internal azkar views
+  if (azkarListView) azkarListView.classList.remove("hidden");
+  if (categoryPage) categoryPage.classList.add("hidden");
+  if (backBtn) backBtn.classList.add("hidden");
   isHomePage = true;
   currentCategory = null;
 
@@ -1701,17 +1734,16 @@ function showHomePage() {
   Object.keys(adhkarData).forEach((categoryKey, index) => {
     createCategoryCard(categoryKey, adhkarData[categoryKey], index);
   });
-
-  // Scroll to top of page
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Show category page with adhkar
 function showCategoryPage(categoryKey) {
-  homePage.classList.add("hidden");
+  // Switch to azkar tab first
+  switchTab("tab-azkar");
+  // Then show detail view
+  if (azkarListView) azkarListView.classList.add("hidden");
   categoryPage.classList.remove("hidden");
-  backBtn.classList.remove("hidden");
-  homeBtn.classList.add("active");
+  if (backBtn) backBtn.classList.remove("hidden");
   isHomePage = false;
   currentCategory = categoryKey;
 
@@ -2282,15 +2314,25 @@ function initializeEnhancedFeatures() {
   const installBtn = document.getElementById("installBtn");
 
   if (scrollTopBtn) scrollTopBtn.addEventListener("click", scrollToTop);
-  if (quickHomeBtn) quickHomeBtn.addEventListener("click", showHomePage);
+  if (quickHomeBtn)
+    quickHomeBtn.addEventListener("click", function () {
+      switchTab("tab-home");
+    });
   if (favoritesBtn) {
     favoritesBtn.addEventListener("click", showFavoritesPage);
     updateFavoritesButton();
   }
   if (resetAllBtn) resetAllBtn.addEventListener("click", resetAllAdhkar);
   if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
-  if (homeBtn) homeBtn.addEventListener("click", showHomePage);
-  if (backBtn) backBtn.addEventListener("click", showHomePage);
+  if (homeBtn)
+    homeBtn.addEventListener("click", function () {
+      switchTab("tab-home");
+    });
+  if (backBtn)
+    backBtn.addEventListener("click", function () {
+      showHomePage();
+      switchTab("tab-azkar");
+    });
   if (installBtn) installBtn.addEventListener("click", showInstallModal);
 
   // Show/hide quick access buttons at end of page

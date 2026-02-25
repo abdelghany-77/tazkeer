@@ -34,6 +34,7 @@
   <link rel="manifest" href="manifest.json" />
 
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="quran.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap"
     rel="stylesheet" />
@@ -48,7 +49,7 @@
       <div class="header-content">
         <h1 class="logo">
           <i class="fas fa-moon"></i>
-          ذَكِّرْ
+          ذَكِّرْ
         </h1>
         <nav class="nav" id="nav">
           <button class="nav-btn install-btn hidden" id="installBtn">
@@ -59,10 +60,6 @@
             <i class="fas fa-sun"></i>
             الوضع النهاري
           </button>
-          <button class="nav-btn" id="homeBtn">
-            <i class="fas fa-home"></i>
-            الرئيسية
-          </button>
           <button class="nav-btn back-btn hidden" id="backBtn">
             <i class="fas fa-arrow-right"></i>
             العودة
@@ -72,18 +69,17 @@
     </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- ===== Main Content with Tab Sections ===== -->
   <main class="main">
     <div class="container">
-      <!-- Home Page -->
-      <div id="homePage">
-        <!-- Welcome Section -->
+
+      <!-- ==================== TAB: الرئيسية (Home) ==================== -->
+      <section id="tab-home" class="tab-content active-tab">
+
         <!-- Welcome Section -->
         <div class="welcome-section">
           <h2 class="welcome-title">أهلاً وسهلاً بك في تطبيق ذَكِّرْ</h2>
-          <p class="welcome-description">
-            اختر نوع الأذكار التي تريد قراءتها
-          </p>
+          <p class="welcome-description">رفيقك اليومي في ذكر الله</p>
         </div>
 
         <!-- Date and Daily Duaa Section -->
@@ -109,7 +105,193 @@
           </div>
         </div>
 
-        <!-- Statistics Dashboard -->
+        <!-- Prayer Times Section -->
+        <div class="prayer-times-section" id="prayerTimesSection">
+          <div class="prayer-times-header">
+            <h3 class="prayer-times-title">
+              <i class="fas fa-mosque"></i>
+              مواعيد الصلاة
+            </h3>
+            <button class="location-btn" id="locationBtn" title="تحديث الموقع">
+              <i class="fas fa-location-crosshairs"></i>
+            </button>
+          </div>
+
+          <div class="prayer-times-location" id="prayerLocation">
+            <i class="fas fa-map-marker-alt"></i>
+            <span id="cityName">جاري تحديد الموقع...</span>
+          </div>
+
+          <div class="next-prayer-countdown" id="nextPrayerCountdown">
+            <div class="countdown-label">الصلاة القادمة</div>
+            <div class="countdown-prayer" id="nextPrayerName">—</div>
+            <div class="countdown-time" id="countdownTime">—</div>
+          </div>
+
+          <div class="prayer-times-grid" id="prayerTimesGrid">
+            <!-- Prayer cards will be populated by JavaScript -->
+          </div>
+
+          <div class="prayer-times-loading" id="prayerTimesLoading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>جاري تحميل مواقيت الصلاة...</p>
+          </div>
+
+          <div class="prayer-times-error hidden" id="prayerTimesError">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>تعذر تحميل مواقيت الصلاة</p>
+            <button class="retry-btn" id="retryPrayerTimes">
+              <i class="fas fa-redo"></i>
+              إعادة المحاولة
+            </button>
+          </div>
+        </div>
+
+        <!-- Qibla Compass -->
+        <div class="qibla-section" id="qiblaSection">
+          <div class="qibla-header">
+            <h3><i class="fas fa-compass"></i> اتجاه القبلة</h3>
+            <button class="qibla-calibrate-btn" id="qiblaCalibrateBtn" title="معايرة البوصلة">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+          <div class="qibla-compass-container">
+            <div class="compass" id="compass">
+              <div class="compass-dial">
+                <div class="compass-needle" id="compassNeedle"></div>
+                <div class="compass-kaaba">
+                  <i class="fas fa-kaaba"></i>
+                </div>
+                <div class="compass-direction north">N</div>
+                <div class="compass-direction east">E</div>
+                <div class="compass-direction south">S</div>
+                <div class="compass-direction west">W</div>
+              </div>
+            </div>
+            <div class="qibla-info">
+              <p class="qibla-degrees" id="qiblaDegrees">—°</p>
+              <p class="qibla-status" id="qiblaStatus">جاري تحديد الاتجاه...</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================== TAB: الأذكار (Azkar) ==================== -->
+      <section id="tab-azkar" class="tab-content">
+
+        <!-- Azkar Categories List -->
+        <div id="azkarListView">
+          <div class="welcome-section">
+            <h2 class="welcome-title">الأذكار والأدعية</h2>
+            <p class="welcome-description">اختر نوع الأذكار التي تريد قراءتها</p>
+          </div>
+          <div class="categories-container" id="categoriesContainer">
+            <!-- Category cards will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Category Detail View -->
+        <div id="categoryPage" class="hidden">
+          <!-- Font Size Controls -->
+          <div class="font-controls">
+            <button class="font-btn" onclick="setFontSize('small', true)">
+              <i class="fas fa-font font-small"></i> صغير
+            </button>
+            <button class="font-btn active" onclick="setFontSize('medium', true)">
+              <i class="fas fa-font"></i> متوسط
+            </button>
+            <button class="font-btn" onclick="setFontSize('large', true)">
+              <i class="fas fa-font font-large"></i> كبير
+            </button>
+          </div>
+
+          <!-- Reading Mode Controls -->
+          <div class="reading-mode-controls">
+            <button class="reading-btn" id="autoScrollBtn" onclick="toggleAutoScroll()">
+              <i class="fas fa-scroll"></i> التمرير التلقائي
+            </button>
+            <button class="reading-btn" id="focusModeBtn" onclick="enterFocusMode()">
+              <i class="fas fa-expand"></i> وضع التركيز
+            </button>
+            <button class="reading-btn" id="nightReadingBtn" onclick="toggleNightReading()">
+              <i class="fas fa-moon"></i> القراءة الليلية
+            </button>
+          </div>
+
+          <!-- Category Title -->
+          <div class="category-header">
+            <h2 id="categoryTitle">أذكار الصباح</h2>
+            <p id="categoryDescription">أذكار الصباح من الكتاب والسنة</p>
+            <button class="reset-all-btn" id="resetAllBtn">
+              <i class="fas fa-refresh"></i>
+              إعادة تعيين جميع الأذكار
+            </button>
+          </div>
+
+          <!-- Adhkar Container -->
+          <div class="adhkar-container" id="adhkarContainer">
+            <!-- Adhkar cards will be populated by JavaScript -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================== TAB: القرآن (Quran) ==================== -->
+      <section id="tab-quran" class="tab-content">
+        <div id="quranPageContent">
+          <!-- Rendered dynamically by quran.js -->
+        </div>
+      </section>
+
+      <!-- ==================== TAB: الملف الشخصي (Profile) ==================== -->
+      <section id="tab-profile" class="tab-content">
+
+        <!-- Profile Header -->
+        <div class="profile-section-header">
+          <div class="profile-avatar-wrapper">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="40" height="40">
+              <path
+                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+            </svg>
+          </div>
+          <h2>ملفك الشخصي</h2>
+        </div>
+
+        <!-- Khatmah Progress Card -->
+        <div class="profile-card" id="profileKhatmahSection">
+          <div class="profile-card-title">
+            <i class="fas fa-quran"></i>
+            <h3>تقدم الختمة</h3>
+          </div>
+          <div id="profileKhatmahContent">
+            <p class="profile-empty-state">لم تبدأ ختمة بعد. اذهب إلى تبويب القرآن لبدء ختمة جديدة.</p>
+          </div>
+        </div>
+
+        <!-- Reading Stats Card -->
+        <div class="profile-card">
+          <div class="profile-card-title">
+            <i class="fas fa-chart-bar"></i>
+            <h3>إحصائيات القراءة</h3>
+          </div>
+          <div class="profile-reading-stats" id="profileReadingStats">
+            <div class="profile-stat-item">
+              <span class="profile-stat-value" id="profileTotalDays">0</span>
+              <span class="profile-stat-label">أيام القراءة</span>
+            </div>
+            <div class="profile-stat-item">
+              <span class="profile-stat-value" id="profilePagesRead">0</span>
+              <span class="profile-stat-label">صفحة مقروءة</span>
+            </div>
+            <div class="profile-stat-item">
+              <span class="profile-stat-value" id="profileCurrentPage">0</span>
+              <span class="profile-stat-label">الصفحة الحالية</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Adhkar Statistics Dashboard -->
         <div class="stats-dashboard" id="statsDashboard">
           <div class="stats-header">
             <h3><i class="fas fa-chart-line"></i> إحصائياتك</h3>
@@ -170,137 +352,16 @@
           </div>
         </div>
 
-        <!-- Qibla Compass -->
-        <div class="qibla-section" id="qiblaSection">
-          <div class="qibla-header">
-            <h3><i class="fas fa-compass"></i> اتجاه القبلة</h3>
-            <button class="qibla-calibrate-btn" id="qiblaCalibrateBtn" title="معايرة البوصلة">
-              <i class="fas fa-sync-alt"></i>
-            </button>
-          </div>
-          <div class="qibla-compass-container">
-            <div class="compass" id="compass">
-              <div class="compass-dial">
-                <div class="compass-needle" id="compassNeedle"></div>
-                <div class="compass-kaaba">
-                  <i class="fas fa-kaaba"></i>
-                </div>
-                <div class="compass-direction north">N</div>
-                <div class="compass-direction east">E</div>
-                <div class="compass-direction south">S</div>
-                <div class="compass-direction west">W</div>
-              </div>
-            </div>
-            <div class="qibla-info">
-              <p class="qibla-degrees" id="qiblaDegrees">—°</p>
-              <p class="qibla-status" id="qiblaStatus">جاري تحديد الاتجاه...</p>
-            </div>
-          </div>
+        <!-- Sadaqa Jariyah -->
+        <div class="profile-card profile-sadaqa">
+          <p>اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد عَبْدالغَنِي أَحْمَد وَجَمِيعِ أَمْوَاتِ
+            المُسْلِمِينَ</p>
         </div>
 
-        <!-- Prayer Times Section -->
-        <div class="prayer-times-section" id="prayerTimesSection">
-          <div class="prayer-times-header">
-            <h3 class="prayer-times-title">
-              <i class="fas fa-mosque"></i>
-              مواعيد الصلاة
-            </h3>
-            <button class="location-btn" id="locationBtn" title="تحديث الموقع">
-              <i class="fas fa-location-crosshairs"></i>
-            </button>
-          </div>
+      </section>
 
-          <div class="prayer-times-location" id="prayerLocation">
-            <i class="fas fa-map-marker-alt"></i>
-            <span id="cityName">جاري تحديد الموقع...</span>
-          </div>
-
-          <div class="next-prayer-countdown" id="nextPrayerCountdown">
-            <div class="countdown-label">الصلاة القادمة</div>
-            <div class="countdown-prayer" id="nextPrayerName">—</div>
-            <div class="countdown-time" id="countdownTime">—</div>
-          </div>
-
-          <div class="prayer-times-grid" id="prayerTimesGrid">
-            <!-- Prayer cards will be populated by JavaScript -->
-          </div>
-
-          <div class="prayer-times-loading" id="prayerTimesLoading">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>جاري تحميل مواقيت الصلاة...</p>
-          </div>
-
-          <div class="prayer-times-error hidden" id="prayerTimesError">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p>تعذر تحميل مواقيت الصلاة</p>
-            <button class="retry-btn" id="retryPrayerTimes">
-              <i class="fas fa-redo"></i>
-              إعادة المحاولة
-            </button>
-          </div>
-        </div>
-
-        <!-- Categories Container -->
-        <div class="categories-container" id="categoriesContainer">
-          <!-- Category cards will be populated by JavaScript -->
-        </div>
-      </div>
-
-      <!-- Category Details Page -->
-      <div id="categoryPage" class="hidden">
-        <!-- Font Size Controls -->
-        <div class="font-controls">
-          <button class="font-btn" onclick="setFontSize('small', true)">
-            <i class="fas fa-font font-small"></i> صغير
-          </button>
-          <button class="font-btn active" onclick="setFontSize('medium', true)">
-            <i class="fas fa-font"></i> متوسط
-          </button>
-          <button class="font-btn" onclick="setFontSize('large', true)">
-            <i class="fas fa-font font-large"></i> كبير
-          </button>
-        </div>
-
-        <!-- Reading Mode Controls -->
-        <div class="reading-mode-controls">
-          <button class="reading-btn" id="autoScrollBtn" onclick="toggleAutoScroll()">
-            <i class="fas fa-scroll"></i> التمرير التلقائي
-          </button>
-          <button class="reading-btn" id="focusModeBtn" onclick="enterFocusMode()">
-            <i class="fas fa-expand"></i> وضع التركيز
-          </button>
-          <button class="reading-btn" id="nightReadingBtn" onclick="toggleNightReading()">
-            <i class="fas fa-moon"></i> القراءة الليلية
-          </button>
-        </div>
-
-        <!-- Category Title -->
-        <div class="category-header">
-          <h2 id="categoryTitle">أذكار الصباح</h2>
-          <p id="categoryDescription">أذكار الصباح من الكتاب والسنة</p>
-          <button class="reset-all-btn" id="resetAllBtn">
-            <i class="fas fa-refresh"></i>
-            إعادة تعيين جميع الأذكار
-          </button>
-        </div>
-
-        <!-- Adhkar Container -->
-        <div class="adhkar-container" id="adhkarContainer">
-          <!-- Adhkar cards will be populated by JavaScript -->
-        </div>
-      </div>
     </div>
   </main>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <p>
-        اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد
-        عَبْدالغَنِي أَحْمَد وَجَمِيعِ أَمْوَاتِ المُسْلِمِينَ
-      </p>
-    </div>
-  </footer>
 
   <!-- Counter Modal -->
   <div id="counterModal" class="modal">
@@ -318,7 +379,6 @@
         <div class="fadl-section" id="fadlSection">
           <div class="fadl-header">
             <i class="fas fa-star"></i>
-            <!-- <span>فضل هذا الذكر</span> -->
           </div>
           <p class="fadl-text" id="fadlText"></p>
         </div>
@@ -344,13 +404,6 @@
     <button class="quick-btn" id="scrollTopBtn" title="العودة للأعلى" aria-label="العودة للأعلى">
       <i class="fas fa-arrow-up"></i>
       <span class="quick-btn-label">أعلى</span>
-    </button>
-  </div>
-
-  <!-- Home Quick Button -->
-  <div class="quick-home">
-    <button class="quick-btn" id="quickHomeBtn" title="العودة للرئيسية" aria-label="العودة للرئيسية">
-      <i class="fas fa-home"></i>
     </button>
   </div>
 
@@ -412,8 +465,40 @@
     <span>لا يوجد اتصال بالإنترنت - التطبيق يعمل بدون اتصال</span>
   </div>
 
+  <!-- ===== Bottom Navigation ===== -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item active" data-tab="tab-home" onclick="switchTab('tab-home')">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+      </svg>
+      <span>الرئيسية</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="tab-azkar" onclick="switchTab('tab-azkar')">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+        <path
+          d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z" />
+      </svg>
+      <span>الأذكار</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="tab-quran" onclick="switchTab('tab-quran')">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+        <path
+          d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM6 20V4h5v7h7v9H6z" />
+      </svg>
+      <span>القرآن</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="tab-profile" onclick="switchTab('tab-profile')">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+        <path
+          d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+      </svg>
+      <span>الملف الشخصي</span>
+    </button>
+  </nav>
+
   <script src="dailyDuas.js"></script>
   <script src="script.js"></script>
+  <script src="quran.js"></script>
 </body>
 
 </html>

@@ -1,10 +1,12 @@
-const CACHE_NAME = "tazkeer-v4.0";
+const CACHE_NAME = "tazkeer-v6.2";
 const urlsToCache = [
   "./",
   "./index.html",
   "./styles.css",
+  "./quran.css",
   "./dailyDuas.js",
   "./script.js",
+  "./quran.js",
   "./manifest.json",
   "./favicon.svg",
   "./widget.html",
@@ -39,7 +41,11 @@ self.addEventListener("fetch", function (event) {
   const url = new URL(event.request.url);
 
   // For API calls (prayer times), use network first
-  if (url.hostname.includes("aladhan.com") || url.hostname.includes("api")) {
+  if (
+    url.hostname.includes("aladhan.com") ||
+    url.hostname.includes("alquran.cloud") ||
+    url.hostname.includes("api")
+  ) {
     event.respondWith(
       fetch(event.request)
         .then(function (response) {
