@@ -1,15 +1,11 @@
 // ========================================
 // QURAN & KHATMAH FEATURE
-// Pure Image-Based Mushaf Viewer
 // ========================================
 
 // ===== CONSTANTS =====
 const TOTAL_QURAN_PAGES = 604;
-const QURAN_IMAGE_BASE =
-  "https://cdn.jsdelivr.net/gh/akram-seid/quran-hd-images@main/images";
-
-// In-memory image cache for instant navigation
-const imageCache = new Map();
+const QURAN_API_BASE = "https://api.alquran.cloud/v1/page";
+const QURAN_EDITION = "quran-uthmani";
 
 // ===== SURAH DATA (114 Surahs - Madina Mushaf) =====
 const SURAH_DATA = [
@@ -165,6 +161,9 @@ const JUZ_DATA = [
 
 // ===== UTILITY FUNCTIONS =====
 
+/**
+ * Convert number to Arabic-Indic numerals
+ */
 function toArabicNumber(num) {
   const arabicDigits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
   return String(num)
@@ -173,51 +172,63 @@ function toArabicNumber(num) {
     .join("");
 }
 
+/**
+ * Get the primary surah for a given page
+ */
 function getSurahForPage(page) {
   for (let i = SURAH_DATA.length - 1; i >= 0; i--) {
-    if (SURAH_DATA[i].startPage <= page) return SURAH_DATA[i];
+    if (SURAH_DATA[i].startPage <= page) {
+      return SURAH_DATA[i];
+    }
   }
   return SURAH_DATA[0];
 }
 
+/**
+ * Get the juz for a given page
+ */
 function getJuzForPage(page) {
   for (let i = JUZ_DATA.length - 1; i >= 0; i--) {
-    if (JUZ_DATA[i].startPage <= page) return JUZ_DATA[i];
+    if (JUZ_DATA[i].startPage <= page) {
+      return JUZ_DATA[i];
+    }
   }
   return JUZ_DATA[0];
 }
 
+/**
+ * Get the hizb quarter for a given page (approximate)
+ */
 function getHizbForPage(page) {
   return Math.ceil((page / TOTAL_QURAN_PAGES) * 60);
-}
-
-/**
- * Build the image URL for a given Mushaf page.
- */
-function getPageImageUrl(pageNumber) {
-  const padded = String(pageNumber).padStart(3, "0");
-  return `${QURAN_IMAGE_BASE}/${padded}.jpg`;
 }
 
 // ===== KHATMAH STATE MANAGEMENT =====
 
 const KHATMAH_STORAGE_KEY = "tazkeer_khatmah";
+const QURAN_PAGE_CACHE_PREFIX = "quran_page_cache_";
 const QURAN_BOOKMARK_KEY = "tazkeer_quran_bookmark";
 
+/**
+ * Get default Khatmah state
+ */
 function getDefaultKhatmahState() {
   return {
     isActive: false,
-    goalType: "days",
+    goalType: "days", // 'days' or 'pages'
     goalValue: 30,
     dailyTarget: 0,
     startDate: null,
     lastReadPage: 1,
-    completedPages: [],
+    completedPages: [], // array of page numbers read
     bookmarkedPage: null,
     totalPagesRead: 0,
   };
 }
 
+/**
+ * Load Khatmah state from localStorage
+ */
 function loadKhatmahState() {
   try {
     const saved = localStorage.getItem(KHATMAH_STORAGE_KEY);
@@ -231,6 +242,9 @@ function loadKhatmahState() {
   return getDefaultKhatmahState();
 }
 
+/**
+ * Save Khatmah state to localStorage
+ */
 function saveKhatmahState(state) {
   try {
     localStorage.setItem(KHATMAH_STORAGE_KEY, JSON.stringify(state));
@@ -239,16 +253,29 @@ function saveKhatmahState(state) {
   }
 }
 
+/**
+ * Calculate daily pages based on goal
+ */
 function calculateDailyTarget(goalType, goalValue) {
-  if (goalType === "days") return Math.ceil(TOTAL_QURAN_PAGES / goalValue);
-  return goalValue;
+  if (goalType === "days") {
+    return Math.ceil(TOTAL_QURAN_PAGES / goalValue);
+  }
+  return goalValue; // pages per day
 }
 
+/**
+ * Calculate estimated days to finish
+ */
 function calculateEstimatedDays(goalType, goalValue) {
-  if (goalType === "days") return goalValue;
-  return Math.ceil(TOTAL_QURAN_PAGES / goalValue);
+  if (goalType === "days") {
+    return goalValue;
+  }
+  return Math.ceil(TOTAL_QURAN_PAGES / goalValue); // pages per day
 }
 
+/**
+ * Get Khatmah completion percentage
+ */
 function getKhatmahProgress(state) {
   if (!state.isActive) return 0;
   const kStart = state.khatmahStartPage || 1;
@@ -256,22 +283,36 @@ function getKhatmahProgress(state) {
   return Math.min(100, Math.round((state.totalPagesRead / totalPages) * 100));
 }
 
+/**
+ * Get today's reading target info
+ */
 function getTodayTarget(state) {
   if (!state.isActive || !state.startDate) return { target: 0, read: 0 };
+
   const startDate = new Date(state.startDate);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   startDate.setHours(0, 0, 0, 0);
+
   const daysDiff = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+  const expectedPages = Math.min(
+    (daysDiff + 1) * state.dailyTarget,
+    TOTAL_QURAN_PAGES,
+  );
   const todayStart = daysDiff * state.dailyTarget + 1;
   const todayEnd = Math.min(
     todayStart + state.dailyTarget - 1,
     TOTAL_QURAN_PAGES,
   );
+
+  // Count pages read today (approximately - pages from todayStart to todayEnd)
   let todayRead = 0;
   for (let p = todayStart; p <= todayEnd; p++) {
-    if (state.completedPages.includes(p)) todayRead++;
+    if (state.completedPages.includes(p)) {
+      todayRead++;
+    }
   }
+
   return {
     target: state.dailyTarget,
     read: todayRead,
@@ -281,6 +322,9 @@ function getTodayTarget(state) {
   };
 }
 
+/**
+ * Get the current wird (daily reading portion) for the active khatmah
+ */
 function getCurrentWird(state) {
   if (!state.isActive) return null;
   const dt = state.dailyTarget;
@@ -342,6 +386,118 @@ function removeBookmark() {
   localStorage.removeItem(QURAN_BOOKMARK_KEY);
 }
 
+// ===== API & PAGE FETCHING =====
+
+const pageCache = {};
+
+/**
+ * Fetch page text from AlQuran Cloud API (with caching)
+ */
+async function fetchPageText(pageNumber) {
+  // Check memory cache
+  if (pageCache[pageNumber]) return pageCache[pageNumber];
+
+  // Check localStorage cache
+  const cacheKey = QURAN_PAGE_CACHE_PREFIX + pageNumber;
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      pageCache[pageNumber] = parsed;
+      return parsed;
+    }
+  } catch (e) {
+    /* ignore */
+  }
+
+  // Fetch from API
+  const response = await fetch(
+    `${QURAN_API_BASE}/${pageNumber}/${QURAN_EDITION}`,
+  );
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const data = await response.json();
+
+  if (data.code !== 200 || !data.data || !data.data.ayahs) {
+    throw new Error("Invalid API response");
+  }
+
+  const ayahs = data.data.ayahs.map((a) => {
+    let text = a.text;
+    // Strip embedded bismillah from first ayah of each surah (except Al-Fatiha & At-Tawbah)
+    if (a.numberInSurah === 1 && a.surah.number !== 1 && a.surah.number !== 9) {
+      // Normalize both strings to NFC so combining marks are in canonical order
+      const norm = text.normalize("NFC");
+      const bism = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ".normalize("NFC");
+      if (norm.startsWith(bism)) {
+        text = norm.substring(bism.length).trim();
+      }
+    }
+    return {
+      number: a.number,
+      text: text,
+      numberInSurah: a.numberInSurah,
+      surahNumber: a.surah.number,
+      surahName:
+        SURAH_DATA.find((s) => s.number === a.surah.number)?.name ||
+        a.surah.name,
+    };
+  });
+
+  // Cache results
+  pageCache[pageNumber] = ayahs;
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify(ayahs));
+  } catch (e) {
+    /* storage full */
+  }
+
+  return ayahs;
+}
+
+/**
+ * Render page text as Mushaf-style HTML
+ */
+function renderPageHTML(ayahs) {
+  let html = "";
+  let currentSurah = null;
+
+  ayahs.forEach((ayah) => {
+    if (currentSurah !== ayah.surahNumber) {
+      currentSurah = ayah.surahNumber;
+
+      // Show surah header banner at the beginning of each surah
+      if (ayah.numberInSurah === 1) {
+        const surahInfo = SURAH_DATA.find((s) => s.number === currentSurah);
+        const surahName = surahInfo ? surahInfo.name : ayah.surahName;
+        html += `<div class="surah-banner">`;
+        html += `  <div class="surah-banner-ornament-top"></div>`;
+        html += `  <div class="surah-banner-content">`;
+        html += `    <span class="surah-banner-label">سُورَةُ ${surahName}</span>`;
+        html += `  </div>`;
+        html += `  <div class="surah-banner-ornament-bottom"></div>`;
+        html += `</div>`;
+      }
+
+      // Show our styled bismillah and strip it from the API ayah text
+      if (
+        ayah.numberInSurah === 1 &&
+        currentSurah !== 1 &&
+        currentSurah !== 9
+      ) {
+        html += `<div class="bismillah-text">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>`;
+      }
+    }
+
+    // Remove the API's embedded bismillah from the first ayah
+    let text = ayah.text;
+
+    html += `<span class="ayah-text">${text}</span>`;
+    html += `<span class="ayah-number">${toArabicNumber(ayah.numberInSurah)}</span>`;
+  });
+
+  return html;
+}
+
 // ===== QURAN VIEWER STATE =====
 
 let quranViewerState = {
@@ -354,45 +510,6 @@ let quranViewerState = {
 };
 
 let khatmahState = loadKhatmahState();
-
-// ===== IMAGE PRELOADER =====
-
-/**
- * Load a page image, returning a promise. Uses in-memory cache.
- */
-function loadPageImage(pageNumber) {
-  const url = getPageImageUrl(pageNumber);
-  if (imageCache.has(url)) return Promise.resolve(imageCache.get(url));
-
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      imageCache.set(url, img);
-      resolve(img);
-    };
-    img.onerror = reject;
-    img.src = url;
-  });
-}
-
-/**
- * Preload adjacent page images for smoother navigation.
- * Loads ±2 pages ahead and ±1 behind using idle callback.
- */
-function preloadAdjacentPages(page) {
-  const pagesToPreload = [page + 1, page + 2, page + 3, page - 1];
-  const schedule =
-    typeof requestIdleCallback === "function"
-      ? requestIdleCallback
-      : setTimeout;
-
-  pagesToPreload.forEach((p, i) => {
-    if (p >= 1 && p <= TOTAL_QURAN_PAGES) {
-      // Stagger preloads to avoid bandwidth contention
-      schedule(() => loadPageImage(p), { timeout: 2000 + i * 500 });
-    }
-  });
-}
 
 // ===== UI RENDERING FUNCTIONS =====
 
@@ -518,6 +635,7 @@ function renderKhatmahSetup() {
     </div>
   `;
 
+  // Initialize calculation preview
   updateGoalPreview();
 }
 
@@ -533,15 +651,15 @@ function renderSurahList() {
 
   let html = `<div class="surah-list-view">
     <div class="surah-list-header">
-      <h2><i class="fas fa-book-open"></i> فهرس السور</h2>
-      <p>اختر سورة لبدء القراءة</p>
+      <h2><i class="fas fa-book-open"></i> \u0641\u0647\u0631\u0633 \u0627\u0644\u0633\u0648\u0631</h2>
+      <p>\u0627\u062e\u062a\u0631 \u0633\u0648\u0631\u0629 \u0644\u0628\u062f\u0621 \u0627\u0644\u0642\u0631\u0627\u0621\u0629</p>
     </div>`;
 
   if (bookmark) {
     const bSurah = getSurahForPage(bookmark);
     html += `<button class="surah-bookmark-resume" onclick="openFreeReader(${bookmark})">
       <i class="fas fa-bookmark"></i>
-      <span>متابعة من صفحة ${toArabicNumber(bookmark)} - سورة ${bSurah.name}</span>
+      <span>\u0645\u062a\u0627\u0628\u0639\u0629 \u0645\u0646 \u0635\u0641\u062d\u0629 ${toArabicNumber(bookmark)} - \u0633\u0648\u0631\u0629 ${bSurah.name}</span>
       <i class="fas fa-chevron-left"></i>
     </button>`;
   }
@@ -559,15 +677,15 @@ function renderSurahList() {
         <span class="surah-list-number">${toArabicNumber(surah.number)}</span>
         <div class="surah-list-info">
           <span class="surah-list-name">${surah.name}</span>
-          <span class="surah-list-meta">صفحة ${toArabicNumber(surah.startPage)} • ${toArabicNumber(pageCount)} صفحة</span>
+          <span class="surah-list-meta">\u0635\u0641\u062d\u0629 ${toArabicNumber(surah.startPage)} \u2022 ${toArabicNumber(pageCount)} \u0635\u0641\u062d\u0629</span>
         </div>
         <i class="fas fa-chevron-left surah-list-arrow"></i>
       </button>`;
   });
 
   html += `</div>`;
-  html += `<button class="surah-list-back" onclick="showQuranPage()">
-    <i class="fas fa-arrow-right"></i> العودة
+  html += `<button class="surah-list-back" onclick="renderKhatmahSetup()">
+    <i class="fas fa-arrow-right"></i> \u0627\u0644\u0639\u0648\u062f\u0629
   </button>`;
   html += `</div>`;
 
@@ -609,7 +727,9 @@ function openKhatmahReader() {
  */
 function completeWirdAndReturn() {
   if (typeof showNotification === "function") {
-    showNotification("أتممت الورد! بارك الله فيك 🌟");
+    showNotification(
+      "\u0623\u062a\u0645\u0645\u062a \u0627\u0644\u0648\u0631\u062f! \u0628\u0627\u0631\u0643 \u0627\u0644\u0644\u0647 \u0641\u064a\u0643 \ud83c\udf1f",
+    );
   }
   renderKhatmahDashboard();
 }
@@ -629,6 +749,7 @@ function renderKhatmahDashboard() {
   const adjustedTotal = TOTAL_QURAN_PAGES - kStart + 1;
   const totalWirds = Math.ceil(adjustedTotal / khatmahState.dailyTarget);
 
+  // Calculate stroke-dashoffset for progress ring
   const circumference = 2 * Math.PI * 80;
   const offset = circumference - (progress / 100) * circumference;
 
@@ -646,6 +767,7 @@ function renderKhatmahDashboard() {
         )
       : 0;
 
+  // Wird progress
   const wirdPercent = wird
     ? Math.min(100, Math.round((wird.pagesRead / wird.totalPages) * 100))
     : 0;
@@ -655,7 +777,7 @@ function renderKhatmahDashboard() {
   container.innerHTML = `
     <div class="khatmah-dashboard">
       <div class="khatmah-dashboard-header">
-        <h2><i class="fas fa-quran"></i> ختمتك</h2>
+        <h2><i class="fas fa-quran"></i> \u062e\u062a\u0645\u062a\u0643</h2>
       </div>
 
       <!-- Progress Ring -->
@@ -668,7 +790,7 @@ function renderKhatmahDashboard() {
           </svg>
           <div class="progress-ring-text">
             <span class="progress-ring-percent">${progress}%</span>
-            <span class="progress-ring-label">${khatmahState.totalPagesRead} / ${adjustedTotal} صفحة</span>
+            <span class="progress-ring-label">${khatmahState.totalPagesRead} / ${adjustedTotal} \u0635\u0641\u062d\u0629</span>
           </div>
         </div>
       </div>
@@ -679,22 +801,22 @@ function renderKhatmahDashboard() {
           ? `
       <div class="wird-card">
         <div class="wird-card-header">
-          <h3><i class="fas fa-book-reader"></i> الورد الحالي</h3>
-          <span class="wird-badge">الورد ${toArabicNumber(wird.wirdNumber)} من ${toArabicNumber(totalWirds)}</span>
+          <h3><i class="fas fa-book-reader"></i> \u0627\u0644\u0648\u0631\u062f \u0627\u0644\u062d\u0627\u0644\u064a</h3>
+          <span class="wird-badge">\u0627\u0644\u0648\u0631\u062f ${toArabicNumber(wird.wirdNumber)} \u0645\u0646 ${toArabicNumber(totalWirds)}</span>
         </div>
         <div class="wird-card-pages">
-          صفحة ${toArabicNumber(wird.startPage)} إلى ${toArabicNumber(wird.endPage)}
+          \u0635\u0641\u062d\u0629 ${toArabicNumber(wird.startPage)} \u0625\u0644\u0649 ${toArabicNumber(wird.endPage)}
         </div>
         <div class="wird-card-surahs">
-          ${wirdSurahStart && wirdSurahEnd ? (wirdSurahStart.name === wirdSurahEnd.name ? wirdSurahStart.name : `${wirdSurahStart.name} — ${wirdSurahEnd.name}`) : ""}
+          ${wirdSurahStart && wirdSurahEnd ? (wirdSurahStart.name === wirdSurahEnd.name ? wirdSurahStart.name : `${wirdSurahStart.name} \u2014 ${wirdSurahEnd.name}`) : ""}
         </div>
         <div class="wird-card-progress">
           <div class="wird-card-progress-bar">
             <div class="wird-card-progress-fill" style="width: ${wirdPercent}%"></div>
           </div>
-          <span class="wird-card-progress-text">${toArabicNumber(wird.pagesRead)} / ${toArabicNumber(wird.totalPages)} صفحة</span>
+          <span class="wird-card-progress-text">${toArabicNumber(wird.pagesRead)} / ${toArabicNumber(wird.totalPages)} \u0635\u0641\u062d\u0629</span>
         </div>
-        ${wird.isComplete ? `<div class="wird-complete-badge"><i class="fas fa-check-circle"></i> أتممت هذا الورد</div>` : ""}
+        ${wird.isComplete ? `<div class="wird-complete-badge"><i class="fas fa-check-circle"></i> \u0623\u062a\u0645\u0645\u062a \u0647\u0630\u0627 \u0627\u0644\u0648\u0631\u062f</div>` : ""}
       </div>`
           : ""
       }
@@ -703,9 +825,9 @@ function renderKhatmahDashboard() {
         wird && wird.khatmahComplete
           ? `
       <div class="khatmah-complete-card-dashboard">
-        <div class="complete-icon">🎉</div>
-        <h3>أتممت الختمة!</h3>
-        <p>تقبل الله منك وجعلك من أهل القرآن</p>
+        <div class="complete-icon">\ud83c\udf89</div>
+        <h3>\u0623\u062a\u0645\u0645\u062a \u0627\u0644\u062e\u062a\u0645\u0629!</h3>
+        <p>\u062a\u0642\u0628\u0644 \u0627\u0644\u0644\u0647 \u0645\u0646\u0643 \u0648\u062c\u0639\u0644\u0643 \u0645\u0646 \u0623\u0647\u0644 \u0627\u0644\u0642\u0631\u0622\u0646</p>
       </div>`
           : ""
       }
@@ -715,22 +837,22 @@ function renderKhatmahDashboard() {
         <div class="khatmah-stat-card">
           <i class="fas fa-file-alt"></i>
           <span class="khatmah-stat-value">${khatmahState.dailyTarget}</span>
-          <span class="khatmah-stat-label">صفحة / ورد</span>
+          <span class="khatmah-stat-label">\u0635\u0641\u062d\u0629 / \u0648\u0631\u062f</span>
         </div>
         <div class="khatmah-stat-card">
           <i class="fas fa-calendar-check"></i>
           <span class="khatmah-stat-value">${daysElapsed}</span>
-          <span class="khatmah-stat-label">يوم مضى</span>
+          <span class="khatmah-stat-label">\u064a\u0648\u0645 \u0645\u0636\u0649</span>
         </div>
         <div class="khatmah-stat-card">
           <i class="fas fa-hourglass-half"></i>
           <span class="khatmah-stat-value">${estimatedDaysLeft}</span>
-          <span class="khatmah-stat-label">يوم متبقي</span>
+          <span class="khatmah-stat-label">\u064a\u0648\u0645 \u0645\u062a\u0628\u0642\u064a</span>
         </div>
         <div class="khatmah-stat-card">
           <i class="fas fa-bookmark"></i>
           <span class="khatmah-stat-value">${khatmahState.lastReadPage}</span>
-          <span class="khatmah-stat-label">آخر صفحة</span>
+          <span class="khatmah-stat-label">\u0622\u062e\u0631 \u0635\u0641\u062d\u0629</span>
         </div>
       </div>
 
@@ -741,25 +863,21 @@ function renderKhatmahDashboard() {
             ? `
         <button class="khatmah-read-btn" onclick="openKhatmahReader()">
           <i class="fas fa-book-open"></i>
-          ${wird.isComplete ? "الورد التالي" : "متابعة الورد"}
+          ${wird.isComplete ? "\u0627\u0644\u0648\u0631\u062f \u0627\u0644\u062a\u0627\u0644\u064a" : "\u0645\u062a\u0627\u0628\u0639\u0629 \u0627\u0644\u0648\u0631\u062f"}
         </button>`
             : ""
         }
         <button class="khatmah-reset-btn" onclick="resetKhatmah()">
           <i class="fas fa-redo"></i>
-          ختمة جديدة
+          \u062e\u062a\u0645\u0629 \u062c\u062f\u064a\u062f\u0629
         </button>
       </div>
     </div>
   `;
 }
 
-// ============================================================
-// IMAGE-BASED MUSHAF VIEWER
-// ============================================================
-
 /**
- * Render the full-screen image-based Mushaf viewer.
+ * Render Mushaf Viewer
  */
 function renderMushafViewer() {
   quranViewerState.currentView = "reader";
@@ -773,439 +891,395 @@ function renderMushafViewer() {
   const isBookmarked = bookmark === page;
 
   // Mode-aware navigation boundaries
-  const isKM = quranViewerState.mode === "khatmah";
-  const navStart = isKM ? quranViewerState.wirdStart : 1;
-  const navEnd = isKM ? quranViewerState.wirdEnd : TOTAL_QURAN_PAGES;
-  const progressPercent = isKM
+  const isKhatmahMode = quranViewerState.mode === "khatmah";
+  const navStart = isKhatmahMode ? quranViewerState.wirdStart : 1;
+  const navEnd = isKhatmahMode ? quranViewerState.wirdEnd : TOTAL_QURAN_PAGES;
+  const wirdNum = isKhatmahMode
+    ? Math.floor((navStart - 1) / khatmahState.dailyTarget) + 1
+    : 0;
+  const totalWirds = isKhatmahMode
+    ? Math.ceil(TOTAL_QURAN_PAGES / khatmahState.dailyTarget)
+    : 0;
+  const wirdProgress = isKhatmahMode
     ? Math.round(((page - navStart + 1) / (navEnd - navStart + 1)) * 100)
     : khatmahState.isActive
       ? getKhatmahProgress(khatmahState)
       : Math.round((page / TOTAL_QURAN_PAGES) * 100);
 
-  // Wird info for banner
-  const wirdNum = isKM
-    ? Math.floor(
-        (navStart - (khatmahState.khatmahStartPage || 1)) /
-          khatmahState.dailyTarget,
-      ) + 1
-    : 0;
-  const totalWirds = isKM
-    ? Math.ceil(
-        (TOTAL_QURAN_PAGES - (khatmahState.khatmahStartPage || 1) + 1) /
-          khatmahState.dailyTarget,
-      )
-    : 0;
-  const atWirdEnd = isKM && page >= navEnd;
-
   // Hide bottom nav for immersive reading
-  const bottomNav = document.getElementById("bottomNav");
+  var bottomNav = document.getElementById("bottomNav");
   if (bottomNav) bottomNav.style.display = "none";
 
-  const imageUrl = getPageImageUrl(page);
-
   container.innerHTML = `
-    <div class="mushaf-container" id="mushafContainer">
-      <!-- Header -->
+    <div class="mushaf-viewer mushaf-fullscreen">
+      <!-- Header Bar (Screenshot Style) -->
       <div class="mushaf-header">
         <div class="mushaf-header-right">
-          <button class="mushaf-back-btn" onclick="exitMushafViewer()" title="رجوع">
+          <button class="mushaf-back-btn" onclick="exitMushafViewer()" title="\u0631\u062c\u0648\u0639">
             <i class="fas fa-arrow-right"></i>
           </button>
         </div>
+
         <div class="mushaf-header-center">
-          <span class="mushaf-surah-name">سورة ${surah.name}</span>
-          <span class="mushaf-page-info">صفحة ${toArabicNumber(page)} · جزء ${toArabicNumber(juz.number)}</span>
+          <span class="mushaf-surah-name">\u0633\u0648\u0631\u0629 ${surah.name}</span>
+          <span class="mushaf-page-info">\u0635\u0641\u062d\u0629 ${toArabicNumber(page)}, \u062c\u0632\u0621 ${toArabicNumber(juz.number)}</span>
         </div>
+
         <div class="mushaf-header-left">
-          <button class="mushaf-action-btn" id="settingsBtn" onclick="toggleMushafSettings()" title="الإعدادات">
+          <button class="mushaf-action-btn" id="settingsBtn" onclick="toggleMushafSettings()" title="\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a">
             <i class="fas fa-cog"></i>
           </button>
           <button class="mushaf-action-btn ${isBookmarked ? "bookmarked" : ""}"
             id="bookmarkBtn"
-            onclick="toggleBookmark(${page})" title="علامة مرجعية">
+            onclick="toggleBookmark(${page})" title="\u0639\u0644\u0627\u0645\u0629 \u0645\u0631\u062c\u0639\u064a\u0629">
             <i class="fas fa-bookmark"></i>
           </button>
 
-          <!-- Settings Dropdown (Page Jump only) -->
+          <!-- Settings Dropdown -->
           <div class="mushaf-settings-dropdown" id="mushafSettingsDropdown">
             <div class="settings-section">
-              <span class="settings-section-label">انتقال لصفحة</span>
+              <span class="settings-section-label">\u062d\u062c\u0645 \u0627\u0644\u062e\u0637</span>
+              <div class="settings-font-controls">
+                <button class="settings-font-btn" onclick="changeMushafFont(-0.1)">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <span class="settings-font-size-label" id="fontSizeLabel">${mushafFontSize.toFixed(1)}</span>
+                <button class="settings-font-btn" onclick="changeMushafFont(0.1)">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="settings-section">
+              <span class="settings-section-label">\u0627\u0646\u062a\u0642\u0627\u0644 \u0644\u0635\u0641\u062d\u0629</span>
               <div class="settings-page-jump">
                 <input type="number" id="pageJumpInput" min="${navStart}" max="${navEnd}"
                   placeholder="${page}" onkeydown="handlePageJump(event)" />
-                <button class="settings-page-jump-btn" onclick="jumpToPage()">انتقال</button>
+                <button class="settings-page-jump-btn" onclick="jumpToPage()">
+                  \u0627\u0646\u062a\u0642\u0627\u0644
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      ${
-        isKM
-          ? `<div class="wird-banner">
-        <span>الورد ${toArabicNumber(wirdNum)} من ${toArabicNumber(totalWirds)}</span>
-        <span class="wird-banner-pages">صفحة ${toArabicNumber(page - navStart + 1)} من ${toArabicNumber(navEnd - navStart + 1)}</span>
-      </div>`
-          : ""
-      }
-
-      <!-- Image Area -->
-      <div class="mushaf-image-area" id="mushafImageArea">
-        <img
-          class="mushaf-page-img loading"
-          id="mushafPageImg"
-          src="${imageUrl}"
-          alt="صفحة ${page} من المصحف"
-          draggable="false"
-        />
-
-        <!-- Tap Zones -->
-        <div class="mushaf-tap-zone mushaf-tap-zone--next" id="tapZoneNext"></div>
-        <div class="mushaf-tap-zone mushaf-tap-zone--prev" id="tapZonePrev"></div>
-
-        <!-- Loading Overlay -->
-        <div class="mushaf-loading-overlay" id="mushafLoading">
-          <i class="fas fa-spinner fa-spin"></i>
-          <p>جاري تحميل الصفحة...</p>
+      <!-- Page Content -->
+      <div class="mushaf-page-container">
+        <div class="mushaf-page-content" id="mushafPageContent">
+          <div class="mushaf-loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>\u062c\u0627\u0631\u064a \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0635\u0641\u062d\u0629...</p>
+          </div>
         </div>
       </div>
 
-      ${
-        atWirdEnd
-          ? `<button class="wird-complete-btn" onclick="completeWirdAndReturn()">
-        <i class="fas fa-check-circle"></i> أتممت الورد
-      </button>`
-          : ""
-      }
-
-      <!-- Bottom Bar (Progress) -->
-      <div class="mushaf-bottom-bar">
-        <div class="mushaf-bottom-info">
-          <span>${isKM ? `${page - navStart + 1} / ${navEnd - navStart + 1}` : `${page} / ${TOTAL_QURAN_PAGES}`}</span>
-          <span>${progressPercent}%</span>
-        </div>
-        <div class="mushaf-progress-track">
-          <div class="mushaf-progress-fill" style="width: ${progressPercent}%"></div>
+      <!-- Page Footer with Progress -->
+      <div class="mushaf-page-footer">
+        <div class="mushaf-progress">
+          <div class="mushaf-progress-fill" style="width: ${wirdProgress}%"></div>
         </div>
       </div>
     </div>
   `;
 
-  // Wait for image to load
-  const imgEl = document.getElementById("mushafPageImg");
-  const loadingEl = document.getElementById("mushafLoading");
+  // Fetch and render page text
+  loadMushafPageContent(page);
 
-  if (imgEl) {
-    // Check if image is already cached — show instantly
-    const cachedUrl = getPageImageUrl(page);
-    if (imageCache.has(cachedUrl)) {
-      imgEl.classList.remove("loading");
-      if (loadingEl) loadingEl.classList.add("hidden");
-      quranViewerState.isLoading = false;
-    } else {
-      quranViewerState.isLoading = true;
-      imgEl.onload = function () {
-        imageCache.set(cachedUrl, imgEl);
-        imgEl.classList.remove("loading");
-        if (loadingEl) loadingEl.classList.add("hidden");
-        quranViewerState.isLoading = false;
-      };
-      imgEl.onerror = function () {
-        imgEl.classList.remove("loading");
-        if (loadingEl) {
-          loadingEl.innerHTML = `
-            <div class="mushaf-error-overlay">
-              <i class="fas fa-exclamation-triangle"></i>
-              <p>تعذر تحميل الصفحة. تأكد من اتصالك بالإنترنت.</p>
-              <button class="mushaf-error-retry" onclick="retryLoadPage()">
-                <i class="fas fa-redo"></i> إعادة المحاولة
-              </button>
-            </div>`;
-          loadingEl.classList.remove("hidden");
-        }
-        quranViewerState.isLoading = false;
-      };
-    }
-  }
-
-  // Mark page as read
-  markPageAsRead(page);
-
-  // Persist current page
-  persistCurrentPage(page);
-
-  // Preload adjacent pages
-  preloadAdjacentPages(page);
-
-  // Setup interactions
-  setupTapNavigation();
+  // Setup swipe support
   setupMushafSwipe();
 }
 
-/**
- * Retry loading the current page image.
- */
-function retryLoadPage() {
-  const page = quranViewerState.currentPage;
-  const imgEl = document.getElementById("mushafPageImg");
-  const loadingEl = document.getElementById("mushafLoading");
+// ===== USER INTERACTION HANDLERS =====
 
-  if (imgEl && loadingEl) {
-    loadingEl.innerHTML = `
+/**
+ * Select goal type in setup
+ */
+function selectGoalType(type) {
+  // Update button states
+  document.querySelectorAll(".goal-type-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.type === type);
+  });
+
+  const slider = document.getElementById("goalValueSlider");
+  const numInput = document.getElementById("goalValueNumber");
+  const label = document.getElementById("goalInputLabel");
+  const unitLabel = document.getElementById("goalUnitLabel");
+
+  if (type === "days") {
+    slider.min = 1;
+    slider.max = 365;
+    slider.value = 30;
+    numInput.min = 1;
+    numInput.max = 365;
+    numInput.value = 30;
+    label.textContent = "عدد الأيام لإتمام الختمة";
+    unitLabel.textContent = "يوم";
+  } else {
+    slider.min = 1;
+    slider.max = 30;
+    slider.value = 5;
+    numInput.min = 1;
+    numInput.max = 30;
+    numInput.value = 5;
+    label.textContent = "عدد الصفحات اليومية";
+    unitLabel.textContent = "صفحة";
+  }
+
+  document
+    .querySelector(".khatmah-setup-card")
+    ?.setAttribute("data-goal-type", type);
+  updateGoalPreview();
+}
+
+/** Sync number input from slider */
+function syncGoalFromSlider() {
+  const slider = document.getElementById("goalValueSlider");
+  const numInput = document.getElementById("goalValueNumber");
+  if (numInput) numInput.value = slider.value;
+  updateGoalPreview();
+}
+
+/** Sync slider from number input */
+function syncGoalFromNumber() {
+  const slider = document.getElementById("goalValueSlider");
+  const numInput = document.getElementById("goalValueNumber");
+  if (slider) slider.value = numInput.value;
+  updateGoalPreview();
+}
+
+/** Adjust goal value by delta */
+function adjustGoalValue(delta) {
+  const numInput = document.getElementById("goalValueNumber");
+  const slider = document.getElementById("goalValueSlider");
+  let val = parseInt(numInput.value) + delta;
+  val = Math.max(parseInt(numInput.min), Math.min(parseInt(numInput.max), val));
+  numInput.value = val;
+  slider.value = val;
+  updateGoalPreview();
+}
+
+/** Select starting Juz */
+function selectStartJuz(startPage) {
+  startPage = parseInt(startPage);
+  const fromBeginBtn = document.querySelector('.juz-start-btn[data-start="1"]');
+  const select = document.getElementById("juzStartSelect");
+
+  if (startPage === 1) {
+    fromBeginBtn?.classList.add("active");
+    if (select) select.value = "0";
+  } else {
+    fromBeginBtn?.classList.remove("active");
+    if (select) select.value = String(startPage);
+  }
+
+  // Store chosen start page on the setup card
+  document
+    .querySelector(".khatmah-setup-card")
+    ?.setAttribute("data-start-page", startPage);
+  updateGoalPreview();
+}
+
+/**
+ * Update goal calculation preview
+ */
+function updateGoalPreview() {
+  const activeType =
+    document.querySelector(".goal-type-btn.active")?.dataset.type || "days";
+  const numInput = document.getElementById("goalValueNumber");
+  const value = parseInt(
+    numInput?.value || document.getElementById("goalValueSlider")?.value || 30,
+  );
+
+  // Get start page from Juz picker
+  const startPage = parseInt(
+    document
+      .querySelector(".khatmah-setup-card")
+      ?.getAttribute("data-start-page") || "1",
+  );
+  const totalPages = TOTAL_QURAN_PAGES - startPage + 1;
+
+  // Calculate
+  let dailyPages, estimatedDays;
+  if (activeType === "days") {
+    dailyPages = Math.ceil(totalPages / value);
+    estimatedDays = value;
+  } else {
+    dailyPages = value;
+    estimatedDays = Math.ceil(totalPages / value);
+  }
+  const dailyJuz = dailyPages / 20;
+  const dailyMinutes = Math.round(dailyPages * 2);
+
+  // Update preview
+  const calcDailyPages = document.getElementById("calcDailyPages");
+  const calcDailyJuz = document.getElementById("calcDailyJuz");
+  const calcDailyTime = document.getElementById("calcDailyTime");
+
+  if (calcDailyPages) {
+    calcDailyPages.textContent = `${dailyPages} صفحة`;
+  }
+  if (calcDailyJuz) {
+    if (dailyJuz >= 1) {
+      calcDailyJuz.textContent = `${dailyJuz.toFixed(1)} جزء`;
+    } else {
+      calcDailyJuz.textContent = `${Math.round(dailyJuz * 4)}/4 حزب`;
+    }
+  }
+  if (calcDailyTime) {
+    if (dailyMinutes >= 60) {
+      const hours = Math.floor(dailyMinutes / 60);
+      const mins = dailyMinutes % 60;
+      calcDailyTime.textContent = `~${hours} ساعة${
+        mins > 0 ? ` و ${mins} دقيقة` : ""
+      }`;
+    } else {
+      calcDailyTime.textContent = `~${dailyMinutes} دقيقة`;
+    }
+  }
+}
+
+/**
+ * Start a new Khatmah
+ */
+function startKhatmah() {
+  const activeType =
+    document.querySelector(".goal-type-btn.active")?.dataset.type || "days";
+  const numInput = document.getElementById("goalValueNumber");
+  const value = parseInt(
+    numInput?.value || document.getElementById("goalValueSlider")?.value || 30,
+  );
+
+  const khatmahStartPage = parseInt(
+    document
+      .querySelector(".khatmah-setup-card")
+      ?.getAttribute("data-start-page") || "1",
+  );
+  const totalPages = TOTAL_QURAN_PAGES - khatmahStartPage + 1;
+  const dailyTarget =
+    activeType === "days" ? Math.ceil(totalPages / value) : value;
+
+  khatmahState = {
+    isActive: true,
+    goalType: activeType,
+    goalValue: value,
+    dailyTarget: dailyTarget,
+    startDate: new Date().toISOString(),
+    lastReadPage: khatmahStartPage,
+    khatmahStartPage: khatmahStartPage,
+    completedPages: [],
+    bookmarkedPage: null,
+    totalPagesRead: 0,
+  };
+
+  saveKhatmahState(khatmahState);
+
+  // Show notification
+  if (typeof showNotification === "function") {
+    showNotification(`تم بدء ختمة جديدة - ${dailyTarget} صفحة يومياً`);
+  }
+
+  // Show dashboard
+  renderKhatmahDashboard();
+}
+
+/**
+ * Reset Khatmah
+ */
+function resetKhatmah() {
+  if (!confirm("هل أنت متأكد من إعادة تعيين الختمة؟ سيتم فقد كل التقدم.")) {
+    return;
+  }
+
+  khatmahState = getDefaultKhatmahState();
+  saveKhatmahState(khatmahState);
+
+  if (typeof showNotification === "function") {
+    showNotification("تم إعادة تعيين الختمة");
+  }
+
+  renderKhatmahSetup();
+}
+
+/**
+ * Start quick read without Khatmah
+ */
+function startQuickRead(startPage) {
+  renderSurahList();
+}
+
+/**
+ * Open Mushaf Viewer at specific page (free mode)
+ */
+function openMushafViewer(page) {
+  quranViewerState.mode = "free";
+  quranViewerState.wirdStart = 1;
+  quranViewerState.wirdEnd = TOTAL_QURAN_PAGES;
+  quranViewerState.currentPage = page || 1;
+  renderMushafViewer();
+}
+
+/**
+ * Exit Mushaf Viewer back to appropriate screen
+ */
+function exitMushafViewer() {
+  // Restore bottom nav visibility
+  var bottomNav = document.getElementById("bottomNav");
+  if (bottomNav) bottomNav.style.display = "";
+
+  if (quranViewerState.mode === "khatmah" && khatmahState.isActive) {
+    renderKhatmahDashboard();
+  } else {
+    renderSurahList();
+  }
+}
+
+// ===== MUSHAF PAGE LOADING =====
+
+/**
+ * Load and render a Mushaf page
+ */
+async function loadMushafPageContent(pageNumber) {
+  const contentEl = document.getElementById("mushafPageContent");
+  if (!contentEl) return;
+
+  quranViewerState.isLoading = true;
+
+  contentEl.innerHTML = `
+    <div class="mushaf-loading">
       <i class="fas fa-spinner fa-spin"></i>
-      <p>جاري تحميل الصفحة...</p>`;
-    loadingEl.classList.remove("hidden");
-    imgEl.classList.add("loading");
-    imgEl.src = getPageImageUrl(page) + "?t=" + Date.now();
-  }
-}
+      <p>جاري تحميل الصفحة...</p>
+    </div>`;
 
-/**
- * Navigate to a new page (without full re-render).
- */
-function navigateToPage(newPage, direction) {
-  const isKM = quranViewerState.mode === "khatmah";
-  const navStart = isKM ? quranViewerState.wirdStart : 1;
-  const navEnd = isKM ? quranViewerState.wirdEnd : TOTAL_QURAN_PAGES;
-
-  if (newPage < navStart || newPage > navEnd) return;
-
-  quranViewerState.currentPage = newPage;
-
-  const surah = getSurahForPage(newPage);
-  const juz = getJuzForPage(newPage);
-  const bookmark = loadBookmark();
-  const isBookmarked = bookmark === newPage;
-
-  const progressPercent = isKM
-    ? Math.round(((newPage - navStart + 1) / (navEnd - navStart + 1)) * 100)
-    : khatmahState.isActive
-      ? getKhatmahProgress(khatmahState)
-      : Math.round((newPage / TOTAL_QURAN_PAGES) * 100);
-
-  // Update header
-  const surahNameEl = document.querySelector(".mushaf-surah-name");
-  const pageInfoEl = document.querySelector(".mushaf-page-info");
-  if (surahNameEl) surahNameEl.textContent = `سورة ${surah.name}`;
-  if (pageInfoEl)
-    pageInfoEl.textContent = `صفحة ${toArabicNumber(newPage)} · جزء ${toArabicNumber(juz.number)}`;
-
-  // Update bookmark
-  const bookmarkBtn = document.getElementById("bookmarkBtn");
-  if (bookmarkBtn) {
-    bookmarkBtn.classList.toggle("bookmarked", isBookmarked);
-    bookmarkBtn.setAttribute("onclick", `toggleBookmark(${newPage})`);
-  }
-
-  // Update wird banner
-  const wirdBannerPages = document.querySelector(".wird-banner-pages");
-  if (wirdBannerPages) {
-    wirdBannerPages.textContent = `صفحة ${toArabicNumber(newPage - navStart + 1)} من ${toArabicNumber(navEnd - navStart + 1)}`;
-  }
-
-  // Update bottom info
-  const bottomInfo = document.querySelector(".mushaf-bottom-info");
-  if (bottomInfo) {
-    bottomInfo.innerHTML = `
-      <span>${isKM ? `${newPage - navStart + 1} / ${navEnd - navStart + 1}` : `${newPage} / ${TOTAL_QURAN_PAGES}`}</span>
-      <span>${progressPercent}%</span>`;
-  }
-
-  // Update progress bar
-  const progressFill = document.querySelector(".mushaf-progress-fill");
-  if (progressFill) progressFill.style.width = `${progressPercent}%`;
-
-  // Update page jump placeholder
-  const jumpInput = document.getElementById("pageJumpInput");
-  if (jumpInput) jumpInput.placeholder = newPage;
-
-  // Show/hide wird complete button
-  const atWirdEnd = isKM && newPage >= navEnd;
-  let wirdBtn = document.querySelector(".wird-complete-btn");
-  if (atWirdEnd && !wirdBtn) {
-    const bottomBar = document.querySelector(".mushaf-bottom-bar");
-    if (bottomBar) {
-      const btn = document.createElement("button");
-      btn.className = "wird-complete-btn";
-      btn.innerHTML = '<i class="fas fa-check-circle"></i> أتممت الورد';
-      btn.onclick = completeWirdAndReturn;
-      bottomBar.parentNode.insertBefore(btn, bottomBar);
-    }
-  } else if (!atWirdEnd && wirdBtn) {
-    wirdBtn.remove();
-  }
-
-  // Animate and swap image
-  const imgEl = document.getElementById("mushafPageImg");
-  const loadingEl = document.getElementById("mushafLoading");
-  const newUrl = getPageImageUrl(newPage);
-  const isCached = imageCache.has(newUrl);
-
-  if (imgEl) {
-    // Apply flip animation
-    const animClass = direction === "next" ? "flip-next" : "flip-prev";
-    imgEl.classList.add(animClass);
-
-    // If cached, swap instantly with just the flip animation (no loading spinner)
-    if (isCached) {
-      setTimeout(() => {
-        imgEl.src = newUrl;
-        imgEl.alt = `صفحة ${newPage} من المصحف`;
-        imgEl.classList.remove(animClass);
-      }, 150);
-    } else {
-      imgEl.classList.add("loading");
-      if (loadingEl) loadingEl.classList.remove("hidden");
-      quranViewerState.isLoading = true;
-
-      // After animation start, swap src
-      setTimeout(() => {
-        imgEl.src = newUrl;
-        imgEl.alt = `صفحة ${newPage} من المصحف`;
-
-        imgEl.onload = function () {
-          imageCache.set(newUrl, true);
-          imgEl.classList.remove("loading");
-          imgEl.classList.remove(animClass);
-          if (loadingEl) loadingEl.classList.add("hidden");
-          quranViewerState.isLoading = false;
-        };
-        imgEl.onerror = function () {
-          imgEl.classList.remove("loading");
-          imgEl.classList.remove(animClass);
-          if (loadingEl) {
-            loadingEl.innerHTML = `
-              <div class="mushaf-error-overlay">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>تعذر تحميل الصفحة</p>
-                <button class="mushaf-error-retry" onclick="retryLoadPage()">
-                  <i class="fas fa-redo"></i> إعادة المحاولة
-                </button>
-              </div>`;
-            loadingEl.classList.remove("hidden");
-          }
-          quranViewerState.isLoading = false;
-        };
-      }, 150);
-    }
-  }
-
-  // Mark page as read & persist
-  markPageAsRead(newPage);
-  persistCurrentPage(newPage);
-
-  // Preload adjacent pages
-  preloadAdjacentPages(newPage);
-}
-
-/**
- * Persist current page to localStorage for resume.
- */
-function persistCurrentPage(page) {
   try {
-    localStorage.setItem("tazkeer_mushaf_current_page", String(page));
-  } catch (e) {
-    /* ignore */
+    const ayahs = await fetchPageText(pageNumber);
+    const html = renderPageHTML(ayahs);
+
+    contentEl.innerHTML = html;
+    contentEl.classList.add("mushaf-page-animate-in");
+
+    setTimeout(() => {
+      contentEl.classList.remove("mushaf-page-animate-in");
+    }, 400);
+
+    markPageAsRead(pageNumber);
+  } catch (error) {
+    console.error("Error loading page:", error);
+    contentEl.innerHTML = `
+      <div class="mushaf-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>تعذر تحميل الصفحة. تأكد من اتصالك بالإنترنت.</p>
+        <button class="mushaf-error-retry" onclick="loadMushafPageContent(${pageNumber})">
+          <i class="fas fa-redo"></i> إعادة المحاولة
+        </button>
+      </div>`;
   }
+
+  quranViewerState.isLoading = false;
 }
 
-// ===== PAGE NAVIGATION =====
-
-function mushafNextPage() {
-  const maxPage =
-    quranViewerState.mode === "khatmah"
-      ? quranViewerState.wirdEnd
-      : TOTAL_QURAN_PAGES;
-  if (quranViewerState.isLoading || quranViewerState.currentPage >= maxPage)
-    return;
-  navigateToPage(quranViewerState.currentPage + 1, "next");
-}
-
-function mushafPrevPage() {
-  const minPage =
-    quranViewerState.mode === "khatmah" ? quranViewerState.wirdStart : 1;
-  if (quranViewerState.isLoading || quranViewerState.currentPage <= minPage)
-    return;
-  navigateToPage(quranViewerState.currentPage - 1, "prev");
-}
-
-// ===== TAP-TO-FLIP NAVIGATION =====
-
-function setupTapNavigation() {
-  const nextZone = document.getElementById("tapZoneNext");
-  const prevZone = document.getElementById("tapZonePrev");
-
-  if (nextZone) {
-    nextZone.addEventListener("click", function (e) {
-      createTapRipple(e, this);
-      mushafNextPage();
-    });
-  }
-  if (prevZone) {
-    prevZone.addEventListener("click", function (e) {
-      createTapRipple(e, this);
-      mushafPrevPage();
-    });
-  }
-}
-
-function createTapRipple(event, zone) {
-  const ripple = document.createElement("div");
-  ripple.className = "mushaf-tap-ripple";
-  const rect = zone.getBoundingClientRect();
-  ripple.style.left = event.clientX - rect.left + "px";
-  ripple.style.top = event.clientY - rect.top + "px";
-  zone.appendChild(ripple);
-  ripple.addEventListener("animationend", () => ripple.remove());
-}
-
-// ===== SWIPE NAVIGATION =====
-
-let mushafTouchStartX = 0;
-let mushafTouchStartY = 0;
-let mushafTouchEndX = 0;
-let mushafTouchEndY = 0;
-
-function setupMushafSwipe() {
-  const imgArea = document.getElementById("mushafImageArea");
-  if (!imgArea) return;
-
-  imgArea.removeEventListener("touchstart", mushafTouchStart);
-  imgArea.removeEventListener("touchend", mushafTouchEnd);
-
-  imgArea.addEventListener("touchstart", mushafTouchStart, { passive: true });
-  imgArea.addEventListener("touchend", mushafTouchEnd, { passive: true });
-}
-
-function mushafTouchStart(e) {
-  mushafTouchStartX = e.changedTouches[0].screenX;
-  mushafTouchStartY = e.changedTouches[0].screenY;
-}
-
-function mushafTouchEnd(e) {
-  mushafTouchEndX = e.changedTouches[0].screenX;
-  mushafTouchEndY = e.changedTouches[0].screenY;
-  handleMushafSwipe();
-}
-
-function handleMushafSwipe() {
-  const deltaX = mushafTouchEndX - mushafTouchStartX;
-  const deltaY = Math.abs(mushafTouchEndY - mushafTouchStartY);
-  const minSwipeDistance = 80;
-
-  if (Math.abs(deltaX) > minSwipeDistance && Math.abs(deltaX) > deltaY) {
-    if (deltaX > 0) {
-      // Swipe right → next page (RTL: right = forward)
-      mushafNextPage();
-    } else {
-      // Swipe left → previous page (RTL: left = backward)
-      mushafPrevPage();
-    }
-  }
-}
-
-// ===== MARK PAGE AS READ =====
-
+/**
+ * Mark a page as read and update Khatmah progress
+ */
 function markPageAsRead(pageNumber) {
   if (khatmahState.isActive) {
     if (!khatmahState.completedPages.includes(pageNumber)) {
@@ -1244,210 +1318,128 @@ function showKhatmahCompletion() {
   document.body.appendChild(overlay);
 }
 
-// ===== USER INTERACTION HANDLERS =====
+// ===== PAGE NAVIGATION =====
 
-function selectGoalType(type) {
-  document.querySelectorAll(".goal-type-btn").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.type === type);
-  });
-
-  const slider = document.getElementById("goalValueSlider");
-  const numInput = document.getElementById("goalValueNumber");
-  const label = document.getElementById("goalInputLabel");
-  const unitLabel = document.getElementById("goalUnitLabel");
-
-  if (type === "days") {
-    slider.min = 1;
-    slider.max = 365;
-    slider.value = 30;
-    numInput.min = 1;
-    numInput.max = 365;
-    numInput.value = 30;
-    label.textContent = "عدد الأيام لإتمام الختمة";
-    unitLabel.textContent = "يوم";
-  } else {
-    slider.min = 1;
-    slider.max = 30;
-    slider.value = 5;
-    numInput.min = 1;
-    numInput.max = 30;
-    numInput.value = 5;
-    label.textContent = "عدد الصفحات اليومية";
-    unitLabel.textContent = "صفحة";
-  }
-
-  document
-    .querySelector(".khatmah-setup-card")
-    ?.setAttribute("data-goal-type", type);
-  updateGoalPreview();
-}
-
-function syncGoalFromSlider() {
-  const slider = document.getElementById("goalValueSlider");
-  const numInput = document.getElementById("goalValueNumber");
-  if (numInput) numInput.value = slider.value;
-  updateGoalPreview();
-}
-
-function syncGoalFromNumber() {
-  const slider = document.getElementById("goalValueSlider");
-  const numInput = document.getElementById("goalValueNumber");
-  if (slider) slider.value = numInput.value;
-  updateGoalPreview();
-}
-
-function adjustGoalValue(delta) {
-  const numInput = document.getElementById("goalValueNumber");
-  const slider = document.getElementById("goalValueSlider");
-  let val = parseInt(numInput.value) + delta;
-  val = Math.max(parseInt(numInput.min), Math.min(parseInt(numInput.max), val));
-  numInput.value = val;
-  slider.value = val;
-  updateGoalPreview();
-}
-
-function selectStartJuz(startPage) {
-  startPage = parseInt(startPage);
-  const fromBeginBtn = document.querySelector('.juz-start-btn[data-start="1"]');
-  const select = document.getElementById("juzStartSelect");
-
-  if (startPage === 1) {
-    fromBeginBtn?.classList.add("active");
-    if (select) select.value = "0";
-  } else {
-    fromBeginBtn?.classList.remove("active");
-    if (select) select.value = String(startPage);
-  }
-
-  document
-    .querySelector(".khatmah-setup-card")
-    ?.setAttribute("data-start-page", startPage);
-  updateGoalPreview();
-}
-
-function updateGoalPreview() {
-  const activeType =
-    document.querySelector(".goal-type-btn.active")?.dataset.type || "days";
-  const numInput = document.getElementById("goalValueNumber");
-  const value = parseInt(
-    numInput?.value || document.getElementById("goalValueSlider")?.value || 30,
-  );
-
-  const startPage = parseInt(
-    document
-      .querySelector(".khatmah-setup-card")
-      ?.getAttribute("data-start-page") || "1",
-  );
-  const totalPages = TOTAL_QURAN_PAGES - startPage + 1;
-
-  let dailyPages, estimatedDays;
-  if (activeType === "days") {
-    dailyPages = Math.ceil(totalPages / value);
-    estimatedDays = value;
-  } else {
-    dailyPages = value;
-    estimatedDays = Math.ceil(totalPages / value);
-  }
-  const dailyJuz = dailyPages / 20;
-  const dailyMinutes = Math.round(dailyPages * 2);
-
-  const calcDailyPages = document.getElementById("calcDailyPages");
-  const calcDailyJuz = document.getElementById("calcDailyJuz");
-  const calcDailyTime = document.getElementById("calcDailyTime");
-
-  if (calcDailyPages) calcDailyPages.textContent = `${dailyPages} صفحة`;
-  if (calcDailyJuz) {
-    calcDailyJuz.textContent =
-      dailyJuz >= 1
-        ? `${dailyJuz.toFixed(1)} جزء`
-        : `${Math.round(dailyJuz * 4)}/4 حزب`;
-  }
-  if (calcDailyTime) {
-    if (dailyMinutes >= 60) {
-      const hours = Math.floor(dailyMinutes / 60);
-      const mins = dailyMinutes % 60;
-      calcDailyTime.textContent = `~${hours} ساعة${mins > 0 ? ` و ${mins} دقيقة` : ""}`;
-    } else {
-      calcDailyTime.textContent = `~${dailyMinutes} دقيقة`;
-    }
-  }
-}
-
-function startKhatmah() {
-  const activeType =
-    document.querySelector(".goal-type-btn.active")?.dataset.type || "days";
-  const numInput = document.getElementById("goalValueNumber");
-  const value = parseInt(
-    numInput?.value || document.getElementById("goalValueSlider")?.value || 30,
-  );
-
-  const khatmahStartPage = parseInt(
-    document
-      .querySelector(".khatmah-setup-card")
-      ?.getAttribute("data-start-page") || "1",
-  );
-  const totalPages = TOTAL_QURAN_PAGES - khatmahStartPage + 1;
-  const dailyTarget =
-    activeType === "days" ? Math.ceil(totalPages / value) : value;
-
-  khatmahState = {
-    isActive: true,
-    goalType: activeType,
-    goalValue: value,
-    dailyTarget: dailyTarget,
-    startDate: new Date().toISOString(),
-    lastReadPage: khatmahStartPage,
-    khatmahStartPage: khatmahStartPage,
-    completedPages: [],
-    bookmarkedPage: null,
-    totalPagesRead: 0,
-  };
-
-  saveKhatmahState(khatmahState);
-
-  if (typeof showNotification === "function") {
-    showNotification(`تم بدء ختمة جديدة - ${dailyTarget} صفحة يومياً`);
-  }
-
-  renderKhatmahDashboard();
-}
-
-function resetKhatmah() {
-  if (!confirm("هل أنت متأكد من إعادة تعيين الختمة؟ سيتم فقد كل التقدم."))
+/**
+ * Go to next page (RTL: left to right means next page number)
+ */
+function mushafNextPage() {
+  const maxPage =
+    quranViewerState.mode === "khatmah"
+      ? quranViewerState.wirdEnd
+      : TOTAL_QURAN_PAGES;
+  if (quranViewerState.isLoading || quranViewerState.currentPage >= maxPage)
     return;
 
-  khatmahState = getDefaultKhatmahState();
-  saveKhatmahState(khatmahState);
+  quranViewerState.currentPage++;
+  navigateToCurrentPage("next");
+}
 
-  if (typeof showNotification === "function") {
-    showNotification("تم إعادة تعيين الختمة");
+/**
+ * Go to previous page
+ */
+function mushafPrevPage() {
+  const minPage =
+    quranViewerState.mode === "khatmah" ? quranViewerState.wirdStart : 1;
+  if (quranViewerState.isLoading || quranViewerState.currentPage <= minPage)
+    return;
+
+  quranViewerState.currentPage--;
+  navigateToCurrentPage("prev");
+}
+
+/**
+ * Navigate to current page with animation
+ */
+function navigateToCurrentPage(direction) {
+  const page = quranViewerState.currentPage;
+  const surah = getSurahForPage(page);
+  const juz = getJuzForPage(page);
+  const bookmark = loadBookmark();
+  const isBookmarked = bookmark === page;
+
+  // Mode-aware boundaries
+  const isKhatmahMode = quranViewerState.mode === "khatmah";
+  const navStart = isKhatmahMode ? quranViewerState.wirdStart : 1;
+  const navEnd = isKhatmahMode ? quranViewerState.wirdEnd : TOTAL_QURAN_PAGES;
+  const wirdProgress = isKhatmahMode
+    ? Math.round(((page - navStart + 1) / (navEnd - navStart + 1)) * 100)
+    : khatmahState.isActive
+      ? getKhatmahProgress(khatmahState)
+      : Math.round((page / TOTAL_QURAN_PAGES) * 100);
+
+  // Update header
+  const surahNameEl = document.querySelector(".mushaf-surah-name");
+  const pageInfoEl = document.querySelector(".mushaf-page-info");
+  const navCurrentEl = document.querySelector(".mushaf-nav-current");
+  const progressFillEl = document.querySelector(".mushaf-progress-fill");
+  const bookmarkBtn = document.getElementById("bookmarkBtn");
+
+  if (surahNameEl)
+    surahNameEl.textContent = `\u0633\u0648\u0631\u0629 ${surah.name}`;
+  if (pageInfoEl)
+    pageInfoEl.textContent = `\u0635\u0641\u062d\u0629 ${toArabicNumber(page)}, \u062c\u0632\u0621 ${toArabicNumber(juz.number)}`;
+  if (navCurrentEl)
+    navCurrentEl.textContent = isKhatmahMode
+      ? `${page - navStart + 1} / ${navEnd - navStart + 1}`
+      : `${page} / ${TOTAL_QURAN_PAGES}`;
+  if (progressFillEl) progressFillEl.style.width = `${wirdProgress}%`;
+
+  // Update wird banner
+  const wirdBannerPages = document.querySelector(".wird-banner-pages");
+  if (wirdBannerPages) {
+    wirdBannerPages.textContent = `\u0635\u0641\u062d\u0629 ${toArabicNumber(page - navStart + 1)} \u0645\u0646 ${toArabicNumber(navEnd - navStart + 1)}`;
   }
 
-  renderKhatmahSetup();
-}
-
-function openMushafViewer(page) {
-  quranViewerState.mode = "free";
-  quranViewerState.wirdStart = 1;
-  quranViewerState.wirdEnd = TOTAL_QURAN_PAGES;
-  quranViewerState.currentPage = page || 1;
-  renderMushafViewer();
-}
-
-function exitMushafViewer() {
-  // Restore bottom nav visibility
-  const bottomNav = document.getElementById("bottomNav");
-  if (bottomNav) bottomNav.style.display = "";
-
-  if (quranViewerState.mode === "khatmah" && khatmahState.isActive) {
-    renderKhatmahDashboard();
-  } else {
-    renderSurahList();
+  // Update bookmark button
+  if (bookmarkBtn) {
+    bookmarkBtn.classList.toggle("bookmarked", isBookmarked);
   }
+
+  // Update nav button states
+  const navBtns = document.querySelectorAll(".mushaf-nav-btn");
+  if (navBtns[0]) navBtns[0].disabled = page >= navEnd;
+  if (navBtns[1]) navBtns[1].disabled = page <= navStart;
+
+  // Show/hide wird complete button
+  const existingWirdBtn = document.querySelector(".wird-complete-btn");
+  if (isKhatmahMode && page >= navEnd && !existingWirdBtn) {
+    const footer = document.querySelector(".mushaf-page-footer");
+    const progressBar = document.querySelector(".mushaf-progress");
+    if (footer && progressBar) {
+      const btn = document.createElement("button");
+      btn.className = "wird-complete-btn";
+      btn.innerHTML =
+        '<i class="fas fa-check-circle"></i> \u0623\u062a\u0645\u0645\u062a \u0627\u0644\u0648\u0631\u062f';
+      btn.onclick = completeWirdAndReturn;
+      footer.insertBefore(btn, progressBar);
+    }
+  } else if (existingWirdBtn && page < navEnd) {
+    existingWirdBtn.remove();
+  }
+
+  // Update page jump placeholder
+  const jumpInput = document.getElementById("pageJumpInput");
+  if (jumpInput) jumpInput.placeholder = page;
+
+  // Add slide animation
+  const contentEl = document.getElementById("mushafPageContent");
+  if (contentEl) {
+    contentEl.classList.add(
+      direction === "next" ? "mushaf-slide-right" : "mushaf-slide-left",
+    );
+    setTimeout(() => {
+      contentEl.classList.remove("mushaf-slide-right", "mushaf-slide-left");
+    }, 400);
+  }
+
+  // Load new page content
+  loadMushafPageContent(page);
 }
 
-// ===== PAGE JUMP =====
-
+/**
+ * Jump to specific page number
+ */
 function jumpToPage() {
   const input = document.getElementById("pageJumpInput");
   if (!input) return;
@@ -1462,23 +1454,33 @@ function jumpToPage() {
 
   if (isNaN(page) || page < minPage || page > maxPage) {
     if (typeof showNotification === "function") {
-      showNotification(`رقم صفحة غير صحيح (${minPage} - ${maxPage})`);
+      showNotification(
+        `\u0631\u0642\u0645 \u0635\u0641\u062d\u0629 \u063a\u064a\u0631 \u0635\u062d\u064a\u062d (${minPage} - ${maxPage})`,
+      );
     }
     return;
   }
 
   const prevPage = quranViewerState.currentPage;
+  quranViewerState.currentPage = page;
   input.value = "";
-  toggleMushafSettings(); // close dropdown
-  navigateToPage(page, page > prevPage ? "next" : "prev");
+  navigateToCurrentPage(page > prevPage ? "next" : "prev");
 }
 
+/**
+ * Handle Enter key in page jump input
+ */
 function handlePageJump(event) {
-  if (event.key === "Enter") jumpToPage();
+  if (event.key === "Enter") {
+    jumpToPage();
+  }
 }
 
 // ===== BOOKMARK =====
 
+/**
+ * Toggle bookmark on current page
+ */
 function toggleBookmark(page) {
   const currentBookmark = loadBookmark();
   const bookmarkBtn = document.getElementById("bookmarkBtn");
@@ -1486,23 +1488,53 @@ function toggleBookmark(page) {
   if (currentBookmark === page) {
     removeBookmark();
     if (bookmarkBtn) bookmarkBtn.classList.remove("bookmarked");
-    if (typeof showNotification === "function")
+    if (typeof showNotification === "function") {
       showNotification("تم إزالة العلامة المرجعية");
+    }
   } else {
     saveBookmark(page);
     if (bookmarkBtn) bookmarkBtn.classList.add("bookmarked");
-    if (typeof showNotification === "function")
+    if (typeof showNotification === "function") {
       showNotification(`تم حفظ العلامة المرجعية - صفحة ${page}`);
+    }
   }
 }
 
-// ===== SETTINGS DROPDOWN =====
+// ===== FONT SIZE =====
 
-function toggleMushafSettings() {
-  const dropdown = document.getElementById("mushafSettingsDropdown");
-  if (dropdown) dropdown.classList.toggle("show");
+let mushafFontSize = parseFloat(
+  localStorage.getItem("mushafFontSize") || "1.5",
+);
+
+/**
+ * Change Mushaf font size
+ */
+function changeMushafFont(delta) {
+  mushafFontSize = Math.max(1.0, Math.min(2.5, mushafFontSize + delta));
+  localStorage.setItem("mushafFontSize", mushafFontSize.toString());
+
+  const contentEl = document.getElementById("mushafPageContent");
+  if (contentEl) {
+    contentEl.style.fontSize = mushafFontSize + "rem";
+  }
+
+  const fontLabel = document.getElementById("fontSizeLabel");
+  if (fontLabel) {
+    fontLabel.textContent = mushafFontSize.toFixed(1);
+  }
 }
 
+/**
+ * Toggle settings dropdown in mushaf viewer
+ */
+function toggleMushafSettings() {
+  const dropdown = document.getElementById("mushafSettingsDropdown");
+  if (dropdown) {
+    dropdown.classList.toggle("show");
+  }
+}
+
+// Close settings dropdown when clicking outside
 document.addEventListener("click", function (e) {
   const dropdown = document.getElementById("mushafSettingsDropdown");
   const settingsBtn = document.getElementById("settingsBtn");
@@ -1517,10 +1549,62 @@ document.addEventListener("click", function (e) {
   }
 });
 
+// ===== SWIPE NAVIGATION =====
+
+let mushafTouchStartX = 0;
+let mushafTouchStartY = 0;
+let mushafTouchEndX = 0;
+let mushafTouchEndY = 0;
+
+/**
+ * Setup swipe gesture support for Mushaf viewer
+ */
+function setupMushafSwipe() {
+  const viewer = document.querySelector(".mushaf-viewer");
+  if (!viewer) return;
+
+  // Remove old listeners to prevent duplicates
+  viewer.removeEventListener("touchstart", mushafTouchStart);
+  viewer.removeEventListener("touchend", mushafTouchEnd);
+
+  viewer.addEventListener("touchstart", mushafTouchStart, { passive: true });
+  viewer.addEventListener("touchend", mushafTouchEnd, { passive: true });
+}
+
+function mushafTouchStart(e) {
+  mushafTouchStartX = e.changedTouches[0].screenX;
+  mushafTouchStartY = e.changedTouches[0].screenY;
+}
+
+function mushafTouchEnd(e) {
+  mushafTouchEndX = e.changedTouches[0].screenX;
+  mushafTouchEndY = e.changedTouches[0].screenY;
+  handleMushafSwipe();
+}
+
+function handleMushafSwipe() {
+  const deltaX = mushafTouchEndX - mushafTouchStartX;
+  const deltaY = Math.abs(mushafTouchEndY - mushafTouchStartY);
+  const minSwipeDistance = 80;
+
+  // Only handle horizontal swipes (not vertical scrolling)
+  if (Math.abs(deltaX) > minSwipeDistance && Math.abs(deltaX) > deltaY) {
+    if (deltaX > 0) {
+      // Swipe right → next page (RTL: right = forward)
+      mushafNextPage();
+    } else {
+      // Swipe left → previous page (RTL: left = backward)
+      mushafPrevPage();
+    }
+  }
+}
+
 // ===== KEYBOARD NAVIGATION =====
 
 document.addEventListener("keydown", function (e) {
+  // Only handle when Mushaf viewer is active
   if (quranViewerState.currentView !== "reader") return;
+
   const quranTab = document.getElementById("tab-quran");
   if (!quranTab || !quranTab.classList.contains("active-tab")) return;
 
@@ -1547,10 +1631,16 @@ document.addEventListener("keydown", function (e) {
 
 // ===== TAB INTEGRATION =====
 
+/**
+ * Called by switchTab('tab-quran') in script.js
+ */
 function initQuranTab() {
   showQuranPage();
 }
 
+/**
+ * Called by switchTab('tab-profile') in script.js
+ */
 function updateProfileTab() {
   khatmahState = loadKhatmahState();
   var content = document.getElementById("profileKhatmahContent");
@@ -1561,6 +1651,12 @@ function updateProfileTab() {
       '<p class="profile-empty-state">لم تبدأ ختمة بعد. اذهب إلى تبويب القرآن لبدء ختمة جديدة.</p>';
   } else {
     var progress = getKhatmahProgress(khatmahState);
+    var daysElapsed = khatmahState.startDate
+      ? Math.floor(
+          (new Date() - new Date(khatmahState.startDate)) /
+            (1000 * 60 * 60 * 24),
+        ) + 1
+      : 0;
     content.innerHTML = `
       <div class="profile-khatmah-progress">
         <div class="profile-khatmah-bar">
@@ -1573,6 +1669,7 @@ function updateProfileTab() {
       </div>`;
   }
 
+  // Update reading stats
   var totalDaysEl = document.getElementById("profileTotalDays");
   var pagesReadEl = document.getElementById("profilePagesRead");
   var currentPageEl = document.getElementById("profileCurrentPage");
@@ -1589,10 +1686,29 @@ function updateProfileTab() {
   if (currentPageEl) currentPageEl.textContent = khatmahState.lastReadPage || 0;
 }
 
-// ===== INITIALIZATION =====
-
+/**
+ * Initialize Quran feature (called on DOM ready)
+ */
 function initQuranFeature() {
+  mushafFontSize = parseFloat(localStorage.getItem("mushafFontSize") || "1.5");
   khatmahState = loadKhatmahState();
+
+  // Clear old page cache so bismillah-stripped text is fetched fresh
+  const cacheCleared = localStorage.getItem("quran_cache_v3");
+  if (!cacheCleared) {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith(QURAN_PAGE_CACHE_PREFIX)) localStorage.removeItem(key);
+    });
+    localStorage.setItem("quran_cache_v3", "1");
+  }
+
+  // Preload first page in background
+  if (navigator.onLine) {
+    const bookmark = loadBookmark();
+    const startPage =
+      bookmark || (khatmahState.isActive ? khatmahState.lastReadPage : 1);
+    fetchPageText(startPage).catch(() => {});
+  }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
