@@ -465,6 +465,19 @@ function renderPageHTML(ayahs) {
     if (currentSurah !== ayah.surahNumber) {
       currentSurah = ayah.surahNumber;
 
+      // Show surah header banner at the beginning of each surah
+      if (ayah.numberInSurah === 1) {
+        const surahInfo = SURAH_DATA.find((s) => s.number === currentSurah);
+        const surahName = surahInfo ? surahInfo.name : ayah.surahName;
+        html += `<div class="surah-banner">`;
+        html += `  <div class="surah-banner-ornament-top"></div>`;
+        html += `  <div class="surah-banner-content">`;
+        html += `    <span class="surah-banner-label">سُورَةُ ${surahName}</span>`;
+        html += `  </div>`;
+        html += `  <div class="surah-banner-ornament-bottom"></div>`;
+        html += `</div>`;
+      }
+
       // Show our styled bismillah and strip it from the API ayah text
       if (
         ayah.numberInSurah === 1 &&
