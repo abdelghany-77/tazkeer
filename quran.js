@@ -278,10 +278,9 @@ function calculateEstimatedDays(goalType, goalValue) {
  */
 function getKhatmahProgress(state) {
   if (!state.isActive) return 0;
-  return Math.min(
-    100,
-    Math.round((state.totalPagesRead / TOTAL_QURAN_PAGES) * 100),
-  );
+  const kStart = state.khatmahStartPage || 1;
+  const totalPages = TOTAL_QURAN_PAGES - kStart + 1;
+  return Math.min(100, Math.round((state.totalPagesRead / totalPages) * 100));
 }
 
 /**
@@ -331,14 +330,18 @@ function getCurrentWird(state) {
   const dt = state.dailyTarget;
   if (!dt || dt <= 0) return null;
 
+  const kStart = state.khatmahStartPage || 1;
+  const totalPages = TOTAL_QURAN_PAGES - kStart + 1;
+
   const wirdIndex = Math.floor(state.totalPagesRead / dt);
-  const startPage = wirdIndex * dt + 1;
+  const startPage = kStart + wirdIndex * dt;
   const endPage = Math.min(startPage + dt - 1, TOTAL_QURAN_PAGES);
 
   if (startPage > TOTAL_QURAN_PAGES) {
-    const lastWirdStart = (Math.ceil(TOTAL_QURAN_PAGES / dt) - 1) * dt + 1;
+    const totalWirds = Math.ceil(totalPages / dt);
+    const lastWirdStart = kStart + (totalWirds - 1) * dt;
     return {
-      wirdNumber: Math.ceil(TOTAL_QURAN_PAGES / dt),
+      wirdNumber: totalWirds,
       startPage: lastWirdStart,
       endPage: TOTAL_QURAN_PAGES,
       totalPages: TOTAL_QURAN_PAGES - lastWirdStart + 1,
@@ -360,7 +363,7 @@ function getCurrentWird(state) {
     totalPages: endPage - startPage + 1,
     pagesRead,
     isComplete: pagesRead >= endPage - startPage + 1,
-    khatmahComplete: state.totalPagesRead >= TOTAL_QURAN_PAGES,
+    khatmahComplete: state.totalPagesRead >= totalPages,
   };
 }
 
@@ -550,10 +553,32 @@ function renderKhatmahSetup() {
         <!-- Goal Value Input -->
         <div class="goal-input-group">
           <label class="goal-input-label" id="goalInputLabel">عدد الأيام لإتمام الختمة</label>
-          <div class="goal-input-wrapper">
+          <div class="goal-input-number-row">
+            <button class="goal-adjust-btn" onclick="adjustGoalValue(-1)"><i class="fas fa-minus"></i></button>
+            <input type="number" id="goalValueNumber" min="1" max="365" value="30"
+              oninput="syncGoalFromNumber()" class="goal-number-input" />
+            <button class="goal-adjust-btn" onclick="adjustGoalValue(1)"><i class="fas fa-plus"></i></button>
+            <span class="goal-unit-label" id="goalUnitLabel">يوم</span>
+          </div>
+          <div class="goal-slider-wrapper">
             <input type="range" id="goalValueSlider" min="1" max="365" value="30"
-              oninput="updateGoalPreview()" />
-            <div class="goal-value-display" id="goalValueDisplay">30 يوم</div>
+              oninput="syncGoalFromSlider()" />
+          </div>
+        </div>
+
+        <!-- Juz Start Picker -->
+        <div class="goal-input-group">
+          <label class="goal-input-label">بداية الختمة</label>
+          <div class="juz-start-picker">
+            <button class="juz-start-btn active" data-start="1" onclick="selectStartJuz(1)">
+              <i class="fas fa-book-open"></i> من البداية
+            </button>
+            <div class="juz-start-select-wrapper">
+              <select id="juzStartSelect" class="juz-start-select" onchange="selectStartJuz(this.value)">
+                <option value="0" selected disabled>اختر جزءاً</option>
+                ${JUZ_DATA.map((j) => `<option value="${j.startPage}">${j.name} (ص ${j.startPage})</option>`).join("")}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -707,7 +732,9 @@ function renderKhatmahDashboard() {
   khatmahState = loadKhatmahState();
   const progress = getKhatmahProgress(khatmahState);
   const wird = getCurrentWird(khatmahState);
-  const totalWirds = Math.ceil(TOTAL_QURAN_PAGES / khatmahState.dailyTarget);
+  const kStart = khatmahState.khatmahStartPage || 1;
+  const adjustedTotal = TOTAL_QURAN_PAGES - kStart + 1;
+  const totalWirds = Math.ceil(adjustedTotal / khatmahState.dailyTarget);
 
   // Calculate stroke-dashoffset for progress ring
   const circumference = 2 * Math.PI * 80;
@@ -722,7 +749,7 @@ function renderKhatmahDashboard() {
   const estimatedDaysLeft =
     khatmahState.dailyTarget > 0
       ? Math.ceil(
-          (TOTAL_QURAN_PAGES - khatmahState.totalPagesRead) /
+          (adjustedTotal - khatmahState.totalPagesRead) /
             khatmahState.dailyTarget,
         )
       : 0;
@@ -750,7 +777,7 @@ function renderKhatmahDashboard() {
           </svg>
           <div class="progress-ring-text">
             <span class="progress-ring-percent">${progress}%</span>
-            <span class="progress-ring-label">${khatmahState.totalPagesRead} / ${TOTAL_QURAN_PAGES} \u0635\u0641\u062d\u0629</span>
+            <span class="progress-ring-label">${khatmahState.totalPagesRead} / ${adjustedTotal} \u0635\u0641\u062d\u0629</span>
           </div>
         </div>
       </div>
@@ -979,27 +1006,82 @@ function selectGoalType(type) {
     btn.classList.toggle("active", btn.dataset.type === type);
   });
 
-  // Update slider and label
   const slider = document.getElementById("goalValueSlider");
+  const numInput = document.getElementById("goalValueNumber");
   const label = document.getElementById("goalInputLabel");
+  const unitLabel = document.getElementById("goalUnitLabel");
 
   if (type === "days") {
     slider.min = 1;
     slider.max = 365;
     slider.value = 30;
+    numInput.min = 1;
+    numInput.max = 365;
+    numInput.value = 30;
     label.textContent = "عدد الأيام لإتمام الختمة";
+    unitLabel.textContent = "يوم";
   } else {
     slider.min = 1;
     slider.max = 30;
     slider.value = 5;
+    numInput.min = 1;
+    numInput.max = 30;
+    numInput.value = 5;
     label.textContent = "عدد الصفحات اليومية";
+    unitLabel.textContent = "صفحة";
   }
 
-  // Store selected type
   document
     .querySelector(".khatmah-setup-card")
-    .setAttribute("data-goal-type", type);
+    ?.setAttribute("data-goal-type", type);
+  updateGoalPreview();
+}
 
+/** Sync number input from slider */
+function syncGoalFromSlider() {
+  const slider = document.getElementById("goalValueSlider");
+  const numInput = document.getElementById("goalValueNumber");
+  if (numInput) numInput.value = slider.value;
+  updateGoalPreview();
+}
+
+/** Sync slider from number input */
+function syncGoalFromNumber() {
+  const slider = document.getElementById("goalValueSlider");
+  const numInput = document.getElementById("goalValueNumber");
+  if (slider) slider.value = numInput.value;
+  updateGoalPreview();
+}
+
+/** Adjust goal value by delta */
+function adjustGoalValue(delta) {
+  const numInput = document.getElementById("goalValueNumber");
+  const slider = document.getElementById("goalValueSlider");
+  let val = parseInt(numInput.value) + delta;
+  val = Math.max(parseInt(numInput.min), Math.min(parseInt(numInput.max), val));
+  numInput.value = val;
+  slider.value = val;
+  updateGoalPreview();
+}
+
+/** Select starting Juz */
+function selectStartJuz(startPage) {
+  startPage = parseInt(startPage);
+  const fromBeginBtn = document.querySelector('.juz-start-btn[data-start="1"]');
+  const select = document.getElementById("juzStartSelect");
+
+  if (startPage === 1) {
+    fromBeginBtn?.classList.add("active");
+    if (select) select.value = "0";
+  } else {
+    fromBeginBtn?.classList.remove("active");
+    if (select) select.value = String(startPage);
+  }
+
+  // Store chosen start page on the setup card
+  document
+    .querySelector(".khatmah-setup-card")
+    ?.setAttribute("data-start-page", startPage);
   updateGoalPreview();
 }
 
@@ -1009,22 +1091,30 @@ function selectGoalType(type) {
 function updateGoalPreview() {
   const activeType =
     document.querySelector(".goal-type-btn.active")?.dataset.type || "days";
-  const slider = document.getElementById("goalValueSlider");
-  const value = parseInt(slider.value);
+  const numInput = document.getElementById("goalValueNumber");
+  const value = parseInt(
+    numInput?.value || document.getElementById("goalValueSlider")?.value || 30,
+  );
 
-  // Update display
-  const display = document.getElementById("goalValueDisplay");
-  if (activeType === "days") {
-    display.textContent = `${value} يوم`;
-  } else {
-    display.textContent = `${value} صفحة`;
-  }
+  // Get start page from Juz picker
+  const startPage = parseInt(
+    document
+      .querySelector(".khatmah-setup-card")
+      ?.getAttribute("data-start-page") || "1",
+  );
+  const totalPages = TOTAL_QURAN_PAGES - startPage + 1;
 
   // Calculate
-  const dailyPages = calculateDailyTarget(activeType, value);
-  const estimatedDays = calculateEstimatedDays(activeType, value);
-  const dailyJuz = dailyPages / 20; // ~20 pages per juz
-  const dailyMinutes = Math.round(dailyPages * 2); // ~2 min per page
+  let dailyPages, estimatedDays;
+  if (activeType === "days") {
+    dailyPages = Math.ceil(totalPages / value);
+    estimatedDays = value;
+  } else {
+    dailyPages = value;
+    estimatedDays = Math.ceil(totalPages / value);
+  }
+  const dailyJuz = dailyPages / 20;
+  const dailyMinutes = Math.round(dailyPages * 2);
 
   // Update preview
   const calcDailyPages = document.getElementById("calcDailyPages");
@@ -1060,10 +1150,19 @@ function updateGoalPreview() {
 function startKhatmah() {
   const activeType =
     document.querySelector(".goal-type-btn.active")?.dataset.type || "days";
-  const slider = document.getElementById("goalValueSlider");
-  const value = parseInt(slider.value);
+  const numInput = document.getElementById("goalValueNumber");
+  const value = parseInt(
+    numInput?.value || document.getElementById("goalValueSlider")?.value || 30,
+  );
 
-  const dailyTarget = calculateDailyTarget(activeType, value);
+  const khatmahStartPage = parseInt(
+    document
+      .querySelector(".khatmah-setup-card")
+      ?.getAttribute("data-start-page") || "1",
+  );
+  const totalPages = TOTAL_QURAN_PAGES - khatmahStartPage + 1;
+  const dailyTarget =
+    activeType === "days" ? Math.ceil(totalPages / value) : value;
 
   khatmahState = {
     isActive: true,
@@ -1071,7 +1170,8 @@ function startKhatmah() {
     goalValue: value,
     dailyTarget: dailyTarget,
     startDate: new Date().toISOString(),
-    lastReadPage: 1,
+    lastReadPage: khatmahStartPage,
+    khatmahStartPage: khatmahStartPage,
     completedPages: [],
     bookmarkedPage: null,
     totalPagesRead: 0,
@@ -1192,7 +1292,9 @@ function markPageAsRead(pageNumber) {
     saveKhatmahState(khatmahState);
 
     // Check if Khatmah is complete
-    if (khatmahState.totalPagesRead >= TOTAL_QURAN_PAGES) {
+    const kStart = khatmahState.khatmahStartPage || 1;
+    const kTotal = TOTAL_QURAN_PAGES - kStart + 1;
+    if (khatmahState.totalPagesRead >= kTotal) {
       showKhatmahCompletion();
     }
   }
@@ -1537,7 +1639,7 @@ function updateProfileTab() {
         </div>
         <div class="profile-khatmah-info">
           <span>${progress}% مكتمل</span>
-          <span>${khatmahState.totalPagesRead} / ${TOTAL_QURAN_PAGES} صفحة</span>
+          <span>${khatmahState.totalPagesRead} / ${TOTAL_QURAN_PAGES - (khatmahState.khatmahStartPage || 1) + 1} صفحة</span>
         </div>
       </div>`;
   }

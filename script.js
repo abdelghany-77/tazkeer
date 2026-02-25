@@ -1446,9 +1446,9 @@ function loadTheme() {
     document.body.classList.add("light-mode");
     themeIcon.className = "fas fa-moon";
     if (themeText && themeText.textContent) {
-      themeText.textContent = " الوضع الليلي";
+      themeText.textContent = " ";
     } else {
-      themeToggle.innerHTML = '<i class="fas fa-moon"></i> الوضع الليلي';
+      themeToggle.innerHTML = '<i class="fas fa-moon"></i> ';
     }
   } else {
     // Default to dark mode (includes both null and "dark" cases)
@@ -1456,10 +1456,10 @@ function loadTheme() {
     document.body.classList.remove("light-mode");
     themeIcon.className = "fas fa-sun";
     if (themeText && themeText.textContent) {
-      themeText.textContent = " الوضع النهاري";
+      themeText.textContent = " ";
     } else {
       // If no text node exists, update the button text content
-      themeToggle.innerHTML = '<i class="fas fa-sun"></i> الوضع النهاري';
+      themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
     }
   }
 }
@@ -1476,14 +1476,14 @@ function toggleTheme() {
     document.body.classList.remove("dark-mode");
     document.body.classList.add("light-mode");
     themeIcon.className = "fas fa-moon";
-    themeToggle.innerHTML = '<i class="fas fa-moon"></i> الوضع الليلي';
+    themeToggle.innerHTML = '<i class="fas fa-moon"></i> ';
     localStorage.setItem("adhkar-theme", "light");
   } else {
     // Switch to dark mode
     document.body.classList.add("dark-mode");
     document.body.classList.remove("light-mode");
     themeIcon.className = "fas fa-sun";
-    themeToggle.innerHTML = '<i class="fas fa-sun"></i> الوضع النهاري';
+    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
     localStorage.setItem("adhkar-theme", "dark");
   }
 
