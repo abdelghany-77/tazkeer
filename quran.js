@@ -359,7 +359,7 @@ function getCurrentWird(state) {
     endPage,
     totalPages: endPage - startPage + 1,
     pagesRead,
-    isComplete: pagesRead >= (endPage - startPage + 1),
+    isComplete: pagesRead >= endPage - startPage + 1,
     khatmahComplete: state.totalPagesRead >= TOTAL_QURAN_PAGES,
   };
 }
@@ -629,7 +629,10 @@ function renderSurahList() {
   html += `<div class="surah-list-grid">`;
 
   SURAH_DATA.forEach((surah, i) => {
-    const endPage = i < SURAH_DATA.length - 1 ? SURAH_DATA[i + 1].startPage - 1 : TOTAL_QURAN_PAGES;
+    const endPage =
+      i < SURAH_DATA.length - 1
+        ? SURAH_DATA[i + 1].startPage - 1
+        : TOTAL_QURAN_PAGES;
     const pageCount = endPage - surah.startPage + 1;
     html += `
       <button class="surah-list-card" onclick="openFreeReader(${surah.startPage})">
@@ -675,7 +678,8 @@ function openKhatmahReader() {
   quranViewerState.wirdEnd = wird.endPage;
 
   const lrp = khatmahState.lastReadPage;
-  const resumePage = (lrp >= wird.startPage && lrp <= wird.endPage) ? lrp : wird.startPage;
+  const resumePage =
+    lrp >= wird.startPage && lrp <= wird.endPage ? lrp : wird.startPage;
   quranViewerState.currentPage = resumePage;
   renderMushafViewer();
 }
@@ -685,7 +689,9 @@ function openKhatmahReader() {
  */
 function completeWirdAndReturn() {
   if (typeof showNotification === "function") {
-    showNotification("\u0623\u062a\u0645\u0645\u062a \u0627\u0644\u0648\u0631\u062f! \u0628\u0627\u0631\u0643 \u0627\u0644\u0644\u0647 \u0641\u064a\u0643 \ud83c\udf1f");
+    showNotification(
+      "\u0623\u062a\u0645\u0645\u062a \u0627\u0644\u0648\u0631\u062f! \u0628\u0627\u0631\u0643 \u0627\u0644\u0644\u0647 \u0641\u064a\u0643 \ud83c\udf1f",
+    );
   }
   renderKhatmahDashboard();
 }
@@ -722,7 +728,9 @@ function renderKhatmahDashboard() {
       : 0;
 
   // Wird progress
-  const wirdPercent = wird ? Math.min(100, Math.round((wird.pagesRead / wird.totalPages) * 100)) : 0;
+  const wirdPercent = wird
+    ? Math.min(100, Math.round((wird.pagesRead / wird.totalPages) * 100))
+    : 0;
   const wirdSurahStart = wird ? getSurahForPage(wird.startPage) : null;
   const wirdSurahEnd = wird ? getSurahForPage(wird.endPage) : null;
 
@@ -748,7 +756,9 @@ function renderKhatmahDashboard() {
       </div>
 
       <!-- Current Wird Card -->
-      ${wird && !wird.khatmahComplete ? `
+      ${
+        wird && !wird.khatmahComplete
+          ? `
       <div class="wird-card">
         <div class="wird-card-header">
           <h3><i class="fas fa-book-reader"></i> \u0627\u0644\u0648\u0631\u062f \u0627\u0644\u062d\u0627\u0644\u064a</h3>
@@ -758,7 +768,7 @@ function renderKhatmahDashboard() {
           \u0635\u0641\u062d\u0629 ${toArabicNumber(wird.startPage)} \u0625\u0644\u0649 ${toArabicNumber(wird.endPage)}
         </div>
         <div class="wird-card-surahs">
-          ${wirdSurahStart && wirdSurahEnd ? (wirdSurahStart.name === wirdSurahEnd.name ? wirdSurahStart.name : `${wirdSurahStart.name} \u2014 ${wirdSurahEnd.name}`) : ''}
+          ${wirdSurahStart && wirdSurahEnd ? (wirdSurahStart.name === wirdSurahEnd.name ? wirdSurahStart.name : `${wirdSurahStart.name} \u2014 ${wirdSurahEnd.name}`) : ""}
         </div>
         <div class="wird-card-progress">
           <div class="wird-card-progress-bar">
@@ -766,15 +776,21 @@ function renderKhatmahDashboard() {
           </div>
           <span class="wird-card-progress-text">${toArabicNumber(wird.pagesRead)} / ${toArabicNumber(wird.totalPages)} \u0635\u0641\u062d\u0629</span>
         </div>
-        ${wird.isComplete ? `<div class="wird-complete-badge"><i class="fas fa-check-circle"></i> \u0623\u062a\u0645\u0645\u062a \u0647\u0630\u0627 \u0627\u0644\u0648\u0631\u062f</div>` : ''}
-      </div>` : ''}
+        ${wird.isComplete ? `<div class="wird-complete-badge"><i class="fas fa-check-circle"></i> \u0623\u062a\u0645\u0645\u062a \u0647\u0630\u0627 \u0627\u0644\u0648\u0631\u062f</div>` : ""}
+      </div>`
+          : ""
+      }
 
-      ${wird && wird.khatmahComplete ? `
+      ${
+        wird && wird.khatmahComplete
+          ? `
       <div class="khatmah-complete-card-dashboard">
         <div class="complete-icon">\ud83c\udf89</div>
         <h3>\u0623\u062a\u0645\u0645\u062a \u0627\u0644\u062e\u062a\u0645\u0629!</h3>
         <p>\u062a\u0642\u0628\u0644 \u0627\u0644\u0644\u0647 \u0645\u0646\u0643 \u0648\u062c\u0639\u0644\u0643 \u0645\u0646 \u0623\u0647\u0644 \u0627\u0644\u0642\u0631\u0622\u0646</p>
-      </div>` : ''}
+      </div>`
+          : ""
+      }
 
       <!-- Stats Grid -->
       <div class="khatmah-stats-grid">
@@ -802,11 +818,15 @@ function renderKhatmahDashboard() {
 
       <!-- Actions -->
       <div class="khatmah-actions" style="margin-top: 1.5rem;">
-        ${wird && !wird.khatmahComplete ? `
+        ${
+          wird && !wird.khatmahComplete
+            ? `
         <button class="khatmah-read-btn" onclick="openKhatmahReader()">
           <i class="fas fa-book-open"></i>
-          ${wird.isComplete ? '\u0627\u0644\u0648\u0631\u062f \u0627\u0644\u062a\u0627\u0644\u064a' : '\u0645\u062a\u0627\u0628\u0639\u0629 \u0627\u0644\u0648\u0631\u062f'}
-        </button>` : ''}
+          ${wird.isComplete ? "\u0627\u0644\u0648\u0631\u062f \u0627\u0644\u062a\u0627\u0644\u064a" : "\u0645\u062a\u0627\u0628\u0639\u0629 \u0627\u0644\u0648\u0631\u062f"}
+        </button>`
+            : ""
+        }
         <button class="khatmah-reset-btn" onclick="resetKhatmah()">
           <i class="fas fa-redo"></i>
           \u062e\u062a\u0645\u0629 \u062c\u062f\u064a\u062f\u0629
@@ -834,11 +854,17 @@ function renderMushafViewer() {
   const isKhatmahMode = quranViewerState.mode === "khatmah";
   const navStart = isKhatmahMode ? quranViewerState.wirdStart : 1;
   const navEnd = isKhatmahMode ? quranViewerState.wirdEnd : TOTAL_QURAN_PAGES;
-  const wirdNum = isKhatmahMode ? Math.floor((navStart - 1) / khatmahState.dailyTarget) + 1 : 0;
-  const totalWirds = isKhatmahMode ? Math.ceil(TOTAL_QURAN_PAGES / khatmahState.dailyTarget) : 0;
+  const wirdNum = isKhatmahMode
+    ? Math.floor((navStart - 1) / khatmahState.dailyTarget) + 1
+    : 0;
+  const totalWirds = isKhatmahMode
+    ? Math.ceil(TOTAL_QURAN_PAGES / khatmahState.dailyTarget)
+    : 0;
   const wirdProgress = isKhatmahMode
     ? Math.round(((page - navStart + 1) / (navEnd - navStart + 1)) * 100)
-    : (khatmahState.isActive ? getKhatmahProgress(khatmahState) : Math.round((page / TOTAL_QURAN_PAGES) * 100));
+    : khatmahState.isActive
+      ? getKhatmahProgress(khatmahState)
+      : Math.round((page / TOTAL_QURAN_PAGES) * 100);
 
   container.innerHTML = `
     <div class="mushaf-viewer">
@@ -875,12 +901,16 @@ function renderMushafViewer() {
         </div>
       </div>
 
-      ${isKhatmahMode ? `
+      ${
+        isKhatmahMode
+          ? `
       <!-- Wird Info Banner -->
       <div class="wird-banner">
         <span class="wird-banner-label">\u0627\u0644\u0648\u0631\u062f ${toArabicNumber(wirdNum)} \u0645\u0646 ${toArabicNumber(totalWirds)}</span>
         <span class="wird-banner-pages">\u0635\u0641\u062d\u0629 ${toArabicNumber(page - navStart + 1)} \u0645\u0646 ${toArabicNumber(navEnd - navStart + 1)}</span>
-      </div>` : ''}
+      </div>`
+          : ""
+      }
 
       <!-- Page Header -->
       <div class="mushaf-page-header">
@@ -916,10 +946,14 @@ function renderMushafViewer() {
             <i class="fas fa-chevron-left"></i>
           </button>
         </div>
-        ${isKhatmahMode && page >= navEnd ? `
+        ${
+          isKhatmahMode && page >= navEnd
+            ? `
         <button class="wird-complete-btn" onclick="completeWirdAndReturn()">
           <i class="fas fa-check-circle"></i> \u0623\u062a\u0645\u0645\u062a \u0627\u0644\u0648\u0631\u062f
-        </button>` : ''}
+        </button>`
+            : ""
+        }
         <div class="mushaf-progress">
           <div class="mushaf-progress-fill" style="width: ${wirdProgress}%"></div>
         </div>
@@ -1190,7 +1224,10 @@ function showKhatmahCompletion() {
  * Go to next page (RTL: left to right means next page number)
  */
 function mushafNextPage() {
-  const maxPage = quranViewerState.mode === "khatmah" ? quranViewerState.wirdEnd : TOTAL_QURAN_PAGES;
+  const maxPage =
+    quranViewerState.mode === "khatmah"
+      ? quranViewerState.wirdEnd
+      : TOTAL_QURAN_PAGES;
   if (quranViewerState.isLoading || quranViewerState.currentPage >= maxPage)
     return;
 
@@ -1202,8 +1239,10 @@ function mushafNextPage() {
  * Go to previous page
  */
 function mushafPrevPage() {
-  const minPage = quranViewerState.mode === "khatmah" ? quranViewerState.wirdStart : 1;
-  if (quranViewerState.isLoading || quranViewerState.currentPage <= minPage) return;
+  const minPage =
+    quranViewerState.mode === "khatmah" ? quranViewerState.wirdStart : 1;
+  if (quranViewerState.isLoading || quranViewerState.currentPage <= minPage)
+    return;
 
   quranViewerState.currentPage--;
   navigateToCurrentPage("prev");
@@ -1225,7 +1264,9 @@ function navigateToCurrentPage(direction) {
   const navEnd = isKhatmahMode ? quranViewerState.wirdEnd : TOTAL_QURAN_PAGES;
   const wirdProgress = isKhatmahMode
     ? Math.round(((page - navStart + 1) / (navEnd - navStart + 1)) * 100)
-    : (khatmahState.isActive ? getKhatmahProgress(khatmahState) : Math.round((page / TOTAL_QURAN_PAGES) * 100));
+    : khatmahState.isActive
+      ? getKhatmahProgress(khatmahState)
+      : Math.round((page / TOTAL_QURAN_PAGES) * 100);
 
   // Update header
   const surahNameEl = document.querySelector(".mushaf-surah-name");
@@ -1235,10 +1276,16 @@ function navigateToCurrentPage(direction) {
   const progressFillEl = document.querySelector(".mushaf-progress-fill");
   const bookmarkBtn = document.getElementById("bookmarkBtn");
 
-  if (surahNameEl) surahNameEl.textContent = `\u0633\u0648\u0631\u0629 ${surah.name}`;
-  if (juzInfoEl) juzInfoEl.textContent = `\u0627\u0644\u062c\u0632\u0621 ${toArabicNumber(juz.number)}`;
-  if (pageNumberEl) pageNumberEl.textContent = `\u0635\u0641\u062d\u0629 ${toArabicNumber(page)}`;
-  if (navCurrentEl) navCurrentEl.textContent = isKhatmahMode ? `${page - navStart + 1} / ${navEnd - navStart + 1}` : `${page} / ${TOTAL_QURAN_PAGES}`;
+  if (surahNameEl)
+    surahNameEl.textContent = `\u0633\u0648\u0631\u0629 ${surah.name}`;
+  if (juzInfoEl)
+    juzInfoEl.textContent = `\u0627\u0644\u062c\u0632\u0621 ${toArabicNumber(juz.number)}`;
+  if (pageNumberEl)
+    pageNumberEl.textContent = `\u0635\u0641\u062d\u0629 ${toArabicNumber(page)}`;
+  if (navCurrentEl)
+    navCurrentEl.textContent = isKhatmahMode
+      ? `${page - navStart + 1} / ${navEnd - navStart + 1}`
+      : `${page} / ${TOTAL_QURAN_PAGES}`;
   if (progressFillEl) progressFillEl.style.width = `${wirdProgress}%`;
 
   // Update wird banner
@@ -1265,7 +1312,8 @@ function navigateToCurrentPage(direction) {
     if (footer && progressBar) {
       const btn = document.createElement("button");
       btn.className = "wird-complete-btn";
-      btn.innerHTML = '<i class="fas fa-check-circle"></i> \u0623\u062a\u0645\u0645\u062a \u0627\u0644\u0648\u0631\u062f';
+      btn.innerHTML =
+        '<i class="fas fa-check-circle"></i> \u0623\u062a\u0645\u0645\u062a \u0627\u0644\u0648\u0631\u062f';
       btn.onclick = completeWirdAndReturn;
       footer.insertBefore(btn, progressBar);
     }
@@ -1300,12 +1348,18 @@ function jumpToPage() {
   if (!input) return;
 
   const page = parseInt(input.value);
-  const minPage = quranViewerState.mode === "khatmah" ? quranViewerState.wirdStart : 1;
-  const maxPage = quranViewerState.mode === "khatmah" ? quranViewerState.wirdEnd : TOTAL_QURAN_PAGES;
+  const minPage =
+    quranViewerState.mode === "khatmah" ? quranViewerState.wirdStart : 1;
+  const maxPage =
+    quranViewerState.mode === "khatmah"
+      ? quranViewerState.wirdEnd
+      : TOTAL_QURAN_PAGES;
 
   if (isNaN(page) || page < minPage || page > maxPage) {
     if (typeof showNotification === "function") {
-      showNotification(`\u0631\u0642\u0645 \u0635\u0641\u062d\u0629 \u063a\u064a\u0631 \u0635\u062d\u064a\u062d (${minPage} - ${maxPage})`);
+      showNotification(
+        `\u0631\u0642\u0645 \u0635\u0641\u062d\u0629 \u063a\u064a\u0631 \u0635\u062d\u064a\u062d (${minPage} - ${maxPage})`,
+      );
     }
     return;
   }
