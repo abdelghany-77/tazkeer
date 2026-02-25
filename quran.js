@@ -479,7 +479,7 @@ function renderPageHTML(ayahs) {
     let text = ayah.text;
 
     html += `<span class="ayah-text">${text}</span>`;
-    html += `<span class="ayah-number"> ﴿${toArabicNumber(ayah.numberInSurah)}﴾ </span>`;
+    html += `<span class="ayah-number">${toArabicNumber(ayah.numberInSurah)}</span>`;
   });
 
   return html;
@@ -895,55 +895,55 @@ function renderMushafViewer() {
 
   container.innerHTML = `
     <div class="mushaf-viewer">
-      <!-- Top Bar -->
-      <div class="mushaf-top-bar">
-        <button class="mushaf-back-btn" onclick="exitMushafViewer()">
-          <i class="fas fa-arrow-right"></i>
-          \u0631\u062c\u0648\u0639
-        </button>
-
-        <div class="mushaf-font-controls">
-          <span class="mushaf-font-label">\u062d\u062c\u0645 \u0627\u0644\u062e\u0637</span>
-          <button class="mushaf-font-btn" onclick="changeMushafFont(-0.1)">
-            <i class="fas fa-minus"></i>
-          </button>
-          <button class="mushaf-font-btn" onclick="changeMushafFont(0.1)">
-            <i class="fas fa-plus"></i>
+      <!-- Header Bar (Screenshot Style) -->
+      <div class="mushaf-header">
+        <div class="mushaf-header-right">
+          <button class="mushaf-back-btn" onclick="exitMushafViewer()" title="\u0631\u062c\u0648\u0639">
+            <i class="fas fa-arrow-right"></i>
           </button>
         </div>
 
-        <div class="mushaf-top-actions">
-          <div class="mushaf-page-jump">
-            <input type="number" id="pageJumpInput" min="${navStart}" max="${navEnd}"
-              placeholder="${page}" onkeydown="handlePageJump(event)" />
-            <button class="mushaf-page-jump-btn" onclick="jumpToPage()">
-              \u0627\u0646\u062a\u0642\u0627\u0644
-            </button>
-          </div>
+        <div class="mushaf-header-center">
+          <span class="mushaf-surah-name">\u0633\u0648\u0631\u0629 ${surah.name}</span>
+          <span class="mushaf-page-info">\u0635\u0641\u062d\u0629 ${toArabicNumber(page)}, \u062c\u0632\u0621 ${toArabicNumber(juz.number)}</span>
+        </div>
+
+        <div class="mushaf-header-left">
+          <button class="mushaf-action-btn" id="settingsBtn" onclick="toggleMushafSettings()" title="\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a">
+            <i class="fas fa-cog"></i>
+          </button>
           <button class="mushaf-action-btn ${isBookmarked ? "bookmarked" : ""}"
             id="bookmarkBtn"
             onclick="toggleBookmark(${page})" title="\u0639\u0644\u0627\u0645\u0629 \u0645\u0631\u062c\u0639\u064a\u0629">
             <i class="fas fa-bookmark"></i>
           </button>
+
+          <!-- Settings Dropdown -->
+          <div class="mushaf-settings-dropdown" id="mushafSettingsDropdown">
+            <div class="settings-section">
+              <span class="settings-section-label">\u062d\u062c\u0645 \u0627\u0644\u062e\u0637</span>
+              <div class="settings-font-controls">
+                <button class="settings-font-btn" onclick="changeMushafFont(-0.1)">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <span class="settings-font-size-label" id="fontSizeLabel">${mushafFontSize.toFixed(1)}</span>
+                <button class="settings-font-btn" onclick="changeMushafFont(0.1)">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="settings-section">
+              <span class="settings-section-label">\u0627\u0646\u062a\u0642\u0627\u0644 \u0644\u0635\u0641\u062d\u0629</span>
+              <div class="settings-page-jump">
+                <input type="number" id="pageJumpInput" min="${navStart}" max="${navEnd}"
+                  placeholder="${page}" onkeydown="handlePageJump(event)" />
+                <button class="settings-page-jump-btn" onclick="jumpToPage()">
+                  \u0627\u0646\u062a\u0642\u0627\u0644
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      ${
-        isKhatmahMode
-          ? `
-      <!-- Wird Info Banner -->
-      <div class="wird-banner">
-        <span class="wird-banner-label">\u0627\u0644\u0648\u0631\u062f ${toArabicNumber(wirdNum)} \u0645\u0646 ${toArabicNumber(totalWirds)}</span>
-        <span class="wird-banner-pages">\u0635\u0641\u062d\u0629 ${toArabicNumber(page - navStart + 1)} \u0645\u0646 ${toArabicNumber(navEnd - navStart + 1)}</span>
-      </div>`
-          : ""
-      }
-
-      <!-- Page Header -->
-      <div class="mushaf-page-header">
-        <span class="mushaf-surah-name">\u0633\u0648\u0631\u0629 ${surah.name}</span>
-        <span class="mushaf-juz-info">\u0627\u0644\u062c\u0632\u0621 ${toArabicNumber(juz.number)}</span>
-        <span class="mushaf-page-number">\u0635\u0641\u062d\u0629 ${toArabicNumber(page)}</span>
       </div>
 
       <!-- Page Content -->
@@ -1372,18 +1372,15 @@ function navigateToCurrentPage(direction) {
 
   // Update header
   const surahNameEl = document.querySelector(".mushaf-surah-name");
-  const juzInfoEl = document.querySelector(".mushaf-juz-info");
-  const pageNumberEl = document.querySelector(".mushaf-page-number");
+  const pageInfoEl = document.querySelector(".mushaf-page-info");
   const navCurrentEl = document.querySelector(".mushaf-nav-current");
   const progressFillEl = document.querySelector(".mushaf-progress-fill");
   const bookmarkBtn = document.getElementById("bookmarkBtn");
 
   if (surahNameEl)
     surahNameEl.textContent = `\u0633\u0648\u0631\u0629 ${surah.name}`;
-  if (juzInfoEl)
-    juzInfoEl.textContent = `\u0627\u0644\u062c\u0632\u0621 ${toArabicNumber(juz.number)}`;
-  if (pageNumberEl)
-    pageNumberEl.textContent = `\u0635\u0641\u062d\u0629 ${toArabicNumber(page)}`;
+  if (pageInfoEl)
+    pageInfoEl.textContent = `\u0635\u0641\u062d\u0629 ${toArabicNumber(page)}, \u062c\u0632\u0621 ${toArabicNumber(juz.number)}`;
   if (navCurrentEl)
     navCurrentEl.textContent = isKhatmahMode
       ? `${page - navStart + 1} / ${navEnd - navStart + 1}`
@@ -1522,7 +1519,37 @@ function changeMushafFont(delta) {
   if (contentEl) {
     contentEl.style.fontSize = mushafFontSize + "rem";
   }
+
+  const fontLabel = document.getElementById("fontSizeLabel");
+  if (fontLabel) {
+    fontLabel.textContent = mushafFontSize.toFixed(1);
+  }
 }
+
+/**
+ * Toggle settings dropdown in mushaf viewer
+ */
+function toggleMushafSettings() {
+  const dropdown = document.getElementById("mushafSettingsDropdown");
+  if (dropdown) {
+    dropdown.classList.toggle("show");
+  }
+}
+
+// Close settings dropdown when clicking outside
+document.addEventListener("click", function (e) {
+  const dropdown = document.getElementById("mushafSettingsDropdown");
+  const settingsBtn = document.getElementById("settingsBtn");
+  if (dropdown && dropdown.classList.contains("show")) {
+    if (
+      !dropdown.contains(e.target) &&
+      e.target !== settingsBtn &&
+      !settingsBtn.contains(e.target)
+    ) {
+      dropdown.classList.remove("show");
+    }
+  }
+});
 
 // ===== SWIPE NAVIGATION =====
 
