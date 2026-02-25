@@ -840,15 +840,6 @@ function renderMushafViewer() {
         </div>
       </div>
 
-      ${
-        isKM
-          ? `<div class="wird-banner">
-        <span>الورد ${toArabicNumber(wirdNum)} من ${toArabicNumber(totalWirds)}</span>
-        <span class="wird-banner-pages">صفحة ${toArabicNumber(page - navStart + 1)} من ${toArabicNumber(navEnd - navStart + 1)}</span>
-      </div>`
-          : ""
-      }
-
       <!-- Image Area -->
       <div class="mushaf-image-area" id="mushafImageArea">
         <img
