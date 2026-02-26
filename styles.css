@@ -4750,7 +4750,11 @@ body.dark-mode .profile-khatmah-info {
 }
 
 body.light-mode .swiper-topbar {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(248, 250, 252, 0.9) 100%
+  );
   border-bottom-color: rgba(26, 138, 92, 0.15);
 }
 
@@ -5219,8 +5223,12 @@ body.light-mode .counter-hint {
     height: 24px;
     font-size: 0.65rem;
   }
-  .sw-font-label { font-size: 0.75rem; }
-  .sw-font-label.lg { font-size: 0.85rem; }
+  .sw-font-label {
+    font-size: 0.75rem;
+  }
+  .sw-font-label.lg {
+    font-size: 0.85rem;
+  }
 }
 
 @media (min-width: 768px) {
