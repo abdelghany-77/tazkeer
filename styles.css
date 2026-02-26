@@ -1025,6 +1025,14 @@ body.dark-mode {
   color: #e2e8f0;
 }
 
+/* Smooth theme transition */
+body.theme-transition,
+body.theme-transition *,
+body.theme-transition *::before,
+body.theme-transition *::after {
+  transition: background 0.4s ease, background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;
+}
+
 /* Dark Mode Header */
 body.dark-mode .header {
   background: rgba(26, 32, 44, 0.95);
@@ -4716,12 +4724,22 @@ body.dark-mode .profile-khatmah-info {
    AZKAR SWIPER  –  full-screen horizontal slide player
    ═══════════════════════════════════════════════════════ */
 
-/* Make the category-page a flex column filling the tab */
+/* Make the category-page a fixed full-screen overlay (escapes .container padding) */
 #categoryPage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 64px; /* room for bottom-nav */
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 64px); /* minus bottom-nav */
   overflow: hidden;
+  z-index: 50;
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+}
+
+body.light-mode #categoryPage {
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
 }
 
 /* Hidden compatibility shims (referenced by JS) */
@@ -4730,172 +4748,213 @@ body.dark-mode .profile-khatmah-info {
   display: none !important;
 }
 
-/* Tiny font icon inside font-size decrease button */
-.sw-font-btn.decrease-font i {
-  font-size: 0.65em;
+/* ── Thin progress line at very top ── */
+.swiper-progress-line {
+  height: 3px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+body.light-mode .swiper-progress-line {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.swiper-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #1a8a5c, #e8c55a);
+  transition: width 0.35s ease;
+  border-radius: 0 2px 2px 0;
 }
 
 /* ══════════════════════════════════════════════
-   Swiper Top Bar – polished two-row header
+   Swiper Top Bar – slim single-row header
    ══════════════════════════════════════════════ */
 .swiper-topbar {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 0.65rem 1rem 0.45rem;
+  padding: 0.35rem 0.75rem;
   backdrop-filter: blur(12px);
   flex-shrink: 0;
-  gap: 0.4rem;
+  gap: 0.5rem;
   direction: rtl;
+  height: 42px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 body.light-mode .swiper-topbar {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(248, 250, 252, 0.9) 100%
-  );
-  border-bottom-color: rgba(26, 138, 92, 0.15);
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
 }
 
-/* ── Main row: title + badge ── */
-.swiper-topbar-main {
+/* Back button */
+.sw-back-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #a0aec0;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
-  width: 100%;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
 }
 
+.sw-back-btn:active {
+  background: rgba(26, 138, 92, 0.3);
+  color: #fff;
+}
+
+body.light-mode .sw-back-btn {
+  background: rgba(0, 0, 0, 0.04);
+  color: #4a5568;
+}
+
+body.light-mode .sw-back-btn:active {
+  background: rgba(26, 138, 92, 0.15);
+  color: #276749;
+}
+
+/* Title */
 .swiper-page-title {
-  font-size: 1.2rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  font-weight: 700;
   color: #f0e6c8;
   margin: 0;
   font-family: "Cairo", serif;
-  letter-spacing: 0.01em;
   text-align: center;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 body.light-mode .swiper-page-title {
   color: #1a202c;
 }
 
+/* Progress badge */
 .swiper-prog-badge {
-  background: rgba(232, 197, 90, 0.12);
-  border: 1px solid rgba(232, 197, 90, 0.4);
+  background: rgba(232, 197, 90, 0.1);
+  border: 1px solid rgba(232, 197, 90, 0.3);
   color: #e8c55a;
-  border-radius: 20px;
-  padding: 1px 11px;
-  font-size: 0.75rem;
+  border-radius: 12px;
+  padding: 1px 10px;
+  font-size: 0.7rem;
   font-weight: 700;
   font-family: "Cairo", serif;
   white-space: nowrap;
   flex-shrink: 0;
-  letter-spacing: 0.04em;
 }
 
 body.light-mode .swiper-prog-badge {
-  background: rgba(26, 138, 92, 0.08);
-  border-color: rgba(26, 138, 92, 0.35);
+  background: rgba(26, 138, 92, 0.06);
+  border-color: rgba(26, 138, 92, 0.25);
   color: #276749;
 }
 
-/* ── Tools row: reset / divider / font buttons ── */
-.swiper-topbar-tools {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.3rem;
-}
-
-.sw-tool-btn {
+/* Settings button (3-dot) */
+.sw-settings-btn {
   width: 32px;
-  height: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 7px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #94a3b8;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #a0aec0;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
-  transition:
-    background 0.2s,
-    transform 0.12s,
-    color 0.2s,
-    border-color 0.2s;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
 }
 
-.sw-tool-btn:active {
-  transform: scale(0.88);
+.sw-settings-btn:active {
   background: rgba(26, 138, 92, 0.3);
   color: #fff;
-  border-color: rgba(26, 138, 92, 0.4);
 }
 
-body.light-mode .sw-tool-btn {
-  border-color: rgba(0, 0, 0, 0.1);
-  background: rgba(0, 0, 0, 0.03);
-  color: #64748b;
+body.light-mode .sw-settings-btn {
+  background: rgba(0, 0, 0, 0.04);
+  color: #4a5568;
 }
 
-body.light-mode .sw-tool-btn:active {
-  background: rgba(26, 138, 92, 0.15);
-  color: #276749;
-}
-
-/* Font label inside buttons */
-.sw-font-label {
-  font-family: "Cairo", serif;
-  font-weight: 700;
-  font-size: 0.82rem;
-  line-height: 1;
+/* ── Floating settings menu ── */
+.swiper-floating-menu {
+  position: absolute;
+  top: 50px;
+  left: 12px;
+  z-index: 100;
   display: flex;
-  align-items: baseline;
-  gap: 1px;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 12px;
+  background: rgba(26, 32, 44, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  animation: floatMenuIn 0.2s ease;
 }
 
-.sw-font-label sup {
-  font-size: 0.55rem;
-  font-weight: 600;
+body.light-mode .swiper-floating-menu {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-.sw-font-label.lg {
-  font-size: 0.95rem;
+.swiper-floating-menu.hidden {
+  display: none !important;
 }
 
-/* Reset button – red tint */
-.sw-reset-btn {
-  background: rgba(220, 60, 60, 0.1);
-  border-color: rgba(220, 60, 60, 0.2);
+.swiper-floating-menu button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+
+.swiper-floating-menu button:active {
+  transform: scale(0.9);
+  background: rgba(26, 138, 92, 0.3);
+  color: #fff;
+}
+
+body.light-mode .swiper-floating-menu button {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.03);
+  color: #4a5568;
+}
+
+/* Reset button red tint */
+.swiper-floating-menu button:last-child {
   color: #f87171;
+  border-color: rgba(220, 60, 60, 0.2);
+  background: rgba(220, 60, 60, 0.08);
 }
 
-.sw-reset-btn:active {
-  background: rgba(220, 60, 60, 0.3) !important;
-  color: #fff !important;
-  border-color: rgba(220, 60, 60, 0.4) !important;
+.swiper-floating-menu button:last-child:active {
+  background: rgba(220, 60, 60, 0.3);
+  color: #fff;
 }
 
-body.light-mode .sw-reset-btn {
-  background: rgba(220, 60, 60, 0.06);
-  border-color: rgba(220, 60, 60, 0.15);
-  color: #ef4444;
-}
-
-/* Vertical divider between reset and font buttons */
-.sw-tool-divider {
-  width: 1px;
-  height: 18px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 0 0.15rem;
-  flex-shrink: 0;
-}
-
-body.light-mode .sw-tool-divider {
-  background: rgba(0, 0, 0, 0.1);
+@keyframes floatMenuIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* ── Swiper track ── */
@@ -4918,12 +4977,13 @@ body.light-mode .sw-tool-divider {
 /* ── Individual slide ── */
 .azkar-slide {
   flex: 0 0 100%;
-  width: 100%;
+  width: 100vw;
+  max-width: 100%;
   scroll-snap-align: start;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   direction: rtl; /* restore RTL inside */
   overflow-y: auto;
   scrollbar-width: none;
@@ -4938,36 +4998,34 @@ body.light-mode .sw-tool-divider {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  background: rgba(26, 32, 44, 0.82);
-  border: 1px solid rgba(232, 197, 90, 0.15);
-  border-radius: 20px;
-  padding: 1.5rem 1.3rem;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(14px);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0.75rem 1rem;
+  box-shadow: none;
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 100%;
   -webkit-user-select: text;
   user-select: text;
 }
 
-/* Light theme override */
-body.light-mode .slide-body {
-  background: rgba(255, 255, 255, 0.96);
-  border-color: rgba(26, 138, 92, 0.2);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-}
-
-/* ── Zikr text ── */
+/* ── Zikr text – the hero ── */
 .slide-zikr-text {
   font-family: "Amiri", serif;
-  font-size: 1.6rem; /* default; overridden by JS */
-  line-height: 2.1;
+  font-size: 1.8rem; /* default; overridden by JS */
+  line-height: 2.3;
   color: #f0e6c8;
   text-align: center;
   letter-spacing: 0.01em;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0;
 }
 
 body.light-mode .slide-zikr-text {
@@ -4979,71 +5037,103 @@ body.light-mode .slide-zikr-text {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 body.light-mode .slide-meta-row {
-  border-top-color: rgba(0, 0, 0, 0.1);
+  border-top-color: rgba(0, 0, 0, 0.06);
 }
 
 .slide-source-label {
-  font-size: 0.85rem;
-  color: #a0aec0;
+  font-size: 0.8rem;
+  color: #718096;
   font-style: italic;
 }
 
 body.light-mode .slide-source-label {
-  color: #718096;
+  color: #a0aec0;
 }
 
 .slide-copy-btn {
   background: none;
   border: none;
-  color: #a0aec0;
+  color: #718096;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   padding: 4px 8px;
   border-radius: 6px;
-  transition:
-    color 0.2s,
-    background 0.2s;
+  transition: color 0.2s, background 0.2s;
 }
 
 .slide-copy-btn:hover {
   color: #e8c55a;
-  background: rgba(232, 197, 90, 0.1);
+  background: rgba(232, 197, 90, 0.08);
 }
 
-/* ── Fadl – always visible ── */
+/* ── Fadl – collapsible at bottom ── */
 .slide-fadl {
-  border-radius: 12px;
-  background: rgba(26, 138, 92, 0.1);
-  border: 1px solid rgba(26, 138, 92, 0.25);
-  padding: 0.6rem 0.9rem;
+  width: 100%;
+  border-radius: 10px;
+  background: rgba(26, 138, 92, 0.06);
+  border: 1px solid rgba(26, 138, 92, 0.15);
+  overflow: hidden;
+  transition: max-height 0.3s ease;
 }
 
 body.light-mode .slide-fadl {
-  background: rgba(26, 138, 92, 0.06);
+  background: rgba(26, 138, 92, 0.04);
+  border-color: rgba(26, 138, 92, 0.1);
 }
 
 .slide-fadl-header {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: #68d391;
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 0.35rem;
+  padding: 0.4rem 0.75rem;
   font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.slide-fadl-header i.fa-chevron-down {
+  margin-right: auto;
+  margin-left: 0;
+  transition: transform 0.25s ease;
+  font-size: 0.65rem;
+}
+
+.slide-fadl .slide-fadl-header i.fa-chevron-down {
+  transform: rotate(180deg);
+}
+
+.slide-fadl.collapsed .slide-fadl-header i.fa-chevron-down {
+  transform: rotate(0deg);
 }
 
 body.light-mode .slide-fadl-header {
   color: #276749;
 }
 
+.slide-fadl-body {
+  max-height: 200px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 0.75rem 0.5rem;
+}
+
+.slide-fadl.collapsed .slide-fadl-body {
+  max-height: 0;
+  padding: 0 0.75rem;
+}
+
 .slide-fadl p {
-  font-size: 0.9rem;
-  color: #cbd5e0;
+  font-size: 0.82rem;
+  color: #a0aec0;
   line-height: 1.7;
   margin: 0;
 }
@@ -5057,20 +5147,19 @@ body.light-mode .slide-fadl p {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.55rem;
-  margin-top: 0.2rem;
+  gap: 0.4rem;
 }
 
 /* The big circular counter button */
 .slide-counter-btn {
-  width: 96px;
-  height: 96px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  border: 3px solid #1a8a5c;
-  background: rgba(26, 138, 92, 0.18);
+  border: 2.5px solid #1a8a5c;
+  background: rgba(26, 138, 92, 0.12);
   color: #68d391;
   font-family: "Cairo", serif;
-  font-size: 1.45rem;
+  font-size: 1.3rem;
   font-weight: 700;
   cursor: pointer;
   display: flex;
@@ -5082,9 +5171,7 @@ body.light-mode .slide-fadl p {
     color 0.25s,
     transform 0.15s,
     box-shadow 0.25s;
-  box-shadow:
-    0 0 0 6px rgba(26, 138, 92, 0.08),
-    0 4px 20px rgba(26, 138, 92, 0.3);
+  box-shadow: 0 2px 12px rgba(26, 138, 92, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -5110,11 +5197,9 @@ body.light-mode .slide-fadl p {
 /* Completed state */
 .slide-counter-btn.completed {
   border-color: #e8c55a;
-  background: rgba(232, 197, 90, 0.15);
+  background: rgba(232, 197, 90, 0.1);
   color: #e8c55a;
-  box-shadow:
-    0 0 0 6px rgba(232, 197, 90, 0.12),
-    0 4px 20px rgba(232, 197, 90, 0.35);
+  box-shadow: 0 2px 12px rgba(232, 197, 90, 0.25);
   cursor: default;
 }
 
@@ -5124,7 +5209,7 @@ body.light-mode .slide-fadl p {
 }
 
 .counter-hint {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #718096;
   font-family: "Cairo", serif;
   letter-spacing: 0.02em;
@@ -5139,19 +5224,19 @@ body.light-mode .counter-hint {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px;
-  padding: 0.5rem 1rem;
+  gap: 5px;
+  padding: 0.35rem 1rem;
   flex-shrink: 0;
   flex-wrap: wrap;
-  max-height: 40px;
+  max-height: 32px;
   overflow: hidden;
 }
 
 .swiper-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   border: none;
   cursor: pointer;
   padding: 0;
@@ -5162,10 +5247,14 @@ body.light-mode .counter-hint {
   flex-shrink: 0;
 }
 
+body.light-mode .swiper-dot {
+  background: rgba(0, 0, 0, 0.1);
+}
+
 .swiper-dot.active {
   background: #e8c55a;
-  transform: scale(1.25);
-  width: 20px;
+  transform: scale(1.2);
+  width: 18px;
   border-radius: 4px;
 }
 
@@ -5208,36 +5297,27 @@ body.light-mode .counter-hint {
 /* ── Responsive ── */
 @media (max-width: 400px) {
   .swiper-page-title {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
   }
   .slide-zikr-text {
-    font-size: 1.35rem;
+    font-size: 1.5rem;
+    line-height: 2.2;
   }
   .slide-counter-btn {
-    width: 80px;
-    height: 80px;
-    font-size: 1.15rem;
-  }
-  .sw-tool-btn {
-    width: 28px;
-    height: 24px;
-    font-size: 0.65rem;
-  }
-  .sw-font-label {
-    font-size: 0.75rem;
-  }
-  .sw-font-label.lg {
-    font-size: 0.85rem;
+    width: 68px;
+    height: 68px;
+    font-size: 1.1rem;
   }
 }
 
 @media (min-width: 768px) {
   .slide-zikr-text {
-    font-size: 1.8rem;
+    font-size: 2.2rem;
+    line-height: 2.4;
   }
   .slide-counter-btn {
-    width: 110px;
-    height: 110px;
-    font-size: 1.7rem;
+    width: 100px;
+    height: 100px;
+    font-size: 1.6rem;
   }
 }

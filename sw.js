@@ -1,4 +1,4 @@
-const CACHE_NAME = "tazkeer-v6.5";
+const CACHE_NAME = "tazkeer-v6.6";
 const urlsToCache = [
   "./",
   "./index.html",
@@ -8,7 +8,6 @@ const urlsToCache = [
   "./script.js",
   "./quran.js",
   "./manifest.json",
-  "./favicon.svg",
   "./widget.html",
   "./widget.css",
   "./widget.js",

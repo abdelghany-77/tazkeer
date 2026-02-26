@@ -1862,9 +1862,9 @@ function createAdhkarSlide(zikr, index, category, track) {
       </div>
       ${
         zikr.fadl
-          ? `<div class="slide-fadl">
-              <div class="slide-fadl-header"><i class="fas fa-star"></i> فضل الذكر</div>
-              <p>${zikr.fadl}</p>
+          ? `<div class="slide-fadl" onclick="this.classList.toggle('collapsed')">
+              <div class="slide-fadl-header"><i class="fas fa-star"></i> فضل الذكر <i class="fas fa-chevron-down"></i></div>
+              <div class="slide-fadl-body"><p>${zikr.fadl}</p></div>
             </div>`
           : ""
       }
@@ -2310,7 +2310,7 @@ function goToSlide(index) {
   saveSwiperPosition(currentCategory, index);
 }
 
-/** Sync progress badge + dots to reflect current slide index */
+/** Sync progress badge, progress line, and dots to reflect current slide index */
 function updateSwiperUI(category, index) {
   if (!category || !adhkarData[category]) return;
   const total = adhkarData[category].adhkar.length;
@@ -2319,6 +2319,13 @@ function updateSwiperUI(category, index) {
   const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
   const badge = document.getElementById("swiperProgressText");
   if (badge) badge.textContent = `${toAr(index + 1)} / ${toAr(total)}`;
+
+  // Progress line fill
+  const fill = document.getElementById("swiperProgressFill");
+  if (fill) {
+    const pct = total > 0 ? ((index + 1) / total) * 100 : 0;
+    fill.style.width = pct + "%";
+  }
 
   // Dots
   document.querySelectorAll(".swiper-dot").forEach((dot, i) => {
@@ -2353,7 +2360,24 @@ function saveSwiperPosition(category, index) {
 
 // ── Font-size stepping ──────────────────────────────
 const SWIPER_FONT_SIZES = [1.05, 1.3, 1.6, 1.9, 2.25, 2.6]; // rem steps
-let swiperFontSizeIndex = 2; // default → 1.6 rem
+let swiperFontSizeIndex = 3; // default → 1.9 rem (matches new card design)
+
+// ── Floating settings menu ──────────────────────────
+function toggleSwiperSettings() {
+  const menu = document.getElementById("swiperFloatingMenu");
+  if (!menu) return;
+  menu.classList.toggle("hidden");
+}
+
+// Close floating menu on outside click
+document.addEventListener("click", function (e) {
+  const menu = document.getElementById("swiperFloatingMenu");
+  const btn = document.getElementById("swiperSettingsBtn");
+  if (!menu || menu.classList.contains("hidden")) return;
+  if (!menu.contains(e.target) && !btn.contains(e.target)) {
+    menu.classList.add("hidden");
+  }
+});
 
 function adjustSwiperFont(delta) {
   swiperFontSizeIndex = Math.max(

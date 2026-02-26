@@ -196,23 +196,34 @@
           <p id="categoryDescription"></p>
           <div id="adhkarContainer"></div>
 
-          <!-- ── Swiper Top Bar ── -->
+          <!-- ── Thin progress line at very top ── -->
+          <div class="swiper-progress-line">
+            <div class="swiper-progress-fill" id="swiperProgressFill"></div>
+          </div>
+
+          <!-- ── Slim Top Bar ── -->
           <div class="swiper-topbar">
-            <div class="swiper-title-row">
-              <h2 class="swiper-page-title" id="categoryTitle">أذكار الصباح</h2>
-              <span class="swiper-prog-badge" id="swiperProgressText">١ / ٢٠</span>
-            </div>
-            <div class="swiper-action-row">
-              <button class="sw-font-btn decrease-font" onclick="adjustSwiperFont(-1)" title="تصغير الخط">
-                <i class="fas fa-font"></i>
-              </button>
-              <button class="sw-font-btn" onclick="adjustSwiperFont(1)" title="تكبير الخط">
-                <i class="fas fa-font"></i>
-              </button>
-              <button class="reset-all-btn" id="resetAllBtn" onclick="resetAllAdhkar()">
-                <i class="fas fa-redo-alt"></i>
-              </button>
-            </div>
+            <button class="sw-back-btn" onclick="showHomePage();switchTab('tab-azkar')">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+            <h2 class="swiper-page-title" id="categoryTitle">أذكار الصباح</h2>
+            <span class="swiper-prog-badge" id="swiperProgressText">١ / ٢٠</span>
+            <button class="sw-settings-btn" id="swiperSettingsBtn" onclick="toggleSwiperSettings()">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+          </div>
+
+          <!-- ── Floating Settings Menu ── -->
+          <div class="swiper-floating-menu hidden" id="swiperFloatingMenu">
+            <button onclick="adjustSwiperFont(-1)" title="تصغير الخط">
+              <i class="fas fa-search-minus"></i>
+            </button>
+            <button onclick="adjustSwiperFont(1)" title="تكبير الخط">
+              <i class="fas fa-search-plus"></i>
+            </button>
+            <button onclick="resetAllAdhkar()" title="إعادة تعيين" id="resetAllBtn">
+              <i class="fas fa-redo-alt"></i>
+            </button>
           </div>
 
           <!-- ── Swiper Track (CSS scroll-snap) ── -->
