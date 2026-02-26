@@ -404,8 +404,6 @@ function showQuranPage() {
 
   if (quranViewerState.currentView === "reader") {
     renderMushafViewer();
-  } else if (quranViewerState.currentView === "surah-list") {
-    renderSurahList();
   } else if (khatmahState.isActive) {
     renderKhatmahDashboard();
   } else {
@@ -455,10 +453,6 @@ function renderKhatmahSetup() {
               oninput="syncGoalFromNumber()" class="goal-number-input" />
             <button class="goal-adjust-btn" onclick="adjustGoalValue(1)"><i class="fas fa-plus"></i></button>
             <span class="goal-unit-label" id="goalUnitLabel">يوم</span>
-          </div>
-          <div class="goal-slider-wrapper">
-            <input type="range" id="goalValueSlider" min="1" max="365" value="30"
-              oninput="syncGoalFromSlider()" />
           </div>
         </div>
 
@@ -1242,24 +1236,17 @@ function selectGoalType(type) {
     btn.classList.toggle("active", btn.dataset.type === type);
   });
 
-  const slider = document.getElementById("goalValueSlider");
   const numInput = document.getElementById("goalValueNumber");
   const label = document.getElementById("goalInputLabel");
   const unitLabel = document.getElementById("goalUnitLabel");
 
   if (type === "days") {
-    slider.min = 1;
-    slider.max = 365;
-    slider.value = 30;
     numInput.min = 1;
     numInput.max = 365;
     numInput.value = 30;
     label.textContent = "عدد الأيام لإتمام الختمة";
     unitLabel.textContent = "يوم";
   } else {
-    slider.min = 1;
-    slider.max = 30;
-    slider.value = 5;
     numInput.min = 1;
     numInput.max = 30;
     numInput.value = 5;
@@ -1273,27 +1260,16 @@ function selectGoalType(type) {
   updateGoalPreview();
 }
 
-function syncGoalFromSlider() {
-  const slider = document.getElementById("goalValueSlider");
-  const numInput = document.getElementById("goalValueNumber");
-  if (numInput) numInput.value = slider.value;
-  updateGoalPreview();
-}
-
 function syncGoalFromNumber() {
-  const slider = document.getElementById("goalValueSlider");
   const numInput = document.getElementById("goalValueNumber");
-  if (slider) slider.value = numInput.value;
   updateGoalPreview();
 }
 
 function adjustGoalValue(delta) {
   const numInput = document.getElementById("goalValueNumber");
-  const slider = document.getElementById("goalValueSlider");
   let val = parseInt(numInput.value) + delta;
   val = Math.max(parseInt(numInput.min), Math.min(parseInt(numInput.max), val));
   numInput.value = val;
-  slider.value = val;
   updateGoalPreview();
 }
 
@@ -1321,7 +1297,7 @@ function updateGoalPreview() {
     document.querySelector(".goal-type-btn.active")?.dataset.type || "days";
   const numInput = document.getElementById("goalValueNumber");
   const value = parseInt(
-    numInput?.value || document.getElementById("goalValueSlider")?.value || 30,
+    numInput?.value || 30,
   );
 
   const startPage = parseInt(
@@ -1369,7 +1345,7 @@ function startKhatmah() {
     document.querySelector(".goal-type-btn.active")?.dataset.type || "days";
   const numInput = document.getElementById("goalValueNumber");
   const value = parseInt(
-    numInput?.value || document.getElementById("goalValueSlider")?.value || 30,
+    numInput?.value || 30,
   );
 
   const khatmahStartPage = parseInt(
