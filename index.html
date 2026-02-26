@@ -192,46 +192,36 @@
 
         <!-- Category Detail View -->
         <div id="categoryPage" class="hidden">
-          <!-- Font Size Controls -->
-          <div class="font-controls">
-            <button class="font-btn" onclick="setFontSize('small', true)">
-              <i class="fas fa-font font-small"></i> صغير
-            </button>
-            <button class="font-btn active" onclick="setFontSize('medium', true)">
-              <i class="fas fa-font"></i> متوسط
-            </button>
-            <button class="font-btn" onclick="setFontSize('large', true)">
-              <i class="fas fa-font font-large"></i> كبير
-            </button>
+          <!-- Hidden compat elements (still referenced by JS) -->
+          <p id="categoryDescription"></p>
+          <div id="adhkarContainer"></div>
+
+          <!-- ── Swiper Top Bar ── -->
+          <div class="swiper-topbar">
+            <div class="swiper-title-row">
+              <h2 class="swiper-page-title" id="categoryTitle">أذكار الصباح</h2>
+              <span class="swiper-prog-badge" id="swiperProgressText">١ / ٢٠</span>
+            </div>
+            <div class="swiper-action-row">
+              <button class="sw-font-btn decrease-font" onclick="adjustSwiperFont(-1)" title="تصغير الخط">
+                <i class="fas fa-font"></i>
+              </button>
+              <button class="sw-font-btn" onclick="adjustSwiperFont(1)" title="تكبير الخط">
+                <i class="fas fa-font"></i>
+              </button>
+              <button class="reset-all-btn" id="resetAllBtn" onclick="resetAllAdhkar()">
+                <i class="fas fa-redo-alt"></i>
+              </button>
+            </div>
           </div>
 
-          <!-- Reading Mode Controls -->
-          <div class="reading-mode-controls">
-            <button class="reading-btn" id="autoScrollBtn" onclick="toggleAutoScroll()">
-              <i class="fas fa-scroll"></i> التمرير التلقائي
-            </button>
-            <button class="reading-btn" id="focusModeBtn" onclick="enterFocusMode()">
-              <i class="fas fa-expand"></i> وضع التركيز
-            </button>
-            <button class="reading-btn" id="nightReadingBtn" onclick="toggleNightReading()">
-              <i class="fas fa-moon"></i> القراءة الليلية
-            </button>
+          <!-- ── Swiper Track (CSS scroll-snap) ── -->
+          <div class="azkar-swiper-track" id="azkarSwiperTrack">
+            <!-- Slides injected by JS -->
           </div>
 
-          <!-- Category Title -->
-          <div class="category-header">
-            <h2 id="categoryTitle">أذكار الصباح</h2>
-            <p id="categoryDescription">أذكار الصباح من الكتاب والسنة</p>
-            <button class="reset-all-btn" id="resetAllBtn">
-              <i class="fas fa-refresh"></i>
-              إعادة تعيين جميع الأذكار
-            </button>
-          </div>
-
-          <!-- Adhkar Container -->
-          <div class="adhkar-container" id="adhkarContainer">
-            <!-- Adhkar cards will be populated by JavaScript -->
-          </div>
+          <!-- ── Dots / Progress Indicator ── -->
+          <div class="swiper-dots-wrap" id="swiperDotsWrap"></div>
         </div>
 
       </section>
@@ -353,7 +343,8 @@
 
         <!-- Sadaqa Jariyah -->
         <div class="profile-card profile-sadaqa">
-          <p style="font-size: 1.2rem;">اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد عَبْدالغَنِي أَحْمَد وَجَمِيعِ أَمْوَاتِ
+          <p style="font-size: 1.1rem;">اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد عَبْدالغَنِي
+            أَحْمَد وَجَمِيعِ أَمْوَاتِ
             المُسْلِمِينَ</p>
         </div>
 

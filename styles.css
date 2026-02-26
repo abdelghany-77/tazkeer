@@ -4711,3 +4711,525 @@ body.dark-mode .profile-khatmah-info {
     font-size: 1.3rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   AZKAR SWIPER  –  full-screen horizontal slide player
+   ═══════════════════════════════════════════════════════ */
+
+/* Make the category-page a flex column filling the tab */
+#categoryPage {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 64px); /* minus bottom-nav */
+  overflow: hidden;
+}
+
+/* Hidden compatibility shims (referenced by JS) */
+#categoryDescription,
+#adhkarContainer {
+  display: none !important;
+}
+
+/* Tiny font icon inside font-size decrease button */
+.sw-font-btn.decrease-font i {
+  font-size: 0.65em;
+}
+
+/* ══════════════════════════════════════════════
+   Swiper Top Bar – polished two-row header
+   ══════════════════════════════════════════════ */
+.swiper-topbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.65rem 1rem 0.45rem;
+  backdrop-filter: blur(12px);
+  flex-shrink: 0;
+  gap: 0.4rem;
+  direction: rtl;
+}
+
+body.light-mode .swiper-topbar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border-bottom-color: rgba(26, 138, 92, 0.15);
+}
+
+/* ── Main row: title + badge ── */
+.swiper-topbar-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.swiper-page-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #f0e6c8;
+  margin: 0;
+  font-family: "Cairo", serif;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+body.light-mode .swiper-page-title {
+  color: #1a202c;
+}
+
+.swiper-prog-badge {
+  background: rgba(232, 197, 90, 0.12);
+  border: 1px solid rgba(232, 197, 90, 0.4);
+  color: #e8c55a;
+  border-radius: 20px;
+  padding: 1px 11px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: "Cairo", serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+}
+
+body.light-mode .swiper-prog-badge {
+  background: rgba(26, 138, 92, 0.08);
+  border-color: rgba(26, 138, 92, 0.35);
+  color: #276749;
+}
+
+/* ── Tools row: reset / divider / font buttons ── */
+.swiper-topbar-tools {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.sw-tool-btn {
+  width: 32px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  transition:
+    background 0.2s,
+    transform 0.12s,
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.sw-tool-btn:active {
+  transform: scale(0.88);
+  background: rgba(26, 138, 92, 0.3);
+  color: #fff;
+  border-color: rgba(26, 138, 92, 0.4);
+}
+
+body.light-mode .sw-tool-btn {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.03);
+  color: #64748b;
+}
+
+body.light-mode .sw-tool-btn:active {
+  background: rgba(26, 138, 92, 0.15);
+  color: #276749;
+}
+
+/* Font label inside buttons */
+.sw-font-label {
+  font-family: "Cairo", serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+}
+
+.sw-font-label sup {
+  font-size: 0.55rem;
+  font-weight: 600;
+}
+
+.sw-font-label.lg {
+  font-size: 0.95rem;
+}
+
+/* Reset button – red tint */
+.sw-reset-btn {
+  background: rgba(220, 60, 60, 0.1);
+  border-color: rgba(220, 60, 60, 0.2);
+  color: #f87171;
+}
+
+.sw-reset-btn:active {
+  background: rgba(220, 60, 60, 0.3) !important;
+  color: #fff !important;
+  border-color: rgba(220, 60, 60, 0.4) !important;
+}
+
+body.light-mode .sw-reset-btn {
+  background: rgba(220, 60, 60, 0.06);
+  border-color: rgba(220, 60, 60, 0.15);
+  color: #ef4444;
+}
+
+/* Vertical divider between reset and font buttons */
+.sw-tool-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 0.15rem;
+  flex-shrink: 0;
+}
+
+body.light-mode .sw-tool-divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* ── Swiper track ── */
+.azkar-swiper-track {
+  flex: 1 1 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none; /* Firefox */
+  scroll-behavior: auto;
+  /* LTR so snap math is predictable */
+  direction: ltr;
+}
+
+.azkar-swiper-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Individual slide ── */
+.azkar-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  direction: rtl; /* restore RTL inside */
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.azkar-slide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Slide card ── */
+.slide-body {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: rgba(26, 32, 44, 0.82);
+  border: 1px solid rgba(232, 197, 90, 0.15);
+  border-radius: 20px;
+  padding: 1.5rem 1.3rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Light theme override */
+body.light-mode .slide-body {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(26, 138, 92, 0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Zikr text ── */
+.slide-zikr-text {
+  font-family: "Amiri", serif;
+  font-size: 1.6rem; /* default; overridden by JS */
+  line-height: 2.1;
+  color: #f0e6c8;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+body.light-mode .slide-zikr-text {
+  color: #2d3748;
+}
+
+/* ── Meta row (source + copy) ── */
+.slide-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.light-mode .slide-meta-row {
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+.slide-source-label {
+  font-size: 0.85rem;
+  color: #a0aec0;
+  font-style: italic;
+}
+
+body.light-mode .slide-source-label {
+  color: #718096;
+}
+
+.slide-copy-btn {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+
+.slide-copy-btn:hover {
+  color: #e8c55a;
+  background: rgba(232, 197, 90, 0.1);
+}
+
+/* ── Fadl – always visible ── */
+.slide-fadl {
+  border-radius: 12px;
+  background: rgba(26, 138, 92, 0.1);
+  border: 1px solid rgba(26, 138, 92, 0.25);
+  padding: 0.6rem 0.9rem;
+}
+
+body.light-mode .slide-fadl {
+  background: rgba(26, 138, 92, 0.06);
+}
+
+.slide-fadl-header {
+  font-size: 0.82rem;
+  color: #68d391;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+}
+
+body.light-mode .slide-fadl-header {
+  color: #276749;
+}
+
+.slide-fadl p {
+  font-size: 0.9rem;
+  color: #cbd5e0;
+  line-height: 1.7;
+  margin: 0;
+}
+
+body.light-mode .slide-fadl p {
+  color: #4a5568;
+}
+
+/* ── Counter area ── */
+.slide-counter-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.2rem;
+}
+
+/* The big circular counter button */
+.slide-counter-btn {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 3px solid #1a8a5c;
+  background: rgba(26, 138, 92, 0.18);
+  color: #68d391;
+  font-family: "Cairo", serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.25s,
+    border-color 0.25s,
+    color 0.25s,
+    transform 0.15s,
+    box-shadow 0.25s;
+  box-shadow:
+    0 0 0 6px rgba(26, 138, 92, 0.08),
+    0 4px 20px rgba(26, 138, 92, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.slide-counter-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.slide-counter-btn:active::after {
+  opacity: 1;
+}
+
+.slide-counter-btn:active {
+  transform: scale(0.9);
+}
+
+/* Completed state */
+.slide-counter-btn.completed {
+  border-color: #e8c55a;
+  background: rgba(232, 197, 90, 0.15);
+  color: #e8c55a;
+  box-shadow:
+    0 0 0 6px rgba(232, 197, 90, 0.12),
+    0 4px 20px rgba(232, 197, 90, 0.35);
+  cursor: default;
+}
+
+.counter-num {
+  display: block;
+  line-height: 1;
+}
+
+.counter-hint {
+  font-size: 0.8rem;
+  color: #718096;
+  font-family: "Cairo", serif;
+  letter-spacing: 0.02em;
+}
+
+body.light-mode .counter-hint {
+  color: #4a5568;
+}
+
+/* ── Dots pagination ── */
+.swiper-dots-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 1rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  max-height: 40px;
+  overflow: hidden;
+}
+
+.swiper-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background 0.25s,
+    transform 0.2s,
+    width 0.25s;
+  flex-shrink: 0;
+}
+
+.swiper-dot.active {
+  background: #e8c55a;
+  transform: scale(1.25);
+  width: 20px;
+  border-radius: 4px;
+}
+
+.swiper-dot.done {
+  background: #1a8a5c;
+}
+
+.swiper-dot.active.done {
+  background: #e8c55a;
+}
+
+/* ── Swiper counter button keyframe animations ── */
+@keyframes swiperCounterPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.88);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes swiperCounterComplete {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.15);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 400px) {
+  .swiper-page-title {
+    font-size: 1.05rem;
+  }
+  .slide-zikr-text {
+    font-size: 1.35rem;
+  }
+  .slide-counter-btn {
+    width: 80px;
+    height: 80px;
+    font-size: 1.15rem;
+  }
+  .sw-tool-btn {
+    width: 28px;
+    height: 24px;
+    font-size: 0.65rem;
+  }
+  .sw-font-label { font-size: 0.75rem; }
+  .sw-font-label.lg { font-size: 0.85rem; }
+}
+
+@media (min-width: 768px) {
+  .slide-zikr-text {
+    font-size: 1.8rem;
+  }
+  .slide-counter-btn {
+    width: 110px;
+    height: 110px;
+    font-size: 1.7rem;
+  }
+}

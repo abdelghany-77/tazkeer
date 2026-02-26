@@ -223,7 +223,7 @@ const adhkarData = {
     icon: "fas fa-moon",
     adhkar: [
       {
-        text: "بِسْمِ اللهِ الرَّحْمنِ الرَّحِيم\naللّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاء وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالأَرْضَ وَلاَ يَؤُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ",
+        text: "بِسْمِ اللهِ الرَّحْمنِ الرَّحِيم\nاللّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاء وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالأَرْضَ وَلاَ يَؤُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ",
         source: "آية الكرسى - سورة البقرة 255",
         fadl: "من قالها حين يصبح أجير من الجن حتى يمسى، ومن قالها حين يمسى أجير من الجن حتى يصبح.",
         count: 1,
@@ -1781,98 +1781,118 @@ function createCategoryCard(categoryKey, categoryData, index) {
   categoriesContainer.appendChild(card);
 }
 
-// Load category data
+// Load category as Swiper (scroll-snap)
 function loadCategory(category) {
   const data = adhkarData[category];
-  categoryTitle.textContent = data.title;
-  categoryDescription.textContent = data.description;
+  if (categoryTitle) categoryTitle.textContent = data.title;
+  if (categoryDescription) categoryDescription.textContent = data.description;
+  currentCategory = category;
 
-  adhkarContainer.innerHTML = "";
+  const track = document.getElementById("azkarSwiperTrack");
+  const dotsWrap = document.getElementById("swiperDotsWrap");
+  if (!track) return;
 
+  track.innerHTML = "";
+  if (dotsWrap) dotsWrap.innerHTML = "";
+
+  // Build slides and dots
   data.adhkar.forEach((zikr, index) => {
-    createAdhkarCard(zikr, index, category);
+    createAdhkarSlide(zikr, index, category, track);
+    if (dotsWrap) {
+      const dot = document.createElement("button");
+      dot.className =
+        "swiper-dot" +
+        (zikr.currentCount >= zikr.count ? " done" : "") +
+        (index === 0 ? " active" : "");
+      dot.setAttribute("aria-label", `ذكر ${index + 1}`);
+      dot.addEventListener("click", () => goToSlide(index));
+      dotsWrap.appendChild(dot);
+    }
   });
 
-  // Add fade-in animation
-  adhkarContainer.classList.add("fade-in");
-  setTimeout(() => {
-    adhkarContainer.classList.remove("fade-in");
-  }, 500);
+  // Apply saved font size
+  loadSwiperFontSize();
+
+  // Restore last position (instant – no animation on first render)
+  const savedPos = parseInt(
+    localStorage.getItem("swiperPos_" + category) || "0",
+  );
+  const validPos = Math.min(Math.max(0, savedPos), data.adhkar.length - 1);
+  requestAnimationFrame(() => {
+    track.scrollLeft = validPos * track.clientWidth;
+    updateSwiperUI(category, validPos);
+  });
+
+  // Scroll listener – sync dots/badge as user swipes
+  let scrollTimer;
+  track.addEventListener(
+    "scroll",
+    () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        const idx = Math.round(track.scrollLeft / track.clientWidth);
+        updateSwiperUI(category, idx);
+        saveSwiperPosition(category, idx);
+      }, 80);
+    },
+    { passive: true },
+  );
 }
 
-// Create adhkar card
-function createAdhkarCard(zikr, index, category) {
-  const card = document.createElement("div");
-  card.className = "adhkar-card fade-in";
-  card.style.animationDelay = `${index * 0.1}s`;
-
+// Create one swiper slide
+function createAdhkarSlide(zikr, index, category, track) {
   const isCompleted = zikr.currentCount >= zikr.count;
-  const progressPercent = (zikr.currentCount / zikr.count) * 100;
+  const safeText = zikr.text
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, " ");
 
-  card.innerHTML = `
-        <div class="adhkar-text">${zikr.text}</div>
-        <div class="adhkar-info">
-            <div class="adhkar-source">${zikr.source}</div>
-            <div class="adhkar-count">${zikr.count}${
-              zikr.count === 1 ? " مرة" : " مرات"
-            }</div>
-        </div>
-        ${
-          zikr.fadl
-            ? `
-        <div class="adhkar-fadl">
-            <div class="fadl-text">${zikr.fadl}</div>
-        </div>
-        `
-            : ""
-        }
-        <div class="adhkar-progress">
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: ${progressPercent}%; background: ${
-                  isCompleted
-                    ? "linear-gradient(90deg, #b8860b, #48bb78)"
-                    : "linear-gradient(90deg, #1a8a5c, #d4a847)"
-                }"></div>
-            </div>
-            <span class="progress-text">${zikr.currentCount}/${
-              zikr.count
-            }</span>
-        </div>
-        <div class="adhkar-actions">
-            <button class="action-btn count-action-btn" onclick="incrementZikrCount('${category}', ${index})" ${
-              isCompleted ? 'style="background: #b8860b;"' : ""
-            }>
-                <i class="fas fa-plus"></i>
-                ${isCompleted ? "مكتمل" : "عدّ"}
-            </button>
-            <button class="action-btn count-action-btn" onclick="openCounter('${
-              zikr.text
-            }', ${zikr.count}, '${category}', ${index})">
-                <i class="fas fa-hand-pointer"></i>
-                العداد
-            </button>
-            <button class="action-btn copy-btn" onclick="copyText('${zikr.text.replace(
-              /'/g,
-              "\\'",
-            )}')">
-                <i class="fas fa-copy"></i>
-                نسخ
-            </button>
-        </div>
-    `;
+  const slide = document.createElement("div");
+  slide.className = "azkar-slide";
+  slide.dataset.index = index;
 
-  adhkarContainer.appendChild(card);
+  slide.innerHTML = `
+    <div class="slide-body">
+      <div class="slide-zikr-text">${zikr.text.replace(/\n/g, "<br>")}</div>
+      <div class="slide-meta-row">
+        <span class="slide-source-label">${zikr.source}</span>
+        <button class="slide-copy-btn" onclick="copyText('${safeText}')">
+          <i class="fas fa-copy"></i>
+        </button>
+      </div>
+      ${
+        zikr.fadl
+          ? `<div class="slide-fadl">
+              <div class="slide-fadl-header"><i class="fas fa-star"></i> فضل الذكر</div>
+              <p>${zikr.fadl}</p>
+            </div>`
+          : ""
+      }
+      <div class="slide-counter-area">
+        <button
+          class="slide-counter-btn${isCompleted ? " completed" : ""}"
+          id="slideCounterBtn_${category}_${index}"
+          ${isCompleted ? "disabled" : ""}
+        >
+          <span class="counter-num">${isCompleted ? "✓" : zikr.currentCount + "/" + zikr.count}</span>
+        </button>
+        <p class="counter-hint">${
+          isCompleted
+            ? "بارك الله فيك"
+            : zikr.count > 1
+              ? "اضغط للعدّ"
+              : "اضغط للإتمام"
+        }</p>
+      </div>
+    </div>
+  `;
 
-  // Add click event to the entire card for counting
-  card.addEventListener("click", function (e) {
-    // Don't trigger if clicking on buttons
-    if (e.target.tagName === "BUTTON" || e.target.tagName === "I") {
-      return;
-    }
+  // Attach counter click
+  const btn = slide.querySelector(".slide-counter-btn");
+  if (btn)
+    btn.addEventListener("click", () => decrementSlideCounter(category, index));
 
-    // Increment count when clicking anywhere on the card
-    incrementZikrCount(category, index);
-  });
+  track.appendChild(slide);
 }
 
 // Increment zikr count directly on card
@@ -1945,16 +1965,11 @@ function resetAllAdhkar() {
   }
 }
 
-// Update all cards progress without reloading
+// Update all slides / cards progress without reloading
 function updateAllCardsProgress(category) {
   if (!category) return;
-
-  const cards = document.querySelectorAll(".adhkar-card");
-
   adhkarData[category].adhkar.forEach((zikr, index) => {
-    if (cards[index]) {
-      updateCardProgress(category, index);
-    }
+    updateCardProgress(category, index);
   });
 }
 
@@ -2106,36 +2121,65 @@ function updateCounterDisplay() {
   }
 }
 
-// Update specific card progress without reloading the page
+// Update slide counter OR fallback to old card progress bar
 function updateCardProgress(category, index) {
   if (!category || index === null) return;
 
   const zikr = adhkarData[category].adhkar[index];
-  const cards = document.querySelectorAll(".adhkar-card");
+  const isCompleted = zikr.currentCount >= zikr.count;
 
+  // ─── Swiper slide counter ───
+  const swiperBtn = document.getElementById(
+    `slideCounterBtn_${category}_${index}`,
+  );
+  if (swiperBtn) {
+    const numEl = swiperBtn.querySelector(".counter-num");
+    const areaEl = swiperBtn.closest(".slide-counter-area");
+    const hintEl = areaEl ? areaEl.querySelector(".counter-hint") : null;
+
+    if (numEl)
+      numEl.textContent = isCompleted
+        ? "✓"
+        : zikr.currentCount + "/" + zikr.count;
+    if (isCompleted) {
+      swiperBtn.classList.add("completed");
+      swiperBtn.disabled = true;
+      if (hintEl) hintEl.textContent = "بارك الله فيك";
+      swiperBtn.style.animation = "swiperCounterComplete 0.4s ease forwards";
+      setTimeout(() => {
+        if (swiperBtn) swiperBtn.style.animation = "";
+      }, 500);
+    } else {
+      swiperBtn.classList.remove("completed");
+      swiperBtn.disabled = false;
+      swiperBtn.style.animation = "swiperCounterPulse 0.18s ease";
+      setTimeout(() => {
+        if (swiperBtn) swiperBtn.style.animation = "";
+      }, 220);
+    }
+    // Sync dot state
+    const dots = document.querySelectorAll(".swiper-dot");
+    if (dots[index]) dots[index].classList.toggle("done", isCompleted);
+    return;
+  }
+
+  // ─── Fallback: old adhkar-card ───
+  const cards = document.querySelectorAll(".adhkar-card");
   if (cards[index]) {
     const card = cards[index];
     const progressBar = card.querySelector(".progress-fill");
     const progressText = card.querySelector(".progress-text");
     const countBtn = card.querySelector(".count-action-btn");
-
-    const isCompleted = zikr.currentCount >= zikr.count;
     const progressPercent = (zikr.currentCount / zikr.count) * 100;
 
-    // Update progress bar
     if (progressBar) {
       progressBar.style.width = `${progressPercent}%`;
       progressBar.style.background = isCompleted
         ? "linear-gradient(90deg, #b8860b, #48bb78)"
         : "linear-gradient(90deg, #1a8a5c, #d4a847)";
     }
-
-    // Update progress text
-    if (progressText) {
+    if (progressText)
       progressText.textContent = `${zikr.currentCount}/${zikr.count}`;
-    }
-
-    // Update count button appearance
     if (countBtn) {
       if (isCompleted) {
         countBtn.style.background = "#b8860b";
@@ -2218,9 +2262,11 @@ function copyText(text) {
 // Touch/Swipe support for mobile
 let touchStartX = 0;
 let touchEndX = 0;
+let touchStartTarget = null; // used to skip swipe-back when inside swiper
 
 document.addEventListener("touchstart", (e) => {
   touchStartX = e.changedTouches[0].screenX;
+  touchStartTarget = e.target;
 });
 
 document.addEventListener("touchend", (e) => {
@@ -2232,13 +2278,106 @@ function handleSwipe() {
   const swipeDistance = touchEndX - touchStartX;
   const minSwipeDistance = 100;
 
+  // Don't intercept swipes that start inside the azkar swiper track
+  const swiperTrack = document.getElementById("azkarSwiperTrack");
+  if (
+    swiperTrack &&
+    touchStartTarget &&
+    swiperTrack.contains(touchStartTarget)
+  ) {
+    return;
+  }
+
   if (Math.abs(swipeDistance) > minSwipeDistance && !isHomePage) {
     if (swipeDistance > 0) {
-      // Swipe right - go back to home
+      // Swipe right - go back to category list
       showHomePage();
     }
   }
 }
+
+// ═══════════════════════════════════════════════════════
+//  AZKAR SWIPER  –  helper functions
+// ═══════════════════════════════════════════════════════
+
+/** Programmatically scroll to the slide at [index] with smooth animation */
+function goToSlide(index) {
+  const track = document.getElementById("azkarSwiperTrack");
+  if (!track || !currentCategory) return;
+  const slideWidth = track.clientWidth;
+  track.scrollTo({ left: index * slideWidth, behavior: "smooth" });
+  updateSwiperUI(currentCategory, index);
+  saveSwiperPosition(currentCategory, index);
+}
+
+/** Sync progress badge + dots to reflect current slide index */
+function updateSwiperUI(category, index) {
+  if (!category || !adhkarData[category]) return;
+  const total = adhkarData[category].adhkar.length;
+
+  // Convert to Arabic-Indic numerals for the badge
+  const toAr = (n) => String(n).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
+  const badge = document.getElementById("swiperProgressText");
+  if (badge) badge.textContent = `${toAr(index + 1)} / ${toAr(total)}`;
+
+  // Dots
+  document.querySelectorAll(".swiper-dot").forEach((dot, i) => {
+    dot.classList.toggle("active", i === index);
+  });
+}
+
+/**
+ * Decrement the visual counter (internally increments currentCount toward
+ * the goal, then auto-advances to the next slide on completion).
+ */
+function decrementSlideCounter(category, index) {
+  const zikr = adhkarData[category].adhkar[index];
+  if (zikr.currentCount >= zikr.count) return; // already done
+
+  // Delegate to the shared increment logic (updates data + stats + marks done)
+  incrementZikrCount(category, index);
+
+  // Auto-advance to next slide 1.5 s after completion
+  if (zikr.currentCount >= zikr.count) {
+    const total = adhkarData[category].adhkar.length;
+    if (index < total - 1) {
+      setTimeout(() => goToSlide(index + 1), 1500);
+    }
+  }
+}
+
+/** Persist which slide the user is on per category */
+function saveSwiperPosition(category, index) {
+  localStorage.setItem("swiperPos_" + category, index);
+}
+
+// ── Font-size stepping ──────────────────────────────
+const SWIPER_FONT_SIZES = [1.05, 1.3, 1.6, 1.9, 2.25, 2.6]; // rem steps
+let swiperFontSizeIndex = 2; // default → 1.6 rem
+
+function adjustSwiperFont(delta) {
+  swiperFontSizeIndex = Math.max(
+    0,
+    Math.min(SWIPER_FONT_SIZES.length - 1, swiperFontSizeIndex + delta),
+  );
+  applyCurrentSwiperFont();
+  localStorage.setItem("swiperFontSizeIndex", swiperFontSizeIndex);
+}
+
+function applyCurrentSwiperFont() {
+  const size = SWIPER_FONT_SIZES[swiperFontSizeIndex];
+  document.querySelectorAll(".slide-zikr-text").forEach((el) => {
+    el.style.fontSize = size + "rem";
+  });
+}
+
+function loadSwiperFontSize() {
+  const saved = localStorage.getItem("swiperFontSizeIndex");
+  if (saved !== null) swiperFontSizeIndex = parseInt(saved, 10);
+  applyCurrentSwiperFont();
+}
+
+// ═══════════════════════════════════════════════════════
 
 // Save progress to localStorage
 function saveProgress() {

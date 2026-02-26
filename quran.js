@@ -1296,9 +1296,7 @@ function updateGoalPreview() {
   const activeType =
     document.querySelector(".goal-type-btn.active")?.dataset.type || "days";
   const numInput = document.getElementById("goalValueNumber");
-  const value = parseInt(
-    numInput?.value || 30,
-  );
+  const value = parseInt(numInput?.value || 30);
 
   const startPage = parseInt(
     document
@@ -1344,9 +1342,7 @@ function startKhatmah() {
   const activeType =
     document.querySelector(".goal-type-btn.active")?.dataset.type || "days";
   const numInput = document.getElementById("goalValueNumber");
-  const value = parseInt(
-    numInput?.value || 30,
-  );
+  const value = parseInt(numInput?.value || 30);
 
   const khatmahStartPage = parseInt(
     document
