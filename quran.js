@@ -1516,26 +1516,39 @@ function initQuranTab() {
 
 function updateProfileTab() {
   khatmahState = loadKhatmahState();
-  var content = document.getElementById("profileKhatmahContent");
-  if (!content) return;
 
-  if (!khatmahState.isActive) {
-    content.innerHTML =
-      '<p class="profile-empty-state">لم تبدأ ختمة بعد. اذهب إلى تبويب القرآن لبدء ختمة جديدة.</p>';
-  } else {
-    var progress = getKhatmahProgress(khatmahState);
-    content.innerHTML = `
-      <div class="profile-khatmah-progress">
-        <div class="profile-khatmah-bar">
-          <div class="profile-khatmah-fill" style="width:${progress}%"></div>
-        </div>
-        <div class="profile-khatmah-info">
-          <span>${progress}% مكتمل</span>
-          <span>${khatmahState.totalPagesRead} / ${TOTAL_QURAN_PAGES - (khatmahState.khatmahStartPage || 1) + 1} صفحة</span>
-        </div>
-      </div>`;
+  /* ── Khatmah ring in summary card ── */
+  var progress = khatmahState.isActive ? getKhatmahProgress(khatmahState) : 0;
+  var ring = document.getElementById("khatmahRing");
+  var pctEl = document.getElementById("khatmahPct");
+  if (ring) {
+    var circumference = 2 * Math.PI * 34; // r = 34
+    ring.style.strokeDasharray = circumference;
+    ring.style.strokeDashoffset = circumference - (circumference * progress) / 100;
+  }
+  if (pctEl) pctEl.textContent = progress + "%";
+
+  /* ── Khatmah detail inside card ── */
+  var content = document.getElementById("profileKhatmahContent");
+  if (content) {
+    if (!khatmahState.isActive) {
+      content.innerHTML =
+        '<p class="dash-empty">لم تبدأ ختمة بعد. اذهب إلى تبويب القرآن لبدء ختمة جديدة.</p>';
+    } else {
+      content.innerHTML = `
+        <div class="profile-khatmah-progress">
+          <div class="profile-khatmah-bar">
+            <div class="profile-khatmah-fill" style="width:${progress}%"></div>
+          </div>
+          <div class="profile-khatmah-info">
+            <span>${progress}% مكتمل</span>
+            <span>${khatmahState.totalPagesRead} / ${TOTAL_QURAN_PAGES - (khatmahState.khatmahStartPage || 1) + 1} صفحة</span>
+          </div>
+        </div>`;
+    }
   }
 
+  /* ── Quran mini-stats ── */
   var totalDaysEl = document.getElementById("profileTotalDays");
   var pagesReadEl = document.getElementById("profilePagesRead");
   var currentPageEl = document.getElementById("profileCurrentPage");

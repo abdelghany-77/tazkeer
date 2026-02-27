@@ -247,114 +247,202 @@
       <!-- ==================== TAB: الملف الشخصي (Profile) ==================== -->
       <section id="tab-profile" class="tab-content">
 
-        <!-- Profile Header -->
-        <div class="profile-section-header">
-          <div class="profile-avatar-wrapper">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="40" height="40">
+        <!-- ── Slim Profile Header ── -->
+        <!-- <div class="dash-header">
+          <div class="dash-avatar">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
               <path
                 d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
             </svg>
           </div>
-          <h2>ملفك الشخصي</h2>
+          <h2 class="dash-title">الملف الشخصي</h2>
+        </div> -->
+
+        <!-- ── Summary Cards (3 main KPIs) ── -->
+        <div class="dash-summary">
+          <!-- Khatmah Progress -->
+          <div class="summary-card" id="summaryKhatmah">
+            <div class="summary-ring-wrap">
+              <svg class="summary-ring" viewBox="0 0 80 80">
+                <circle class="ring-bg" cx="40" cy="40" r="34" />
+                <circle class="ring-fill" id="khatmahRing" cx="40" cy="40" r="34" stroke-dasharray="213.6"
+                  stroke-dashoffset="213.6" />
+              </svg>
+              <span class="ring-pct" id="khatmahPct">0%</span>
+            </div>
+            <span class="summary-label">الختمة</span>
+          </div>
+          <!-- Azkar Today -->
+          <div class="summary-card" id="summaryAzkar">
+            <div class="summary-icon azkar-icon">
+              <!-- Lucide-style book-open icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" width="28" height="28">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            </div>
+            <span class="summary-value" id="summaryAzkarVal">0</span>
+            <span class="summary-label">أذكار اليوم</span>
+          </div>
+          <!-- Streak -->
+          <div class="summary-card" id="summaryStreak">
+            <div class="summary-icon streak-icon">
+              <!-- Lucide-style flame icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                stroke-linejoin="round" width="28" height="28">
+                <path
+                  d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+              </svg>
+            </div>
+            <span class="summary-value" id="summaryStreakVal">0</span>
+            <span class="summary-label">أيام متتالية</span>
+          </div>
         </div>
 
-        <!-- Khatmah Progress Card -->
-        <div class="profile-card" id="profileKhatmahSection">
-          <div class="profile-card-title">
-            <i class="fas fa-quran"></i>
-            <h3>تقدم الختمة</h3>
+        <!-- ── Section 1: القرآن الكريم ── -->
+        <div class="dash-card" id="profileKhatmahSection">
+          <div class="dash-card-head">
+            <!-- Lucide-style book icon -->
+            <svg class="dash-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z" />
+            </svg>
+            <h3>القرآن الكريم</h3>
           </div>
           <div id="profileKhatmahContent">
-            <p class="profile-empty-state">لم تبدأ ختمة بعد. اذهب إلى تبويب القرآن لبدء ختمة جديدة.</p>
+            <p class="dash-empty">لم تبدأ ختمة بعد. اذهب إلى تبويب القرآن لبدء ختمة جديدة.</p>
           </div>
+          <div class="dash-quran-stats">
+            <div class="dash-mini-stat">
+              <span class="mini-val" id="profileCurrentPage">0</span>
+              <span class="mini-lbl">الصفحة الحالية</span>
+            </div>
+            <div class="dash-mini-stat">
+              <span class="mini-val" id="profilePagesRead">0</span>
+              <span class="mini-lbl">صفحة مقروءة</span>
+            </div>
+            <div class="dash-mini-stat">
+              <span class="mini-val" id="profileTotalDays">0</span>
+              <span class="mini-lbl">أيام القراءة</span>
+            </div>
+          </div>
+          <button class="dash-continue-btn" onclick="switchTab('tab-quran')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" width="18" height="18">
+              <polygon points="5 4 15 12 5 20 5 4" />
+              <line x1="19" y1="5" x2="19" y2="19" />
+            </svg>
+            متابعة القراءة
+          </button>
         </div>
 
-        <!-- Reading Stats Card -->
-        <div class="profile-card">
-          <div class="profile-card-title">
-            <i class="fas fa-chart-bar"></i>
-            <h3>إحصائيات القران الكريم</h3>
+        <!-- ── Section 2: إحصائيات الأذكار ── -->
+        <div class="dash-card">
+          <div class="dash-card-head">
+            <!-- Lucide-style bar-chart icon -->
+            <svg class="dash-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            <h3>إحصائيات الأذكار</h3>
           </div>
-          <div class="profile-reading-stats" id="profileReadingStats">
-            <div class="profile-stat-item">
-              <span class="profile-stat-value" id="profileTotalDays">0</span>
-              <span class="profile-stat-label">أيام القراءة</span>
-            </div>
-            <div class="profile-stat-item">
-              <span class="profile-stat-value" id="profilePagesRead">0</span>
-              <span class="profile-stat-label">صفحة مقروءة</span>
-            </div>
-            <div class="profile-stat-item">
-              <span class="profile-stat-value" id="profileCurrentPage">0</span>
-              <span class="profile-stat-label">الصفحة الحالية</span>
-            </div>
-          </div>
-        </div>
 
-        <!-- Adhkar Statistics Dashboard -->
-        <div class="stats-dashboard" id="statsDashboard">
-          <div class="stats-header">
-            <h3><i class="fas fa-chart-line"></i> إحصائيات الاذكار</h3>
-            <button class="stats-toggle-btn" id="statsToggleBtn" title="إظهار/إخفاء">
-              <i class="fas fa-chevron-up"></i>
-            </button>
-          </div>
-          <div class="stats-content" id="statsContent">
-            <div class="stats-cards">
-              <div class="stat-card streak">
-                <div class="stat-icon"><i class="fas fa-fire"></i></div>
-                <div class="stat-value" id="streakCount">0</div>
-                <div class="stat-label">أيام متتالية</div>
-              </div>
-              <div class="stat-card today">
-                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-                <div class="stat-value" id="todayCount">0</div>
-                <div class="stat-label">أذكار اليوم</div>
-              </div>
-              <div class="stat-card week">
-                <div class="stat-icon"><i class="fas fa-calendar-week"></i></div>
-                <div class="stat-value" id="weekCount">0</div>
-                <div class="stat-label">هذا الأسبوع</div>
-              </div>
-              <div class="stat-card total">
-                <div class="stat-icon"><i class="fas fa-trophy"></i></div>
-                <div class="stat-value" id="totalCount">0</div>
-                <div class="stat-label">إجمالي الإنجاز</div>
-              </div>
+          <!-- Azkar category mini-bars -->
+          <!-- <div class="dash-azkar-bars">
+            <div class="azkar-bar-row">
+              <span class="azkar-bar-label">صباح</span>
+              <div class="azkar-bar-track"><div class="azkar-bar-fill morning-fill" id="barMorning"></div></div>
+              <span class="azkar-bar-num" id="numMorning">0</span>
             </div>
-            <!-- Weekly Progress Chart -->
-            <div class="weekly-chart">
-              <h4><i class="fas fa-chart-bar"></i> نشاط الأسبوع</h4>
-              <div class="chart-bars" id="weeklyBars">
-                <div class="chart-day">
-                  <div class="bar" data-day="6"></div><span>السبت</span>
-                </div>
-                <div class="chart-day">
-                  <div class="bar" data-day="0"></div><span>الأحد</span>
-                </div>
-                <div class="chart-day">
-                  <div class="bar" data-day="1"></div><span>الإثنين</span>
-                </div>
-                <div class="chart-day">
-                  <div class="bar" data-day="2"></div><span>الثلاثاء</span>
-                </div>
-                <div class="chart-day">
-                  <div class="bar" data-day="3"></div><span>الأربعاء</span>
-                </div>
-                <div class="chart-day">
-                  <div class="bar" data-day="4"></div><span>الخميس</span>
-                </div>
-                <div class="chart-day">
-                  <div class="bar" data-day="5"></div><span>الجمعة</span>
-                </div>
+            <div class="azkar-bar-row">
+              <span class="azkar-bar-label">مساء</span>
+              <div class="azkar-bar-track"><div class="azkar-bar-fill evening-fill" id="barEvening"></div></div>
+              <span class="azkar-bar-num" id="numEvening">0</span>
+            </div>
+            <div class="azkar-bar-row">
+              <span class="azkar-bar-label">تسبيح</span>
+              <div class="azkar-bar-track"><div class="azkar-bar-fill tasbih-fill" id="barTasbih"></div></div>
+              <span class="azkar-bar-num" id="numTasbih">0</span>
+            </div>
+          </div> -->
+
+          <!-- 4 compact stat pills -->
+          <div class="dash-stat-pills" id="statsContent">
+            <div class="stat-pill pill-streak">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path
+                  d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+              </svg>
+              <span id="streakCount">0</span>
+              <small>أيام</small>
+            </div>
+            <div class="stat-pill pill-today">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span id="todayCount">0</span>
+              <small>اليوم</small>
+            </div>
+            <div class="stat-pill pill-week">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              <span id="weekCount">0</span>
+              <small>الأسبوع</small>
+            </div>
+            <div class="stat-pill pill-total">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7" />
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7" />
+                <path d="M4 22h16" />
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22" />
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22" />
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+              </svg>
+              <span id="totalCount">0</span>
+              <small>الإجمالي</small>
+            </div>
+          </div>
+
+          <!-- Weekly mini-chart -->
+          <div class="dash-weekly">
+            <h4>نشاط الأسبوع</h4>
+            <div class="dash-bars" id="weeklyBars">
+              <div class="dash-bar-col">
+                <div class="bar" data-day="6"></div><span>سبت</span>
+              </div>
+              <div class="dash-bar-col">
+                <div class="bar" data-day="0"></div><span>أحد</span>
+              </div>
+              <div class="dash-bar-col">
+                <div class="bar" data-day="1"></div><span>إثن</span>
+              </div>
+              <div class="dash-bar-col">
+                <div class="bar" data-day="2"></div><span>ثلا</span>
+              </div>
+              <div class="dash-bar-col">
+                <div class="bar" data-day="3"></div><span>أرب</span>
+              </div>
+              <div class="dash-bar-col">
+                <div class="bar" data-day="4"></div><span>خمي</span>
+              </div>
+              <div class="dash-bar-col">
+                <div class="bar" data-day="5"></div><span>جمع</span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Sadaqa Jariyah -->
-        <div class="profile-card profile-sadaqa">
-          <p style="font-size: 1.1rem;">اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد عَبْدالغَنِي
+        <div class="dash-card dash-sadaqa">
+          <p>اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد عَبْدالغَنِي
             أَحْمَد وَجَمِيعِ أَمْوَاتِ
             المُسْلِمِينَ</p>
         </div>

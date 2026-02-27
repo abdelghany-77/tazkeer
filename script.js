@@ -1432,6 +1432,8 @@ function switchTab(tabId) {
     if (typeof initQuranTab === "function") initQuranTab();
   } else if (tabId === "tab-profile") {
     if (typeof updateProfileTab === "function") updateProfileTab();
+    if (typeof updateStatsDashboard === "function") updateStatsDashboard();
+    if (typeof updateWeeklyChart === "function") updateWeeklyChart();
   }
   // Scroll top
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -3780,17 +3782,6 @@ function initializeNewFeatures() {
 let weeklyProgress = JSON.parse(localStorage.getItem("weeklyProgress")) || {};
 
 function initializeStatsDashboard() {
-  // Stats toggle functionality
-  const statsToggle = document.getElementById("statsToggleBtn");
-  const statsContent = document.getElementById("statsContent");
-
-  if (statsToggle && statsContent) {
-    statsToggle.addEventListener("click", () => {
-      statsContent.classList.toggle("hidden");
-      statsToggle.classList.toggle("collapsed");
-    });
-  }
-
   // Update stats on load
   updateStatsDashboard();
   updateWeeklyChart();
@@ -3820,7 +3811,7 @@ function updateStatsDashboard() {
   // Get total count
   let totalCount = dailyProgress.totalCompletions || 0;
 
-  // Update UI
+  // Update stat pills
   const streakEl = document.getElementById("streakCount");
   const todayEl = document.getElementById("todayCount");
   const weekEl = document.getElementById("weekCount");
@@ -3830,6 +3821,42 @@ function updateStatsDashboard() {
   if (todayEl) todayEl.textContent = todayCount;
   if (weekEl) weekEl.textContent = weekCount;
   if (totalEl) totalEl.textContent = totalCount;
+
+  // Update summary cards (top KPIs)
+  var summaryAzkarVal = document.getElementById("summaryAzkarVal");
+  var summaryStreakVal = document.getElementById("summaryStreakVal");
+  if (summaryAzkarVal) summaryAzkarVal.textContent = todayCount;
+  if (summaryStreakVal) summaryStreakVal.textContent = streak;
+
+  // Update azkar category bars
+  updateAzkarCategoryBars();
+}
+
+function updateAzkarCategoryBars() {
+  var completed = dailyProgress.completedZekr || [];
+  var morningTotal = adhkarData.morning ? adhkarData.morning.adhkar.length : 0;
+  var eveningTotal = adhkarData.evening ? adhkarData.evening.adhkar.length : 0;
+  // tasbeeh-like counts come from "general" category
+  var tasbihTotal = adhkarData.general ? adhkarData.general.adhkar.length : 0;
+
+  var morningDone = completed.filter(function(id) { return id.startsWith("morning_"); }).length;
+  var eveningDone = completed.filter(function(id) { return id.startsWith("evening_"); }).length;
+  var tasbihDone = completed.filter(function(id) { return id.startsWith("general_"); }).length;
+
+  var barMorning = document.getElementById("barMorning");
+  var barEvening = document.getElementById("barEvening");
+  var barTasbih = document.getElementById("barTasbih");
+  var numMorning = document.getElementById("numMorning");
+  var numEvening = document.getElementById("numEvening");
+  var numTasbih = document.getElementById("numTasbih");
+
+  if (barMorning) barMorning.style.width = (morningTotal ? (morningDone / morningTotal) * 100 : 0) + "%";
+  if (barEvening) barEvening.style.width = (eveningTotal ? (eveningDone / eveningTotal) * 100 : 0) + "%";
+  if (barTasbih) barTasbih.style.width = (tasbihTotal ? (tasbihDone / tasbihTotal) * 100 : 0) + "%";
+
+  if (numMorning) numMorning.textContent = morningDone + "/" + morningTotal;
+  if (numEvening) numEvening.textContent = eveningDone + "/" + eveningTotal;
+  if (numTasbih) numTasbih.textContent = tasbihDone + "/" + tasbihTotal;
 }
 
 function calculateStreak() {
@@ -3867,9 +3894,9 @@ function calculateWeeklyCount() {
 }
 
 function updateWeeklyChart() {
-  const bars = document.querySelectorAll(".chart-day .bar");
+  const bars = document.querySelectorAll(".dash-bar-col .bar");
   const today = new Date();
-  const maxHeight = 100;
+  const maxHeight = 70;
 
   // Find max value for scaling
   let maxVal = 1;
@@ -3891,7 +3918,7 @@ function updateWeeklyChart() {
     const dateStr = date.toDateString();
     const val = weeklyProgress[dateStr] || 0;
 
-    const height = Math.max(10, (val / maxVal) * maxHeight);
+    const height = Math.max(6, (val / maxVal) * maxHeight);
     bar.style.height = height + "px";
 
     // Highlight today

@@ -4526,198 +4526,262 @@ body.dark-mode .bottom-nav-item.active::before {
 }
 
 /* ================================================================
-   PROFILE TAB STYLES
+   PROFILE TAB – UNIFIED DASHBOARD  
    ================================================================ */
 
-.profile-section-header {
+/* ── Slim header ── */
+.dash-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  padding: 2rem 0;
+  gap: 0.65rem;
+  padding: 1rem 0 0.5rem;
 }
-
-.profile-avatar-wrapper {
-  width: 72px;
-  height: 72px;
+.dash-avatar {
+  width: 44px; height: 44px;
   border-radius: 50%;
   background: linear-gradient(135deg, #1a8a5c, #0d6b4e);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  box-shadow: 0 4px 16px rgba(26, 138, 92, 0.35);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(26,138,92,0.3);
+  flex-shrink: 0;
 }
-
-.profile-section-header h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #2d3748;
+.dash-title {
+  font-size: 1.25rem; font-weight: 700; color: #fff; margin: 0;
 }
+body.light-mode .dash-title,
+body:not(.dark-mode):not(.light-mode) .dash-title { color: #fff; }
+body.dark-mode .dash-title { color: #e2e8f0; }
 
-body.dark-mode .profile-section-header h2 {
-  color: #e2e8f0;
-}
-
-/* Profile Cards */
-.profile-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
-  padding: 1.5rem;
-  margin-bottom: 1.25rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.04);
-}
-
-body.dark-mode .profile-card {
-  background: rgba(45, 55, 72, 0.95);
-  border: 1px solid #4a5568;
-}
-
-.profile-card-title {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-  color: #1a8a5c;
-}
-
-.profile-card-title h3 {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #2d3748;
-}
-
-body.dark-mode .profile-card-title h3 {
-  color: #e2e8f0;
-}
-
-.profile-card-title i {
-  font-size: 1.15rem;
-}
-
-.profile-empty-state {
-  text-align: center;
-  color: #a0aec0;
-  padding: 1rem 0;
-  font-size: 0.95rem;
-}
-
-body.dark-mode .profile-empty-state {
-  color: #718096;
-}
-
-/* Profile Reading Stats Grid */
-.profile-reading-stats {
+/* ── Summary Cards (3 KPI rings / numbers) ── */
+.dash-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  text-align: center;
+  gap: 0.75rem;
+  margin: 0.75rem 0 1rem;
+}
+.summary-card {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 1rem 0.5rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+  backdrop-filter: blur(8px);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.summary-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+body.dark-mode .summary-card {
+  background: rgba(45,55,72,0.6);
+  border-color: rgba(255,255,255,0.06);
+}
+body.light-mode .summary-card {
+  background: rgba(255,255,255,0.92);
+  border-color: rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-.profile-stat-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+/* Ring (Khatmah) */
+.summary-ring-wrap {
+  position: relative; width: 64px; height: 64px;
+}
+.summary-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 5; }
+.ring-fill { fill: none; stroke: #1a8a5c; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+body.dark-mode .ring-bg { stroke: rgba(255,255,255,0.06); }
+body.light-mode .ring-bg { stroke: rgba(0,0,0,0.06); }
+body.light-mode .ring-fill { stroke: #1a8a5c; }
+.ring-pct {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 700; color: #68d391;
+}
+body.light-mode .ring-pct { color: #1a8a5c; }
+
+/* Icon + value */
+.summary-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.azkar-icon { background: rgba(26,138,92,0.12); color: #68d391; }
+.streak-icon { background: rgba(246,173,85,0.12); color: #f6ad55; }
+body.light-mode .azkar-icon { background: rgba(26,138,92,0.08); color: #1a8a5c; }
+body.light-mode .streak-icon { background: rgba(237,137,54,0.08); color: #dd6b20; }
+.summary-value {
+  font-size: 1.5rem; font-weight: 700; color: #f0f0f0; line-height: 1;
+}
+body.light-mode .summary-value { color: #2d3748; }
+body.dark-mode .summary-value { color: #e2e8f0; }
+.summary-label {
+  font-size: 0.7rem; color: #a0aec0; font-weight: 500; text-align: center;
+}
+body.light-mode .summary-label { color: #718096; }
+
+/* ── Generic Dashboard Card ── */
+.dash-card {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 1.15rem;
+  margin-bottom: 0.85rem;
+  backdrop-filter: blur(8px);
+}
+body.dark-mode .dash-card {
+  background: rgba(45,55,72,0.65);
+  border-color: rgba(255,255,255,0.05);
+}
+body.light-mode .dash-card {
+  background: rgba(255,255,255,0.92);
+  border-color: rgba(0,0,0,0.06);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-.profile-stat-value {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #1a8a5c;
+.dash-card-head {
+  display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem;
+}
+.dash-card-icon { color: #68d391; flex-shrink: 0; }
+body.light-mode .dash-card-icon { color: #1a8a5c; }
+.dash-card-head h3 {
+  margin: 0; font-size: 1rem; font-weight: 700; color: #e2e8f0;
+}
+body.light-mode .dash-card-head h3 { color: #2d3748; }
+
+.dash-empty {
+  text-align: center; color: #718096; padding: 0.5rem 0; font-size: 0.88rem;
 }
 
-body.dark-mode .profile-stat-value {
+/* ── Quran mini-stats row ── */
+.dash-quran-stats {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 0.5rem; text-align: center; margin: 0.75rem 0;
+}
+.dash-mini-stat { display: flex; flex-direction: column; gap: 0.15rem; }
+.mini-val { font-size: 1.35rem; font-weight: 700; color: #68d391; }
+body.light-mode .mini-val { color: #1a8a5c; }
+.mini-lbl { font-size: 0.7rem; color: #a0aec0; }
+body.light-mode .mini-lbl { color: #718096; }
+
+/* Continue Reading button */
+.dash-continue-btn {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  width: 100%; padding: 0.65rem; margin-top: 0.5rem;
+  border: 1px solid rgba(26,138,92,0.3);
+  border-radius: 12px;
+  background: rgba(26,138,92,0.08);
   color: #68d391;
+  font-family: "Cairo", sans-serif; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, transform 0.15s;
 }
-
-.profile-stat-label {
-  font-size: 0.78rem;
-  color: #718096;
-  font-weight: 500;
+.dash-continue-btn:hover { background: #1a8a5c; color: #fff; }
+.dash-continue-btn:active { transform: scale(0.97); }
+body.light-mode .dash-continue-btn {
+  background: rgba(26,138,92,0.06); border-color: rgba(26,138,92,0.2); color: #276749;
 }
+body.light-mode .dash-continue-btn:hover { background: #1a8a5c; color: #fff; }
 
-body.dark-mode .profile-stat-label {
-  color: #a0aec0;
-}
-
-/* Sadaqa Card */
-.profile-sadaqa {
-  text-align: center;
-  font-family: "Amiri", serif;
-  line-height: 2;
-  font-size: 1.05rem;
-  color: #4a5568;
-  background: linear-gradient(
-    135deg,
-    rgba(26, 138, 92, 0.07),
-    rgba(212, 168, 71, 0.07)
-  );
-}
-
-body.dark-mode .profile-sadaqa {
-  color: #cbd5e0;
-  background: linear-gradient(
-    135deg,
-    rgba(26, 138, 92, 0.12),
-    rgba(212, 168, 71, 0.12)
-  );
-}
-
-/* Khatmah progress in profile */
-.profile-khatmah-progress {
-  margin-top: 0.5rem;
-}
-
+/* ── Khatmah progress bar (rendered by JS) ── */
+.profile-khatmah-progress { margin-top: 0.5rem; }
 .profile-khatmah-bar {
-  width: 100%;
-  height: 10px;
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 5px;
-  overflow: hidden;
-  margin-bottom: 0.5rem;
+  width: 100%; height: 8px;
+  background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; margin-bottom: 0.4rem;
 }
-
-body.dark-mode .profile-khatmah-bar {
-  background: rgba(255, 255, 255, 0.1);
-}
-
+body.dark-mode .profile-khatmah-bar { background: rgba(255,255,255,0.06); }
+body.light-mode .profile-khatmah-bar { background: rgba(0,0,0,0.06); }
 .profile-khatmah-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #1a8a5c, #d4a847);
-  border-radius: 5px;
-  transition: width 0.5s ease;
+  height: 100%; background: linear-gradient(90deg,#1a8a5c,#d4a847);
+  border-radius: 4px; transition: width 0.5s ease;
 }
-
 .profile-khatmah-info {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: #718096;
+  display: flex; justify-content: space-between; font-size: 0.8rem; color: #a0aec0;
+}
+body.light-mode .profile-khatmah-info { color: #718096; }
+
+/* ── Azkar category bars ── */
+.dash-azkar-bars { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1rem; }
+.azkar-bar-row { display: flex; align-items: center; gap: 0.5rem; }
+.azkar-bar-label { width: 42px; font-size: 0.75rem; font-weight: 600; color: #a0aec0; text-align: start; flex-shrink: 0; }
+body.light-mode .azkar-bar-label { color: #718096; }
+.azkar-bar-track {
+  flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden;
+}
+body.light-mode .azkar-bar-track { background: rgba(0,0,0,0.05); }
+.azkar-bar-fill {
+  height: 100%; border-radius: 4px; transition: width 0.6s ease; min-width: 0;
+}
+.morning-fill { background: linear-gradient(90deg,#f6ad55,#ed8936); width: 0%; }
+.evening-fill { background: linear-gradient(90deg,#63b3ed,#4299e1); width: 0%; }
+.tasbih-fill  { background: linear-gradient(90deg,#68d391,#38a169); width: 0%; }
+.azkar-bar-num { width: 28px; font-size: 0.78rem; font-weight: 700; color: #cbd5e0; text-align: center; }
+body.light-mode .azkar-bar-num { color: #4a5568; }
+
+/* ── Stat pills (4 compact) ── */
+.dash-stat-pills {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 0.5rem; margin-bottom: 0.85rem;
+}
+.stat-pill {
+  display: flex; flex-direction: column; align-items: center; gap: 0.15rem;
+  padding: 0.55rem 0.25rem; border-radius: 12px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06);
+}
+body.dark-mode .stat-pill { background: rgba(26,32,44,0.4); }
+body.light-mode .stat-pill { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.05); }
+.stat-pill svg { flex-shrink: 0; }
+.pill-streak svg { color: #f6ad55; }
+.pill-today svg  { color: #68d391; }
+.pill-week svg   { color: #63b3ed; }
+.pill-total svg  { color: #b794f4; }
+.stat-pill span {
+  font-size: 1.15rem; font-weight: 700; color: #e2e8f0; line-height: 1;
+}
+body.light-mode .stat-pill span { color: #2d3748; }
+.stat-pill small {
+  font-size: 0.62rem; color: #718096; font-weight: 500;
 }
 
-body.dark-mode .profile-khatmah-info {
-  color: #a0aec0;
+/* ── Weekly mini chart ── */
+.dash-weekly {
+  background: rgba(255,255,255,0.04); border-radius: 12px; padding: 0.75rem;
 }
+body.dark-mode .dash-weekly { background: rgba(26,32,44,0.5); }
+body.light-mode .dash-weekly { background: rgba(0,0,0,0.02); }
+.dash-weekly h4 {
+  font-size: 0.82rem; font-weight: 600; color: #a0aec0; margin: 0 0 0.5rem;
+}
+body.light-mode .dash-weekly h4 { color: #4a5568; }
+.dash-bars {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  height: 70px; gap: 4px;
+}
+.dash-bar-col {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.dash-bar-col .bar {
+  width: 100%; min-height: 6px;
+  background: linear-gradient(to top,#1a8a5c,#d4a847);
+  border-radius: 3px 3px 0 0; transition: height 0.5s ease;
+}
+.dash-bar-col span {
+  font-size: 0.58rem; color: #718096; white-space: nowrap;
+}
+body.light-mode .dash-bar-col span { color: #a0aec0; }
 
-/* Responsive tweaks for bottom nav & profile */
+/* ── Sadaqa card ── */
+.dash-sadaqa {
+  text-align: center; font-family: "Amiri", serif; line-height: 2;
+  font-size: 1rem; color: #cbd5e0;
+  background: linear-gradient(135deg,rgba(26,138,92,0.08),rgba(212,168,71,0.08)) !important;
+}
+body.light-mode .dash-sadaqa { color: #4a5568; }
+
+/* ── Responsive ── */
 @media (max-width: 480px) {
-  .bottom-nav-item {
-    font-size: 0.6rem;
-  }
-  .bottom-nav-item svg {
-    width: 22px;
-    height: 22px;
-  }
-  .profile-reading-stats {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-  }
-  .profile-stat-value {
-    font-size: 1.3rem;
-  }
+  .dash-summary { gap: 0.5rem; }
+  .summary-ring-wrap { width: 52px; height: 52px; }
+  .summary-value { font-size: 1.25rem; }
+  .summary-label { font-size: 0.62rem; }
+  .dash-stat-pills { grid-template-columns: repeat(2,1fr); }
+  .mini-val { font-size: 1.15rem; }
+  .bottom-nav-item { font-size: 0.6rem; }
+  .bottom-nav-item svg { width: 22px; height: 22px; }
 }
 
 /* ═══════════════════════════════════════════════════════
