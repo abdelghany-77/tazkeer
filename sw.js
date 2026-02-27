@@ -1,4 +1,4 @@
-const CACHE_NAME = "tazkeer-v6.7";
+const CACHE_NAME = "tazkeer-v6.8";
 const urlsToCache = [
   "./",
   "./index.html",
