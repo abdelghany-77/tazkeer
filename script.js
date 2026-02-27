@@ -2361,8 +2361,8 @@ function saveSwiperPosition(category, index) {
 }
 
 // ── Font-size stepping ──────────────────────────────
-const SWIPER_FONT_SIZES = [1.05, 1.3, 1.6, 1.9, 2.25, 2.6]; // rem steps
-let swiperFontSizeIndex = 3; // default → 1.9 rem (matches new card design)
+const SWIPER_FONT_SIZES = [0.85, 1.05, 1.25, 1.45, 1.7, 2.0]; // rem steps
+let swiperFontSizeIndex = 2; // default → 1.25 rem (smaller to avoid header overlap)
 
 // ── Floating settings menu ──────────────────────────
 function toggleSwiperSettings() {
@@ -3610,8 +3610,8 @@ function displayPrayerTimes(cityName) {
 
   if (!grid || !prayerTimesData) return;
 
-  // Main prayers to display
-  const mainPrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+  // Main prayers to display (including Sunrise)
+  const mainPrayers = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
   grid.innerHTML = mainPrayers
     .map((prayer) => {
@@ -3635,11 +3635,11 @@ function displayPrayerTimes(cityName) {
     .join("");
 }
 
-// Convert 24-hour time to 12-hour AM/PM format
+// Convert 24-hour time to 12-hour AM/PM format (Arabic)
 function formatTo12Hour(time24) {
   const [hours, minutes] = time24.split(":");
   let hour = parseInt(hours);
-  const period = hour >= 12 ? "PM" : "AM";
+  const period = hour >= 12 ? "م" : "ص";
 
   hour = hour % 12 || 12; // Convert 0 to 12 for midnight
 
@@ -3700,9 +3700,9 @@ function updateCountdown() {
 
   if (countdownTimeEl) {
     if (hours > 0) {
-      countdownTimeEl.textContent = `${hours} ساعة و ${minutes} دقيقة`;
+      countdownTimeEl.textContent = `متبقي ${hours} ساعة و${minutes} دقيقة`;
     } else {
-      countdownTimeEl.textContent = `${minutes} دقيقة`;
+      countdownTimeEl.textContent = `متبقي ${minutes} دقيقة`;
     }
   }
 

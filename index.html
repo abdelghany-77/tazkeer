@@ -76,10 +76,10 @@
       <section id="tab-home" class="tab-content active-tab">
 
         <!-- Welcome Section -->
-        <div class="welcome-section">
+        <!-- <div class="welcome-section">
           <h2 class="welcome-title">أهلاً وسهلاً بك في تطبيق ذَكِّرْ</h2>
           <p class="welcome-description">رفيقك اليومي في ذكر الله</p>
-        </div>
+        </div> -->
 
         <!-- Date and Daily Duaa Section -->
         <div class="daily-info-section">
@@ -107,24 +107,22 @@
         <!-- Prayer Times Section -->
         <div class="prayer-times-section" id="prayerTimesSection">
           <div class="prayer-times-header">
+            <div class="prayer-times-location" id="prayerLocation">
+              <button class="location-btn" id="locationBtn" title="تحديث الموقع">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="cityName">جاري تحديد الموقع...</span>
+              </button>
+            </div>
             <h3 class="prayer-times-title">
+              مواقيت الصلاة
               <i class="fas fa-mosque"></i>
-              مواعيد الصلاة
             </h3>
-            <button class="location-btn" id="locationBtn" title="تحديث الموقع">
-              <i class="fas fa-location-crosshairs"></i>
-            </button>
-          </div>
-
-          <div class="prayer-times-location" id="prayerLocation">
-            <i class="fas fa-map-marker-alt"></i>
-            <span id="cityName">جاري تحديد الموقع...</span>
           </div>
 
           <div class="next-prayer-countdown" id="nextPrayerCountdown">
-            <div class="countdown-label">الصلاة القادمة</div>
-            <div class="countdown-prayer" id="nextPrayerName">—</div>
-            <div class="countdown-time" id="countdownTime">—</div>
+            <span class="countdown-label">الصلاة القادمة</span>
+            <span class="countdown-prayer" id="nextPrayerName">—</span>
+            <span class="countdown-time" id="countdownTime">—</span>
           </div>
 
           <div class="prayer-times-grid" id="prayerTimesGrid">

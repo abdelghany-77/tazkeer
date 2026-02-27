@@ -648,9 +648,6 @@ function renderKhatmahDashboard() {
 
   container.innerHTML = `
     <div class="khatmah-dashboard">
-      <div class="khatmah-dashboard-header">
-        <h2><i class="fas fa-quran"></i> ختمتك</h2>
-      </div>
 
       <!-- Progress Ring -->
       <div class="khatmah-progress-ring-container">
