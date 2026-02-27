@@ -1524,7 +1524,8 @@ function updateProfileTab() {
   if (ring) {
     var circumference = 2 * Math.PI * 34; // r = 34
     ring.style.strokeDasharray = circumference;
-    ring.style.strokeDashoffset = circumference - (circumference * progress) / 100;
+    ring.style.strokeDashoffset =
+      circumference - (circumference * progress) / 100;
   }
   if (pctEl) pctEl.textContent = progress + "%";
 

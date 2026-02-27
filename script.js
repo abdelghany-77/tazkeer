@@ -3839,9 +3839,15 @@ function updateAzkarCategoryBars() {
   // tasbeeh-like counts come from "general" category
   var tasbihTotal = adhkarData.general ? adhkarData.general.adhkar.length : 0;
 
-  var morningDone = completed.filter(function(id) { return id.startsWith("morning_"); }).length;
-  var eveningDone = completed.filter(function(id) { return id.startsWith("evening_"); }).length;
-  var tasbihDone = completed.filter(function(id) { return id.startsWith("general_"); }).length;
+  var morningDone = completed.filter(function (id) {
+    return id.startsWith("morning_");
+  }).length;
+  var eveningDone = completed.filter(function (id) {
+    return id.startsWith("evening_");
+  }).length;
+  var tasbihDone = completed.filter(function (id) {
+    return id.startsWith("general_");
+  }).length;
 
   var barMorning = document.getElementById("barMorning");
   var barEvening = document.getElementById("barEvening");
@@ -3850,9 +3856,15 @@ function updateAzkarCategoryBars() {
   var numEvening = document.getElementById("numEvening");
   var numTasbih = document.getElementById("numTasbih");
 
-  if (barMorning) barMorning.style.width = (morningTotal ? (morningDone / morningTotal) * 100 : 0) + "%";
-  if (barEvening) barEvening.style.width = (eveningTotal ? (eveningDone / eveningTotal) * 100 : 0) + "%";
-  if (barTasbih) barTasbih.style.width = (tasbihTotal ? (tasbihDone / tasbihTotal) * 100 : 0) + "%";
+  if (barMorning)
+    barMorning.style.width =
+      (morningTotal ? (morningDone / morningTotal) * 100 : 0) + "%";
+  if (barEvening)
+    barEvening.style.width =
+      (eveningTotal ? (eveningDone / eveningTotal) * 100 : 0) + "%";
+  if (barTasbih)
+    barTasbih.style.width =
+      (tasbihTotal ? (tasbihDone / tasbihTotal) * 100 : 0) + "%";
 
   if (numMorning) numMorning.textContent = morningDone + "/" + morningTotal;
   if (numEvening) numEvening.textContent = eveningDone + "/" + eveningTotal;
