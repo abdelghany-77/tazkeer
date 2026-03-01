@@ -401,6 +401,7 @@ function preloadAdjacentPages(page) {
  */
 function showQuranPage() {
   khatmahState = loadKhatmahState();
+  initMushafTheme();
 
   if (quranViewerState.currentView === "reader") {
     renderMushafViewer();
@@ -816,8 +817,15 @@ function renderMushafViewer() {
             <i class="fas fa-bookmark"></i>
           </button>
 
-          <!-- Settings Dropdown (Page Jump only) -->
+          <!-- Settings Dropdown -->
           <div class="mushaf-settings-dropdown" id="mushafSettingsDropdown">
+            <div class="settings-section">
+              <span class="settings-section-label">المظهر</span>
+              <button class="settings-theme-btn" onclick="toggleMushafTheme()">
+                <i class="fas fa-${document.body.classList.contains("mushaf-dark-mode") ? "sun" : "moon"}" id="mushafThemeIcon"></i>
+                <span>تبديل المظهر</span>
+              </button>
+            </div>
             <div class="settings-section">
               <span class="settings-section-label">انتقال لصفحة</span>
               <div class="settings-page-jump">
@@ -1456,6 +1464,25 @@ function toggleBookmark(page) {
 }
 
 // ===== SETTINGS DROPDOWN =====
+
+function initMushafTheme() {
+  const savedTheme = localStorage.getItem("mushaf-theme") || "light";
+  if (savedTheme === "dark") {
+    document.body.classList.add("mushaf-dark-mode");
+  } else {
+    document.body.classList.remove("mushaf-dark-mode");
+  }
+}
+
+function toggleMushafTheme() {
+  const isDark = document.body.classList.toggle("mushaf-dark-mode");
+  localStorage.setItem("mushaf-theme", isDark ? "dark" : "light");
+
+  const icon = document.getElementById("mushafThemeIcon");
+  if (icon) {
+    icon.className = isDark ? "fas fa-sun" : "fas fa-moon";
+  }
+}
 
 function toggleMushafSettings() {
   const dropdown = document.getElementById("mushafSettingsDropdown");

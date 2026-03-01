@@ -19,7 +19,7 @@
 }
 
 /* Dark mode overrides */
-.dark-mode {
+.mushaf-dark-mode {
   --quran-bg: #1a1a2e;
   --quran-text: #e8dcc8;
   --quran-page-bg: #16213e;
@@ -116,7 +116,7 @@
   overflow: hidden;
 }
 
-.dark-mode .khatmah-setup-card {
+.mushaf-dark-mode .khatmah-setup-card {
   background: rgba(30, 30, 50, 0.95);
 }
 
@@ -149,7 +149,7 @@
   font-family: "Cairo", serif;
 }
 
-.dark-mode .goal-type-btn {
+.mushaf-dark-mode .goal-type-btn {
   background: #1a1a2e;
   border-color: #2d3748;
   color: #e8dcc8;
@@ -163,7 +163,7 @@
   background: rgba(26, 138, 92, 0.08);
   box-shadow: 0 4px 15px rgba(26, 138, 92, 0.2);
 }
-.dark-mode .goal-type-btn.active {
+.mushaf-dark-mode .goal-type-btn.active {
   background: rgba(26, 138, 92, 0.15);
 }
 .goal-type-btn i {
@@ -178,7 +178,7 @@
   color: #2d3748;
   display: block;
 }
-.dark-mode .goal-type-btn .goal-label {
+.mushaf-dark-mode .goal-type-btn .goal-label {
   color: #e8dcc8;
 }
 .goal-type-btn .goal-desc {
@@ -199,7 +199,7 @@
   color: #2d3748;
   margin-bottom: 0.8rem;
 }
-.dark-mode .goal-input-label {
+.mushaf-dark-mode .goal-input-label {
   color: #e8dcc8;
 }
 
@@ -235,7 +235,7 @@
   border-color: var(--quran-primary);
   box-shadow: 0 0 0 3px rgba(26, 138, 92, 0.15);
 }
-.dark-mode .goal-number-input {
+.mushaf-dark-mode .goal-number-input {
   background: rgba(26, 138, 92, 0.12);
   border-color: rgba(26, 138, 92, 0.4);
   color: #4fd1a5;
@@ -263,7 +263,7 @@
 .goal-adjust-btn:active {
   transform: scale(0.95);
 }
-.dark-mode .goal-adjust-btn {
+.mushaf-dark-mode .goal-adjust-btn {
   background: #1a1a2e;
   border-color: rgba(26, 138, 92, 0.4);
   color: #4fd1a5;
@@ -275,7 +275,7 @@
   color: #718096;
   min-width: 40px;
 }
-.dark-mode .goal-unit-label {
+.mushaf-dark-mode .goal-unit-label {
   color: #a0aec0;
 }
 
@@ -331,12 +331,12 @@
   background: rgba(26, 138, 92, 0.1);
   color: var(--quran-primary);
 }
-.dark-mode .juz-start-btn {
+.mushaf-dark-mode .juz-start-btn {
   background: #1a1a2e;
   border-color: #2d3748;
   color: #a0aec0;
 }
-.dark-mode .juz-start-btn.active {
+.mushaf-dark-mode .juz-start-btn.active {
   border-color: var(--quran-primary);
   background: rgba(26, 138, 92, 0.15);
   color: #4fd1a5;
@@ -361,7 +361,7 @@
 .juz-start-select:focus {
   border-color: var(--quran-primary);
 }
-.dark-mode .juz-start-select {
+.mushaf-dark-mode .juz-start-select {
   background: #1a1a2e;
   border-color: #2d3748;
   color: #e8dcc8;
@@ -383,7 +383,7 @@
   font-size: 0.95rem;
   color: #4a5568;
 }
-.dark-mode .calc-row {
+.mushaf-dark-mode .calc-row {
   color: #a0aec0;
 }
 .calc-row:not(:last-child) {
@@ -522,7 +522,7 @@
   text-align: center;
   box-shadow: 0 4px 15px var(--quran-shadow);
 }
-.dark-mode .khatmah-stat-card {
+.mushaf-dark-mode .khatmah-stat-card {
   background: rgba(30, 30, 50, 0.95);
 }
 .khatmah-stat-card i {
@@ -536,7 +536,7 @@
   color: #2d3748;
   display: block;
 }
-.dark-mode .khatmah-stat-value {
+.mushaf-dark-mode .khatmah-stat-value {
   color: #e8dcc8;
 }
 .khatmah-stat-label {
@@ -990,6 +990,31 @@
   font-family: "Cairo", serif;
 }
 
+.settings-theme-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--quran-border);
+  border-radius: 8px;
+  color: var(--quran-text);
+  font-family: "Cairo", serif;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: right;
+}
+.settings-theme-btn:hover {
+  background: rgba(26, 138, 92, 0.1);
+  border-color: var(--quran-primary);
+}
+.settings-theme-btn i {
+  color: var(--quran-primary);
+  font-size: 1.1rem;
+}
+
 .settings-page-jump {
   display: flex;
   align-items: center;
@@ -1088,10 +1113,10 @@
   }
 }
 
-body.dark-mode .mushaf-page-img {
+.mushaf-dark-mode .mushaf-page-img {
   filter: invert(0.88) hue-rotate(180deg);
 }
-body.dark-mode .mushaf-image-area::before {
+.mushaf-dark-mode .mushaf-image-area::before {
   background: linear-gradient(
     110deg,
     transparent 30%,
@@ -1269,7 +1294,7 @@ body.dark-mode .mushaf-image-area::before {
   margin: 1rem;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
-.dark-mode .khatmah-complete-card {
+.mushaf-dark-mode .khatmah-complete-card {
   background: #1a1a2e;
 }
 .khatmah-complete-card .complete-icon {
@@ -1393,25 +1418,25 @@ body.dark-mode .mushaf-image-area::before {
 }
 
 /* ===== Dark mode extras ===== */
-.dark-mode .surah-list-card {
+.mushaf-dark-mode .surah-list-card {
   background: var(--quran-page-bg);
   border-color: rgba(212, 168, 71, 0.3);
 }
-.dark-mode .surah-list-card:hover {
+.mushaf-dark-mode .surah-list-card:hover {
   background: var(--quran-bg);
 }
-.dark-mode .wird-card {
+.mushaf-dark-mode .wird-card {
   background: var(--quran-page-bg);
   border-color: rgba(212, 168, 71, 0.5);
 }
-.dark-mode .wird-card-progress-bar {
+.mushaf-dark-mode .wird-card-progress-bar {
   background: rgba(255, 255, 255, 0.1);
 }
-.dark-mode .khatmah-complete-card-dashboard {
+.mushaf-dark-mode .khatmah-complete-card-dashboard {
   background: var(--quran-page-bg);
   border-color: rgba(212, 168, 71, 0.5);
 }
-.dark-mode .surah-list-back {
+.mushaf-dark-mode .surah-list-back {
   border-color: rgba(212, 168, 71, 0.3);
 }
 
@@ -1487,7 +1512,7 @@ body.dark-mode .mushaf-image-area::before {
   overflow: hidden;
   margin-bottom: 0.5rem;
 }
-body.dark-mode .profile-khatmah-bar {
+.mushaf-dark-mode .profile-khatmah-bar {
   background: #2d3748;
 }
 .profile-khatmah-fill {
@@ -1502,6 +1527,6 @@ body.dark-mode .profile-khatmah-bar {
   font-size: 0.85rem;
   color: #4a5568;
 }
-body.dark-mode .profile-khatmah-info {
+.mushaf-dark-mode .profile-khatmah-info {
   color: #a0aec0;
 }
