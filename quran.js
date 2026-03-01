@@ -1466,11 +1466,11 @@ function toggleBookmark(page) {
 // ===== SETTINGS DROPDOWN =====
 
 function initMushafTheme() {
-  const savedTheme = localStorage.getItem("mushaf-theme") || "light";
-  if (savedTheme === "dark") {
-    document.body.classList.add("mushaf-dark-mode");
-  } else {
+  const savedTheme = localStorage.getItem("mushaf-theme") || "dark";
+  if (savedTheme === "light") {
     document.body.classList.remove("mushaf-dark-mode");
+  } else {
+    document.body.classList.add("mushaf-dark-mode");
   }
 }
 
