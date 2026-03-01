@@ -545,7 +545,6 @@ function renderKhatmahSetup() {
     <div class="khatmah-setup">
       <div class="khatmah-setup-header">
         <h2><i class="fas fa-quran"></i> ابدأ ختمة جديدة</h2>
-        <p>حدد هدفك وابدأ رحلتك مع القرآن الكريم</p>
       </div>
 
       <div class="khatmah-setup-card">

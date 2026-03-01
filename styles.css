@@ -3038,7 +3038,7 @@ body.dark-mode .install-prompt .install-btn.secondary:hover {
   overflow: hidden;
 }
 
-.prayer-times-section::before {
+/* .prayer-times-section::before {
   content: "";
   position: absolute;
   top: 0;
@@ -3046,7 +3046,7 @@ body.dark-mode .install-prompt .install-btn.secondary:hover {
   right: 0;
   height: 4px;
   background: linear-gradient(90deg, #1a8a5c, #d4a847);
-}
+} */
 
 .prayer-times-header {
   display: flex;
