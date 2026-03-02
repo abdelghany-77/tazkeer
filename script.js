@@ -1566,30 +1566,23 @@ function showManualInstallInstructions() {
     instructions = `
       <div class="install-steps active">
         <div class="install-step">
+          <div class="step-icon"><i class="fas fa-download" style="color: #007AFF;"></i></div>
+          <div class="step-content">
+            <h5>تحميل التطبيق</h5>
+            <p>اضغط على زر <strong>تثبيت التطبيق</strong> في أعلى الشاشة، ثم اتبع التعليمات.</p>
+          </div>
+        </div>
+        <div class="install-step">
           <div class="step-icon">📲</div>
           <div class="step-content">
-            <h5>الخطوة 1</h5>
-            <p>اضغط على زر <strong>المشاركة</strong> <i class="fas fa-share" style="color: #007AFF;"></i> في الأسفل</p>
-          </div>
-        </div>
-        <div class="install-step">
-          <div class="step-icon">➕</div>
-          <div class="step-content">
-            <h5>الخطوة 2</h5>
-            <p>مرّر للأسفل واختر "<strong>إضافة إلى الشاشة الرئيسية</strong>"</p>
-          </div>
-        </div>
-        <div class="install-step">
-          <div class="step-icon">✅</div>
-          <div class="step-content">
-            <h5>الخطوة 3</h5>
-            <p>اضغط "<strong>إضافة</strong>" في الأعلى للتأكيد</p>
+            <h5>أو يدوياً</h5>
+            <p>اضغط على زر <strong>المشاركة</strong> <i class="fas fa-share" style="color: #007AFF;"></i> ثم "<strong>إضافة إلى الشاشة الرئيسية</strong>"</p>
           </div>
         </div>
       </div>
       <div class="install-note">
         <i class="fas fa-info-circle"></i>
-        <span>تأكد من استخدام متصفح <strong>Safari</strong></span>
+        <span>لأفضل تجربة، استخدم متصفح <strong>Safari</strong></span>
       </div>
     `;
   } else if (isAndroid) {
@@ -1597,24 +1590,17 @@ function showManualInstallInstructions() {
     instructions = `
       <div class="install-steps active">
         <div class="install-step">
-          <div class="step-icon">⋮</div>
+          <div class="step-icon"><i class="fas fa-download" style="color: #4CAF50;"></i></div>
           <div class="step-content">
             <h5>الخطوة 1</h5>
-            <p>اضغط على <strong>القائمة</strong> (⋮) في أعلى المتصفح</p>
-          </div>
-        </div>
-        <div class="install-step">
-          <div class="step-icon">🏠</div>
-          <div class="step-content">
-            <h5>الخطوة 2</h5>
-            <p>اختر "<strong>إضافة إلى الشاشة الرئيسية</strong>" أو "<strong>Add to Home screen</strong>"</p>
+            <p>اضغط على زر <strong>تثبيت التطبيق <i class="fas fa-download"></i></strong> في أعلى الشاشة.</p>
           </div>
         </div>
         <div class="install-step">
           <div class="step-icon">✅</div>
           <div class="step-content">
-            <h5>الخطوة 3</h5>
-            <p>اضغط "<strong>إضافة</strong>" أو "<strong>Add</strong>" للتأكيد</p>
+            <h5>الخطوة 2</h5>
+            <p>قم بتأكيد التحميل بالضغط على "<strong>تثبيت</strong>" للتمتع بالتطبيق بدون إنترنت.</p>
           </div>
         </div>
       </div>
@@ -1625,24 +1611,17 @@ function showManualInstallInstructions() {
     instructions = `
       <div class="install-steps active">
         <div class="install-step">
-          <div class="step-icon">🔍</div>
+          <div class="step-icon"><i class="fas fa-download" style="color: #4CAF50;"></i></div>
           <div class="step-content">
             <h5>الخطوة 1</h5>
-            <p>ابحث عن أيقونة <strong>التثبيت</strong> <i class="fas fa-plus-circle"></i> في شريط العنوان</p>
-          </div>
-        </div>
-        <div class="install-step">
-          <div class="step-icon">⚙️</div>
-          <div class="step-content">
-            <h5>الخطوة 2</h5>
-            <p>أو استخدم <strong>قائمة المتصفح</strong> واختر "إضافة إلى الشاشة الرئيسية"</p>
+            <p>اضغط على زر <strong>تثبيت التطبيق <i class="fas fa-download"></i></strong> في أعلى الشاشة.</p>
           </div>
         </div>
         <div class="install-step">
           <div class="step-icon">✅</div>
           <div class="step-content">
-            <h5>الخطوة 3</h5>
-            <p>اتبع التعليمات التي تظهر لك</p>
+            <h5>الخطوة 2</h5>
+            <p>قم بتأكيد التحميل لتثبيت التطبيق على جهازك والوصول إليه سريعاً.</p>
           </div>
         </div>
       </div>
@@ -1654,8 +1633,8 @@ function showManualInstallInstructions() {
       <span class="close" onclick="dismissInstallModal(true)">&times;</span>
       <div class="install-content">
         <div class="install-header">
-          <h3>أضف التطبيق للشاشة الرئيسية</h3>
-          <p class="install-subtitle">للوصول السريع والسهل لأذكارك اليومية</p>
+          <h3>قم بتحميل التطبيق الآن</h3>
+          <p class="install-subtitle">للوصول السريع والسهل لأذكارك اليومية بدون إنترنت</p>
         </div>
         
         <div class="device-badge">${deviceName}</div>
