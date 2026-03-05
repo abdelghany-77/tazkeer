@@ -3757,6 +3757,14 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
 
     if (data.code === 200 && data.data) {
       prayerTimesData = data.data.timings;
+
+      // Cache the prayer times for offline use
+      localStorage.setItem(
+        "cachedPrayerTimes",
+        JSON.stringify(prayerTimesData),
+      );
+      localStorage.setItem("cachedPrayerCity", cityName);
+
       displayPrayerTimes(cityName);
       startCountdown();
 
@@ -3767,7 +3775,31 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
     }
   } catch (err) {
     console.error("Prayer times fetch error:", err);
-    showPrayerTimesError("تعذر تحميل مواقيت الصلاة");
+
+    // Check cache
+    const cachedDataStr = localStorage.getItem("cachedPrayerTimes");
+    const cachedCity = localStorage.getItem("cachedPrayerCity");
+
+    if (cachedDataStr) {
+      try {
+        prayerTimesData = JSON.parse(cachedDataStr);
+        displayPrayerTimes(cachedCity || cityName);
+        startCountdown();
+
+        if (loading) loading.style.display = "none";
+        if (error) error.classList.add("hidden");
+
+        showEnhancedNotification(
+          "أنت غير متصل. تم عرض مواقيت الصلاة المحفوظة مسبقاً.",
+          "warning",
+          5000,
+        );
+      } catch (e) {
+        showPrayerTimesError("تعذر تحميل مواقيت الصلاة");
+      }
+    } else {
+      showPrayerTimesError("تعذر تحميل مواقيت الصلاة");
+    }
   }
 }
 

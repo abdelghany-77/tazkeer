@@ -366,6 +366,7 @@ function loadPageImage(pageNumber) {
 
   return new Promise((resolve, reject) => {
     const img = new Image();
+    img.crossOrigin = "Anonymous"; // Required to get a CORS response with status 200 so SW can cache it
     img.onload = () => {
       imageCache.set(url, img);
       resolve(img);
@@ -603,7 +604,7 @@ function openKhatmahReader() {
  */
 function completeWirdAndReturn() {
   if (typeof showNotification === "function") {
-    showNotification("أتممت الورد! بارك الله فيك 🌟");
+    showNotification("أتممت الورد! بارك الله فيك ");
   }
   renderKhatmahDashboard();
 }
@@ -845,6 +846,7 @@ function renderMushafViewer() {
           id="mushafPageImg"
           src="${imageUrl}"
           alt="صفحة ${page} من المصحف"
+          crossorigin="anonymous"
           draggable="false"
         />
 
