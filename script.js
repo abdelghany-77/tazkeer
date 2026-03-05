@@ -1739,23 +1739,216 @@ function showCategoryPage(categoryKey) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+// SVG icons for category cards (matching the reference design)
+const categoryIcons = {
+  morning: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.6"/>
+        <stop offset="100%" style="stop-color:#FFD700;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="40" fill="url(#sunGlow)"/>
+    <circle cx="50" cy="50" r="20" fill="#FFD700"/>
+    <circle cx="50" cy="50" r="16" fill="#FFA500"/>
+    <g stroke="#FFD700" stroke-width="3" stroke-linecap="round">
+      <line x1="50" y1="10" x2="50" y2="22"/>
+      <line x1="50" y1="78" x2="50" y2="90"/>
+      <line x1="10" y1="50" x2="22" y2="50"/>
+      <line x1="78" y1="50" x2="90" y2="50"/>
+      <line x1="21" y1="21" x2="30" y2="30"/>
+      <line x1="70" y1="70" x2="79" y2="79"/>
+      <line x1="79" y1="21" x2="70" y2="30"/>
+      <line x1="30" y1="70" x2="21" y2="79"/>
+    </g>
+  </svg>`,
+  evening: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:0.3"/>
+        <stop offset="100%" style="stop-color:#87CEEB;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="40" fill="url(#moonGlow)"/>
+    <path d="M55 20 C35 20, 20 40, 25 60 C30 80, 55 85, 70 70 C55 75, 40 60, 40 45 C40 30, 50 20, 55 20Z" fill="#C0D8E8"/>
+    <path d="M55 20 C35 20, 20 40, 25 60 C30 80, 55 85, 70 70 C55 75, 40 60, 40 45 C40 30, 50 20, 55 20Z" fill="url(#moonGlow)" opacity="0.5"/>
+    <circle cx="68" cy="28" r="2" fill="#FFD700"/>
+    <circle cx="78" cy="40" r="1.5" fill="#FFD700"/>
+    <circle cx="75" cy="55" r="2.5" fill="#FFD700"/>
+    <circle cx="82" cy="30" r="1" fill="#FFD700"/>
+    <circle cx="85" cy="48" r="1.5" fill="#FFD700"/>
+    <path d="M65 22 l2 5 5 0 -4 3 1.5 5 -4.5-3 -4.5 3 1.5-5 -4-3 5 0z" fill="#FFD700" transform="scale(0.6) translate(35, 10)"/>
+  </svg>`,
+  prayer: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="prayGlow" cx="50%" cy="40%" r="50%">
+        <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.4"/>
+        <stop offset="100%" style="stop-color:#FFD700;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="40" r="35" fill="url(#prayGlow)"/>
+    <path d="M35 75 C35 50, 30 40, 30 30 C30 20, 35 15, 40 25 C42 30, 43 40, 45 50 L50 35 L55 50 C57 40, 58 30, 60 25 C65 15, 70 20, 70 30 C70 40, 65 50, 65 75Z" fill="#E8D5B0" stroke="#D4A847" stroke-width="1"/>
+    <path d="M42 30 C44 25, 46 22, 50 22 C54 22, 56 25, 58 30" fill="none" stroke="#FFD700" stroke-width="2" opacity="0.6"/>
+    <circle cx="50" cy="18" r="3" fill="#FFD700" opacity="0.5"/>
+  </svg>`,
+  sleep: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bedGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#7B9EC7"/>
+        <stop offset="100%" style="stop-color:#5A7FA0"/>
+      </linearGradient>
+    </defs>
+    <rect x="15" y="55" width="70" height="20" rx="4" fill="url(#bedGrad)"/>
+    <rect x="12" y="70" width="4" height="12" rx="2" fill="#5A7FA0"/>
+    <rect x="84" y="70" width="4" height="12" rx="2" fill="#5A7FA0"/>
+    <rect x="80" y="48" width="5" height="25" rx="2" fill="#5A7FA0"/>
+    <ellipse cx="30" cy="50" rx="12" ry="8" fill="#A8C4DB"/>
+    <circle cx="35" cy="42" r="8" fill="#D4B896"/>
+    <text x="60" y="40" font-size="14" fill="#87CEEB" font-weight="bold" opacity="0.8">Z</text>
+    <text x="68" y="30" font-size="10" fill="#87CEEB" font-weight="bold" opacity="0.6">Z</text>
+    <text x="74" y="22" font-size="8" fill="#87CEEB" font-weight="bold" opacity="0.4">Z</text>
+  </svg>`,
+  wakeup: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sunriseGrad" x1="50%" y1="100%" x2="50%" y2="0%">
+        <stop offset="0%" style="stop-color:#FF6B35;stop-opacity:0.6"/>
+        <stop offset="50%" style="stop-color:#FFD700;stop-opacity:0.3"/>
+        <stop offset="100%" style="stop-color:#FFD700;stop-opacity:0"/>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="60" width="100" height="40" fill="url(#sunriseGrad)" opacity="0.3"/>
+    <circle cx="50" cy="62" r="18" fill="#FFD700"/>
+    <circle cx="50" cy="62" r="14" fill="#FFA500"/>
+    <line x1="10" y1="62" x2="90" y2="62" stroke="#C0D8E8" stroke-width="2" opacity="0.5"/>
+    <g stroke="#FFD700" stroke-width="2.5" stroke-linecap="round" opacity="0.8">
+      <line x1="50" y1="32" x2="50" y2="40"/>
+      <line x1="25" y1="42" x2="32" y2="48"/>
+      <line x1="75" y1="42" x2="68" y2="48"/>
+      <line x1="15" y1="56" x2="24" y2="56"/>
+      <line x1="85" y1="56" x2="76" y2="56"/>
+    </g>
+  </svg>`,
+  general: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="personGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:0.3"/>
+        <stop offset="100%" style="stop-color:#87CEEB;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="40" fill="url(#personGlow)"/>
+    <circle cx="50" cy="30" r="10" fill="#C0D8E8"/>
+    <path d="M50 42 L50 65" stroke="#C0D8E8" stroke-width="4" stroke-linecap="round"/>
+    <path d="M50 48 L30 35" stroke="#C0D8E8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M50 48 L70 35" stroke="#C0D8E8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M50 65 L35 82" stroke="#C0D8E8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M50 65 L65 82" stroke="#C0D8E8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M45 15 C38 10, 30 15, 35 22 C28 18, 30 10, 38 8 C42 7, 46 10, 45 15Z" fill="#C0D8E8" opacity="0.8"/>
+  </svg>`,
+  food: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="foodGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.3"/>
+        <stop offset="100%" style="stop-color:#FFD700;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="55" r="35" fill="url(#foodGlow)"/>
+    <ellipse cx="50" cy="60" rx="30" ry="15" fill="none" stroke="#D4A847" stroke-width="2.5"/>
+    <path d="M20 60 Q50 35 80 60" fill="none" stroke="#D4A847" stroke-width="2.5"/>
+    <path d="M30 40 Q35 20 30 10" fill="none" stroke="#C0D8E8" stroke-width="2" opacity="0.5"/>
+    <path d="M50 35 Q55 15 50 5" fill="none" stroke="#C0D8E8" stroke-width="2" opacity="0.5"/>
+    <path d="M70 40 Q75 20 70 10" fill="none" stroke="#C0D8E8" stroke-width="2" opacity="0.5"/>
+  </svg>`,
+  travel: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="travelGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:0.3"/>
+        <stop offset="100%" style="stop-color:#87CEEB;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="40" fill="url(#travelGlow)"/>
+    <path d="M50 20 L55 45 L75 50 L55 55 L50 80 L45 55 L25 50 L45 45Z" fill="#87CEEB" opacity="0.8"/>
+    <circle cx="50" cy="50" r="6" fill="#5A7FA0"/>
+    <ellipse cx="30" cy="30" rx="12" ry="5" fill="#C0D8E8" opacity="0.4"/>
+    <ellipse cx="72" cy="25" rx="10" ry="4" fill="#C0D8E8" opacity="0.3"/>
+  </svg>`,
+  dua: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="duaGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style="stop-color:#1a8a5c;stop-opacity:0.4"/>
+        <stop offset="100%" style="stop-color:#1a8a5c;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="40" fill="url(#duaGlow)"/>
+    <path d="M30 80 Q30 55 35 45 Q38 38 43 40 L47 50 L50 38 L53 50 L57 40 Q62 38 65 45 Q70 55 70 80Z" fill="#2d9d6e" opacity="0.8"/>
+    <path d="M40 35 L50 20 L60 35" fill="none" stroke="#FFD700" stroke-width="2.5"/>
+    <circle cx="50" cy="15" r="4" fill="#FFD700" opacity="0.7"/>
+    <line x1="50" y1="8" x2="50" y2="3" stroke="#FFD700" stroke-width="1.5" opacity="0.5"/>
+    <line x1="43" y1="10" x2="40" y2="6" stroke="#FFD700" stroke-width="1.5" opacity="0.5"/>
+    <line x1="57" y1="10" x2="60" y2="6" stroke="#FFD700" stroke-width="1.5" opacity="0.5"/>
+  </svg>`,
+  rain: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="rainGlow" cx="50%" cy="40%" r="50%">
+        <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:0.3"/>
+        <stop offset="100%" style="stop-color:#87CEEB;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="40" r="35" fill="url(#rainGlow)"/>
+    <ellipse cx="50" cy="35" rx="28" ry="16" fill="#8BA4B8"/>
+    <ellipse cx="35" cy="32" rx="14" ry="12" fill="#A0B4C8"/>
+    <ellipse cx="65" cy="32" rx="14" ry="12" fill="#A0B4C8"/>
+    <ellipse cx="50" cy="28" rx="12" ry="10" fill="#B4C8DC"/>
+    <line x1="30" y1="55" x2="28" y2="68" stroke="#87CEEB" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <line x1="42" y1="55" x2="40" y2="72" stroke="#87CEEB" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    <line x1="54" y1="55" x2="52" y2="70" stroke="#87CEEB" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <line x1="66" y1="55" x2="64" y2="68" stroke="#87CEEB" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  </svg>`,
+  distress: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="heartGlow" cx="50%" cy="45%" r="50%">
+        <stop offset="0%" style="stop-color:#E87C7C;stop-opacity:0.4"/>
+        <stop offset="100%" style="stop-color:#E87C7C;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="40" fill="url(#heartGlow)"/>
+    <path d="M50 80 C20 55 10 35 25 25 C35 18 45 25 50 35 C55 25 65 18 75 25 C90 35 80 55 50 80Z" fill="#E87C7C"/>
+    <path d="M30 50 L40 50 L45 38 L50 55 L55 42 L60 50 L70 50" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  </svg>`,
+  home: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="homeGlow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style="stop-color:#2d9d6e;stop-opacity:0.3"/>
+        <stop offset="100%" style="stop-color:#2d9d6e;stop-opacity:0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="40" fill="url(#homeGlow)"/>
+    <path d="M50 18 L15 48 L22 48 L22 78 L78 78 L78 48 L85 48Z" fill="#5A7FA0" stroke="#7B9EC7" stroke-width="1.5"/>
+    <rect x="40" y="55" width="20" height="23" rx="2" fill="#D4A847" opacity="0.8"/>
+    <circle cx="55" cy="67" r="2" fill="#A0843C"/>
+    <rect x="28" y="52" width="10" height="10" rx="1" fill="#87CEEB" opacity="0.6"/>
+    <rect x="62" y="52" width="10" height="10" rx="1" fill="#87CEEB" opacity="0.6"/>
+  </svg>`,
+};
+
 // Create category card
 function createCategoryCard(categoryKey, categoryData, index) {
   const card = document.createElement("div");
   card.className = "category-card fade-in";
-  card.style.animationDelay = `${index * 0.1}s`;
+  card.style.animationDelay = `${index * 0.08}s`;
 
   const adhkarCount = categoryData.adhkar.length;
+  const svgIcon = categoryIcons[categoryKey] || categoryIcons.general;
 
   card.innerHTML = `
-    <div class="category-icon">
-      <i class="${categoryData.icon}"></i>
+    <div class="category-card-inner">
+      <div class="category-card-icon">
+        ${svgIcon}
+      </div>
+      <div class="category-card-info">
+        <h3 class="category-title">${categoryData.title}</h3>
+        <div class="category-count-badge">${adhkarCount}</div>
+      </div>
     </div>
-    <h3 class="category-title">${categoryData.title}</h3>
-    <p class="category-description">${categoryData.description}</p>
-    <div class="category-count">${adhkarCount} ${
-      adhkarCount === 1 ? "ذكر" : "أذكار"
-    }</div>
   `;
 
   card.addEventListener("click", () => showCategoryPage(categoryKey));
@@ -3764,6 +3957,9 @@ function initializeStatsDashboard() {
   // Update stats on load
   updateStatsDashboard();
   updateWeeklyChart();
+  if (typeof updateQuranWeeklyChart === "function") {
+    updateQuranWeeklyChart();
+  }
 }
 
 function updateStatsDashboard() {
@@ -3885,38 +4081,121 @@ function calculateWeeklyCount() {
 }
 
 function updateWeeklyChart() {
-  const bars = document.querySelectorAll(".dash-bar-col .bar");
+  const chartContainer = document.getElementById("azkarChart");
+  if (!chartContainer) return;
+
+  const bars = chartContainer.querySelectorAll(".chart-bar-fill");
+  const valueDivs = chartContainer.querySelectorAll(".chart-bar-value");
+  const cols = chartContainer.querySelectorAll(".chart-bar-col");
   const today = new Date();
-  const maxHeight = 70;
+  const maxHeight = 80;
 
   // Find max value for scaling
   let maxVal = 1;
+  const dayValues = {};
   for (let i = 0; i < 7; i++) {
     const date = new Date(today);
     date.setDate(date.getDate() - (6 - i));
     const dateStr = date.toDateString();
     const val = weeklyProgress[dateStr] || 0;
     if (val > maxVal) maxVal = val;
+    dayValues[date.getDay()] = val;
   }
 
-  bars.forEach((bar, index) => {
-    const dayOffset = parseInt(bar.getAttribute("data-day"));
-    const date = new Date(today);
-    // Adjust to get correct day of week
-    const currentDay = today.getDay();
-    const diff = dayOffset - currentDay;
-    date.setDate(date.getDate() + diff);
-    const dateStr = date.toDateString();
-    const val = weeklyProgress[dateStr] || 0;
+  cols.forEach((col) => {
+    const dayNum = parseInt(col.getAttribute("data-day"));
+    const bar = col.querySelector(".chart-bar-fill");
+    const valueDiv = col.querySelector(".chart-bar-value");
+    const val = dayValues[dayNum] || 0;
 
-    const height = Math.max(6, (val / maxVal) * maxHeight);
-    bar.style.height = height + "px";
-
-    // Highlight today
-    if (date.toDateString() === today.toDateString()) {
-      bar.style.background = "linear-gradient(to top, #48bb78, #b8860b)";
+    // Check if this is today
+    if (dayNum === today.getDay()) {
+      col.classList.add("today");
+    } else {
+      col.classList.remove("today");
     }
+
+    const height = Math.max(4, (val / maxVal) * maxHeight);
+    if (bar) bar.style.height = height + "px";
+    if (valueDiv) valueDiv.textContent = val > 0 ? val : "";
   });
+}
+
+// Quran weekly reading progress
+let quranWeeklyProgress =
+  JSON.parse(localStorage.getItem("quranWeeklyProgress")) || {};
+
+function trackQuranDailyReading() {
+  const today = new Date().toDateString();
+  if (!quranWeeklyProgress[today]) {
+    quranWeeklyProgress[today] = 0;
+  }
+  quranWeeklyProgress[today]++;
+  localStorage.setItem(
+    "quranWeeklyProgress",
+    JSON.stringify(quranWeeklyProgress),
+  );
+}
+
+function updateQuranWeeklyChart() {
+  const chartContainer = document.getElementById("quranChart");
+  if (!chartContainer) return;
+
+  const cols = chartContainer.querySelectorAll(".chart-bar-col");
+  const today = new Date();
+  const maxHeight = 80;
+
+  // Find max value for scaling
+  let maxVal = 1;
+  const dayValues = {};
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - (6 - i));
+    const dateStr = date.toDateString();
+    const val = quranWeeklyProgress[dateStr] || 0;
+    if (val > maxVal) maxVal = val;
+    dayValues[date.getDay()] = val;
+  }
+
+  cols.forEach((col) => {
+    const dayNum = parseInt(col.getAttribute("data-day"));
+    const bar = col.querySelector(".chart-bar-fill");
+    const valueDiv = col.querySelector(".chart-bar-value");
+    const val = dayValues[dayNum] || 0;
+
+    if (dayNum === today.getDay()) {
+      col.classList.add("today");
+    } else {
+      col.classList.remove("today");
+    }
+
+    const height = Math.max(4, (val / maxVal) * maxHeight);
+    if (bar) bar.style.height = height + "px";
+    if (valueDiv) valueDiv.textContent = val > 0 ? val : "";
+  });
+}
+
+function switchChartTab(chartType) {
+  // Toggle tabs
+  document.querySelectorAll(".chart-tab").forEach(function (tab) {
+    tab.classList.toggle(
+      "active",
+      tab.getAttribute("data-chart") === chartType,
+    );
+  });
+
+  // Toggle chart panels
+  var azkarChart = document.getElementById("azkarChart");
+  var quranChart = document.getElementById("quranChart");
+
+  if (chartType === "azkar") {
+    if (azkarChart) azkarChart.classList.remove("hidden");
+    if (quranChart) quranChart.classList.add("hidden");
+  } else {
+    if (azkarChart) azkarChart.classList.add("hidden");
+    if (quranChart) quranChart.classList.remove("hidden");
+    updateQuranWeeklyChart();
+  }
 }
 
 // ========================================
@@ -3964,20 +4243,57 @@ function initQibla() {
 }
 
 function requestQiblaPermissions() {
-  // Request compass permission on iOS 13+
-  if (
-    typeof DeviceOrientationEvent !== "undefined" &&
-    typeof DeviceOrientationEvent.requestPermission === "function"
-  ) {
-    DeviceOrientationEvent.requestPermission()
-      .then((response) => {
-        if (response === "granted") {
+  updateQiblaStatus("جاري تحديد الموقع...");
+
+  // Always try to get location first
+  if (!userLocation && navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        userLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        displayStaticQibla();
+
+        // Then try compass
+        if (
+          typeof DeviceOrientationEvent !== "undefined" &&
+          typeof DeviceOrientationEvent.requestPermission === "function"
+        ) {
+          // iOS 13+ requires explicit permission
+          DeviceOrientationEvent.requestPermission()
+            .then((response) => {
+              if (response === "granted") {
+                setupCompass();
+              } else {
+                updateQiblaStatus(
+                  "اتجاه القبلة: " +
+                    Math.round(calculateQiblaDirection()) +
+                    "° من الشمال",
+                );
+              }
+            })
+            .catch(() => {
+              updateQiblaStatus(
+                "اتجاه القبلة: " +
+                  Math.round(calculateQiblaDirection()) +
+                  "° من الشمال",
+              );
+            });
+        } else {
           setupCompass();
         }
-      })
-      .catch(console.error);
+      },
+      (error) => {
+        updateQiblaStatus("يرجى السماح بالوصول للموقع");
+        console.log("Geolocation error:", error);
+      },
+    );
+  } else if (userLocation) {
+    displayStaticQibla();
+    setupCompass();
   } else {
-    initQibla();
+    updateQiblaStatus("المتصفح لا يدعم تحديد الموقع");
   }
 }
 
@@ -4003,6 +4319,9 @@ function calculateQiblaDirection() {
 }
 
 function setupCompass() {
+  // Always show the static degree first
+  displayStaticQibla();
+
   if ("DeviceOrientationEvent" in window) {
     window.addEventListener(
       "deviceorientationabsolute",
@@ -4013,8 +4332,8 @@ function setupCompass() {
     updateQiblaStatus("البوصلة تعمل");
   } else {
     // Fallback for devices without compass
-    updateQiblaStatus("البوصلة غير متوفرة");
-    displayStaticQibla();
+    var dir = Math.round(calculateQiblaDirection());
+    updateQiblaStatus("اتجاه القبلة: " + dir + "° من الشمال");
   }
 }
 
@@ -4056,9 +4375,15 @@ function displayStaticQibla() {
 
   const qiblaDirection = calculateQiblaDirection();
   const degreesEl = document.getElementById("qiblaDegrees");
+  const needle = document.getElementById("compassNeedle");
 
   if (degreesEl) {
     degreesEl.textContent = Math.round(qiblaDirection) + "°";
+  }
+
+  // Rotate needle to point toward Qibla (static, no compass heading)
+  if (needle) {
+    needle.style.transform = `translate(-50%, -100%) rotate(${qiblaDirection}deg)`;
   }
 }
 
@@ -4370,7 +4695,7 @@ function updateDailyInfo() {
     const mm = String(now.getMonth() + 1).padStart(2, "0");
     const dd = String(now.getDate()).padStart(2, "0");
 
-    gregorianDateElement.textContent = `${yyyy}-${mm}-${dd}`;
+    gregorianDateElement.textContent = `${dd} / ${mm} / ${yyyy}`;
 
     // Month Name - Year (e.g. فبراير - شباط)
     // Using standard locale data
@@ -4418,12 +4743,12 @@ function updateDailyInfo() {
     const hMonth = numericParts.find((p) => p.type === "month")?.value;
     const hDay = numericParts.find((p) => p.type === "day")?.value;
 
-    hijriDateElement.textContent = `${hYear}-${hMonth}-${hDay}`;
+    hijriDateElement.textContent = `${hDay} / ${hMonth} / ${hYear}`;
 
     // Update Header with Hijri Date for Duaa
     const duaaHeader = document.getElementById("duaaHeader");
     if (duaaHeader) {
-      duaaHeader.textContent = `دعاء اليوم ${hDay}-${hijriMonth}`;
+      duaaHeader.textContent = `دعاء اليوم ${hDay} رمضان`;
     }
   }
 
@@ -4480,3 +4805,78 @@ function random(seed) {
 document.addEventListener("DOMContentLoaded", () => {
   updateDailyInfo();
 });
+
+/* ========================================
+   GLOBAL NUMBERS TO ARABIC CONVERTER
+   ======================================== */
+function toArabicNumerals(str) {
+  return String(str).replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[d]);
+}
+
+function convertNodeTextToArabic(node) {
+  if (node.nodeType === Node.TEXT_NODE) {
+    if (
+      node.parentElement &&
+      node.parentElement.tagName !== "STYLE" &&
+      node.parentElement.tagName !== "SCRIPT" &&
+      node.parentElement.tagName !== "LINK" // Just in case
+    ) {
+      if (/\d/.test(node.nodeValue)) {
+        node.nodeValue = toArabicNumerals(node.nodeValue);
+      }
+    }
+  } else if (node.nodeType === Node.ELEMENT_NODE) {
+    if (["SCRIPT", "STYLE", "INPUT", "TEXTAREA"].includes(node.tagName)) return;
+    if (
+      node.classList &&
+      (node.classList.contains("fa") || node.classList.contains("fas"))
+    )
+      return; // skip font awesome base
+    node.childNodes.forEach(convertNodeTextToArabic);
+  }
+}
+
+// Ensure the conversion runs after everything else initializes
+setTimeout(() => {
+  convertNodeTextToArabic(document.body);
+
+  // Watch for dynamic changes globally
+  const numObserver = new MutationObserver((mutations) => {
+    // Collect all unique nodes to change to prevent recursive mutation loops
+    const textNodesToUpdate = new Set();
+
+    mutations.forEach((mutation) => {
+      if (mutation.type === "childList") {
+        mutation.addedNodes.forEach((added) => {
+          convertNodeTextToArabic(added);
+        });
+      } else if (mutation.type === "characterData") {
+        const val = mutation.target.nodeValue;
+        if (/\d/.test(val)) {
+          const parent = mutation.target.parentElement;
+          if (
+            parent &&
+            parent.tagName !== "STYLE" &&
+            parent.tagName !== "SCRIPT"
+          ) {
+            textNodesToUpdate.add(mutation.target);
+          }
+        }
+      }
+    });
+
+    // Apply the updates safely
+    textNodesToUpdate.forEach((node) => {
+      const newVal = toArabicNumerals(node.nodeValue);
+      if (node.nodeValue !== newVal) {
+        node.nodeValue = newVal;
+      }
+    });
+  });
+
+  numObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+  });
+}, 100);

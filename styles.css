@@ -122,18 +122,24 @@ body {
 /* Categories Container */
 .categories-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
   margin-bottom: 2rem;
+  padding: 0 0.25rem;
 }
 
-/* Category Card */
+/* Category Card – Glassmorphism Design */
 .category-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  background: rgba(40, 55, 75, 0.65);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.2rem 1rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -146,26 +152,86 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #1a8a5c, #d4a847);
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0) 50%
+  );
+  pointer-events: none;
 }
 
 .category-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
+.category-card:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+/* Card Inner Layout */
+.category-card-inner {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+/* Card Icon */
+.category-card-icon {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+}
+
+.category-card-icon svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Card Info */
+.category-card-info {
+  flex: 1;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+.category-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e8edf2;
+  margin: 0;
+  line-height: 1.3;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Count Badge */
+.category-count-badge {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #a8c4db;
+  padding: 2px 14px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-block;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+/* Legacy classes kept for compatibility */
 .category-icon {
   font-size: 3rem;
   color: #1a8a5c;
   margin-bottom: 1rem;
-}
-
-.category-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
 }
 
 .category-description {
@@ -922,7 +988,17 @@ body {
   }
 
   .categories-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .category-card-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .category-title {
+    font-size: 0.95rem;
   }
 
   #categoryTitle {
@@ -1100,20 +1176,37 @@ body.dark-mode #categoryDescription {
 }
 
 /* Dark Mode Cards */
-body.dark-mode .category-card,
+body.dark-mode .category-card {
+  background: rgba(25, 35, 50, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
 body.dark-mode .adhkar-card {
   background: rgba(45, 55, 72, 0.95);
   border: 1px solid #4a5568;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-body.dark-mode .category-card:hover,
+body.dark-mode .category-card:hover {
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-6px) scale(1.02);
+}
+
 body.dark-mode .adhkar-card:hover {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   transform: translateY(-10px);
 }
 
-body.dark-mode .category-title,
+body.dark-mode .category-title {
+  color: #e2e8f0;
+}
+
 body.dark-mode .adhkar-text {
   color: #e2e8f0;
 }
@@ -3029,11 +3122,16 @@ body.dark-mode .install-prompt .install-btn.secondary:hover {
 /* ==================== Prayer Times Section ==================== */
 
 .prayer-times-section {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 25px;
+  background: rgba(40, 55, 75, 0.65);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
   padding: 1.2rem 1.2rem 1.5rem;
-  margin-bottom: 3rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.85rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
   position: relative;
   overflow: hidden;
 }
@@ -3318,9 +3416,16 @@ body.dark-mode .install-prompt .install-btn.secondary:hover {
 
 /* Dark Mode for Prayer Times */
 body.dark-mode .prayer-times-section {
-  background: rgba(45, 55, 72, 0.95);
-  border: 1px solid #4a5568;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  background: rgba(40, 55, 75, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+body.light-mode .prayer-times-section {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 body.dark-mode .prayer-times-title {
@@ -4298,6 +4403,344 @@ body.dark-mode #scrollSpeedLabel {
 }
 
 /* Date and Daily Duaa Section */
+/* ═══════════════════════════════════════
+   HOME PAGE – Compact Date / Qibla / Dua
+   ═══════════════════════════════════════ */
+
+/* Top row: Date + Qibla side by side */
+.home-top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-bottom: 0.65rem;
+}
+
+/* ── Compact Date Card ── */
+.date-card-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: rgba(40, 55, 75, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.1rem 1.2rem;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  margin-bottom: 0.5rem;
+}
+body.light-mode .date-card-compact {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+.date-compact-icon {
+  flex-shrink: 0;
+  color: #68d391;
+  opacity: 0.85;
+}
+body.light-mode .date-compact-icon {
+  color: #1a8a5c;
+}
+.date-compact-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
+  min-width: 0;
+}
+.date-compact-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #a0aec0;
+  margin-bottom: 0.2rem;
+}
+body.light-mode .date-compact-title {
+  color: #718096;
+}
+.date-compact-day {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f7fafc;
+  line-height: 1.3;
+}
+body.light-mode .date-compact-day {
+  color: #2d3748;
+}
+.date-compact-hijri {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #68d391;
+  line-height: 1.4;
+}
+body.light-mode .date-compact-hijri {
+  color: #1a8a5c;
+}
+.date-compact-greg {
+  font-size: 0.8rem;
+  color: #a0aec0;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+/* ── Compact Qibla Card ── */
+.qibla-card-compact {
+  background: rgba(40, 55, 75, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1rem 1.2rem;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  margin-bottom: 0.65rem;
+}
+body.light-mode .qibla-card-compact {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+.qibla-compact-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.qibla-compact-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #d4a847;
+}
+body.light-mode .qibla-compact-title {
+  color: #b8860b;
+}
+.qibla-compact-btn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(212, 168, 71, 0.12);
+  color: #d4a847;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+.qibla-compact-btn:hover {
+  background: rgba(212, 168, 71, 0.25);
+}
+body.light-mode .qibla-compact-btn {
+  background: rgba(184, 134, 11, 0.08);
+  color: #b8860b;
+}
+
+/* ── Mini Compass ── */
+.qibla-mini-compass-wrap {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  justify-content: center;
+}
+.qibla-mini-compass {
+  width: 110px;
+  height: 110px;
+  flex-shrink: 0;
+}
+.qibla-mini-dial {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(40, 55, 75, 0.8) 0%,
+    rgba(26, 32, 44, 0.9) 100%
+  );
+  border: 2px solid rgba(212, 168, 71, 0.35);
+  position: relative;
+  box-shadow:
+    0 0 20px rgba(212, 168, 71, 0.1),
+    inset 0 0 15px rgba(0, 0, 0, 0.3);
+}
+body.light-mode .qibla-mini-dial {
+  background: radial-gradient(circle, #f7fafc 0%, #edf2f7 100%);
+  border-color: rgba(184, 134, 11, 0.3);
+  box-shadow:
+    0 0 20px rgba(184, 134, 11, 0.08),
+    inset 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Direction labels */
+.qmc-dir {
+  position: absolute;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  z-index: 2;
+}
+body.light-mode .qmc-dir {
+  color: rgba(0, 0, 0, 0.3);
+}
+.qmc-n {
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1rem;
+  color: unset !important;
+}
+.qmc-s {
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.qmc-e {
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.qmc-w {
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Needle */
+.qibla-mini-needle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 44px;
+  transform: translate(-50%, -100%);
+  transform-origin: bottom center;
+  z-index: 3;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.qmn-tip {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 30px solid #d4a847;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 0 4px rgba(212, 168, 71, 0.4));
+}
+.qmn-tail {
+  width: 2px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 1px;
+}
+
+/* Center kaaba */
+.qibla-mini-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  width: 8px;
+  height: 8px;
+  background: #d4a847;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(212, 168, 71, 0.5);
+}
+body.light-mode .qibla-mini-center {
+  background: #b8860b;
+  box-shadow: 0 0 6px rgba(184, 134, 11, 0.4);
+}
+
+/* Info next to compass */
+.qibla-mini-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+.qibla-compact-deg {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #d4a847;
+  line-height: 1.1;
+}
+body.light-mode .qibla-compact-deg {
+  color: #b8860b;
+}
+.qibla-compact-status {
+  font-size: 0.7rem;
+  color: #718096;
+  text-align: center;
+  max-width: 100px;
+  line-height: 1.3;
+}
+
+/* ── Compact Duaa Card ── */
+.duaa-card-compact {
+  background: rgba(40, 55, 75, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 0.5rem;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+body.light-mode .duaa-card-compact {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+.duaa-compact-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: #68d391;
+}
+.duaa-compact-icon {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+.duaa-compact-head span {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #a0aec0;
+}
+body.light-mode .duaa-compact-head {
+  color: #1a8a5c;
+}
+body.light-mode .duaa-compact-head span {
+  color: #718096;
+}
+.duaa-compact-text {
+  font-family: "Amiri", serif;
+  font-size: 1.1rem;
+  line-height: 1.9;
+  color: #cbd5e0;
+  text-align: center;
+  margin: 0;
+}
+body.light-mode .duaa-compact-text {
+  color: #4a5568;
+}
+
+/* ── Legacy (keep for compatibility) ── */
 .daily-info-section {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -4707,21 +5150,25 @@ body.light-mode .summary-label {
 
 /* ── Generic Dashboard Card ── */
 .dash-card {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(40, 55, 75, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 1.15rem;
   margin-bottom: 0.85rem;
-  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 body.dark-mode .dash-card {
-  background: rgba(45, 55, 72, 0.65);
-  border-color: rgba(255, 255, 255, 0.05);
+  background: rgba(40, 55, 75, 0.7);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 body.light-mode .dash-card {
   background: rgba(255, 255, 255, 0.92);
   border-color: rgba(0, 0, 0, 0.06);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 .dash-card-head {
@@ -4757,7 +5204,7 @@ body.light-mode .dash-card-head h3 {
 /* ── Quran mini-stats row ── */
 .dash-quran-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
   text-align: center;
   margin: 0.75rem 0;
@@ -4932,15 +5379,16 @@ body.light-mode .azkar-bar-num {
   gap: 0.15rem;
   padding: 0.55rem 0.25rem;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 body.dark-mode .stat-pill {
-  background: rgba(26, 32, 44, 0.4);
+  background: rgba(26, 32, 44, 0.5);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 body.light-mode .stat-pill {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
 }
 .stat-pill svg {
   flex-shrink: 0;
@@ -4957,6 +5405,19 @@ body.light-mode .stat-pill {
 .pill-total svg {
   color: #b794f4;
 }
+/* Quran stat pill icon colors */
+.pill-page svg {
+  color: #4fd1c5;
+}
+.pill-read svg {
+  color: #68d391;
+}
+.pill-days svg {
+  color: #63b3ed;
+}
+.pill-khatmah svg {
+  color: #f6ad55;
+}
 .stat-pill span {
   font-size: 1.15rem;
   font-weight: 700;
@@ -4972,7 +5433,190 @@ body.light-mode .stat-pill span {
   font-weight: 500;
 }
 
-/* ── Weekly mini chart ── */
+/* ── Dashboard Section & Divider ── */
+.dash-section {
+  padding: 0;
+}
+.dash-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  margin: 1rem 0;
+}
+body.light-mode .dash-divider {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 0, 0, 0.08),
+    transparent
+  );
+}
+
+/* ── Quran stats row (4 columns) ── */
+.dash-quran-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  text-align: center;
+  margin: 0.75rem 0;
+}
+
+/* ── Weekly Chart – Modern Tab Design ── */
+.dash-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.dash-chart-header h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #a0aec0;
+  margin: 0;
+}
+body.light-mode .dash-chart-header h4 {
+  color: #4a5568;
+}
+
+/* Chart Tabs */
+.dash-chart-tabs {
+  display: flex;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+body.light-mode .dash-chart-tabs {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+.chart-tab {
+  padding: 4px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #718096;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.chart-tab.active {
+  background: rgba(26, 138, 92, 0.2);
+  color: #68d391;
+}
+body.light-mode .chart-tab.active {
+  background: rgba(26, 138, 92, 0.12);
+  color: #1a8a5c;
+}
+.chart-tab:hover:not(.active) {
+  color: #a0aec0;
+}
+
+/* Modern Chart Container */
+.dash-chart-container {
+  position: relative;
+}
+.dash-modern-chart {
+  transition: opacity 0.3s ease;
+}
+.dash-modern-chart.hidden {
+  display: none;
+}
+
+/* Modern Chart Bars */
+.chart-bars {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 0.5rem 0;
+}
+.chart-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.chart-bar-value {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #68d391;
+  min-height: 14px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.chart-bar-col:hover .chart-bar-value,
+.chart-bar-col.today .chart-bar-value {
+  opacity: 1;
+}
+body.light-mode .chart-bar-value {
+  color: #1a8a5c;
+}
+
+.chart-bar-track {
+  width: 100%;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  position: relative;
+}
+body.light-mode .chart-bar-track {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.chart-bar-fill {
+  width: 100%;
+  min-height: 4px;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(to top, #1a8a5c, #68d391);
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+.chart-bar-fill.quran-fill {
+  background: linear-gradient(to top, #2b6cb0, #63b3ed);
+}
+
+/* Today highlight */
+.chart-bar-col.today .chart-bar-track {
+  background: rgba(26, 138, 92, 0.08);
+  border: 1px solid rgba(26, 138, 92, 0.15);
+}
+.chart-bar-col.today .chart-bar-fill {
+  background: linear-gradient(to top, #d4a847, #48bb78);
+}
+.chart-bar-col.today .chart-bar-fill.quran-fill {
+  background: linear-gradient(to top, #d4a847, #63b3ed);
+}
+
+.chart-bar-col span {
+  font-size: 0.58rem;
+  color: #718096;
+  white-space: nowrap;
+  font-weight: 500;
+}
+body.light-mode .chart-bar-col span {
+  color: #a0aec0;
+}
+.chart-bar-col.today span {
+  color: #68d391;
+  font-weight: 700;
+}
+body.light-mode .chart-bar-col.today span {
+  color: #1a8a5c;
+}
+
+/* Legacy dash-weekly (keep for old references) */
 .dash-weekly {
   background: rgba(255, 255, 255, 0.04);
   border-radius: 12px;
@@ -5056,10 +5700,56 @@ body.light-mode .dash-sadaqa {
     font-size: 0.62rem;
   }
   .dash-stat-pills {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.3rem;
+  }
+  .stat-pill {
+    padding: 0.4rem 0.15rem;
+  }
+  .stat-pill span {
+    font-size: 1rem;
+  }
+  .stat-pill small {
+    font-size: 0.55rem;
   }
   .mini-val {
-    font-size: 1.15rem;
+    font-size: 1rem;
+  }
+  .mini-lbl {
+    font-size: 0.6rem;
+  }
+  /* Quran stats stay 4 per row */
+  .dash-quran-stats {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.3rem;
+  }
+  .dash-chart-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  .dash-chart-header h4 {
+    text-align: center;
+  }
+  .dash-chart-tabs {
+    align-self: center;
+  }
+  .chart-bars {
+    gap: 3px;
+  }
+  .chart-bar-track {
+    height: 60px;
+    border-radius: 5px;
+  }
+  .chart-bar-col span {
+    font-size: 0.5rem;
+  }
+  .chart-bar-value {
+    font-size: 0.5rem;
+    min-height: 12px;
+  }
+  .chart-bar-fill {
+    border-radius: 5px 5px 0 0;
   }
   .bottom-nav-item {
     font-size: 0.6rem;
@@ -5086,6 +5776,42 @@ body.light-mode .dash-sadaqa {
   overflow: hidden;
   z-index: 50;
   background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+}
+
+/* Light Mode Category Cards */
+body.light-mode .category-card {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+body.light-mode .category-card::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0) 50%
+  );
+}
+
+body.light-mode .category-card:hover {
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.1);
+  transform: translateY(-6px) scale(1.02);
+}
+
+body.light-mode .category-title {
+  color: #2d3748;
+  text-shadow: none;
+}
+
+body.light-mode .category-count-badge {
+  background: rgba(26, 138, 92, 0.1);
+  border: 1px solid rgba(26, 138, 92, 0.2);
+  color: #1a8a5c;
 }
 
 body.light-mode #categoryPage {

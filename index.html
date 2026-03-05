@@ -81,27 +81,32 @@
           <p class="welcome-description">رفيقك اليومي في ذكر الله</p>
         </div> -->
 
-        <!-- Date and Daily Duaa Section -->
-        <div class="daily-info-section">
-          <div class="date-card">
-            <div class="date-header">تاريخ اليوم</div>
-            <div class="day-name" id="dayName">--</div>
-            <div class="hijri-date">
-              <span id="hijriMonth">--</span>
-              <span id="hijriDate">--</span>
-            </div>
-            <div class="gregorian-date">
-              <span id="gregorianMonth">--</span>
-              <span id="gregorianDate">--</span>
-            </div>
+        <!-- Date Card -->
+        <div class="date-card-compact">
+          <div class="date-compact-icon">
+            <!-- <i class="fas fa-calendar-alt" style="font-size: 1.2rem; opacity: 0.9;"></i> -->
           </div>
-          <div class="duaa-card">
-            <div class="duaa-header" id="duaaHeader">دعاء اليوم</div>
-            <div class="duaa-content">
-              <p class="duaa-text" id="dailyDuaaText">جاري تحميل دعاء اليوم...</p>
-              <i class="fas fa-quote-left quote-icon"></i>
+          <div class="date-compact-body">
+            <div class="date-compact-title">
+              <span>تاريخ اليوم</span>
             </div>
+            <span class="date-compact-day" id="dayName">--</span>
+            <span class="date-compact-hijri">
+              <span id="hijriDate">--</span> <span id="hijriMonth">--</span>
+            </span>
+            <span class="date-compact-greg">
+              <span id="gregorianDate">--</span> <span id="gregorianMonth">--</span>
+            </span>
           </div>
+        </div>
+
+
+        <!-- Duaa Card – Compact -->
+        <div class="duaa-card-compact">
+          <div class="duaa-compact-head">
+            <span id="duaaHeader">دعاء اليوم</span>
+          </div>
+          <p class="duaa-compact-text" id="dailyDuaaText">جاري تحميل دعاء اليوم...</p>
         </div>
 
         <!-- Prayer Times Section -->
@@ -144,30 +149,35 @@
           </div>
         </div>
 
-        <!-- Qibla Compass -->
-        <div class="qibla-section" id="qiblaSection">
-          <div class="qibla-header">
-            <h3><i class="fas fa-compass"></i> اتجاه القبلة</h3>
-            <button class="qibla-calibrate-btn" id="qiblaCalibrateBtn" title="معايرة البوصلة">
-              <i class="fas fa-sync-alt"></i>
+        <!-- Qibla Card with Visual Compass -->
+        <div class="qibla-card-compact" id="qiblaSection">
+          <div class="qibla-compact-top">
+            <span class="qibla-compact-title">اتجاه القبلة</span>
+            <button class="qibla-compact-btn" id="qiblaCalibrateBtn" title="تفعيل البوصلة">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <polyline points="23 4 23 10 17 10" />
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+              </svg>
             </button>
           </div>
-          <div class="qibla-compass-container">
-            <div class="compass" id="compass">
-              <div class="compass-dial">
-                <div class="compass-needle" id="compassNeedle"></div>
-                <div class="compass-kaaba">
-                  <i class="fas fa-kaaba"></i>
+          <!-- Mini Compass -->
+          <div class="qibla-mini-compass-wrap">
+            <div class="qibla-mini-compass" id="compass">
+              <div class="qibla-mini-dial">
+                <span class="qmc-dir qmc-n">🕋</span>
+                <span class="qmc-dir qmc-e">E</span>
+                <span class="qmc-dir qmc-s">S</span>
+                <span class="qmc-dir qmc-w">W</span>
+                <div class="qibla-mini-needle" id="compassNeedle">
+                  <div class="qmn-tip"></div>
+                  <div class="qmn-tail"></div>
                 </div>
-                <div class="compass-direction north">N</div>
-                <div class="compass-direction east">E</div>
-                <div class="compass-direction south">S</div>
-                <div class="compass-direction west">W</div>
+                <div class="qibla-mini-center"></div>
               </div>
             </div>
-            <div class="qibla-info">
-              <p class="qibla-degrees" id="qiblaDegrees">—°</p>
-              <p class="qibla-status" id="qiblaStatus">جاري تحديد الاتجاه...</p>
+            <div class="qibla-mini-info">
+              <span class="qibla-compact-deg" id="qiblaDegrees">—°</span>
+              <span class="qibla-compact-status" id="qiblaStatus">اضغط لتفعيل البوصلة</span>
             </div>
           </div>
         </div>
@@ -181,7 +191,7 @@
         <div id="azkarListView">
           <div class="welcome-section">
             <h2 class="welcome-title">الأذكار والأدعية</h2>
-            <p class="welcome-description">اختر نوع الأذكار التي تريد قراءتها</p>
+            <!-- <p class="welcome-description">اختر نوع الأذكار التي تريد قراءتها</p> -->
           </div>
           <div class="categories-container" id="categoriesContainer">
             <!-- Category cards will be populated by JavaScript -->
@@ -293,144 +303,249 @@
           </div>
         </div> -->
 
-        <!-- ── Section 1: القرآن الكريم ── -->
-        <div class="dash-card" id="profileKhatmahSection">
-          <div class="dash-card-head">
-            <!-- Lucide-style book icon -->
-            <svg class="dash-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-              <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z" />
-            </svg>
-            <h3>القرآن الكريم</h3>
-          </div>
-          <div id="profileKhatmahContent">
-            <p class="dash-empty">لم تبدأ ختمة بعد. اذهب إلى تبويب القرآن لبدء ختمة جديدة.</p>
-          </div>
-          <div class="dash-quran-stats">
-            <div class="dash-mini-stat">
-              <span class="mini-val" id="profileCurrentPage">0</span>
-              <span class="mini-lbl">الصفحة الحالية</span>
-            </div>
-            <div class="dash-mini-stat">
-              <span class="mini-val" id="profilePagesRead">0</span>
-              <span class="mini-lbl">صفحة مقروءة</span>
-            </div>
-            <div class="dash-mini-stat">
-              <span class="mini-val" id="profileTotalDays">0</span>
-              <span class="mini-lbl">أيام القراءة</span>
-            </div>
-          </div>
-          <button class="dash-continue-btn" onclick="switchTab('tab-quran')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" width="18" height="18">
-              <polygon points="5 4 15 12 5 20 5 4" />
-              <line x1="19" y1="5" x2="19" y2="19" />
-            </svg>
-            متابعة القراءة
-          </button>
-        </div>
+        <!-- ── Unified Dashboard Card ── -->
+        <div class="dash-card" id="unifiedDashCard">
 
-        <!-- ── Section 2: إحصائيات الأذكار ── -->
-        <div class="dash-card">
-          <div class="dash-card-head">
-            <!-- Lucide-style bar-chart icon -->
-            <svg class="dash-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-              <line x1="18" y1="20" x2="18" y2="10" />
-              <line x1="12" y1="20" x2="12" y2="4" />
-              <line x1="6" y1="20" x2="6" y2="14" />
-            </svg>
-            <h3>إحصائيات الأذكار</h3>
-          </div>
-
-          <!-- Azkar category mini-bars -->
-          <!-- <div class="dash-azkar-bars">
-            <div class="azkar-bar-row">
-              <span class="azkar-bar-label">صباح</span>
-              <div class="azkar-bar-track"><div class="azkar-bar-fill morning-fill" id="barMorning"></div></div>
-              <span class="azkar-bar-num" id="numMorning">0</span>
-            </div>
-            <div class="azkar-bar-row">
-              <span class="azkar-bar-label">مساء</span>
-              <div class="azkar-bar-track"><div class="azkar-bar-fill evening-fill" id="barEvening"></div></div>
-              <span class="azkar-bar-num" id="numEvening">0</span>
-            </div>
-            <div class="azkar-bar-row">
-              <span class="azkar-bar-label">تسبيح</span>
-              <div class="azkar-bar-track"><div class="azkar-bar-fill tasbih-fill" id="barTasbih"></div></div>
-              <span class="azkar-bar-num" id="numTasbih">0</span>
-            </div>
-          </div> -->
-
-          <!-- 4 compact stat pills -->
-          <div class="dash-stat-pills" id="statsContent">
-            <div class="stat-pill pill-streak">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                <path
-                  d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+          <!-- ─ Section: القرآن الكريم ─ -->
+          <div class="dash-section" id="profileKhatmahSection">
+            <div class="dash-card-head">
+              <svg class="dash-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z" />
               </svg>
-              <span id="streakCount">0</span>
-              <small>أيام</small>
+              <h3>القرآن الكريم</h3>
             </div>
-            <div class="stat-pill pill-today">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                <polyline points="20 6 9 17 4 12" />
+            <div id="profileKhatmahContent">
+              <p class="dash-empty">لم تبدأ ختمة بعد. اذهب إلى تبويب القرآن لبدء ختمة جديدة.</p>
+            </div>
+            <div class="dash-stat-pills">
+              <div class="stat-pill pill-page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+                <span id="profileCurrentPage">0</span>
+                <small>الصفحة الحالية</small>
+              </div>
+              <div class="stat-pill pill-read">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                  <polyline points="16 7 22 7 22 13" />
+                </svg>
+                <span id="profilePagesRead">0</span>
+                <small>صفحة مقروءة</small>
+              </div>
+              <div class="stat-pill pill-days">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                <span id="profileTotalDays">0</span>
+                <small>أيام القراءة</small>
+              </div>
+              <div class="stat-pill pill-khatmah">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <circle cx="12" cy="8" r="7" />
+                  <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+                </svg>
+                <span id="profileKhatmahCount">0</span>
+                <small>عدد الختمات</small>
+              </div>
+            </div>
+            <button class="dash-continue-btn" onclick="switchTab('tab-quran')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" width="18" height="18">
+                <polygon points="5 4 15 12 5 20 5 4" />
+                <line x1="19" y1="5" x2="19" y2="19" />
               </svg>
-              <span id="todayCount">0</span>
-              <small>اليوم</small>
-            </div>
-            <div class="stat-pill pill-week">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-              <span id="weekCount">0</span>
-              <small>الأسبوع</small>
-            </div>
-            <div class="stat-pill pill-total">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7" />
-                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7" />
-                <path d="M4 22h16" />
-                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22" />
-                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22" />
-                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
-              </svg>
-              <span id="totalCount">0</span>
-              <small>الإجمالي</small>
-            </div>
+              متابعة القراءة
+            </button>
           </div>
 
-          <!-- Weekly mini-chart -->
-          <div class="dash-weekly">
-            <h4>نشاط الأسبوع</h4>
-            <div class="dash-bars" id="weeklyBars">
-              <div class="dash-bar-col">
-                <div class="bar" data-day="6"></div><span>السبت</span>
+          <!-- ─ Divider ─ -->
+          <div class="dash-divider"></div>
+
+          <!-- ─ Section: إحصائيات الأذكار ─ -->
+          <div class="dash-section">
+            <div class="dash-card-head">
+              <svg class="dash-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg>
+              <h3>إحصائيات الأذكار</h3>
+            </div>
+
+            <!-- 4 compact stat pills -->
+            <div class="dash-stat-pills" id="statsContent">
+              <div class="stat-pill pill-streak">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path
+                    d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+                </svg>
+                <span id="streakCount">0</span>
+                <small>أيام</small>
               </div>
-              <div class="dash-bar-col">
-                <div class="bar" data-day="0"></div><span>الأحد</span>
+              <div class="stat-pill pill-today">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span id="todayCount">0</span>
+                <small>اليوم</small>
               </div>
-              <div class="dash-bar-col">
-                <div class="bar" data-day="1"></div><span>الأثنين</span>
+              <div class="stat-pill pill-week">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                <span id="weekCount">0</span>
+                <small>الأسبوع</small>
               </div>
-              <div class="dash-bar-col">
-                <div class="bar" data-day="2"></div><span>الثلاثاء</span>
-              </div>
-              <div class="dash-bar-col">
-                <div class="bar" data-day="3"></div><span>الأربعاء</span>
-              </div>
-              <div class="dash-bar-col">
-                <div class="bar" data-day="4"></div><span>الخميس</span>
-              </div>
-              <div class="dash-bar-col">
-                <div class="bar" data-day="5"></div><span>الجمعة</span>
+              <div class="stat-pill pill-total">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7" />
+                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7" />
+                  <path d="M4 22h16" />
+                  <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22" />
+                  <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22" />
+                  <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                </svg>
+                <span id="totalCount">0</span>
+                <small>الإجمالي</small>
               </div>
             </div>
           </div>
+
+          <!-- ─ Divider ─ -->
+          <div class="dash-divider"></div>
+
+          <!-- ─ Section: نشاط الأسبوع (Unified Chart) ─ -->
+          <div class="dash-section">
+            <div class="dash-chart-header">
+              <h4>نشاط الأسبوع</h4>
+              <div class="dash-chart-tabs">
+                <button class="chart-tab active" data-chart="azkar" onclick="switchChartTab('azkar')">الأذكار</button>
+                <button class="chart-tab" data-chart="quran" onclick="switchChartTab('quran')">القرآن</button>
+              </div>
+            </div>
+            <div class="dash-chart-container">
+              <!-- Azkar Chart -->
+              <div class="dash-modern-chart" id="azkarChart">
+                <div class="chart-bars" id="weeklyBars">
+                  <div class="chart-bar-col" data-day="6">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill" data-day="6"></div>
+                    </div>
+                    <span>السبت</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="0">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill" data-day="0"></div>
+                    </div>
+                    <span>الأحد</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="1">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill" data-day="1"></div>
+                    </div>
+                    <span>الأثنين</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="2">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill" data-day="2"></div>
+                    </div>
+                    <span>الثلاثاء</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="3">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill" data-day="3"></div>
+                    </div>
+                    <span>الأربعاء</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="4">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill" data-day="4"></div>
+                    </div>
+                    <span>الخميس</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="5">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill" data-day="5"></div>
+                    </div>
+                    <span>الجمعة</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Quran Chart -->
+              <div class="dash-modern-chart hidden" id="quranChart">
+                <div class="chart-bars" id="quranWeeklyBars">
+                  <div class="chart-bar-col" data-day="6">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill quran-fill" data-day="6"></div>
+                    </div>
+                    <span>السبت</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="0">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill quran-fill" data-day="0"></div>
+                    </div>
+                    <span>الأحد</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="1">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill quran-fill" data-day="1"></div>
+                    </div>
+                    <span>الأثنين</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="2">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill quran-fill" data-day="2"></div>
+                    </div>
+                    <span>الثلاثاء</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="3">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill quran-fill" data-day="3"></div>
+                    </div>
+                    <span>الأربعاء</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="4">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill quran-fill" data-day="4"></div>
+                    </div>
+                    <span>الخميس</span>
+                  </div>
+                  <div class="chart-bar-col" data-day="5">
+                    <div class="chart-bar-value"></div>
+                    <div class="chart-bar-track">
+                      <div class="chart-bar-fill quran-fill" data-day="5"></div>
+                    </div>
+                    <span>الجمعة</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- Sadaqa Jariyah -->

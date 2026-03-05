@@ -1196,6 +1196,11 @@ function handleMushafSwipe() {
 // ===== MARK PAGE AS READ =====
 
 function markPageAsRead(pageNumber) {
+  // Track for weekly Quran chart
+  if (typeof trackQuranDailyReading === "function") {
+    trackQuranDailyReading();
+  }
+
   if (khatmahState.isActive) {
     if (!khatmahState.completedPages.includes(pageNumber)) {
       khatmahState.completedPages.push(pageNumber);
@@ -1217,6 +1222,13 @@ function markPageAsRead(pageNumber) {
  * Show Khatmah completion celebration
  */
 function showKhatmahCompletion() {
+  // Increment completed khatmah count
+  var completedCount = parseInt(
+    localStorage.getItem("completedKhatmahCount") || "0",
+  );
+  completedCount++;
+  localStorage.setItem("completedKhatmahCount", String(completedCount));
+
   const overlay = document.createElement("div");
   overlay.className = "khatmah-complete-overlay";
   overlay.innerHTML = `
@@ -1576,6 +1588,8 @@ function updateProfileTab() {
   var totalDaysEl = document.getElementById("profileTotalDays");
   var pagesReadEl = document.getElementById("profilePagesRead");
   var currentPageEl = document.getElementById("profileCurrentPage");
+  var khatmahCountEl = document.getElementById("profileKhatmahCount");
+
   if (totalDaysEl) {
     var days = khatmahState.startDate
       ? Math.floor(
@@ -1587,6 +1601,19 @@ function updateProfileTab() {
   }
   if (pagesReadEl) pagesReadEl.textContent = khatmahState.totalPagesRead || 0;
   if (currentPageEl) currentPageEl.textContent = khatmahState.lastReadPage || 0;
+
+  // Khatmah count
+  if (khatmahCountEl) {
+    var completedKhatmahCount = parseInt(
+      localStorage.getItem("completedKhatmahCount") || "0",
+    );
+    khatmahCountEl.textContent = completedKhatmahCount;
+  }
+
+  // Update Quran weekly chart too
+  if (typeof updateQuranWeeklyChart === "function") {
+    updateQuranWeeklyChart();
+  }
 }
 
 // ===== INITIALIZATION =====
