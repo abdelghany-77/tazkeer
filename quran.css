@@ -547,6 +547,7 @@
 /* Dashboard Actions */
 .khatmah-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -571,6 +572,29 @@
 .khatmah-read-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(26, 138, 92, 0.4);
+}
+.khatmah-free-read-btn {
+  flex: 2;
+  padding: 1rem;
+  border: 2px solid #1a8a5c;
+  border-radius: 15px;
+  background: transparent;
+  color: #1a8a5c;
+  font-family: "Cairo", serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.khatmah-free-read-btn:hover {
+  background: #1a8a5c;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(26, 138, 92, 0.3);
 }
 .khatmah-reset-btn {
   flex: 1;

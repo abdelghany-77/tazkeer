@@ -546,11 +546,11 @@ function renderSurahList() {
   SURAH_DATA.forEach((surah, i) => {
     const endPage =
       i < SURAH_DATA.length - 1
-        ? SURAH_DATA[i + 1].startPage - 1
+        ? SURAH_DATA[i + 1].startPage
         : TOTAL_QURAN_PAGES;
     const pageCount = endPage - surah.startPage + 1;
     html += `
-      <button class="surah-list-card" onclick="openFreeReader(${surah.startPage})">
+      <button class="surah-list-card" onclick="openFreeReader(${surah.startPage}, ${endPage})">
         <span class="surah-list-number">${toArabicNumber(surah.number)}</span>
         <div class="surah-list-info">
           <span class="surah-list-name">${surah.name}</span>
@@ -570,13 +570,19 @@ function renderSurahList() {
 }
 
 /**
- * Open the Mushaf in free reading mode at a specific page
+ * Open the Mushaf in free reading mode at a specific page.
+ * If endPage is provided, navigation is scoped to that range (surah boundaries).
  */
-function openFreeReader(page) {
+function openFreeReader(page, endPage) {
   quranViewerState.mode = "free";
-  quranViewerState.wirdStart = 1;
-  quranViewerState.wirdEnd = TOTAL_QURAN_PAGES;
   quranViewerState.currentPage = page || 1;
+  if (endPage) {
+    quranViewerState.wirdStart = page;
+    quranViewerState.wirdEnd = endPage;
+  } else {
+    quranViewerState.wirdStart = 1;
+    quranViewerState.wirdEnd = TOTAL_QURAN_PAGES;
+  }
   renderMushafViewer();
 }
 
@@ -737,6 +743,10 @@ function renderKhatmahDashboard() {
         </button>`
             : ""
         }
+        <button class="khatmah-free-read-btn" onclick="renderSurahList()">
+          <i class="fas fa-book-reader"></i>
+          قراءة حرة (فهرس السور)
+        </button>
         <button class="khatmah-reset-btn" onclick="resetKhatmah()">
           <i class="fas fa-redo"></i>
           ختمة جديدة
@@ -766,13 +776,11 @@ function renderMushafViewer() {
 
   // Mode-aware navigation boundaries
   const isKM = quranViewerState.mode === "khatmah";
-  const navStart = isKM ? quranViewerState.wirdStart : 1;
-  const navEnd = isKM ? quranViewerState.wirdEnd : TOTAL_QURAN_PAGES;
-  const progressPercent = isKM
-    ? Math.round(((page - navStart + 1) / (navEnd - navStart + 1)) * 100)
-    : khatmahState.isActive
-      ? getKhatmahProgress(khatmahState)
-      : Math.round((page / TOTAL_QURAN_PAGES) * 100);
+  const navStart = quranViewerState.wirdStart;
+  const navEnd = quranViewerState.wirdEnd;
+  const progressPercent = Math.round(
+    ((page - navStart + 1) / (navEnd - navStart + 1)) * 100,
+  );
 
   // Wird info for banner
   const wirdNum = isKM
@@ -872,7 +880,7 @@ function renderMushafViewer() {
       <!-- Bottom Bar (Progress) -->
       <div class="mushaf-bottom-bar">
         <div class="mushaf-bottom-info">
-          <span>${isKM ? `${page - navStart + 1} / ${navEnd - navStart + 1}` : `${page} / ${TOTAL_QURAN_PAGES}`}</span>
+          <span>${page - navStart + 1} / ${navEnd - navStart + 1}</span>
           <span>${progressPercent}%</span>
         </div>
         <div class="mushaf-progress-track">
@@ -956,8 +964,8 @@ function retryLoadPage() {
  */
 function navigateToPage(newPage, direction) {
   const isKM = quranViewerState.mode === "khatmah";
-  const navStart = isKM ? quranViewerState.wirdStart : 1;
-  const navEnd = isKM ? quranViewerState.wirdEnd : TOTAL_QURAN_PAGES;
+  const navStart = quranViewerState.wirdStart;
+  const navEnd = quranViewerState.wirdEnd;
 
   if (newPage < navStart || newPage > navEnd) return;
 
@@ -968,11 +976,9 @@ function navigateToPage(newPage, direction) {
   const bookmark = loadBookmark();
   const isBookmarked = bookmark === newPage;
 
-  const progressPercent = isKM
-    ? Math.round(((newPage - navStart + 1) / (navEnd - navStart + 1)) * 100)
-    : khatmahState.isActive
-      ? getKhatmahProgress(khatmahState)
-      : Math.round((newPage / TOTAL_QURAN_PAGES) * 100);
+  const progressPercent = Math.round(
+    ((newPage - navStart + 1) / (navEnd - navStart + 1)) * 100,
+  );
 
   // Update header
   const surahNameEl = document.querySelector(".mushaf-surah-name");
@@ -998,7 +1004,7 @@ function navigateToPage(newPage, direction) {
   const bottomInfo = document.querySelector(".mushaf-bottom-info");
   if (bottomInfo) {
     bottomInfo.innerHTML = `
-      <span>${isKM ? `${newPage - navStart + 1} / ${navEnd - navStart + 1}` : `${newPage} / ${TOTAL_QURAN_PAGES}`}</span>
+      <span>${newPage - navStart + 1} / ${navEnd - navStart + 1}</span>
       <span>${progressPercent}%</span>`;
   }
 
@@ -1103,19 +1109,19 @@ function persistCurrentPage(page) {
 // ===== PAGE NAVIGATION =====
 
 function mushafNextPage() {
-  const maxPage =
-    quranViewerState.mode === "khatmah"
-      ? quranViewerState.wirdEnd
-      : TOTAL_QURAN_PAGES;
-  if (quranViewerState.isLoading || quranViewerState.currentPage >= maxPage)
+  if (
+    quranViewerState.isLoading ||
+    quranViewerState.currentPage >= quranViewerState.wirdEnd
+  )
     return;
   navigateToPage(quranViewerState.currentPage + 1, "next");
 }
 
 function mushafPrevPage() {
-  const minPage =
-    quranViewerState.mode === "khatmah" ? quranViewerState.wirdStart : 1;
-  if (quranViewerState.isLoading || quranViewerState.currentPage <= minPage)
+  if (
+    quranViewerState.isLoading ||
+    quranViewerState.currentPage <= quranViewerState.wirdStart
+  )
     return;
   navigateToPage(quranViewerState.currentPage - 1, "prev");
 }
@@ -1203,7 +1209,8 @@ function markPageAsRead(pageNumber) {
     trackQuranDailyReading();
   }
 
-  if (khatmahState.isActive) {
+  // Only update khatmah progress when reading in khatmah mode
+  if (khatmahState.isActive && quranViewerState.mode === "khatmah") {
     if (!khatmahState.completedPages.includes(pageNumber)) {
       khatmahState.completedPages.push(pageNumber);
       khatmahState.totalPagesRead = khatmahState.completedPages.length;
@@ -1434,12 +1441,8 @@ function jumpToPage() {
   if (!input) return;
 
   const page = parseInt(input.value);
-  const minPage =
-    quranViewerState.mode === "khatmah" ? quranViewerState.wirdStart : 1;
-  const maxPage =
-    quranViewerState.mode === "khatmah"
-      ? quranViewerState.wirdEnd
-      : TOTAL_QURAN_PAGES;
+  const minPage = quranViewerState.wirdStart;
+  const maxPage = quranViewerState.wirdEnd;
 
   if (isNaN(page) || page < minPage || page > maxPage) {
     if (typeof showNotification === "function") {

@@ -3323,10 +3323,16 @@ function showEnhancedNotification(message, type = "success", duration = 3000) {
     </button>
   `;
 
+  // Calculate top position - push below offline banner if visible
+  const offlineBanner = document.getElementById("offlineBanner");
+  const topOffset = offlineBanner && !offlineBanner.classList.contains("hidden")
+    ? offlineBanner.offsetHeight + 10
+    : 20;
+
   // Add notification styles
   notification.style.cssText = `
     position: fixed;
-    top: 20px;
+    top: ${topOffset}px;
     right: 20px;
     background: ${getNotificationColor(type)};
     color: white;
@@ -3790,7 +3796,7 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
         if (error) error.classList.add("hidden");
 
         showEnhancedNotification(
-          "أنت غير متصل. تم عرض مواقيت الصلاة المحفوظة مسبقاً.",
+          "أنت غير متصل بالأنترنت. تم عرض مواقيت الصلاة المحفوظة مسبقاً.",
           "warning",
           5000,
         );

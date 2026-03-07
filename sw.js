@@ -1,4 +1,4 @@
-const CACHE_NAME = "tazkeer-v7.9";
+const CACHE_NAME = "tazkeer-v8.0";
 const urlsToCache = [
   "./",
   "./index.html",
@@ -8,9 +8,6 @@ const urlsToCache = [
   "./script.js",
   "./quran.js",
   "./manifest.json",
-  "./widget.html",
-  "./widget.css",
-  "./widget.js",
   "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-solid-900.woff2",
