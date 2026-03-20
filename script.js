@@ -1,4 +1,4 @@
-﻿// Islamic Adhkar Data
+// Islamic Adhkar Data
 const adhkarData = {
   morning: {
     title: "أذكار الصباح",
@@ -4747,9 +4747,7 @@ function updateDailyInfo() {
   const hijriDateElement = document.getElementById("hijriDate");
 
   if (hijriMonthElement && hijriDateElement) {
-    // Offset by -1 day to match actual moon sighting (umalqura is 1 day ahead)
     const hijriNow = new Date(now);
-    hijriNow.setDate(hijriNow.getDate() - 1);
 
     const hijriFormatter = new Intl.DateTimeFormat(
       "ar-SA-u-ca-islamic-umalqura",
