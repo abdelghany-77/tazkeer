@@ -4784,7 +4784,7 @@ function updateDailyInfo() {
     // Update Header with Hijri Date for Duaa
     const duaaHeader = document.getElementById("duaaHeader");
     if (duaaHeader) {
-      duaaHeader.textContent = `دعاء اليوم ${hDay} رمضان`;
+      duaaHeader.textContent = `دعاء اليوم ${parseInt(hDay)} ${hijriMonth}`;
     }
   }
 
