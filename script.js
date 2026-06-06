@@ -1708,6 +1708,13 @@ function showHomePage() {
     resetCategoryCounters(currentCategory);
   }
 
+  // Disconnect IntersectionObserver to prevent stale callbacks
+  if (_swiperObserver) {
+    _swiperObserver.disconnect();
+    _swiperObserver = null;
+  }
+  _swiperIsScrolling = false;
+
   // Toggle internal azkar views
   if (azkarListView) azkarListView.classList.remove("hidden");
   if (categoryPage) categoryPage.classList.add("hidden");
@@ -1955,7 +1962,11 @@ function createCategoryCard(categoryKey, categoryData, index) {
   categoriesContainer.appendChild(card);
 }
 
-// Load category as Swiper (scroll-snap)
+// ── Global scroll lock flag for programmatic scrolls ──
+let _swiperIsScrolling = false;
+let _swiperObserver = null;
+
+// Load category as Swiper (scroll-snap) – uses IntersectionObserver for reliable index detection
 function loadCategory(category) {
   const data = adhkarData[category];
   if (categoryTitle) categoryTitle.textContent = data.title;
@@ -1965,6 +1976,12 @@ function loadCategory(category) {
   const track = document.getElementById("azkarSwiperTrack");
   const dotsWrap = document.getElementById("swiperDotsWrap");
   if (!track) return;
+
+  // Disconnect previous observer if exists
+  if (_swiperObserver) {
+    _swiperObserver.disconnect();
+    _swiperObserver = null;
+  }
 
   track.innerHTML = "";
   if (dotsWrap) dotsWrap.innerHTML = "";
@@ -1997,20 +2014,36 @@ function loadCategory(category) {
     updateSwiperUI(category, validPos);
   });
 
-  // Scroll listener – sync dots/badge as user swipes
-  let scrollTimer;
-  track.addEventListener(
-    "scroll",
-    () => {
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
-        const idx = Math.round(track.scrollLeft / track.clientWidth);
-        updateSwiperUI(category, idx);
-        saveSwiperPosition(category, idx);
-      }, 80);
+  // ── IntersectionObserver – reliably detect active slide ──
+  // Fires when a slide crosses 50% visibility in the track viewport.
+  // This eliminates the timing race condition between scroll-snap and
+  // the old setTimeout-based scrollLeft calculation that caused skipping.
+  _swiperObserver = new IntersectionObserver(
+    (entries) => {
+      // Skip if a programmatic scroll is in progress
+      if (_swiperIsScrolling) return;
+
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const slide = entry.target;
+          const idx = parseInt(slide.dataset.index, 10);
+          if (!isNaN(idx)) {
+            updateSwiperUI(category, idx);
+            saveSwiperPosition(category, idx);
+          }
+        }
+      });
     },
-    { passive: true },
+    {
+      root: track,
+      threshold: 0.5, // fire when 50% of slide is visible
+    },
   );
+
+  // Observe all slides
+  track.querySelectorAll(".azkar-slide").forEach((slide) => {
+    _swiperObserver.observe(slide);
+  });
 }
 
 // Create one swiper slide
@@ -2478,10 +2511,19 @@ function handleSwipe() {
 function goToSlide(index) {
   const track = document.getElementById("azkarSwiperTrack");
   if (!track || !currentCategory) return;
+
+  // Lock the observer during programmatic scroll to prevent conflicts
+  _swiperIsScrolling = true;
+
   const slideWidth = track.clientWidth;
   track.scrollTo({ left: index * slideWidth, behavior: "smooth" });
   updateSwiperUI(currentCategory, index);
   saveSwiperPosition(currentCategory, index);
+
+  // Release lock after scroll animation completes
+  setTimeout(() => {
+    _swiperIsScrolling = false;
+  }, 450);
 }
 
 /** Sync progress badge, progress line, and dots to reflect current slide index */
@@ -2518,11 +2560,21 @@ function decrementSlideCounter(category, index) {
   // Delegate to the shared increment logic (updates data + stats + marks done)
   incrementZikrCount(category, index);
 
-  // Auto-advance to next slide 1.5 s after completion
+  // Auto-advance to next slide on completion with ultra-fluid transition
   if (zikr.currentCount >= zikr.count) {
+    // Add completion flash effect to counter button
+    const swiperBtn = document.getElementById(
+      `slideCounterBtn_${category}_${index}`,
+    );
+    if (swiperBtn) {
+      swiperBtn.classList.add("completion-flash");
+      setTimeout(() => swiperBtn.classList.remove("completion-flash"), 600);
+    }
+
     const total = adhkarData[category].adhkar.length;
     if (index < total - 1) {
-      setTimeout(() => goToSlide(index + 1), 1500);
+      // 600ms delay for ultra-fluid auto-advance (was 1500ms)
+      setTimeout(() => goToSlide(index + 1), 600);
     }
   }
 }
@@ -4790,6 +4842,33 @@ function updateDailyInfo() {
 
   // 4. Update Daily Duaa
   updateDailyDuaa(now);
+
+  // 5. Friday Banner — show only on Fridays (day 5 = Friday)
+  const fridayBanner = document.getElementById("fridayBanner");
+  if (fridayBanner) {
+    if (now.getDay() === 5) {
+      fridayBanner.classList.remove("hidden");
+    } else {
+      fridayBanner.classList.add("hidden");
+    }
+  }
+}
+
+/**
+ * Opens Surah Al-Kahf directly in the Mushaf reader.
+ * Al-Kahf: pages 293–304 (Maryam starts at 305).
+ */
+function openSurahAlKahf() {
+  // Switch to the Quran tab
+  switchTab("tab-quran");
+
+  // Open the Mushaf reader directly at Surah Al-Kahf
+  // openFreeReader(startPage, endPage) renders the reader immediately
+  setTimeout(() => {
+    if (typeof openFreeReader === "function") {
+      openFreeReader(293, 304);
+    }
+  }, 150); // brief delay to let the tab render
 }
 
 function updateDailyDuaa(date) {
