@@ -1,0 +1,342 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&family=Tajawal:wght@300;400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════
+   TAZKEER v2.0 — Design System
+   Cyberpunk / Dark Neon Islamic Theme
+   ═══════════════════════════════════════════════ */
+
+/* ── CSS Variables / Design Tokens ── */
+:root {
+  /* Colors — Dark Theme (default) */
+  --bg-primary: #12181F;
+  --bg-secondary: #1A222D;
+  --bg-card: rgba(30, 39, 51, 0.6);
+  --bg-card-solid: #1E2733;
+  --border-subtle: rgba(100, 116, 139, 0.25);
+  --border-glow: rgba(0, 230, 118, 0.3);
+
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  --accent-mint: #00E676;
+  --accent-emerald: #10B981;
+  --accent-gold: #F59E0B;
+  --accent-cyan: #00D9F5;
+  --accent-red: #EF4444;
+
+  /* Typography */
+  --font-ui: 'Cairo', 'Tajawal', sans-serif;
+  --font-quran: 'Amiri', serif;
+  --dhikr-font-size: clamp(1.1rem, 2.5vw + 0.5rem, 1.75rem);
+  --quran-font-size: 1.25rem;
+
+  /* Safe Areas */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(26, 34, 45, 0.6);
+  --glass-border: rgba(100, 116, 139, 0.2);
+  --glass-blur: 12px;
+}
+
+/* ── Sepia Theme ── */
+[data-theme="sepia"] {
+  --bg-primary: #F5F0E8;
+  --bg-secondary: #EDE6D6;
+  --bg-card: rgba(232, 224, 207, 0.8);
+  --bg-card-solid: #E8E0CF;
+  --border-subtle: rgba(92, 75, 55, 0.2);
+  --border-glow: rgba(16, 185, 129, 0.3);
+  --text-primary: #3D2E1F;
+  --text-secondary: #5C4B37;
+  --text-muted: #8B7355;
+  --glass-bg: rgba(237, 230, 214, 0.7);
+  --glass-border: rgba(92, 75, 55, 0.15);
+}
+
+/* ── Light Theme ── */
+[data-theme="light"] {
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #F1F5F9;
+  --bg-card: rgba(255, 255, 255, 0.8);
+  --bg-card-solid: #FFFFFF;
+  --border-subtle: rgba(148, 163, 184, 0.3);
+  --border-glow: rgba(16, 185, 129, 0.3);
+  --text-primary: #1E293B;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(148, 163, 184, 0.2);
+}
+
+/* ── Base Styles ── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-family: var(--font-ui);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  width: 100%;
+  width: 100vw;
+  min-width: 100%;
+  height: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100%;
+  width: 100vw;
+  min-width: 100%;
+  height: 100%;
+  height: 100dvh;
+  min-height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#root {
+  width: 100%;
+  width: 100vw;
+  min-width: 100%;
+  height: 100%;
+  height: 100dvh;
+  min-height: 100%;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Scrollbar Styling ── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 4px;
+}
+
+/* Hide scrollbar while keeping scroll functional */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Line clamping utility */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Glassmorphism Card ── */
+@layer components {
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+  }
+
+  .neon-glow {
+    box-shadow: 0 0 20px rgba(0, 230, 118, 0.15),
+                0 0 60px rgba(0, 230, 118, 0.05);
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.3),
+                0 0 60px rgba(245, 158, 11, 0.1);
+  }
+}
+
+/* ── Arabic Text Rendering ── */
+.font-quran {
+  font-family: var(--font-quran);
+  font-feature-settings: 'liga' 1;
+  line-height: 2.2;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Fluid Dhikr Typography ── */
+.dhikr-text {
+  font-family: var(--font-quran);
+  font-size: var(--dhikr-font-size);
+  line-height: 2.2;
+  text-align: center;
+  color: var(--text-primary);
+  word-spacing: 0.05em;
+}
+
+/* ── Counter Button ── */
+.counter-btn {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 3px solid var(--accent-emerald);
+  background: var(--bg-card-solid);
+  color: var(--accent-mint);
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.counter-btn:active {
+  transform: scale(0.92);
+}
+
+.counter-btn.completed {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+/* ── Bottom Navigation ── */
+.bottom-nav {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: var(--bg-card-solid);
+  border-top: 1px solid var(--border-subtle);
+  padding: 6px 0;
+  padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
+  flex-shrink: 0;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 12px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav-item.active {
+  color: var(--accent-mint);
+}
+
+.bottom-nav-item svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* ── Completion Flash Animation ── */
+@keyframes completion-ring {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+  70% { box-shadow: 0 0 0 20px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+.completion-flash {
+  animation: completion-ring 600ms ease-out;
+}
+
+/* ── Progress Dots ── */
+.progress-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+  width: 20px;
+  border-radius: 3px;
+  background: var(--accent-emerald);
+}
+
+.progress-dot.completed {
+  background: var(--accent-gold);
+}
+
+/* ── Quran Image Viewer & Themes ── */
+.mushaf-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+  margin: 0 auto;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Sepia (بيج / رملي): Warm soothing Islamic parchment with dark amber-brown text */
+[data-quran-theme="sepia"] {
+  background-color: #F5F0E8 !important;
+}
+
+[data-quran-theme="sepia"] .mushaf-image {
+  filter: sepia(0.55) contrast(1.15) brightness(0.96) saturate(1.2) !important;
+  mix-blend-mode: multiply !important;
+}
+
+/* Light (فاتح / أبيض): Crisp pure white paper with deep black ink */
+[data-quran-theme="light"] {
+  background-color: #ffffff !important;
+}
+
+[data-quran-theme="light"] .mushaf-image {
+  filter: contrast(1.08) brightness(1.02) !important;
+  mix-blend-mode: multiply !important;
+}
+
+/* Dark (داكن / أسود): OLED pure black background with crisp glowing white script */
+[data-quran-theme="dark"] {
+  background-color: #000000 !important;
+}
+
+[data-quran-theme="dark"] .mushaf-image {
+  filter: invert(1) grayscale(1) brightness(0.9) contrast(1.6) !important;
+  mix-blend-mode: normal !important;
+}
+
