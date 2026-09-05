@@ -46,16 +46,19 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json}'],
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
-            // Cache Quran HD images from CDN
-            urlPattern: /^https:\/\/cdn\.jsdelivr\.net\/gh\/akram-seid\/quran-hd-images/,
+            urlPattern: ({ url }) => {
+              return (url.protocol === 'http:' || url.protocol === 'https:') &&
+                url.href.includes('cdn.jsdelivr.net');
+            },
             handler: 'CacheFirst',
             options: {
               cacheName: 'quran-images',
               expiration: {
                 maxEntries: 700,
-                maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days
+                maxAgeSeconds: 60 * 60 * 24 * 90,
               },
               cacheableResponse: {
                 statuses: [0, 200],
@@ -63,29 +66,16 @@ export default defineConfig({
             },
           },
           {
-            // Cache Prayer Times API
-            urlPattern: /^https:\/\/api\.aladhan\.com/,
+            urlPattern: ({ url }) => {
+              return (url.protocol === 'http:' || url.protocol === 'https:') &&
+                url.href.includes('api.aladhan.com');
+            },
             handler: 'NetworkFirst',
             options: {
               cacheName: 'prayer-times-api',
               expiration: {
                 maxEntries: 30,
-                maxAgeSeconds: 60 * 60 * 12, // 12 hours
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
-          {
-            // Cache Google Fonts (fallback if loaded externally)
-            urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts',
-              expiration: {
-                maxEntries: 20,
-                maxAgeSeconds: 60 * 60 * 24 * 365,
+                maxAgeSeconds: 60 * 60 * 12,
               },
               cacheableResponse: {
                 statuses: [0, 200],
