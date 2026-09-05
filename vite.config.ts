@@ -101,5 +101,5 @@ export default defineConfig({
       '@': path.resolve('./src'),
     },
   },
-  base: './',
+  base: '/tazkeer/',
 })
