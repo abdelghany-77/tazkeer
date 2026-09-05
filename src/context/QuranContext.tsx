@@ -82,7 +82,8 @@ export const QuranProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const startKhatmah = (goalType: 'days' | 'pages', goalValue: number, startPage: number = 1) => {
-    const dailyTarget = goalType === 'days' ? Math.ceil(604 / goalValue) : goalValue;
+    const remainingPages = Math.max(1, 604 - startPage + 1);
+    const dailyTarget = goalType === 'days' ? Math.ceil(remainingPages / goalValue) : goalValue;
     const newState: KhatmahState = {
       isActive: true,
       goalType,

@@ -9,8 +9,17 @@ import {
   RotateCcw,
   BookMarked,
   Sparkles,
+  Layers,
+  Plus,
+  Minus,
+  Flag,
 } from 'lucide-react';
-import { toArabicNumber, getSurahForPage, TOTAL_QURAN_PAGES } from '@/data/surah-data';
+import {
+  toArabicNumber,
+  getSurahForPage,
+  JUZ_DATA,
+  TOTAL_QURAN_PAGES,
+} from '@/data/surah-data';
 
 interface KhatmahDashboardProps {
   onContinueWird: (startPage: number, endPage: number, targetPage?: number) => void;
@@ -22,26 +31,33 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
   onBack,
 }) => {
   const { khatmah, startKhatmah, resetKhatmah } = useQuran();
+
+  // Setup form state
+  const [startMode, setStartMode] = useState<'beginning' | 'page' | 'juz'>('beginning');
+  const [customStartPage, setCustomStartPage] = useState<number>(1);
+  const [selectedJuzNumber, setSelectedJuzNumber] = useState<number>(1);
+
   const [goalType, setGoalType] = useState<'days' | 'pages'>('days');
   const [goalValue, setGoalValue] = useState<number>(30);
   const [showResetConfirm, setShowResetConfirm] = useState<boolean>(false);
 
-  const totalPages = TOTAL_QURAN_PAGES; // 604
+  // Active Khatmah calculations (taking khatmahStartPage into account)
+  const khatmahStartPage = khatmah.khatmahStartPage || 1;
+  const khatmahTotalPages = Math.max(1, TOTAL_QURAN_PAGES - khatmahStartPage + 1);
   const dailyTarget = Math.max(1, khatmah.dailyTarget || 20);
-  const totalWirds = Math.ceil(totalPages / dailyTarget);
+  const totalWirds = Math.ceil(khatmahTotalPages / dailyTarget);
 
   // Determine current active wird index (1-based)
-  // Last read page determines which wird the user is currently on
-  const readPagesCount = Math.min(totalPages, khatmah.totalPagesRead);
-  const lastPage = Math.max(1, Math.min(totalPages, khatmah.lastReadPage));
+  const readPagesCount = Math.min(khatmahTotalPages, khatmah.totalPagesRead);
+  const lastPage = Math.max(khatmahStartPage, Math.min(TOTAL_QURAN_PAGES, khatmah.lastReadPage));
 
   const currentWirdIndex = Math.min(
     totalWirds,
-    Math.max(1, Math.floor((lastPage - 1) / dailyTarget) + 1)
+    Math.max(1, Math.floor((lastPage - khatmahStartPage) / dailyTarget) + 1)
   );
 
-  const wirdStartPage = (currentWirdIndex - 1) * dailyTarget + 1;
-  const wirdEndPage = Math.min(totalPages, currentWirdIndex * dailyTarget);
+  const wirdStartPage = khatmahStartPage + (currentWirdIndex - 1) * dailyTarget;
+  const wirdEndPage = Math.min(TOTAL_QURAN_PAGES, wirdStartPage + dailyTarget - 1);
   const wirdTotalPages = wirdEndPage - wirdStartPage + 1;
 
   // Pages read inside the current wird
@@ -51,7 +67,7 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
   );
 
   // Overall Khatmah progress percent
-  const overallPercent = Math.min(100, Math.round((readPagesCount / totalPages) * 100));
+  const overallPercent = Math.min(100, Math.round((readPagesCount / khatmahTotalPages) * 100));
 
   // Surahs covered by this Wird
   const startSurah = getSurahForPage(wirdStartPage);
@@ -72,20 +88,40 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
     daysRemaining = Math.max(0, targetDays - daysPassed);
   }
 
+  // Determine effective starting page for new khatmah setup
+  const getEffectiveStartPage = (): number => {
+    if (startMode === 'page') return Math.max(1, Math.min(TOTAL_QURAN_PAGES, customStartPage));
+    if (startMode === 'juz') {
+      const foundJuz = JUZ_DATA.find((j) => j.number === selectedJuzNumber);
+      return foundJuz ? foundJuz.startPage : 1;
+    }
+    return 1;
+  };
+
+  const effectiveStartPage = getEffectiveStartPage();
+  const effectiveRemainingPages = Math.max(1, TOTAL_QURAN_PAGES - effectiveStartPage + 1);
+
   const handleStart = () => {
-    startKhatmah(goalType, goalValue, 1);
+    startKhatmah(goalType, Math.max(1, goalValue), effectiveStartPage);
   };
 
   const handleReadWird = () => {
-    // Open reader starting at lastReadPage (or wirdStartPage if earlier) Clamped to wird range
     const targetPage = Math.max(wirdStartPage, Math.min(wirdEndPage, lastPage));
     onContinueWird(wirdStartPage, wirdEndPage, targetPage);
+  };
+
+  const updateGoalValue = (delta: number) => {
+    setGoalValue((prev) => Math.max(1, prev + delta));
+  };
+
+  const updateStartPage = (delta: number) => {
+    setCustomStartPage((prev) => Math.max(1, Math.min(TOTAL_QURAN_PAGES, prev + delta)));
   };
 
   return (
     <div className="h-full flex flex-col max-w-lg mx-auto w-full px-4 py-3 overflow-y-auto no-scrollbar select-none">
       {khatmah.isActive ? (
-        /* ── Active Khatmah Dashboard matching exact user reference screenshots ── */
+        /* ── Active Khatmah Dashboard ── */
         <div className="flex flex-col items-center w-full space-y-4 pb-6 pt-1 shrink-0">
           {/* 1. Circular Progress Indicator */}
           <div className="flex flex-col items-center justify-center my-1 relative">
@@ -123,7 +159,7 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
                   %{toArabicNumber(overallPercent)}
                 </span>
                 <span className="text-[11px] text-neutral-400 font-mono mt-0.5">
-                  {toArabicNumber(readPagesCount)} / {toArabicNumber(totalPages)} صفحة
+                  {toArabicNumber(readPagesCount)} / {toArabicNumber(khatmahTotalPages)} صفحة
                 </span>
               </div>
             </div>
@@ -268,22 +304,155 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
         </div>
       ) : (
         /* ── Setup New Khatmah Screen ── */
-        <div className="rounded-3xl p-6 glass-card border border-border-subtle bg-primary-surface/90 shadow-xl space-y-5 my-auto shrink-0 w-full">
+        <div className="rounded-3xl p-5 sm:p-6 glass-card border border-border-subtle bg-primary-surface/90 shadow-xl space-y-5 my-auto shrink-0 w-full">
           <div className="text-center">
             <div className="w-14 h-14 rounded-2xl bg-accent-mint/15 text-accent-mint border border-accent-mint/30 flex items-center justify-center mx-auto mb-3">
               <Calendar className="w-7 h-7" />
             </div>
             <h3 className="text-lg font-black text-text-primary">ابدأ خطة ختم القرآن الكريم</h3>
             <p className="text-xs text-text-muted mt-1">
-              حدد هدفك وسيقوم التطبيق بحساب الورد اليومي وتقسيمه ومتابعة تقدمك
+              حدد من أين تريد البدء وهدفك القادم، وسيقوم التطبيق بتنظيم الورد ومتابعة تقدمك
             </p>
           </div>
 
-          {/* Mode Selector */}
-          <div>
-            <label className="text-xs font-bold text-text-muted block mb-2">نوع الهدف:</label>
+          {/* ── 1. Start Location Selection (من أين تريد البدء؟) ── */}
+          <div className="space-y-2.5">
+            <label className="text-xs font-bold text-text-muted flex items-center gap-1.5">
+              <Flag className="w-4 h-4 text-accent-mint" />
+              <span>نقطة بداية الختمة:</span>
+            </label>
+
+            {/* Mode Tabs */}
+            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-primary-card/80 border border-border-subtle/70">
+              <button
+                type="button"
+                onClick={() => setStartMode('beginning')}
+                className={`py-2 px-2 rounded-xl text-xs font-bold transition-all ${
+                  startMode === 'beginning'
+                    ? 'bg-accent-mint text-primary-bg shadow-sm'
+                    : 'text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                من البداية
+              </button>
+              <button
+                type="button"
+                onClick={() => setStartMode('page')}
+                className={`py-2 px-2 rounded-xl text-xs font-bold transition-all ${
+                  startMode === 'page'
+                    ? 'bg-accent-mint text-primary-bg shadow-sm'
+                    : 'text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                صفحة محددة
+              </button>
+              <button
+                type="button"
+                onClick={() => setStartMode('juz')}
+                className={`py-2 px-2 rounded-xl text-xs font-bold transition-all ${
+                  startMode === 'juz'
+                    ? 'bg-accent-mint text-primary-bg shadow-sm'
+                    : 'text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                جزء محدد
+              </button>
+            </div>
+
+            {/* Controls depending on mode */}
+            {startMode === 'beginning' && (
+              <div className="p-3 rounded-xl bg-accent-mint/10 border border-accent-mint/20 text-[11px] text-accent-mint text-center font-medium">
+                تبدأ الختمة من الصفحة الأولى (سورة الفاتحة) — صفحة ١
+              </div>
+            )}
+
+            {startMode === 'page' && (
+              <div className="p-3.5 rounded-2xl bg-primary-card/90 border border-border-subtle/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-text-secondary">رقم الصفحة:</span>
+                  <span className="text-xs text-accent-mint font-bold">
+                    سورة {getSurahForPage(customStartPage).name}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => updateStartPage(-10)}
+                    className="px-2.5 py-1.5 rounded-xl bg-[#131c26] text-text-secondary hover:text-white border border-border-subtle text-xs font-mono font-bold active:scale-95"
+                  >
+                    -١٠
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateStartPage(-1)}
+                    className="p-2 rounded-xl bg-[#131c26] text-text-secondary hover:text-white border border-border-subtle active:scale-95"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+
+                  <input
+                    type="number"
+                    min={1}
+                    max={TOTAL_QURAN_PAGES}
+                    value={customStartPage}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      if (!isNaN(val)) {
+                        setCustomStartPage(Math.max(1, Math.min(TOTAL_QURAN_PAGES, val)));
+                      }
+                    }}
+                    className="w-20 py-1.5 text-center font-mono font-bold text-base bg-[#131c26] text-accent-gold border border-accent-gold/40 rounded-xl focus:outline-none focus:border-accent-gold"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => updateStartPage(1)}
+                    className="p-2 rounded-xl bg-[#131c26] text-text-secondary hover:text-white border border-border-subtle active:scale-95"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateStartPage(10)}
+                    className="px-2.5 py-1.5 rounded-xl bg-[#131c26] text-text-secondary hover:text-white border border-border-subtle text-xs font-mono font-bold active:scale-95"
+                  >
+                    +١٠
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {startMode === 'juz' && (
+              <div className="p-3.5 rounded-2xl bg-primary-card/90 border border-border-subtle/80 space-y-2">
+                <label className="text-xs font-bold text-text-secondary block">اختر الجزء:</label>
+                <select
+                  value={selectedJuzNumber}
+                  onChange={(e) => setSelectedJuzNumber(parseInt(e.target.value, 10))}
+                  className="w-full py-2.5 px-3 rounded-xl bg-[#131c26] text-white border border-border-subtle text-xs font-bold focus:outline-none focus:border-accent-mint cursor-pointer"
+                >
+                  {JUZ_DATA.map((juz) => (
+                    <option key={juz.number} value={juz.number} className="bg-[#131c26] text-white">
+                      {juz.name} (صفحة {toArabicNumber(juz.startPage)})
+                    </option>
+                  ))}
+                </select>
+                <div className="text-[11px] text-accent-mint font-medium text-center pt-1">
+                  تبدأ من الصفحة {toArabicNumber(effectiveStartPage)}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── 2. Goal Type Selector (طريقة الحساب) ── */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-text-muted flex items-center gap-1.5">
+              <Layers className="w-4 h-4 text-accent-mint" />
+              <span>نوع الهدف:</span>
+            </label>
             <div className="grid grid-cols-2 gap-2">
               <button
+                type="button"
                 onClick={() => {
                   setGoalType('days');
                   setGoalValue(30);
@@ -297,6 +466,7 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
                 ختم في عدد أيام
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setGoalType('pages');
                   setGoalValue(20);
@@ -312,49 +482,130 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
             </div>
           </div>
 
-          {/* Value Selector */}
-          <div>
-            <label className="text-xs font-bold text-text-muted block mb-2">
-              {goalType === 'days' ? 'المدة المستهدفة (بالأيام):' : 'عدد الصفحات اليومية:'}
-            </label>
-            <div className="flex items-center gap-2">
-              {[
-                goalType === 'days' ? 15 : 10,
-                goalType === 'days' ? 30 : 20,
-                goalType === 'days' ? 60 : 30,
-              ].map((preset) => (
-                <button
-                  key={preset}
-                  onClick={() => setGoalValue(preset)}
-                  className={`flex-1 py-2 rounded-xl border font-mono text-xs font-bold transition-all ${
-                    goalValue === preset
-                      ? 'bg-accent-gold/20 text-accent-gold border-accent-gold'
-                      : 'bg-primary-card text-text-muted border-border-subtle hover:text-text-primary'
-                  }`}
-                >
-                  {toArabicNumber(preset)} {goalType === 'days' ? 'يوم' : 'صفحة'}
-                </button>
-              ))}
+          {/* ── 3. Custom Value Selector with Input & Presets ── */}
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-text-muted">
+                {goalType === 'days' ? 'المدة المستهدفة (بالأيام):' : 'عدد الصفحات اليومية:'}
+              </label>
+              <span className="text-[11px] text-text-muted">ادخل أو اختر أي رقم</span>
+            </div>
+
+            {/* Custom Input with Stepper */}
+            <div className="flex items-center justify-center gap-2 p-3 rounded-2xl bg-primary-card/90 border border-border-subtle/80">
+              <button
+                type="button"
+                onClick={() => updateGoalValue(goalType === 'days' ? -5 : -2)}
+                className="px-2.5 py-1.5 rounded-xl bg-[#131c26] text-text-secondary hover:text-white border border-border-subtle text-xs font-mono font-bold active:scale-95"
+              >
+                {goalType === 'days' ? '-٥' : '-٢'}
+              </button>
+              <button
+                type="button"
+                onClick={() => updateGoalValue(-1)}
+                className="p-2 rounded-xl bg-[#131c26] text-text-secondary hover:text-white border border-border-subtle active:scale-95"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="number"
+                  min={1}
+                  max={goalType === 'days' ? 365 : effectiveRemainingPages}
+                  value={goalValue}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10);
+                    if (!isNaN(val)) {
+                      setGoalValue(Math.max(1, val));
+                    }
+                  }}
+                  className="w-20 py-1.5 text-center font-mono font-bold text-lg bg-[#131c26] text-accent-gold border border-accent-gold/40 rounded-xl focus:outline-none focus:border-accent-gold"
+                />
+                <span className="text-xs font-bold text-text-secondary">
+                  {goalType === 'days' ? 'يوم' : 'صفحة'}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => updateGoalValue(1)}
+                className="p-2 rounded-xl bg-[#131c26] text-text-secondary hover:text-white border border-border-subtle active:scale-95"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => updateGoalValue(goalType === 'days' ? 5 : 2)}
+                className="px-2.5 py-1.5 rounded-xl bg-[#131c26] text-text-secondary hover:text-white border border-border-subtle text-xs font-mono font-bold active:scale-95"
+              >
+                {goalType === 'days' ? '+٥' : '+٢'}
+              </button>
+            </div>
+
+            {/* Presets Chips */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {(goalType === 'days' ? [7, 15, 30, 45, 60, 90] : [3, 5, 10, 15, 20, 30]).map(
+                (preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setGoalValue(preset)}
+                    className={`flex-1 min-w-[50px] py-1.5 rounded-xl border font-mono text-xs font-bold transition-all ${
+                      goalValue === preset
+                        ? 'bg-accent-gold/20 text-accent-gold border-accent-gold'
+                        : 'bg-primary-card text-text-muted border-border-subtle hover:text-text-primary'
+                    }`}
+                  >
+                    {toArabicNumber(preset)}
+                  </button>
+                )
+              )}
             </div>
           </div>
 
-          {/* Daily calculation preview */}
-          <div className="p-3.5 rounded-2xl bg-primary-card/70 border border-border-subtle/60 text-xs text-text-secondary space-y-1">
-            <div className="flex justify-between">
-              <span>الورد اليومي المحسوب:</span>
-              <span className="font-bold text-accent-mint font-mono">
-                {toArabicNumber(goalType === 'days' ? Math.ceil(604 / goalValue) : goalValue)} صفحة / يوم
+          {/* ── 4. Calculation Preview Card ── */}
+          <div className="p-3.5 rounded-2xl bg-primary-card/70 border border-border-subtle/60 text-xs text-text-secondary space-y-1.5">
+            <div className="flex justify-between items-center">
+              <span>نقطة البداية:</span>
+              <span className="font-bold text-text-primary font-mono">
+                صفحة {toArabicNumber(effectiveStartPage)}
               </span>
             </div>
-            <div className="flex justify-between">
+            {effectiveStartPage > 1 && (
+              <div className="flex justify-between items-center">
+                <span>إجمالي الصفحات المطلوبة:</span>
+                <span className="font-bold text-accent-cyan font-mono">
+                  {toArabicNumber(effectiveRemainingPages)} صفحة
+                </span>
+              </div>
+            )}
+            <div className="flex justify-between items-center">
+              <span>الورد اليومي المحسوب:</span>
+              <span className="font-bold text-accent-mint font-mono">
+                {toArabicNumber(
+                  goalType === 'days'
+                    ? Math.ceil(effectiveRemainingPages / goalValue)
+                    : goalValue
+                )}{' '}
+                صفحة / يوم
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
               <span>المدة التقريبية:</span>
               <span className="font-bold text-accent-gold font-mono">
-                {toArabicNumber(goalType === 'days' ? goalValue : Math.ceil(604 / goalValue))} يوماً
+                {toArabicNumber(
+                  goalType === 'days'
+                    ? goalValue
+                    : Math.ceil(effectiveRemainingPages / goalValue)
+                )}{' '}
+                يوماً
               </span>
             </div>
           </div>
 
           <button
+            type="button"
             onClick={handleStart}
             className="w-full py-3.5 rounded-2xl bg-accent-mint text-primary-bg font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-accent-mint/20 hover:bg-accent-emerald active:scale-98 transition-all"
           >
