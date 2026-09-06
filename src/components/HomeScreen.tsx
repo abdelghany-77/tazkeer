@@ -82,8 +82,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       {/* ── Friday Kahf Banner (conditional) ── */}
       <FridayBanner onOpenKahf={() => onOpenQuranPage(293)} />
 
-      {/* ═══ Section 2: دعاء اليوم — expands to fill available space ═══ */}
-      <div className="flex-1 min-h-0 flex flex-col">
+      {/* ═══ Section 2: دعاء اليوم — smaller share ═══ */}
+      <div className="min-h-0 flex flex-col" style={{ flex: '0.7' }}>
         <DailyDuaCard />
       </div>
 
@@ -162,8 +162,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </div>
 
-      {/* ═══ Section 4: مواقيت الصلاة — expands to fill remaining space ═══ */}
-      <div className="flex-1 min-h-0 flex flex-col">
+      {/* ═══ Section 4: مواقيت الصلاة — larger share for bigger prayer cards ═══ */}
+      <div className="min-h-0 flex flex-col" style={{ flex: '1.3' }}>
         <PrayerTimesSection onOpenQibla={onOpenQibla} />
       </div>
     </div>

@@ -6,6 +6,7 @@ import {
   type Coordinates,
   type PrayerTimeItem,
 } from "@/utils/prayerTimes";
+import { toArabicNumber } from "@/data/surah-data";
 
 interface PrayerTimesSectionProps {
   onOpenQibla?: () => void;
@@ -43,7 +44,7 @@ export const PrayerTimesSection: React.FC<PrayerTimesSectionProps> = ({
           const h = Math.floor(totalSecs / 3600);
           const m = Math.floor((totalSecs % 3600) / 60);
           const s = totalSecs % 60;
-          const pad = (n: number) => (n < 10 ? "0" + n : String(n));
+          const pad = (n: number) => (n < 10 ? '٠' + toArabicNumber(n) : toArabicNumber(n));
           setNextCountdown(`${pad(h)}:${pad(m)}:${pad(s)}`);
         } else {
           setNextCountdown("حان وقت الصلاة");
@@ -76,19 +77,19 @@ export const PrayerTimesSection: React.FC<PrayerTimesSectionProps> = ({
   const getPrayerIcon = (id: PrayerTimeItem["id"]) => {
     switch (id) {
       case "fajr":
-        return <Sunrise className="w-4 h-4" />;
+        return <Sunrise className="w-5 h-5" />;
       case "sunrise":
-        return <Sun className="w-4 h-4 text-accent-gold" />;
+        return <Sun className="w-5 h-5 text-accent-gold" />;
       case "dhuhr":
-        return <Sun className="w-4 h-4 text-amber-400" />;
+        return <Sun className="w-5 h-5 text-amber-400" />;
       case "asr":
-        return <Sun className="w-4 h-4 text-orange-400" />;
+        return <Sun className="w-5 h-5 text-orange-400" />;
       case "maghrib":
-        return <SunsetIcon className="w-4 h-4 text-rose-400" />;
+        return <SunsetIcon className="w-5 h-5 text-rose-400" />;
       case "isha":
-        return <Moon className="w-4 h-4 text-indigo-300" />;
+        return <Moon className="w-5 h-5 text-indigo-300" />;
       default:
-        return <Clock className="w-4 h-4" />;
+        return <Clock className="w-5 h-5" />;
     }
   };
 
@@ -147,19 +148,19 @@ export const PrayerTimesSection: React.FC<PrayerTimesSectionProps> = ({
         {prayers.map((prayer) => (
           <div
             key={prayer.id}
-            className={`flex flex-col items-center justify-center py-2.5 px-1 rounded-xl border transition-all ${
+            className={`flex flex-col items-center justify-center py-3.5 px-1.5 rounded-xl border transition-all ${
               prayer.isNext
                 ? "bg-accent-mint/15 border-accent-mint text-accent-mint shadow-sm shadow-accent-mint/20 scale-[1.02]"
                 : "bg-primary-surface/60 border-border-subtle/50 text-text-secondary hover:border-border-subtle"
             }`}
           >
-            <div className="mb-0.5">{getPrayerIcon(prayer.id)}</div>
-            <span className="text-[10px] font-bold leading-tight">{prayer.nameAr}</span>
+            <div className="mb-1">{getPrayerIcon(prayer.id)}</div>
+            <span className="text-xs font-bold leading-tight">{prayer.nameAr}</span>
             <span
-              className="text-[10px] font-semibold mt-0.5 font-mono text-text-primary"
+              className="text-xs font-semibold mt-1 font-mono text-text-primary"
               dir="ltr"
             >
-              {prayer.time}
+              {prayer.time.replace(/[0-9]/g, (d) => toArabicNumber(parseInt(d)))}
             </span>
           </div>
         ))}

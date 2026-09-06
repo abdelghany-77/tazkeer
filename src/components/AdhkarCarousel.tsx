@@ -6,6 +6,7 @@ import { ArrowRight, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { vibrate } from '@/utils/feedback';
 import { saveItem, getItem } from '@/utils/storage';
+import { toArabicNumber } from '@/data/surah-data';
 
 interface AdhkarCarouselProps {
   category: AdhkarCategory;
@@ -195,7 +196,7 @@ export const AdhkarCarousel: React.FC<AdhkarCarouselProps> = ({
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
             <span className="font-mono font-bold text-xs text-accent-mint px-2 py-0.5 rounded-md bg-accent-mint/10 border border-accent-mint/20">
-              {currentIndex + 1} / {category.adhkar.length}
+              {toArabicNumber(currentIndex + 1)} / {toArabicNumber(category.adhkar.length)}
             </span>
           </div>
         </div>
@@ -258,7 +259,7 @@ export const AdhkarCarousel: React.FC<AdhkarCarouselProps> = ({
           >
             <div className="flex flex-col items-center justify-center leading-none">
               <span className="text-2xl font-black font-mono">
-                {currentZikr.count - currentCount > 0 ? currentZikr.count - currentCount : '✓'}
+                {currentZikr.count - currentCount > 0 ? toArabicNumber(currentZikr.count - currentCount) : '✓'}
               </span>
               <span className="text-[10px] font-normal opacity-70 mt-1">
                 {isCurrentFinished ? 'اكتمل' : 'متبقي'}

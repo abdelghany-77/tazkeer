@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Zikr } from '@/types';
 import { Copy, Check, Info, Sparkles } from 'lucide-react';
+import { toArabicNumber } from '@/data/surah-data';
 
 interface DhikrCardProps {
   zikr: Zikr;
@@ -91,7 +92,7 @@ export const DhikrCard: React.FC<DhikrCardProps> = ({ zikr, currentCount }) => {
               : 'bg-primary-card text-accent-mint border-accent-mint/30'
           }`}
         >
-          التكرار المطلوب: {zikr.count} {zikr.count === 1 ? 'مرة' : 'مرات'}
+          التكرار المطلوب: {toArabicNumber(zikr.count)} {zikr.count === 1 ? 'مرة' : 'مرات'}
         </span>
       </div>
     </div>

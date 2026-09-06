@@ -60,11 +60,13 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
   const wirdEndPage = Math.min(TOTAL_QURAN_PAGES, wirdStartPage + dailyTarget - 1);
   const wirdTotalPages = wirdEndPage - wirdStartPage + 1;
 
-  // Pages read inside the current wird
-  const pagesReadInCurrentWird = Math.max(
-    0,
-    Math.min(wirdTotalPages, lastPage >= wirdStartPage ? lastPage - wirdStartPage + 1 : 0)
-  );
+  // Pages read inside the current wird (count actual completed pages in range)
+  const pagesReadInCurrentWird = khatmah.completedPages.filter(
+    (p) => p >= wirdStartPage && p <= wirdEndPage
+  ).length;
+
+  // Check if current wird is fully completed
+  const isCurrentWirdComplete = pagesReadInCurrentWird >= wirdTotalPages;
 
   // Overall Khatmah progress percent
   const overallPercent = Math.min(100, Math.round((readPagesCount / khatmahTotalPages) * 100));
@@ -106,8 +108,23 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
   };
 
   const handleReadWird = () => {
-    const targetPage = Math.max(wirdStartPage, Math.min(wirdEndPage, lastPage));
-    onContinueWird(wirdStartPage, wirdEndPage, targetPage);
+    // If current wird is complete, start reading from next wird
+    if (isCurrentWirdComplete && currentWirdIndex < totalWirds) {
+      const nextWirdStart = khatmahStartPage + currentWirdIndex * dailyTarget;
+      const nextWirdEnd = Math.min(TOTAL_QURAN_PAGES, nextWirdStart + dailyTarget - 1);
+      onContinueWird(nextWirdStart, nextWirdEnd, nextWirdStart);
+    } else {
+      const targetPage = Math.max(wirdStartPage, Math.min(wirdEndPage, lastPage));
+      onContinueWird(wirdStartPage, wirdEndPage, targetPage);
+    }
+  };
+
+  const handleNextWird = () => {
+    if (currentWirdIndex < totalWirds) {
+      const nextWirdStart = khatmahStartPage + currentWirdIndex * dailyTarget;
+      const nextWirdEnd = Math.min(TOTAL_QURAN_PAGES, nextWirdStart + dailyTarget - 1);
+      onContinueWird(nextWirdStart, nextWirdEnd, nextWirdStart);
+    }
   };
 
   const updateGoalValue = (delta: number) => {
@@ -194,7 +211,7 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
             {/* Progress Bar inside Wird */}
             <div className="w-full h-1.5 rounded-full bg-[#202f3e] overflow-hidden mb-2">
               <div
-                className="h-full bg-[#00bba7] rounded-full transition-all duration-500"
+                className={`h-full rounded-full transition-all duration-500 ${isCurrentWirdComplete ? 'bg-[#d97706]' : 'bg-[#00bba7]'}`}
                 style={{
                   width: `${Math.min(
                     100,
@@ -207,6 +224,9 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
             {/* Bottom count */}
             <div className="text-[11px] text-neutral-400 font-mono">
               {toArabicNumber(pagesReadInCurrentWird)} / {toArabicNumber(wirdTotalPages)} صفحة
+              {isCurrentWirdComplete && (
+                <span className="text-[#d97706] font-bold mr-2">✓ اكتمل</span>
+              )}
             </div>
           </div>
 
@@ -251,13 +271,24 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
 
           {/* 4. Action Buttons Stack */}
           <div className="w-full flex flex-col gap-3 pt-2">
+            {/* Button: الانتقال للورد التالي (when current wird is complete) */}
+            {isCurrentWirdComplete && currentWirdIndex < totalWirds && (
+              <button
+                onClick={handleNextWird}
+                className="w-full py-3.5 px-4 rounded-2xl bg-[#d97706] hover:bg-[#b45309] text-white font-bold text-base flex items-center justify-center gap-2.5 shadow-lg shadow-[#d97706]/30 active:scale-98 transition-all animate-pulse"
+              >
+                <Sparkles className="w-5 h-5" />
+                <span>الانتقال للورد التالي</span>
+              </button>
+            )}
+
             {/* Button 1: متابعة الورد (Solid Emerald Green) */}
             <button
               onClick={handleReadWird}
               className="w-full py-3.5 px-4 rounded-2xl bg-[#0e8055] hover:bg-[#119463] text-white font-bold text-base flex items-center justify-center gap-2.5 shadow-lg shadow-[#0e8055]/30 active:scale-98 transition-all"
             >
               <BookOpen className="w-5 h-5" />
-              <span>متابعة الورد</span>
+              <span>{isCurrentWirdComplete ? 'مراجعة الورد' : 'متابعة الورد'}</span>
             </button>
 
             {/* Button 2: قراءة حرة (فهرس السور) (Outlined Green) */}

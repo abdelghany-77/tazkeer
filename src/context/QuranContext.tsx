@@ -107,13 +107,16 @@ export const QuranProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const markPageRead = (page: number) => {
     if (!khatmah.isActive) return;
-    if (!khatmah.completedPages.includes(page)) {
-      const newPages = [...khatmah.completedPages, page];
+    const alreadyRead = khatmah.completedPages.includes(page);
+    const newPages = alreadyRead ? khatmah.completedPages : [...khatmah.completedPages, page];
+    // Always track the highest page ever read so progress never regresses
+    const newLastReadPage = Math.max(khatmah.lastReadPage, page);
+    if (!alreadyRead || newLastReadPage !== khatmah.lastReadPage) {
       const updated: KhatmahState = {
         ...khatmah,
         completedPages: newPages,
         totalPagesRead: newPages.length,
-        lastReadPage: page,
+        lastReadPage: newLastReadPage,
       };
       setKhatmahState(updated);
       saveItem('tazkeer_khatmah_state', updated);

@@ -94,7 +94,7 @@ export const DailyDuaCard: React.FC = () => {
             transition={{ duration: 0.2 }}
             className="space-y-2 w-full"
           >
-            <p className="font-quran text-base sm:text-lg text-text-primary leading-[2.2] text-center px-1">
+            <p className="font-quran text-sm sm:text-base text-text-primary leading-[2] text-center px-1">
               "{currentDua.text}"
             </p>
           </motion.div>
