@@ -53,7 +53,7 @@ export const DailyDuaCard: React.FC = () => {
       <div className="relative z-10 flex items-center justify-between pb-2 border-b border-border-subtle/50 mb-auto">
         <div className="flex items-center gap-1.5 text-accent-gold font-bold text-xs">
           <Quote className="w-3.5 h-3.5 rotate-180 text-accent-mint" />
-          <span>دعاء اليوم {hijriDate}</span>
+          <span>دعاء اليوم</span>
         </div>
 
         <div className="flex items-center gap-1">
