@@ -298,7 +298,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
                     {/* Bar Track & Gradient Fill (Expanded Height h-36) */}
                     <div
-                      className={`w-full max-w-[42px] h-30 sm:h-40 rounded-2xl p-1 flex flex-col justify-end transition-all ${
+                      className={`w-full max-w-[42px] h-33 sm:h-40 rounded-2xl p-1 flex flex-col justify-end transition-all ${
                         day.isToday
                           ? "bg-primary-card border border-accent-mint/50 shadow-inner ring-2 ring-accent-mint/10"
                           : "bg-primary-card/50 border border-border-subtle/25"
