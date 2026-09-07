@@ -16,7 +16,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { MisbahaIcon } from './icons/MisbahaIcon';
-import { getItem } from '@/utils/storage';
+import { getItem, getTodayDateKey } from '@/utils/storage';
 
 interface AdhkarHubProps {
   onSelectCategory: (category: AdhkarCategory) => void;
@@ -28,12 +28,16 @@ export const AdhkarHub: React.FC<AdhkarHubProps> = ({ onSelectCategory, onOpenTa
   const [completedMap, setCompletedMap] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    // Load completion statuses from storage
+    // Load completion statuses from storage for today
     const loadStatuses = async () => {
       const map: Record<string, boolean> = {};
+      const today = getTodayDateKey();
       for (const cat of adhkarCategories) {
-        const session = await getItem<{ completed: boolean } | null>(`tazkeer_session_${cat.key}`, null);
-        if (session?.completed) {
+        const session = await getItem<{ completed: boolean; completedDate?: string } | null>(
+          `tazkeer_session_${cat.key}`,
+          null
+        );
+        if (session?.completed && session.completedDate === today) {
           map[cat.key] = true;
         }
       }

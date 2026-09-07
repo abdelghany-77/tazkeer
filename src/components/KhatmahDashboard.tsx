@@ -108,15 +108,12 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
   };
 
   const handleReadWird = () => {
-    // If current wird is complete, start reading from next wird
-    if (isCurrentWirdComplete && currentWirdIndex < totalWirds) {
-      const nextWirdStart = khatmahStartPage + currentWirdIndex * dailyTarget;
-      const nextWirdEnd = Math.min(TOTAL_QURAN_PAGES, nextWirdStart + dailyTarget - 1);
-      onContinueWird(nextWirdStart, nextWirdEnd, nextWirdStart);
-    } else {
-      const targetPage = Math.max(wirdStartPage, Math.min(wirdEndPage, lastPage));
-      onContinueWird(wirdStartPage, wirdEndPage, targetPage);
-    }
+    const targetPage = Math.max(wirdStartPage, Math.min(wirdEndPage, lastPage));
+    onContinueWird(wirdStartPage, wirdEndPage, targetPage);
+  };
+
+  const handleReviewWird = () => {
+    onContinueWird(wirdStartPage, wirdEndPage, wirdStartPage);
   };
 
   const handleNextWird = () => {
@@ -282,9 +279,9 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
               </button>
             )}
 
-            {/* Button 1: متابعة الورد (Solid Emerald Green) */}
+            {/* Button 1: متابعة الورد / مراجعة الورد (Solid Emerald Green) */}
             <button
-              onClick={handleReadWird}
+              onClick={isCurrentWirdComplete ? handleReviewWird : handleReadWird}
               className="w-full py-3.5 px-4 rounded-2xl bg-[#0e8055] hover:bg-[#119463] text-white font-bold text-base flex items-center justify-center gap-2.5 shadow-lg shadow-[#0e8055]/30 active:scale-98 transition-all"
             >
               <BookOpen className="w-5 h-5" />

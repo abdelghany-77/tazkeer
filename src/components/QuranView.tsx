@@ -10,13 +10,32 @@ interface QuranViewProps {
 }
 
 export const QuranView: React.FC<QuranViewProps> = ({ initialPage, onClearInitialPage }) => {
-  const { setCurrentPage, setActiveSurahNumber, setScope, setWirdRange, setIsReaderOpen } = useQuran();
+  const { khatmah, scope, setCurrentPage, setActiveSurahNumber, setScope, setWirdRange, setIsReaderOpen } = useQuran();
   const [subView, setSubView] = useState<'index' | 'reader' | 'khatmah'>(() => {
     if (initialPage) {
       return 'reader';
     }
+    if (khatmah.isActive) {
+      return 'khatmah';
+    }
     return 'index';
   });
+
+  const [returnSubView, setReturnSubView] = useState<'index' | 'khatmah'>(() => {
+    if (khatmah.isActive) return 'khatmah';
+    return 'index';
+  });
+
+  const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
+
+  // Sync subView if Khatmah state loads asynchronously
+  React.useEffect(() => {
+    if (!hasAutoNavigated && !initialPage && khatmah.isActive) {
+      setSubView('khatmah');
+      setReturnSubView('khatmah');
+      setHasAutoNavigated(true);
+    }
+  }, [khatmah.isActive, initialPage, hasAutoNavigated]);
 
   React.useEffect(() => {
     setIsReaderOpen(subView === 'reader');
@@ -46,6 +65,7 @@ export const QuranView: React.FC<QuranViewProps> = ({ initialPage, onClearInitia
     } else {
       setScope('all');
     }
+    setReturnSubView('index');
     setSubView('reader');
   };
 
@@ -54,13 +74,22 @@ export const QuranView: React.FC<QuranViewProps> = ({ initialPage, onClearInitia
     setCurrentPage(pageToOpen);
     setWirdRange({ startPage, endPage });
     setScope('wird');
+    setReturnSubView('khatmah');
     setSubView('reader');
+  };
+
+  const handleBackFromReader = () => {
+    if (scope === 'wird' || khatmah.isActive) {
+      setSubView('khatmah');
+    } else {
+      setSubView(returnSubView);
+    }
   };
 
   return (
     <div className="h-full w-full flex-1 overflow-hidden flex flex-col">
       {subView === 'reader' && (
-        <QuranReader onBackToIndex={() => setSubView('index')} />
+        <QuranReader onBackToIndex={handleBackFromReader} />
       )}
       {subView === 'index' && (
         <SurahList

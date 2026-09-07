@@ -5,7 +5,9 @@ import { CompletionSheet } from './CompletionSheet';
 import { ArrowRight, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { vibrate } from '@/utils/feedback';
-import { saveItem, getItem } from '@/utils/storage';
+import { saveItem, getItem, getTodayDateKey } from '@/utils/storage';
+import { recordAdhkarCompletion } from '@/utils/activity';
+
 import { toArabicNumber } from '@/data/surah-data';
 
 interface AdhkarCarouselProps {
@@ -33,17 +35,27 @@ export const AdhkarCarousel: React.FC<AdhkarCarouselProps> = ({
   // ── Category Lifecycle Fix: Initialize / Reset on entry ──
   useEffect(() => {
     let isMounted = true;
-    getItem<{ currentIndex: number; counters: number[]; completed: boolean } | null>(
+    getItem<{ currentIndex: number; counters: number[]; completed: boolean; completedDate?: string } | null>(
       storageKey,
       null
     ).then((saved) => {
       if (!isMounted) return;
-      if (saved && !saved.completed && Array.isArray(saved.counters)) {
+      const today = getTodayDateKey();
+      if (saved && saved.completed && saved.completedDate !== today) {
+        // Previously completed on a prior day: reset session for the new day
+        setCurrentIndex(0);
+        setCounters(new Array(category.adhkar.length).fill(0));
+        saveItem(storageKey, {
+          currentIndex: 0,
+          counters: new Array(category.adhkar.length).fill(0),
+          completed: false,
+        });
+      } else if (saved && !saved.completed && Array.isArray(saved.counters)) {
         // Resume in-progress session
         setCurrentIndex(Math.min(saved.currentIndex || 0, category.adhkar.length - 1));
         setCounters(saved.counters);
       } else {
-        // Fresh start or previously finished: always start at index 0 with clean counters
+        // Fresh start or finished today: start at index 0 with clean counters
         setCurrentIndex(0);
         setCounters(new Array(category.adhkar.length).fill(0));
       }
@@ -57,7 +69,13 @@ export const AdhkarCarousel: React.FC<AdhkarCarouselProps> = ({
 
   // Persist session changes
   const saveSession = (idx: number, cnts: number[], completed: boolean) => {
-    saveItem(storageKey, { currentIndex: idx, counters: cnts, completed });
+    const today = getTodayDateKey();
+    saveItem(storageKey, {
+      currentIndex: idx,
+      counters: cnts,
+      completed,
+      completedDate: completed ? today : undefined,
+    });
   };
 
   const currentZikr = category.adhkar[currentIndex] || category.adhkar[0];
@@ -89,6 +107,7 @@ export const AdhkarCarousel: React.FC<AdhkarCarouselProps> = ({
         if (isLastDhikr) {
           // Completed entire category
           saveSession(currentIndex, newCounters, true);
+          recordAdhkarCompletion(category.key);
           if (onCategoryCompleted) onCategoryCompleted(category.key);
           setIsCompletedSheetOpen(true);
         } else {
@@ -146,8 +165,6 @@ export const AdhkarCarousel: React.FC<AdhkarCarouselProps> = ({
     }
   };
 
-  const progressPercent = ((currentIndex + (isCurrentFinished ? 1 : 0)) / category.adhkar.length) * 100;
-
   // Slide animation variants
   const slideVariants: Variants = {
     enter: (dir: number) => ({
@@ -173,10 +190,10 @@ export const AdhkarCarousel: React.FC<AdhkarCarouselProps> = ({
     <div className="h-full w-full flex-1 flex flex-col justify-between overflow-hidden bg-primary-bg select-none">
       {/* ── Top Bar with Safe Area Inset ── */}
       <header
-        className="w-full px-4 pb-2 flex-shrink-0 bg-primary-surface/80 border-b border-border-subtle/40 backdrop-blur-md z-20"
+        className="w-full px-4 py-2.5 flex-shrink-0 bg-primary-surface/80 border-b border-border-subtle/40 backdrop-blur-md z-20"
         style={{ paddingTop: 'max(10px, env(safe-area-inset-top, 10px))' }}
       >
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between">
           <button
             onClick={onBack}
             className="flex items-center gap-1.5 py-1 px-2.5 rounded-xl bg-primary-card/80 hover:bg-white/10 text-text-secondary hover:text-text-primary transition-colors text-xs font-semibold"
@@ -199,14 +216,6 @@ export const AdhkarCarousel: React.FC<AdhkarCarouselProps> = ({
               {toArabicNumber(currentIndex + 1)} / {toArabicNumber(category.adhkar.length)}
             </span>
           </div>
-        </div>
-
-        {/* Linear Category Progress Bar */}
-        <div className="w-full h-1.5 rounded-full bg-primary-card overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-l from-accent-mint to-accent-emerald transition-all duration-300"
-            style={{ width: `${progressPercent}%` }}
-          />
         </div>
       </header>
 

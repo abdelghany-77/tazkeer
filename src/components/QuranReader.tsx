@@ -454,20 +454,39 @@ export const QuranReader: React.FC<QuranReaderProps> = ({ onBackToIndex }) => {
               paddingBottom: 'max(8px, env(safe-area-inset-bottom, 8px))',
             }}
           >
-            {/* Numbers Row matching photo: Right shows page/total, Left shows percentage */}
-            <div className="flex items-center justify-between text-xs font-mono font-bold px-0.5">
-              <span className={isDark ? 'text-accent-mint tracking-wider' : isSepia ? 'text-[#8A5A2B]' : 'text-[#0E8055]'}>
-                {scope === 'wird'
-                  ? `${toArabicNumber(totalWirdPages)} / ${toArabicNumber(pageInWird)}`
+            {/* Scope-based Progress Numbers Row */}
+            {(() => {
+              const currentProgressCount =
+                scope === 'wird'
+                  ? pageInWird
                   : scope === 'surah'
-                  ? `${toArabicNumber(totalSurahPages)} / ${toArabicNumber(pageInSurah)}`
-                  : `${toArabicNumber(TOTAL_QURAN_PAGES)} / ${toArabicNumber(currentPage)}`}
-              </span>
+                  ? pageInSurah
+                  : currentPage;
 
-              <span className={isDark ? 'text-accent-mint tracking-wider' : isSepia ? 'text-[#8A5A2B]' : 'text-[#0E8055]'}>
-                %{toArabicNumber(Math.round((currentPage / TOTAL_QURAN_PAGES) * 100))}
-              </span>
-            </div>
+              const totalProgressPages =
+                scope === 'wird'
+                  ? totalWirdPages
+                  : scope === 'surah'
+                  ? totalSurahPages
+                  : TOTAL_QURAN_PAGES;
+
+              const scopeProgressPercent = Math.min(
+                100,
+                Math.max(0, Math.round((currentProgressCount / Math.max(1, totalProgressPages)) * 100))
+              );
+
+              return (
+                <div className="flex items-center justify-between text-xs font-mono font-bold px-0.5">
+                  <span className={isDark ? 'text-accent-mint tracking-wider' : isSepia ? 'text-[#8A5A2B]' : 'text-[#0E8055]'}>
+                    {toArabicNumber(currentProgressCount)} / {toArabicNumber(totalProgressPages)}
+                  </span>
+
+                  <span className={isDark ? 'text-accent-mint tracking-wider' : isSepia ? 'text-[#8A5A2B]' : 'text-[#0E8055]'}>
+                    %{toArabicNumber(scopeProgressPercent)}
+                  </span>
+                </div>
+              );
+            })()}
 
             {/* Ultra-slim green progress slider */}
             <div className="w-full relative flex items-center py-0.5">

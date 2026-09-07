@@ -3,7 +3,6 @@ import { dailyDuas } from "@/data/daily-duas";
 import type { DailyDua } from "@/types";
 import { RefreshCw, Copy, Check, Quote } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getFormattedHijriDate } from "@/utils/prayerTimes";
 
 export const DailyDuaCard: React.FC = () => {
   const [currentDua, setCurrentDua] = useState<DailyDua>(() => {
@@ -16,7 +15,6 @@ export const DailyDuaCard: React.FC = () => {
 
   const [copied, setCopied] = useState(false);
   const [isRotating, setIsRotating] = useState(false);
-  const hijriDate = getFormattedHijriDate();
 
   useEffect(() => {
     if (copied) {

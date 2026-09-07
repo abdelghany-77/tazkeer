@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { KhatmahState, ThemePreset } from '@/types';
 import { getItem, saveItem } from '@/utils/storage';
+import { recordQuranPageRead } from '@/utils/activity';
 
 interface QuranContextType {
   currentPage: number;
@@ -106,6 +107,9 @@ export const QuranProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const markPageRead = (page: number) => {
+    // Record real activity log for profile metrics
+    recordQuranPageRead(page);
+
     if (!khatmah.isActive) return;
     const alreadyRead = khatmah.completedPages.includes(page);
     const newPages = alreadyRead ? khatmah.completedPages : [...khatmah.completedPages, page];
