@@ -231,7 +231,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({ onBackToIndex }) => {
             transition={{ duration: 0.15 }}
             className={`px-3 shrink-0 flex items-center justify-between z-30 ${
               isDark
-                ? 'bg-black/95 text-white border-b border-neutral-900'
+                ? 'bg-[#092d21]/95 text-white border-b border-[#144f3b]'
                 : isSepia
                 ? 'bg-[#EFE6D8]/95 border-b border-[#D8CCB9] text-[#5C4B37]'
                 : 'bg-white/95 border-b border-slate-200 text-slate-800'
@@ -246,7 +246,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({ onBackToIndex }) => {
               onClick={onBackToIndex}
               className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                 isDark
-                  ? 'bg-[#1b2b24] text-white hover:bg-[#253d32] border border-[#2e473b]/50 shadow-sm active:scale-95'
+                  ? 'bg-[#124232] text-white hover:bg-[#1a5542] border border-[#246952]/60 shadow-sm active:scale-95'
                   : isSepia
                   ? 'bg-[#E3D7C4] text-[#5C4B37] hover:bg-[#D8CCB9] border border-[#CBBDA6] active:scale-95'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 active:scale-95'
@@ -278,11 +278,9 @@ export const QuranReader: React.FC<QuranReaderProps> = ({ onBackToIndex }) => {
                 )}
               </h3>
               <span className={`text-[11px] font-medium mt-0.5 ${
-                isDark ? 'text-neutral-300' : isSepia ? 'text-[#7A6953]' : 'text-slate-500'
+                isDark ? 'text-emerald-200/90' : isSepia ? 'text-[#7A6953]' : 'text-slate-500'
               }`}>
-                {scope === 'wird'
-                  ? `صفحة ${toArabicNumber(currentPage)} (ورد: ${toArabicNumber(pageInWird)} من ${toArabicNumber(totalWirdPages)})`
-                  : `صفحة ${toArabicNumber(currentPage)} • ${currentJuz.name}`}
+                صفحة {toArabicNumber(currentPage)} • {currentJuz.name}
               </span>
             </div>
 
@@ -292,7 +290,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({ onBackToIndex }) => {
                 onClick={() => setIsSettingsOpen(true)}
                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                   isDark
-                    ? 'bg-[#1b2b24] text-white hover:bg-[#253d32] border border-[#2e473b]/50 shadow-sm active:scale-95'
+                    ? 'bg-[#124232] text-white hover:bg-[#1a5542] border border-[#246952]/60 shadow-sm active:scale-95'
                     : isSepia
                     ? 'bg-[#E3D7C4] text-[#5C4B37] hover:bg-[#D8CCB9] border border-[#CBBDA6] active:scale-95'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 active:scale-95'
@@ -306,7 +304,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({ onBackToIndex }) => {
                 onClick={toggleBookmark}
                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                   isDark
-                    ? 'bg-[#1b2b24] hover:bg-[#253d32] border border-[#2e473b]/50 shadow-sm active:scale-95'
+                    ? 'bg-[#124232] hover:bg-[#1a5542] border border-[#246952]/60 shadow-sm active:scale-95'
                     : isSepia
                     ? 'bg-[#E3D7C4] hover:bg-[#D8CCB9] border border-[#CBBDA6] active:scale-95'
                     : 'bg-slate-100 hover:bg-slate-200 border border-slate-300 active:scale-95'
@@ -445,7 +443,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({ onBackToIndex }) => {
             transition={{ duration: 0.15 }}
             className={`px-4 pt-1.5 shrink-0 flex flex-col gap-1 z-30 ${
               isDark
-                ? 'bg-black/95 text-white border-t border-neutral-900'
+                ? 'bg-[#092d21]/95 text-white border-t border-[#144f3b]'
                 : isSepia
                 ? 'bg-[#EFE6D8]/95 border-t border-[#D8CCB9] text-[#5C4B37]'
                 : 'bg-white/95 border-t border-slate-200 text-slate-800'
@@ -497,7 +495,7 @@ export const QuranReader: React.FC<QuranReaderProps> = ({ onBackToIndex }) => {
                 value={currentPage}
                 onChange={(e) => setCurrentPage(parseInt(e.target.value, 10))}
                 className={`w-full accent-accent-mint h-1 rounded-full cursor-pointer ${
-                  isDark ? 'bg-neutral-800' : isSepia ? 'bg-[#D8CCB9]' : 'bg-slate-200'
+                  isDark ? 'bg-[#144f3b]' : isSepia ? 'bg-[#D8CCB9]' : 'bg-slate-200'
                 }`}
               />
             </div>
