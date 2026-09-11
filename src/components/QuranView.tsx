@@ -46,15 +46,18 @@ export const QuranView: React.FC<QuranViewProps> = ({ initialPage, onClearInitia
   React.useEffect(() => {
     if (initialPage) {
       setCurrentPage(initialPage);
+      setWirdRange(null);
       if (initialPage === 293) {
         // Surah Al-Kahf is Surah 18
         setActiveSurahNumber(18);
         setScope('surah');
+      } else {
+        setScope('all');
       }
       setSubView('reader');
       if (onClearInitialPage) onClearInitialPage();
     }
-  }, [initialPage, setCurrentPage, setActiveSurahNumber, setScope, onClearInitialPage]);
+  }, [initialPage, setCurrentPage, setActiveSurahNumber, setScope, setWirdRange, onClearInitialPage]);
 
   const handleSelectPage = (page: number, surahNumber?: number) => {
     setCurrentPage(page);
