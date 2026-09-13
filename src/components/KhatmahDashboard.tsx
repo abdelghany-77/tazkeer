@@ -47,14 +47,23 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
   const dailyTarget = Math.max(1, khatmah.dailyTarget || 20);
   const totalWirds = Math.ceil(khatmahTotalPages / dailyTarget);
 
-  // Determine current active wird index (1-based)
+  // Days calculations (needed for day-based wird)
+  let daysPassed = 1;
+  let daysRemaining = khatmah.goalValue || 30;
+  if (khatmah.startDate) {
+    const startMillis = new Date(khatmah.startDate).getTime();
+    const diffDays = Math.floor((Date.now() - startMillis) / (1000 * 60 * 60 * 24));
+    daysPassed = Math.max(1, diffDays + 1);
+    const targetDays = khatmah.goalType === 'days' ? khatmah.goalValue : totalWirds;
+    daysRemaining = Math.max(0, targetDays - daysPassed);
+  }
+
+  // Determine current active wird index (1-based, day-based)
+  // Each day corresponds to a wird — day 1 = wird 1, day 2 = wird 2, etc.
   const readPagesCount = Math.min(khatmahTotalPages, khatmah.totalPagesRead);
   const lastPage = Math.max(khatmahStartPage, Math.min(TOTAL_QURAN_PAGES, khatmah.lastReadPage));
 
-  const currentWirdIndex = Math.min(
-    totalWirds,
-    Math.max(1, Math.floor((lastPage - khatmahStartPage) / dailyTarget) + 1)
-  );
+  const currentWirdIndex = Math.min(totalWirds, daysPassed);
 
   const wirdStartPage = khatmahStartPage + (currentWirdIndex - 1) * dailyTarget;
   const wirdEndPage = Math.min(TOTAL_QURAN_PAGES, wirdStartPage + dailyTarget - 1);
@@ -79,17 +88,6 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
       ? startSurah.name
       : `${startSurah.name} — ${endSurah.name}`;
 
-  // Days calculations
-  let daysPassed = 1;
-  let daysRemaining = khatmah.goalValue || 30;
-  if (khatmah.startDate) {
-    const startMillis = new Date(khatmah.startDate).getTime();
-    const diffDays = Math.floor((Date.now() - startMillis) / (1000 * 60 * 60 * 24));
-    daysPassed = Math.max(1, diffDays + 1);
-    const targetDays = khatmah.goalType === 'days' ? khatmah.goalValue : totalWirds;
-    daysRemaining = Math.max(0, targetDays - daysPassed);
-  }
-
   // Determine effective starting page for new khatmah setup
   const getEffectiveStartPage = (): number => {
     if (startMode === 'page') return Math.max(1, Math.min(TOTAL_QURAN_PAGES, customStartPage));
@@ -108,7 +106,10 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
   };
 
   const handleReadWird = () => {
-    const targetPage = Math.max(wirdStartPage, Math.min(wirdEndPage, lastPage));
+    // If lastPage is within the current wird range, resume from there
+    // Otherwise (new day), start from the beginning of the wird
+    const isWithinWird = lastPage >= wirdStartPage && lastPage <= wirdEndPage;
+    const targetPage = isWithinWird ? lastPage : wirdStartPage;
     onContinueWird(wirdStartPage, wirdEndPage, targetPage);
   };
 
@@ -191,7 +192,7 @@ export const KhatmahDashboard: React.FC<KhatmahDashboardProps> = ({
               {/* Title with Quran Icon */}
               <div className="flex items-center gap-1.5 text-[#00bba7]">
                 <BookOpen className="w-5 h-5" />
-                <h3 className="text-base font-bold">الورد الحالي</h3>
+                <h3 className="text-base font-bold">ورد اليوم</h3>
               </div>
             </div>
 
