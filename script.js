@@ -1085,6 +1085,15 @@ function checkDailyProgress() {
     dailyProgress.date = today;
     dailyProgress.completedZekr = [];
     saveDailyProgress();
+
+    // Reset all azkar counts and swiper positions so each category starts fresh from the first zekr
+    Object.keys(adhkarData).forEach((cat) => {
+      adhkarData[cat].adhkar.forEach((z) => {
+        z.currentCount = 0;
+      });
+      localStorage.removeItem("swiperPos_" + cat);
+    });
+    saveProgress();
   }
   updateProgressStats();
 }
@@ -1424,10 +1433,13 @@ function switchTab(tabId) {
   localStorage.setItem("activeTab", tabId);
   // Tab-specific init
   if (tabId === "tab-azkar") {
-    // Make sure we show azkar list, not detail
-    if (azkarListView) azkarListView.classList.remove("hidden");
-    if (categoryPage) categoryPage.classList.add("hidden");
-    showHomePage(); // populate categories
+    // Only show category list if user is NOT currently reading a category
+    if (!currentCategory || categoryPage.classList.contains("hidden")) {
+      if (azkarListView) azkarListView.classList.remove("hidden");
+      if (categoryPage) categoryPage.classList.add("hidden");
+      showHomePage(); // populate categories
+    }
+    // If user was in a category, preserve their position and progress
   } else if (tabId === "tab-quran") {
     if (typeof initQuranTab === "function") initQuranTab();
   } else if (tabId === "tab-profile") {
@@ -1703,10 +1715,8 @@ function setupEventListeners() {
 
 // Show azkar list (populate categories)
 function showHomePage() {
-  // Reset all counters when leaving any category
-  if (currentCategory) {
-    resetCategoryCounters(currentCategory);
-  }
+  // Don't reset counters when leaving — preserve progress
+  // Counters only reset when ALL azkar in a category are completed
 
   // Disconnect IntersectionObserver to prevent stale callbacks
   if (_swiperObserver) {
@@ -2005,9 +2015,22 @@ function loadCategory(category) {
   loadSwiperFontSize();
 
   // Restore last position (instant – no animation on first render)
-  const savedPos = parseInt(
-    localStorage.getItem("swiperPos_" + category) || "0",
-  );
+  // Reset to position 0 if it's a new day (so morning azkar start fresh)
+  const today = new Date().toDateString();
+  const savedPosData = localStorage.getItem("swiperPos_" + category);
+  let savedPos = 0;
+  if (savedPosData) {
+    try {
+      const parsed = JSON.parse(savedPosData);
+      // Only restore position if same day
+      if (parsed.date === today) {
+        savedPos = parsed.index || 0;
+      }
+    } catch (e) {
+      // Legacy format (just a number) — treat as expired
+      savedPos = 0;
+    }
+  }
   const validPos = Math.min(Math.max(0, savedPos), data.adhkar.length - 1);
   requestAnimationFrame(() => {
     track.scrollLeft = validPos * track.clientWidth;
@@ -2145,6 +2168,8 @@ function incrementZikrCount(category, index) {
     if (allCompleted) {
       setTimeout(() => {
         showNotification("تم إكمال الاذكار! بارك الله فيك");
+        // Reset counters after completion so they're fresh next time
+        resetCategoryCounters(category);
       }, 300);
     }
   }
@@ -2181,12 +2206,16 @@ function updateAllCardsProgress(category) {
 }
 
 // Reset all counters in a category when leaving it
+// NOTE: This is now only called when ALL azkar are completed
 function resetCategoryCounters(category) {
   if (!category || !adhkarData[category]) return;
 
   adhkarData[category].adhkar.forEach((zikr) => {
     zikr.currentCount = 0;
   });
+
+  // Reset swiper position so category starts from first zekr next time
+  saveSwiperPosition(category, 0);
 
   // Save progress
   saveProgress();
@@ -2579,9 +2608,12 @@ function decrementSlideCounter(category, index) {
   }
 }
 
-/** Persist which slide the user is on per category */
+/** Persist which slide the user is on per category (with date for daily reset) */
 function saveSwiperPosition(category, index) {
-  localStorage.setItem("swiperPos_" + category, index);
+  localStorage.setItem("swiperPos_" + category, JSON.stringify({
+    index: index,
+    date: new Date().toDateString()
+  }));
 }
 
 // ── Font-size stepping ──────────────────────────────
@@ -2629,20 +2661,46 @@ function loadSwiperFontSize() {
 
 // ═══════════════════════════════════════════════════════
 
-// Save progress to localStorage
+// Save progress to localStorage (date-aware)
 function saveProgress() {
-  localStorage.setItem("adhkarProgress", JSON.stringify(adhkarData));
+  localStorage.setItem(
+    "adhkarProgress",
+    JSON.stringify({
+      date: new Date().toDateString(),
+      data: adhkarData,
+    }),
+  );
 }
 
-// Load progress from localStorage
+// Load progress from localStorage (starts fresh on a new day)
 function loadProgress() {
   const saved = localStorage.getItem("adhkarProgress");
   if (saved) {
     try {
-      const savedData = JSON.parse(saved);
-      // Update currentCount for all adhkar
+      const parsed = JSON.parse(saved);
+      const today = new Date().toDateString();
+      const savedDate = parsed.date;
+      const savedData = parsed.data || parsed;
+
+      // If data is from a previous day, start fresh from the first zekr
+      if (savedDate && savedDate !== today) {
+        Object.keys(adhkarData).forEach((categoryKey) => {
+          adhkarData[categoryKey].adhkar.forEach((zikr) => {
+            zikr.currentCount = 0;
+          });
+          localStorage.removeItem("swiperPos_" + categoryKey);
+        });
+        saveProgress();
+        return;
+      }
+
+      // Update currentCount for all adhkar if same day
       Object.keys(savedData).forEach((categoryKey) => {
-        if (adhkarData[categoryKey]) {
+        if (
+          adhkarData[categoryKey] &&
+          savedData[categoryKey] &&
+          savedData[categoryKey].adhkar
+        ) {
           savedData[categoryKey].adhkar.forEach((savedZikr, index) => {
             if (adhkarData[categoryKey].adhkar[index]) {
               adhkarData[categoryKey].adhkar[index].currentCount =
@@ -5008,3 +5066,203 @@ setTimeout(() => {
     characterData: true,
   });
 }, 100);
+
+/* ================================================================
+   MISBAHA (Digital Prayer Beads) – JavaScript
+   ================================================================ */
+
+// Misbaha state
+let misbahaCount = 0;
+let misbahaTarget = 33;
+let misbahaRounds = 0;
+let misbahaTotal = 0;
+let misbahaDhikr = "سبحان الله";
+const MISBAHA_CIRCUMFERENCE = 2 * Math.PI * 90; // 565.48
+
+// Load misbaha state from localStorage
+function loadMisbahaState() {
+  try {
+    const saved = localStorage.getItem("misbahaState");
+    if (saved) {
+      const state = JSON.parse(saved);
+      misbahaCount = state.count || 0;
+      misbahaTarget = state.target !== undefined ? state.target : 33;
+      misbahaRounds = state.rounds || 0;
+      misbahaTotal = state.total || 0;
+      misbahaDhikr = state.dhikr || "سبحان الله";
+    }
+  } catch (e) {
+    console.error("Error loading misbaha state:", e);
+  }
+}
+
+// Save misbaha state to localStorage
+function saveMisbahaState() {
+  try {
+    localStorage.setItem(
+      "misbahaState",
+      JSON.stringify({
+        count: misbahaCount,
+        target: misbahaTarget,
+        rounds: misbahaRounds,
+        total: misbahaTotal,
+        dhikr: misbahaDhikr,
+      }),
+    );
+  } catch (e) {
+    console.error("Error saving misbaha state:", e);
+  }
+}
+
+// Update misbaha UI
+function updateMisbahaUI() {
+  const countNum = document.getElementById("misbahaCountNum");
+  const countTarget = document.getElementById("misbahaCountTarget");
+  const roundsVal = document.getElementById("misbahaRoundsVal");
+  const totalValue = document.getElementById("misbahaTotalValue");
+  const ringFill = document.getElementById("misbahaRingFill");
+  const dhikrText = document.getElementById("mishbahaDhikrText");
+
+  if (countNum) countNum.textContent = misbahaCount;
+  if (countTarget)
+    countTarget.textContent = misbahaTarget > 0 ? "/ " + misbahaTarget : "∞";
+  if (roundsVal) roundsVal.textContent = misbahaRounds;
+  if (totalValue) totalValue.textContent = misbahaTotal;
+  if (dhikrText) dhikrText.textContent = misbahaDhikr;
+
+  // Update ring progress
+  if (ringFill) {
+    if (misbahaTarget > 0) {
+      const progress = misbahaCount / misbahaTarget;
+      const offset = MISBAHA_CIRCUMFERENCE * (1 - Math.min(progress, 1));
+      ringFill.style.strokeDashoffset = offset;
+    } else {
+      ringFill.style.strokeDashoffset = 0;
+    }
+  }
+
+  // Update preset active state
+  const presets = document.querySelectorAll(".misbaha-preset");
+  presets.forEach(function (btn) {
+    btn.classList.toggle("active", btn.dataset.dhikr === misbahaDhikr);
+  });
+
+  // Update target buttons active state
+  const targetBtns = document.querySelectorAll(".misbaha-target-btn");
+  targetBtns.forEach(function (btn) {
+    const btnTarget = parseInt(btn.dataset.target);
+    btn.classList.toggle("active", btnTarget === misbahaTarget);
+  });
+}
+
+// Open misbaha
+function openMisbaha() {
+  loadMisbahaState();
+  const overlay = document.getElementById("misbahaOverlay");
+  if (overlay) {
+    overlay.classList.remove("hidden");
+    updateMisbahaUI();
+  }
+}
+
+// Close misbaha
+function closeMisbaha() {
+  const overlay = document.getElementById("misbahaOverlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
+}
+
+// Select target (33, 50, 100, 0 for infinite)
+function setMisbahaTarget(target) {
+  misbahaTarget = parseInt(target) || 0;
+  if (misbahaTarget > 0 && misbahaCount >= misbahaTarget) {
+    misbahaCount = 0;
+  }
+  saveMisbahaState();
+  updateMisbahaUI();
+}
+
+// Select a preset dhikr
+function selectMisbahaPreset(btn) {
+  misbahaDhikr = btn.dataset.dhikr;
+  saveMisbahaState();
+  updateMisbahaUI();
+}
+
+// Increment misbaha counter
+function incrementMisbaha() {
+  const tapBtn = document.getElementById("misbahaTapBtn");
+
+  if (misbahaTarget > 0) {
+    // If round was completed on last tap, begin fresh round
+    if (misbahaCount >= misbahaTarget) {
+      misbahaCount = 0;
+      if (tapBtn) tapBtn.classList.remove("completed-flash");
+    }
+
+    misbahaCount++;
+    misbahaTotal++;
+
+    // Reached target -> round completed!
+    if (misbahaCount === misbahaTarget) {
+      misbahaRounds++;
+      if (tapBtn) {
+        tapBtn.classList.add("completed-flash");
+        setTimeout(function () {
+          tapBtn.classList.remove("completed-flash");
+        }, 1200);
+      }
+      if (navigator.vibrate) {
+        navigator.vibrate([60, 60, 120]);
+      }
+      showNotification(`أتممت الدورة ${misbahaRounds}! بارك الله فيك 🌟`);
+    } else {
+      if (navigator.vibrate) {
+        navigator.vibrate(30);
+      }
+    }
+  } else {
+    // Infinite mode: continuously count
+    misbahaCount++;
+    misbahaTotal++;
+    if (navigator.vibrate) {
+      navigator.vibrate(30);
+    }
+  }
+
+  // Pulse animation
+  if (tapBtn) {
+    tapBtn.classList.remove("pulse");
+    void tapBtn.offsetWidth;
+    tapBtn.classList.add("pulse");
+  }
+
+  saveMisbahaState();
+  updateMisbahaUI();
+}
+
+// Reset misbaha counter
+function resetMisbaha() {
+  if (misbahaCount === 0 && misbahaTotal === 0 && misbahaRounds === 0) return;
+
+  if (confirm("هل تريد تصفير عداد المسبحة والدورات؟")) {
+    misbahaCount = 0;
+    misbahaTotal = 0;
+    misbahaRounds = 0;
+    const tapBtn = document.getElementById("misbahaTapBtn");
+    if (tapBtn) tapBtn.classList.remove("completed-flash");
+    saveMisbahaState();
+    updateMisbahaUI();
+  }
+}
+
+// Close misbaha on Escape key
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") {
+    const overlay = document.getElementById("misbahaOverlay");
+    if (overlay && !overlay.classList.contains("hidden")) {
+      closeMisbaha();
+    }
+  }
+});
