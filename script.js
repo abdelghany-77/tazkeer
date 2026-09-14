@@ -3923,48 +3923,61 @@ function updateCountdown() {
   if (!prayerTimesData) return;
 
   const now = new Date();
-  const currentTime = now.getHours() * 60 + now.getMinutes();
-
-  // Main prayers only
   const prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
   let nextPrayer = null;
-  let nextPrayerTime = null;
+  let targetDate = null;
 
   for (const prayer of prayers) {
-    const [hours, minutes] = prayerTimesData[prayer].split(":").map(Number);
-    const prayerTimeInMinutes = hours * 60 + minutes;
+    const timeStr = prayerTimesData[prayer];
+    if (!timeStr) continue;
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    const pDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0, 0);
 
-    if (prayerTimeInMinutes > currentTime) {
+    if (pDate > now) {
       nextPrayer = prayer;
-      nextPrayerTime = prayerTimeInMinutes;
+      targetDate = pDate;
       break;
     }
   }
 
-  // If no prayer found today, next is Fajr tomorrow
+  // If no prayer remaining today, next is Fajr tomorrow
   if (!nextPrayer) {
     nextPrayer = "Fajr";
     const [hours, minutes] = prayerTimesData.Fajr.split(":").map(Number);
-    nextPrayerTime = hours * 60 + minutes + 24 * 60; // Add 24 hours
+    targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, hours, minutes, 0, 0);
   }
 
-  const timeDiff = nextPrayerTime - currentTime;
-  const hours = Math.floor(timeDiff / 60);
-  const minutes = timeDiff % 60;
+  const diffMs = targetDate - now;
+
+  if (diffMs <= 0) {
+    if (typeof displayPrayerTimes === "function") {
+      const cityName = localStorage.getItem("cachedPrayerCity") || "";
+      displayPrayerTimes(cityName);
+    }
+    return;
+  }
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
 
   const nextPrayerNameEl = document.getElementById("nextPrayerName");
   const countdownTimeEl = document.getElementById("countdownTime");
 
   if (nextPrayerNameEl) {
-    nextPrayerNameEl.textContent = prayerNames[nextPrayer];
+    nextPrayerNameEl.textContent = prayerNames[nextPrayer] || nextPrayer;
   }
 
   if (countdownTimeEl) {
+    const pad = (n) => String(n).padStart(2, "0");
     if (hours > 0) {
-      countdownTimeEl.textContent = `متبقي ${hours} ساعة و${minutes} دقيقة`;
+      countdownTimeEl.textContent = `متبقي ${hours} ساعة و${minutes} دقيقة و${pad(seconds)} ثانية`;
+    } else if (minutes > 0) {
+      countdownTimeEl.textContent = `متبقي ${minutes} دقيقة و${pad(seconds)} ثانية`;
     } else {
-      countdownTimeEl.textContent = `متبقي ${minutes} دقيقة`;
+      countdownTimeEl.textContent = `متبقي ${pad(seconds)} ثانية`;
     }
   }
 
