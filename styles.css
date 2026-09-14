@@ -3225,7 +3225,9 @@ body.dark-mode .install-prompt .install-btn.secondary:hover {
   border: 2px solid #e2e8f0;
   position: relative;
   z-index: 1;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .countdown-label {
@@ -3545,15 +3547,22 @@ body.dark-mode .retry-btn:hover {
   }
 
   .next-prayer-countdown {
-    padding: 0.6rem 0.8rem;
+    padding: 0.5rem 0.6rem;
+    gap: 0.3rem;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .countdown-label {
+    font-size: 0.8rem;
   }
 
   .countdown-prayer {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 
   .countdown-time {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
   }
 
   .prayer-times-grid {
@@ -3588,6 +3597,25 @@ body.dark-mode .retry-btn:hover {
     font-size: 1.05rem;
   }
 
+  .next-prayer-countdown {
+    padding: 0.45rem 0.4rem;
+    gap: 0.2rem;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .countdown-label {
+    font-size: 0.7rem;
+  }
+
+  .countdown-prayer {
+    font-size: 0.8rem;
+  }
+
+  .countdown-time {
+    font-size: 0.7rem;
+  }
+
   .prayer-times-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 0.4rem;
@@ -3608,14 +3636,6 @@ body.dark-mode .retry-btn:hover {
 
   .prayer-time {
     font-size: 0.8rem;
-  }
-
-  .countdown-prayer {
-    font-size: 0.9rem;
-  }
-
-  .countdown-time {
-    font-size: 0.75rem;
   }
 }
 
