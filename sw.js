@@ -1,1 +1,132 @@
-if(!self.define){let e,i={};const n=(n,s)=>(n=new URL(n+".js",s).href,i[n]||new Promise(i=>{if("document"in self){const e=document.createElement("script");e.src=n,e.onload=i,document.head.appendChild(e)}else e=n,importScripts(n),i()}).then(()=>{let e=i[n];if(!e)throw new Error(`Module ${n} didn’t register its module`);return e}));self.define=(s,c)=>{const r=e||("document"in self?document.currentScript.src:"")||location.href;if(i[r])return;let a={};const o=e=>n(e,r),t={module:{uri:r},exports:a,require:o};i[r]=Promise.all(s.map(e=>t[e]||o(e))).then(e=>(c(...e),a))}}define(["./workbox-63c18b4d"],function(e){"use strict";self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"registerSW.js",revision:"b3f5e6cf804fcbfcd714f35a0e532cdc"},{url:"index.html",revision:"e3d1ac3a0312f6b36deff3114b6c0f47"},{url:"icons.svg",revision:"3b4fcfcf393eca4d264dca4a4663bc37"},{url:"icon.png",revision:"a67992df186c8620098b8a6738513cba"},{url:"favicon.svg",revision:"e8678bc649315d64ceb18505c28099b6"},{url:"images/icon.png",revision:"a67992df186c8620098b8a6738513cba"},{url:"images/icon-512.png",revision:"e1c022ebc70725dd61c94662a6efef96"},{url:"images/icon-192.png",revision:"1ac38dd0e69f45b56fd011fdb2bc9da1"},{url:"assets/index-kweCHyZp.js",revision:null},{url:"assets/index-B97R2Fmc.css",revision:null},{url:"assets/icon-DXW-4eAY.png",revision:null},{url:"assets/favicon-SECwf2ws.svg",revision:null},{url:"favicon.svg",revision:"e8678bc649315d64ceb18505c28099b6"},{url:"images/icon-192.png",revision:"1ac38dd0e69f45b56fd011fdb2bc9da1"},{url:"images/icon-512.png",revision:"e1c022ebc70725dd61c94662a6efef96"},{url:"images/icon.png",revision:"a67992df186c8620098b8a6738513cba"},{url:"manifest.webmanifest",revision:"db983ae6b9675527696eb0d31db050b4"}],{}),e.cleanupOutdatedCaches(),e.registerRoute(new e.NavigationRoute(e.createHandlerBoundToURL("index.html"))),e.registerRoute(({url:e})=>("http:"===e.protocol||"https:"===e.protocol)&&e.href.includes("cdn.jsdelivr.net"),new e.CacheFirst({cacheName:"quran-images",plugins:[new e.ExpirationPlugin({maxEntries:700,maxAgeSeconds:7776e3}),new e.CacheableResponsePlugin({statuses:[0,200]})]}),"GET"),e.registerRoute(({url:e})=>("http:"===e.protocol||"https:"===e.protocol)&&e.href.includes("api.aladhan.com"),new e.NetworkFirst({cacheName:"prayer-times-api",plugins:[new e.ExpirationPlugin({maxEntries:30,maxAgeSeconds:43200}),new e.CacheableResponsePlugin({statuses:[0,200]})]}),"GET")});
+const CACHE_NAME = "tazkeer-v8.3";
+const urlsToCache = [
+  "./",
+  "./index.html",
+  "./styles.css",
+  "./quran.css",
+  "./dailyDuas.js",
+  "./script.js",
+  "./quran.js",
+  "./manifest.json",
+  "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap",
+  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css",
+  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-solid-900.woff2",
+  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-regular-400.woff2",
+];
+
+// Install event - cache resources
+self.addEventListener("install", function (event) {
+  // Force the waiting service worker to become the active service worker
+  self.skipWaiting();
+
+  event.waitUntil(
+    caches
+      .open(CACHE_NAME)
+      .then(function (cache) {
+        console.log("Opened cache");
+        return cache.addAll(urlsToCache);
+      })
+      .catch(function (error) {
+        console.error("Cache install failed:", error);
+      }),
+  );
+});
+
+// Fetch event - Cache first for static assets, network first for API calls
+self.addEventListener("fetch", function (event) {
+  const url = new URL(event.request.url);
+
+  // For API calls (prayer times), use network first
+  if (
+    url.hostname.includes("aladhan.com") ||
+    url.hostname.includes("alquran.cloud") ||
+    url.hostname.includes("api")
+  ) {
+    event.respondWith(
+      fetch(event.request)
+        .then(function (response) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(function (cache) {
+            cache.put(event.request, responseClone);
+          });
+          return response;
+        })
+        .catch(function () {
+          return caches.match(event.request);
+        }),
+    );
+  } else {
+    // For static assets, use cache first
+    event.respondWith(
+      caches.match(event.request).then(function (response) {
+        if (response) {
+          // Update cache in background
+          fetch(event.request)
+            .then(function (networkResponse) {
+              if (networkResponse && networkResponse.status === 200) {
+                caches.open(CACHE_NAME).then(function (cache) {
+                  cache.put(event.request, networkResponse.clone());
+                });
+              }
+            })
+            .catch(() => {});
+          return response;
+        }
+
+        return fetch(event.request).then(function (networkResponse) {
+          if (!networkResponse || networkResponse.status !== 200) {
+            return networkResponse;
+          }
+
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then(function (cache) {
+            cache.put(event.request, responseClone);
+          });
+
+          return networkResponse;
+        });
+      }),
+    );
+  }
+});
+
+// Activate event - clean up old caches
+self.addEventListener("activate", function (event) {
+  event.waitUntil(
+    caches
+      .keys()
+      .then(function (cacheNames) {
+        return Promise.all(
+          cacheNames.map(function (cacheName) {
+            if (cacheName !== CACHE_NAME) {
+              console.log("Deleting old cache:", cacheName);
+              return caches.delete(cacheName);
+            }
+          }),
+        );
+      })
+      .then(function () {
+        return self.clients.claim();
+      }),
+  );
+});
+
+// Handle push notifications (for future use)
+self.addEventListener("push", function (event) {
+  const options = {
+    body: event.data ? event.data.text() : "حان وقت الذكر",
+    icon: "./favicon.svg",
+    badge: "./favicon.svg",
+    vibrate: [100, 50, 100],
+    dir: "rtl",
+    lang: "ar",
+  };
+
+  event.waitUntil(self.registration.showNotification("ذَكِّرْ", options));
+});
+
+// Handle notification click
+self.addEventListener("notificationclick", function (event) {
+  event.notification.close();
+  event.waitUntil(clients.openWindow("./"));
+});

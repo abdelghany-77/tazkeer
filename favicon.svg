@@ -1,20 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <rect width="512" height="512" rx="128" fill="#12181F"/>
-  <circle cx="256" cy="256" r="230" stroke="#00E676" stroke-opacity="0.25" stroke-width="8"/>
-  <circle cx="256" cy="256" r="210" stroke="#F59E0B" stroke-opacity="0.15" stroke-width="4"/>
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
   <defs>
-    <linearGradient id="crescentGrad" x1="120" y1="120" x2="380" y2="380" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#00E676"/>
-      <stop offset="50%" stop-color="#10B981"/>
-      <stop offset="100%" stop-color="#F59E0B"/>
+    <radialGradient id="bgGradient" cx="50%" cy="30%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </radialGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#f7fafc;stop-opacity:1" />
     </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="12" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
   </defs>
-  <!-- Crescent Moon -->
-  <path d="M280 140C205 140 144 201 144 276C144 351 205 412 280 412C322 412 359 393 384 363C326 368 274 322 274 264C274 209 321 165 376 167C351 150 317 140 280 140Z" fill="url(#crescentGrad)" filter="url(#glow)"/>
-  <!-- Eight-pointed Islamic Star -->
-  <path d="M370 190L382 205L402 205L389 220L396 239L377 231L362 245L362 225L343 218L361 208Z" fill="#F59E0B" filter="url(#glow)"/>
+  
+  <!-- Background -->
+  <circle cx="16" cy="16" r="16" fill="url(#bgGradient)" />
+  
+  <!-- Crescent moon (Islamic symbol) -->
+  <path d="M12 6c-4.4 0-8 3.6-8 8s3.6 8 8 8c1.5 0 2.9-0.4 4.1-1.2-2.4 0.8-5.1-0.2-6.7-2.8-1.6-2.6-1.1-6 1.2-8.1C11.2 6.3 11.6 6.1 12 6z" fill="url(#textGradient)" opacity="0.8"/>
+  
+  <!-- Tasbih beads (prayer beads) -->
+  <circle cx="22" cy="10" r="2" fill="url(#textGradient)" opacity="0.7"/>
+  <circle cx="24" cy="16" r="1.5" fill="url(#textGradient)" opacity="0.6"/>
+  <circle cx="22" cy="22" r="1.5" fill="url(#textGradient)" opacity="0.6"/>
+  
+  <!-- Arabic-style decorative element -->
+  <path d="M8 16c0-1 1-2 2-2s2 1 2 2-1 2-2 2-2-1-2-2z M16 12c0-0.5 0.5-1 1-1s1 0.5 1 1-0.5 1-1 1-1-0.5-1-1z" fill="url(#textGradient)" opacity="0.5"/>
 </svg>
