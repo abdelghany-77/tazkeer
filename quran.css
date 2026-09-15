@@ -1554,3 +1554,264 @@
 .mushaf-dark-mode .profile-khatmah-info {
   color: #a0aec0;
 }
+
+/* ========================================
+   SURAH SEARCH & BULK OFFLINE DOWNLOADER
+   ======================================== */
+
+/* 🔍 Surah Search Box */
+.surah-search-box {
+  position: relative;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.surah-search-input {
+  width: 100%;
+  padding: 0.85rem 2.8rem 0.85rem 2.8rem;
+  border-radius: 14px;
+  border: 1.5px solid var(--quran-border, #e2e8f0);
+  background: var(--quran-card-bg, #ffffff);
+  color: var(--quran-text, #1e293b);
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.mushaf-dark-mode .surah-search-input {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+}
+
+.surah-search-input:focus {
+  outline: none;
+  border-color: var(--quran-primary, #10b981);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+
+.surah-search-icon {
+  position: absolute;
+  right: 1rem;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+.surah-search-clear {
+  position: absolute;
+  left: 0.85rem;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(148, 163, 184, 0.2);
+  color: #64748b;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.surah-search-clear:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.surah-search-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.surah-search-empty i {
+  font-size: 2.5rem;
+  opacity: 0.5;
+  color: var(--quran-primary, #10b981);
+}
+
+/* 📲 Offline Quran Download Card (Glassmorphism) */
+.quran-offline-card {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(212, 168, 71, 0.08) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 18px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.mushaf-dark-mode .quran-offline-card {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(212, 168, 71, 0.1) 100%);
+  border-color: rgba(16, 185, 129, 0.3);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.quran-offline-card[data-status="completed"] {
+  border-color: rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%);
+}
+
+.quran-offline-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.quran-offline-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  flex-shrink: 0;
+}
+
+.quran-offline-text-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.quran-offline-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--quran-text, #1e293b);
+  margin: 0 0 0.25rem 0;
+  font-family: 'Cairo', sans-serif;
+}
+
+.mushaf-dark-mode .quran-offline-title {
+  color: #f8fafc;
+}
+
+.quran-offline-desc {
+  font-size: 0.82rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.mushaf-dark-mode .quran-offline-desc {
+  color: #94a3b8;
+}
+
+.quran-offline-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.quran-offline-progress-track {
+  height: 8px;
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+}
+
+.quran-offline-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #d4a847 100%);
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+
+.quran-offline-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.quran-offline-count-text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.mushaf-dark-mode .quran-offline-count-text {
+  color: #cbd5e1;
+}
+
+.quran-offline-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quran-offline-action-btn {
+  padding: 0.55rem 1.1rem;
+  border-radius: 12px;
+  border: none;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.quran-offline-btn-start {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.quran-offline-btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+}
+
+.quran-offline-btn-pause {
+  background: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+}
+
+.quran-offline-btn-done {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  cursor: default;
+}
+
+.quran-offline-delete-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quran-offline-delete-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+}

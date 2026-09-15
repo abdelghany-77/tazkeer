@@ -1,4 +1,5 @@
 const CACHE_NAME = "tazkeer-v8.3";
+const QURAN_CACHE_NAME = "tazkeer-quran-pages-v1";
 const urlsToCache = [
   "./",
   "./index.html",
@@ -35,6 +36,29 @@ self.addEventListener("install", function (event) {
 // Fetch event - Cache first for static assets, network first for API calls
 self.addEventListener("fetch", function (event) {
   const url = new URL(event.request.url);
+
+  // Dedicated cache strategy for Quran page images
+  if (
+    url.hostname.includes("jsdelivr.net") &&
+    url.pathname.includes("quran-hd-images")
+  ) {
+    event.respondWith(
+      caches.open(QURAN_CACHE_NAME).then(function (quranCache) {
+        return quranCache.match(event.request).then(function (response) {
+          if (response) {
+            return response;
+          }
+          return fetch(event.request).then(function (networkResponse) {
+            if (networkResponse && networkResponse.status === 200) {
+              quranCache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          });
+        });
+      })
+    );
+    return;
+  }
 
   // For API calls (prayer times), use network first
   if (
@@ -98,7 +122,7 @@ self.addEventListener("activate", function (event) {
       .then(function (cacheNames) {
         return Promise.all(
           cacheNames.map(function (cacheName) {
-            if (cacheName !== CACHE_NAME) {
+            if (cacheName !== CACHE_NAME && cacheName !== QURAN_CACHE_NAME) {
               console.log("Deleting old cache:", cacheName);
               return caches.delete(cacheName);
             }
