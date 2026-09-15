@@ -192,73 +192,21 @@ async function deleteOfflineQuranCache() {
 /**
  * Update the UI of all Offline Cards dynamically.
  */
+/**
+ * Update the UI of all Offline Cards dynamically.
+ */
 function updateOfflineCardUI() {
   const percent = Math.round((quranOfflineState.downloadedPages / TOTAL_QURAN_PAGES) * 100);
 
-  document.querySelectorAll(".quran-offline-pct-text").forEach(el => {
-    el.textContent = `${percent}%`;
-  });
-  document.querySelectorAll(".quran-offline-count-text").forEach(el => {
-    el.textContent = `${quranOfflineState.downloadedPages} / ${TOTAL_QURAN_PAGES} صفحة`;
-  });
-  document.querySelectorAll(".quran-offline-progress-fill").forEach(el => {
-    el.style.width = `${percent}%`;
-  });
-
-  const cards = document.querySelectorAll(".quran-offline-card");
-  cards.forEach(card => {
-    card.setAttribute("data-status", quranOfflineState.status);
-
-    const titleEl = card.querySelector(".quran-offline-title");
-    const descEl = card.querySelector(".quran-offline-desc");
-    const btnGroup = card.querySelector(".quran-offline-btn-group");
-
-    if (!btnGroup) return;
-
-    if (quranOfflineState.status === "completed") {
-      if (titleEl) titleEl.textContent = "المصحف محمل بالكامل أوفلاين ✅";
-      if (descEl) descEl.textContent = "يمكنك قراءة القرآن كاملاً بدون أي اتصال بالإنترنت";
-      btnGroup.innerHTML = `
-        <button class="quran-offline-action-btn quran-offline-btn-done">
-          <i class="fas fa-check-circle"></i> تم التحميل
-        </button>
-        <button class="quran-offline-delete-btn" onclick="deleteOfflineQuranCache()" title="حذف التنزيل">
-          <i class="fas fa-trash-alt"></i>
-        </button>
-      `;
-    } else if (quranOfflineState.status === "downloading") {
-      if (titleEl) titleEl.textContent = "جاري تنزيل صفحات المصحف...";
-      if (descEl) descEl.textContent = `تم تحميل ${quranOfflineState.downloadedPages} من ${TOTAL_QURAN_PAGES} صفحة (${percent}%)`;
-      btnGroup.innerHTML = `
-        <button class="quran-offline-action-btn quran-offline-btn-pause" onclick="pauseOfflineQuranDownload()">
-          <i class="fas fa-pause"></i> إيقاف مؤقت
-        </button>
-      `;
-    } else if (quranOfflineState.status === "paused") {
-      if (titleEl) titleEl.textContent = "تنزيل المصحف متوقف مؤقتاً";
-      if (descEl) descEl.textContent = `تم تحميل ${quranOfflineState.downloadedPages} من ${TOTAL_QURAN_PAGES} صفحة (${percent}%)`;
-      btnGroup.innerHTML = `
-        <button class="quran-offline-action-btn quran-offline-btn-start" onclick="startOfflineQuranDownload()">
-          <i class="fas fa-play"></i> استئناف
-        </button>
-        <button class="quran-offline-delete-btn" onclick="deleteOfflineQuranCache()" title="حذف">
-          <i class="fas fa-trash-alt"></i>
-        </button>
-      `;
-    } else {
-      if (titleEl) titleEl.textContent = "تحميل المصحف للقراءة بدون إنترنت";
-      if (descEl) descEl.textContent = "حمل 604 صفحة للقراءة في أي وقت بدون إنترنت نهائياً (~70MB)";
-      btnGroup.innerHTML = `
-        <button class="quran-offline-action-btn quran-offline-btn-start" onclick="startOfflineQuranDownload()">
-          <i class="fas fa-cloud-download-alt"></i> تنزيل المصحف أوفلاين
-        </button>
-      `;
-    }
+  const widgets = document.querySelectorAll(".quran-offline-widget");
+  widgets.forEach(widget => {
+    widget.setAttribute("data-status", quranOfflineState.status);
+    widget.outerHTML = renderOfflineQuranCardHtml();
   });
 }
 
 /**
- * Generate HTML string for the Offline Quran Download Card.
+ * Generate HTML string for the Offline Quran Download Action Button / Widget.
  */
 function renderOfflineQuranCardHtml() {
   const percent = Math.round((quranOfflineState.downloadedPages / TOTAL_QURAN_PAGES) * 100);
@@ -267,56 +215,71 @@ function renderOfflineQuranCardHtml() {
   const isPaused = quranOfflineState.status === "paused";
 
   return `
-    <div class="quran-offline-card" data-status="${quranOfflineState.status}">
-      <div class="quran-offline-card-header">
-        <div class="quran-offline-icon-wrap">
-          <i class="fas fa-wifi-slash"></i>
+    <div class="quran-offline-widget" id="quranOfflineWidget" data-status="${quranOfflineState.status}">
+      ${isCompleted ? `
+        <div class="quran-offline-pill quran-offline-done">
+          <i class="fas fa-check-circle"></i>
+          <span>المصحف محمل أوفلاين</span>
+          <button class="quran-offline-mini-del" onclick="deleteOfflineQuranCache()" title="حذف التنزيل">
+            <i class="fas fa-trash-alt"></i>
+          </button>
         </div>
-        <div class="quran-offline-text-wrap">
-          <h4 class="quran-offline-title">
-            ${isCompleted ? "المصحف محمل بالكامل أوفلاين ✅" : isDownloading ? "جاري تنزيل صفحات المصحف..." : isPaused ? "تنزيل المصحف متوقف مؤقتاً" : "تحميل المصحف للقراءة بدون إنترنت"}
-          </h4>
-          <p class="quran-offline-desc">
-            ${isCompleted ? "يمكنك قراءة القرآن كاملاً بدون أي اتصال بالإنترنت" : isDownloading || isPaused ? `تم تحميل ${quranOfflineState.downloadedPages} من ${TOTAL_QURAN_PAGES} صفحة (${percent}%)` : "حمل 604 صفحة للقراءة في أي وقت بدون إنترنت نهائياً (~70MB)"}
-          </p>
+      ` : isDownloading || isPaused ? `
+        <div class="quran-offline-progress-box">
+          <div class="quran-offline-progress-info">
+            <span class="quran-offline-prog-title">
+              <i class="${isDownloading ? 'fas fa-spinner fa-spin' : 'fas fa-pause-circle'}"></i>
+              ${isDownloading ? 'جاري تنزيل المصحف...' : 'التحميل متوقف مؤقتاً'}
+            </span>
+            <span class="quran-offline-count-text">${quranOfflineState.downloadedPages} / ${TOTAL_QURAN_PAGES} صفحة (${percent}%)</span>
+          </div>
+          <div class="quran-offline-progress-track">
+            <div class="quran-offline-progress-fill" style="width: ${percent}%"></div>
+          </div>
+          <div class="quran-offline-prog-actions">
+            ${isDownloading ? `
+              <button class="quran-offline-btn-pause" onclick="pauseOfflineQuranDownload()">
+                <i class="fas fa-pause"></i> إيقاف مؤقت
+              </button>
+            ` : `
+              <button class="quran-offline-btn-start" onclick="startOfflineQuranDownload()">
+                <i class="fas fa-play"></i> استئناف
+              </button>
+              <button class="quran-offline-mini-del" onclick="deleteOfflineQuranCache()" title="حذف">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            `}
+          </div>
         </div>
-        <span class="quran-offline-badge quran-offline-pct-text">${percent}%</span>
-      </div>
-
-      <div class="quran-offline-progress-track">
-        <div class="quran-offline-progress-fill" style="width: ${percent}%"></div>
-      </div>
-
-      <div class="quran-offline-card-footer">
-        <span class="quran-offline-count-text">${quranOfflineState.downloadedPages} / ${TOTAL_QURAN_PAGES} صفحة</span>
-        <div class="quran-offline-btn-group">
-          ${isCompleted ? `
-            <button class="quran-offline-action-btn quran-offline-btn-done">
-              <i class="fas fa-check-circle"></i> تم التحميل
-            </button>
-            <button class="quran-offline-delete-btn" onclick="deleteOfflineQuranCache()" title="حذف التنزيل">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          ` : isDownloading ? `
-            <button class="quran-offline-action-btn quran-offline-btn-pause" onclick="pauseOfflineQuranDownload()">
-              <i class="fas fa-pause"></i> إيقاف مؤقت
-            </button>
-          ` : isPaused ? `
-            <button class="quran-offline-action-btn quran-offline-btn-start" onclick="startOfflineQuranDownload()">
-              <i class="fas fa-play"></i> استئناف
-            </button>
-            <button class="quran-offline-delete-btn" onclick="deleteOfflineQuranCache()" title="حذف">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-          ` : `
-            <button class="quran-offline-action-btn quran-offline-btn-start" onclick="startOfflineQuranDownload()">
-              <i class="fas fa-cloud-download-alt"></i> تنزيل المصحف أوفلاين
-            </button>
-          `}
-        </div>
-      </div>
+      ` : `
+        <button class="quran-offline-main-btn" onclick="startOfflineQuranDownload()" title="تحميل 604 صفحة للقراءة أوفلاين (~70MB)">
+          <span>تنزيل المصحف أوفلاين</span>
+          <i class="fas fa-cloud-download-alt"></i>
+        </button>
+      `}
     </div>
   `;
+}
+
+/**
+ * Scroll smooth to specific Juz in surah index
+ */
+function scrollToJuz(juzNumber) {
+  const juz = JUZ_DATA.find(j => j.number === juzNumber);
+  if (!juz) return;
+  const targetSurah = getSurahForPage(juz.startPage);
+  if (!targetSurah) return;
+
+  document.querySelectorAll('.juz-chip').forEach(c => {
+    c.classList.toggle('active', c.getAttribute('data-juz') == juzNumber);
+  });
+
+  const card = document.querySelector(`.surah-list-card[data-number="${targetSurah.number}"]`);
+  if (card) {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.classList.add('surah-highlight');
+    setTimeout(() => card.classList.remove('surah-highlight'), 1800);
+  }
 }
 
 // ===== SURAH LIVE FILTER / SEARCH =====
@@ -783,6 +746,9 @@ function renderKhatmahSetup() {
         <h2><i class="fas fa-quran"></i> ابدأ ختمة جديدة</h2>
       </div>
 
+      <!-- 📲 Offline Quran Download Button / Widget -->
+      ${renderOfflineQuranCardHtml()}
+
       <div class="khatmah-setup-card">
         <!-- Goal Type Selection -->
         <div class="goal-type-selector">
@@ -898,7 +864,7 @@ function renderSurahList() {
     </div>
   `;
 
-  // 📲 Offline Quran Downloader Card
+  // 📲 Offline Quran Downloader Action Button / Widget
   html += renderOfflineQuranCardHtml();
 
   if (bookmark) {
@@ -926,12 +892,14 @@ function renderSurahList() {
         data-number="${surah.number}"
         data-norm-name="${normName}"
         onclick="openFreeReader(${surah.startPage}, ${endPage})">
-        <span class="surah-list-number">${toArabicNumber(surah.number)}</span>
-        <div class="surah-list-info">
-          <span class="surah-list-name">${surah.name}</span>
-          <span class="surah-list-meta">صفحة ${toArabicNumber(surah.startPage)} • ${toArabicNumber(pageCount)} صفحة</span>
+        <div class="surah-card-header">
+          <span class="surah-list-number">${toArabicNumber(surah.number)}</span>
+          <span class="surah-list-page">صفحة ${toArabicNumber(surah.startPage)}</span>
         </div>
-        <i class="fas fa-chevron-left surah-list-arrow"></i>
+        <div class="surah-card-body">
+          <span class="surah-list-name">سورة ${surah.name}</span>
+          <span class="surah-list-pages-count">${toArabicNumber(pageCount)} صفحة</span>
+        </div>
       </button>`;
   });
 
@@ -1130,6 +1098,10 @@ function renderKhatmahDashboard() {
         </button>`
             : ""
         }
+
+        <!-- 📲 Offline Quran Download Button / Widget -->
+        ${renderOfflineQuranCardHtml()}
+
         <button class="khatmah-free-read-btn" onclick="renderSurahList()">
           <i class="fas fa-book-reader"></i>
           قراءة حرة (فهرس السور)
