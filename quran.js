@@ -11,6 +11,359 @@ const QURAN_IMAGE_BASE =
 // In-memory image cache for instant navigation
 const imageCache = new Map();
 
+// ===== ARABIC SEARCH NORMALIZATION =====
+function normalizeArabic(str) {
+  if (!str) return "";
+  return str
+    .replace(/[\u064B-\u065F\u0670]/g, "") // Remove tashkeel (diacritics)
+    .replace(/[أإآٱ]/g, "ا")             // Normalize alef
+    .replace(/ة/g, "ه")                  // Normalize taa marbouta
+    .replace(/ى/g, "ي")                  // Normalize alef maqsura
+    .trim()
+    .toLowerCase();
+}
+
+// ===== QURAN BULK OFFLINE DOWNLOAD MANAGER =====
+const QURAN_CACHE_NAME_JS = "tazkeer-quran-pages-v1";
+
+const quranOfflineState = {
+  status: "idle", // 'idle' | 'downloading' | 'paused' | 'completed'
+  downloadedPages: 0,
+  totalPages: TOTAL_QURAN_PAGES,
+  isChecking: false,
+};
+
+/**
+ * Check how many Quran pages are currently cached in CacheStorage.
+ */
+async function checkOfflineQuranStatus() {
+  if (quranOfflineState.isChecking) return;
+  quranOfflineState.isChecking = true;
+
+  try {
+    if ('caches' in window) {
+      const cache = await caches.open(QURAN_CACHE_NAME_JS);
+      const keys = await cache.keys();
+      let cachedCount = 0;
+
+      for (const req of keys) {
+        if (req.url.includes("quran-hd-images") || req.url.match(/\/\d{3}\.jpg/)) {
+          cachedCount++;
+        }
+      }
+
+      quranOfflineState.downloadedPages = Math.min(cachedCount, TOTAL_QURAN_PAGES);
+      if (quranOfflineState.downloadedPages >= TOTAL_QURAN_PAGES) {
+        quranOfflineState.status = "completed";
+      } else if (quranOfflineState.status !== "downloading" && quranOfflineState.status !== "paused") {
+        quranOfflineState.status = quranOfflineState.downloadedPages > 0 ? "paused" : "idle";
+      }
+    }
+  } catch (e) {
+    console.warn("Could not check offline cache status:", e);
+  } finally {
+    quranOfflineState.isChecking = false;
+    updateOfflineCardUI();
+  }
+}
+
+/**
+ * Start or resume bulk offline download of 604 pages.
+ */
+async function startOfflineQuranDownload() {
+  if (quranOfflineState.status === "downloading") return;
+
+  if (!('caches' in window)) {
+    if (typeof showNotification === "function") {
+      showNotification("متصفحك لا يدعم تخزين الصفحات أوفلاين");
+    }
+    return;
+  }
+
+  quranOfflineState.status = "downloading";
+  updateOfflineCardUI();
+
+  if (typeof showNotification === "function") {
+    showNotification("بدأ تحميل المصحف أوفلاين...");
+  }
+
+  try {
+    const cache = await caches.open(QURAN_CACHE_NAME_JS);
+    const CONCURRENCY = 6;
+    let pagesToFetch = [];
+
+    for (let page = 1; page <= TOTAL_QURAN_PAGES; page++) {
+      const url = getPageImageUrl(page);
+      const match = await cache.match(url);
+      if (!match) {
+        pagesToFetch.push(page);
+      } else {
+        imageCache.set(url, true);
+      }
+    }
+
+    quranOfflineState.downloadedPages = TOTAL_QURAN_PAGES - pagesToFetch.length;
+    updateOfflineCardUI();
+
+    if (pagesToFetch.length === 0) {
+      quranOfflineState.status = "completed";
+      updateOfflineCardUI();
+      if (typeof showNotification === "function") {
+        showNotification("المصحف محمل بالكامل ومتوفر بدون إنترنت! 🎉");
+      }
+      return;
+    }
+
+    for (let i = 0; i < pagesToFetch.length; i += CONCURRENCY) {
+      if (quranOfflineState.status !== "downloading") break;
+
+      const batch = pagesToFetch.slice(i, i + CONCURRENCY);
+      await Promise.all(
+        batch.map(async (pageNumber) => {
+          if (quranOfflineState.status !== "downloading") return;
+
+          const url = getPageImageUrl(pageNumber);
+          try {
+            const resp = await fetch(url, { mode: "cors" });
+            if (resp.ok) {
+              await cache.put(url, resp.clone());
+              imageCache.set(url, true);
+              quranOfflineState.downloadedPages++;
+              updateOfflineCardUI();
+            }
+          } catch (err) {
+            console.warn(`Failed to fetch page ${pageNumber}:`, err);
+          }
+        })
+      );
+    }
+
+    if (quranOfflineState.downloadedPages >= TOTAL_QURAN_PAGES) {
+      quranOfflineState.status = "completed";
+      if (typeof showNotification === "function") {
+        showNotification("تم اكتمال تنزيل المصحف كاملاً بدون إنترنت! 🎉");
+      }
+    } else if (quranOfflineState.status === "downloading") {
+      quranOfflineState.status = "paused";
+    }
+  } catch (err) {
+    console.error("Bulk download error:", err);
+    quranOfflineState.status = "paused";
+  } finally {
+    updateOfflineCardUI();
+  }
+}
+
+/**
+ * Pause offline download.
+ */
+function pauseOfflineQuranDownload() {
+  quranOfflineState.status = "paused";
+  updateOfflineCardUI();
+  if (typeof showNotification === "function") {
+    showNotification("تم إيقاف التحميل مؤقتاً");
+  }
+}
+
+/**
+ * Delete cached offline Quran pages to free up device storage.
+ */
+async function deleteOfflineQuranCache() {
+  if (!confirm("هل أنت متأكد من حذف صفحات المصحف المحملة؟ ستحتاج إلى اتصال بالإنترنت للقراءة مجدداً.")) {
+    return;
+  }
+
+  try {
+    if ('caches' in window) {
+      await caches.delete(QURAN_CACHE_NAME_JS);
+      quranOfflineState.downloadedPages = 0;
+      quranOfflineState.status = "idle";
+      imageCache.clear();
+      updateOfflineCardUI();
+      if (typeof showNotification === "function") {
+        showNotification("تم حذف صفحات المصحف المحملة وإفراغ المساحة");
+      }
+    }
+  } catch (e) {
+    console.error("Error deleting cache:", e);
+  }
+}
+
+/**
+ * Update the UI of all Offline Cards dynamically.
+ */
+function updateOfflineCardUI() {
+  const percent = Math.round((quranOfflineState.downloadedPages / TOTAL_QURAN_PAGES) * 100);
+
+  document.querySelectorAll(".quran-offline-pct-text").forEach(el => {
+    el.textContent = `${percent}%`;
+  });
+  document.querySelectorAll(".quran-offline-count-text").forEach(el => {
+    el.textContent = `${quranOfflineState.downloadedPages} / ${TOTAL_QURAN_PAGES} صفحة`;
+  });
+  document.querySelectorAll(".quran-offline-progress-fill").forEach(el => {
+    el.style.width = `${percent}%`;
+  });
+
+  const cards = document.querySelectorAll(".quran-offline-card");
+  cards.forEach(card => {
+    card.setAttribute("data-status", quranOfflineState.status);
+
+    const titleEl = card.querySelector(".quran-offline-title");
+    const descEl = card.querySelector(".quran-offline-desc");
+    const btnGroup = card.querySelector(".quran-offline-btn-group");
+
+    if (!btnGroup) return;
+
+    if (quranOfflineState.status === "completed") {
+      if (titleEl) titleEl.textContent = "المصحف محمل بالكامل أوفلاين ✅";
+      if (descEl) descEl.textContent = "يمكنك قراءة القرآن كاملاً بدون أي اتصال بالإنترنت";
+      btnGroup.innerHTML = `
+        <button class="quran-offline-action-btn quran-offline-btn-done">
+          <i class="fas fa-check-circle"></i> تم التحميل
+        </button>
+        <button class="quran-offline-delete-btn" onclick="deleteOfflineQuranCache()" title="حذف التنزيل">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      `;
+    } else if (quranOfflineState.status === "downloading") {
+      if (titleEl) titleEl.textContent = "جاري تنزيل صفحات المصحف...";
+      if (descEl) descEl.textContent = `تم تحميل ${quranOfflineState.downloadedPages} من ${TOTAL_QURAN_PAGES} صفحة (${percent}%)`;
+      btnGroup.innerHTML = `
+        <button class="quran-offline-action-btn quran-offline-btn-pause" onclick="pauseOfflineQuranDownload()">
+          <i class="fas fa-pause"></i> إيقاف مؤقت
+        </button>
+      `;
+    } else if (quranOfflineState.status === "paused") {
+      if (titleEl) titleEl.textContent = "تنزيل المصحف متوقف مؤقتاً";
+      if (descEl) descEl.textContent = `تم تحميل ${quranOfflineState.downloadedPages} من ${TOTAL_QURAN_PAGES} صفحة (${percent}%)`;
+      btnGroup.innerHTML = `
+        <button class="quran-offline-action-btn quran-offline-btn-start" onclick="startOfflineQuranDownload()">
+          <i class="fas fa-play"></i> استئناف
+        </button>
+        <button class="quran-offline-delete-btn" onclick="deleteOfflineQuranCache()" title="حذف">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      `;
+    } else {
+      if (titleEl) titleEl.textContent = "تحميل المصحف للقراءة بدون إنترنت";
+      if (descEl) descEl.textContent = "حمل 604 صفحة للقراءة في أي وقت بدون إنترنت نهائياً (~70MB)";
+      btnGroup.innerHTML = `
+        <button class="quran-offline-action-btn quran-offline-btn-start" onclick="startOfflineQuranDownload()">
+          <i class="fas fa-cloud-download-alt"></i> تنزيل المصحف أوفلاين
+        </button>
+      `;
+    }
+  });
+}
+
+/**
+ * Generate HTML string for the Offline Quran Download Card.
+ */
+function renderOfflineQuranCardHtml() {
+  const percent = Math.round((quranOfflineState.downloadedPages / TOTAL_QURAN_PAGES) * 100);
+  const isCompleted = quranOfflineState.status === "completed";
+  const isDownloading = quranOfflineState.status === "downloading";
+  const isPaused = quranOfflineState.status === "paused";
+
+  return `
+    <div class="quran-offline-card" data-status="${quranOfflineState.status}">
+      <div class="quran-offline-card-header">
+        <div class="quran-offline-icon-wrap">
+          <i class="fas fa-wifi-slash"></i>
+        </div>
+        <div class="quran-offline-text-wrap">
+          <h4 class="quran-offline-title">
+            ${isCompleted ? "المصحف محمل بالكامل أوفلاين ✅" : isDownloading ? "جاري تنزيل صفحات المصحف..." : isPaused ? "تنزيل المصحف متوقف مؤقتاً" : "تحميل المصحف للقراءة بدون إنترنت"}
+          </h4>
+          <p class="quran-offline-desc">
+            ${isCompleted ? "يمكنك قراءة القرآن كاملاً بدون أي اتصال بالإنترنت" : isDownloading || isPaused ? `تم تحميل ${quranOfflineState.downloadedPages} من ${TOTAL_QURAN_PAGES} صفحة (${percent}%)` : "حمل 604 صفحة للقراءة في أي وقت بدون إنترنت نهائياً (~70MB)"}
+          </p>
+        </div>
+        <span class="quran-offline-badge quran-offline-pct-text">${percent}%</span>
+      </div>
+
+      <div class="quran-offline-progress-track">
+        <div class="quran-offline-progress-fill" style="width: ${percent}%"></div>
+      </div>
+
+      <div class="quran-offline-card-footer">
+        <span class="quran-offline-count-text">${quranOfflineState.downloadedPages} / ${TOTAL_QURAN_PAGES} صفحة</span>
+        <div class="quran-offline-btn-group">
+          ${isCompleted ? `
+            <button class="quran-offline-action-btn quran-offline-btn-done">
+              <i class="fas fa-check-circle"></i> تم التحميل
+            </button>
+            <button class="quran-offline-delete-btn" onclick="deleteOfflineQuranCache()" title="حذف التنزيل">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          ` : isDownloading ? `
+            <button class="quran-offline-action-btn quran-offline-btn-pause" onclick="pauseOfflineQuranDownload()">
+              <i class="fas fa-pause"></i> إيقاف مؤقت
+            </button>
+          ` : isPaused ? `
+            <button class="quran-offline-action-btn quran-offline-btn-start" onclick="startOfflineQuranDownload()">
+              <i class="fas fa-play"></i> استئناف
+            </button>
+            <button class="quran-offline-delete-btn" onclick="deleteOfflineQuranCache()" title="حذف">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          ` : `
+            <button class="quran-offline-action-btn quran-offline-btn-start" onclick="startOfflineQuranDownload()">
+              <i class="fas fa-cloud-download-alt"></i> تنزيل المصحف أوفلاين
+            </button>
+          `}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ===== SURAH LIVE FILTER / SEARCH =====
+function filterSurahList(query) {
+  const normQuery = normalizeArabic(query);
+  const cards = document.querySelectorAll("#surahListGrid .surah-list-card");
+  const clearBtn = document.getElementById("surahSearchClear");
+  const emptyState = document.getElementById("surahSearchEmpty");
+
+  if (clearBtn) {
+    clearBtn.style.display = query && query.trim().length > 0 ? "flex" : "none";
+  }
+
+  let visibleCount = 0;
+
+  cards.forEach(card => {
+    const name = card.getAttribute("data-name") || "";
+    const number = card.getAttribute("data-number") || "";
+    const normName = card.getAttribute("data-norm-name") || "";
+
+    if (
+      !normQuery ||
+      normName.includes(normQuery) ||
+      number.includes(normQuery) ||
+      name.includes(normQuery)
+    ) {
+      card.style.display = "";
+      visibleCount++;
+    } else {
+      card.style.display = "none";
+    }
+  });
+
+  if (emptyState) {
+    emptyState.classList.toggle("hidden", visibleCount > 0);
+  }
+}
+
+function clearSurahSearch() {
+  const input = document.getElementById("surahSearchInput");
+  if (input) {
+    input.value = "";
+    filterSurahList("");
+    input.focus();
+  }
+}
+
 // ===== SURAH DATA (114 Surahs - Madina Mushaf) =====
 const SURAH_DATA = [
   { number: 1, name: "الفاتحة", startPage: 1 },
@@ -517,7 +870,7 @@ function renderKhatmahSetup() {
 }
 
 /**
- * Render Surah List for free reading mode
+ * Render Surah List for free reading mode with Search & Offline Downloader
  */
 function renderSurahList() {
   quranViewerState.currentView = "surah-list";
@@ -529,8 +882,24 @@ function renderSurahList() {
   let html = `<div class="surah-list-view">
     <div class="surah-list-header">
       <h2><i class="fas fa-book-open"></i> فهرس السور</h2>
-      <p>اختر سورة لبدء القراءة</p>
+      <p>اختر سورة لبدء القراءة أو ابحث برقمها واسمها</p>
     </div>`;
+
+  // 🔍 Surah Search Box
+  html += `
+    <div class="surah-search-box">
+      <i class="fas fa-search surah-search-icon"></i>
+      <input type="text" id="surahSearchInput" class="surah-search-input"
+        placeholder="بحث باسم السورة أو رقمها (مثلاً: البقرة، 18)..."
+        oninput="filterSurahList(this.value)" autocomplete="off" />
+      <button class="surah-search-clear" id="surahSearchClear" onclick="clearSurahSearch()" title="مسح">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  `;
+
+  // 📲 Offline Quran Downloader Card
+  html += renderOfflineQuranCardHtml();
 
   if (bookmark) {
     const bSurah = getSurahForPage(bookmark);
@@ -541,7 +910,7 @@ function renderSurahList() {
     </button>`;
   }
 
-  html += `<div class="surah-list-grid">`;
+  html += `<div class="surah-list-grid" id="surahListGrid">`;
 
   SURAH_DATA.forEach((surah, i) => {
     const endPage =
@@ -549,8 +918,14 @@ function renderSurahList() {
         ? SURAH_DATA[i + 1].startPage
         : TOTAL_QURAN_PAGES;
     const pageCount = endPage - surah.startPage + 1;
+    const normName = normalizeArabic(surah.name);
+
     html += `
-      <button class="surah-list-card" onclick="openFreeReader(${surah.startPage}, ${endPage})">
+      <button class="surah-list-card"
+        data-name="${surah.name}"
+        data-number="${surah.number}"
+        data-norm-name="${normName}"
+        onclick="openFreeReader(${surah.startPage}, ${endPage})">
         <span class="surah-list-number">${toArabicNumber(surah.number)}</span>
         <div class="surah-list-info">
           <span class="surah-list-name">${surah.name}</span>
@@ -561,12 +936,24 @@ function renderSurahList() {
   });
 
   html += `</div>`;
+
+  // Empty state for search
+  html += `
+    <div class="surah-search-empty hidden" id="surahSearchEmpty">
+      <i class="fas fa-search-minus"></i>
+      <p>لا توجد سورة تطابق البحث</p>
+    </div>
+  `;
+
   html += `<button class="surah-list-back" onclick="showQuranPage()">
     <i class="fas fa-arrow-right"></i> العودة
   </button>`;
   html += `</div>`;
 
   container.innerHTML = html;
+
+  // Check offline status asynchronously
+  checkOfflineQuranStatus();
 }
 
 /**
@@ -749,7 +1136,7 @@ function renderKhatmahDashboard() {
         </button>
         <button class="khatmah-reset-btn" onclick="resetKhatmah()">
           <i class="fas fa-redo"></i>
-          ختمة جديدة
+          إعادة تعيين الختمة
         </button>
       </div>
     </div>
@@ -833,6 +1220,13 @@ function renderMushafViewer() {
               <button class="settings-theme-btn" onclick="toggleMushafTheme()">
                 <i class="fas fa-${document.body.classList.contains("mushaf-dark-mode") ? "sun" : "moon"}" id="mushafThemeIcon"></i>
                 <span>تبديل المظهر</span>
+              </button>
+            </div>
+            <div class="settings-section">
+              <span class="settings-section-label">التنزيل أوفلاين</span>
+              <button class="settings-theme-btn" onclick="startOfflineQuranDownload()">
+                <i class="fas fa-cloud-download-alt"></i>
+                <span class="quran-offline-pct-text">${quranOfflineState.status === 'completed' ? 'المصحف أوفلاين ✅' : 'تنزيل المصحف أوفلاين'}</span>
               </button>
             </div>
             <div class="settings-section">
@@ -1625,6 +2019,7 @@ function updateProfileTab() {
 
 function initQuranFeature() {
   khatmahState = loadKhatmahState();
+  checkOfflineQuranStatus();
 }
 
 document.addEventListener("DOMContentLoaded", function () {
