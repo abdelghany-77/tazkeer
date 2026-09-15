@@ -298,13 +298,17 @@ function filterSurahList(query) {
   cards.forEach(card => {
     const name = card.getAttribute("data-name") || "";
     const number = card.getAttribute("data-number") || "";
+    const type = card.getAttribute("data-type") || "";
+    const juz = card.getAttribute("data-juz") || "";
     const normName = card.getAttribute("data-norm-name") || "";
 
     if (
       !normQuery ||
       normName.includes(normQuery) ||
       number.includes(normQuery) ||
-      name.includes(normQuery)
+      name.includes(normQuery) ||
+      type.includes(normQuery) ||
+      juz.includes(normQuery)
     ) {
       card.style.display = "";
       visibleCount++;
@@ -444,6 +448,15 @@ const SURAH_DATA = [
   { number: 113, name: "الفلق", startPage: 604 },
   { number: 114, name: "الناس", startPage: 604 },
 ];
+
+// 28 Medinan Surahs
+const MEDINAN_SURAH_NUMBERS = new Set([
+  2, 3, 4, 5, 8, 9, 13, 22, 24, 33, 47, 48, 49, 55, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 76, 98, 99, 110
+]);
+
+SURAH_DATA.forEach(s => {
+  s.type = MEDINAN_SURAH_NUMBERS.has(s.number) ? "مدنية" : "مكية";
+});
 
 // ===== JUZ DATA (30 Juz - Madina Mushaf) =====
 const JUZ_DATA = [
@@ -746,9 +759,6 @@ function renderKhatmahSetup() {
         <h2><i class="fas fa-quran"></i> ابدأ ختمة جديدة</h2>
       </div>
 
-      <!-- 📲 Offline Quran Download Button / Widget -->
-      ${renderOfflineQuranCardHtml()}
-
       <div class="khatmah-setup-card">
         <!-- Goal Type Selection -->
         <div class="goal-type-selector">
@@ -886,19 +896,42 @@ function renderSurahList() {
     const pageCount = endPage - surah.startPage + 1;
     const normName = normalizeArabic(surah.name);
 
+    const nextStartPage = i < SURAH_DATA.length - 1 ? SURAH_DATA[i + 1].startPage : TOTAL_QURAN_PAGES + 1;
+    const lastPageOfSurah = Math.max(surah.startPage, nextStartPage - 1);
+    const startJuz = getJuzForPage(surah.startPage);
+    const endJuz = getJuzForPage(lastPageOfSurah);
+    const juzText = startJuz.number === endJuz.number
+      ? `الجزء ${toArabicNumber(startJuz.number)}`
+      : `الأجزاء ${toArabicNumber(startJuz.number)} - ${toArabicNumber(endJuz.number)}`;
+    const juzSearchData = `جزء ${startJuz.number} جزء ${endJuz.number} ${startJuz.name} ${endJuz.name}`;
+
     html += `
-      <button class="surah-list-card"
+      <button class="surah-list-item"
         data-name="${surah.name}"
         data-number="${surah.number}"
+        data-type="${surah.type}"
+        data-juz="${juzSearchData}"
         data-norm-name="${normName}"
         onclick="openFreeReader(${surah.startPage}, ${endPage})">
-        <div class="surah-card-header">
-          <span class="surah-list-number">${toArabicNumber(surah.number)}</span>
-          <span class="surah-list-page">صفحة ${toArabicNumber(surah.startPage)}</span>
+        
+        <div class="surah-item-right">
+          <div class="surah-list-number">${toArabicNumber(surah.number)}</div>
+          <div class="surah-item-title-group">
+            <span class="surah-list-name">سورة ${surah.name}</span>
+            <span class="surah-list-page">صفحة ${toArabicNumber(surah.startPage)} • ${toArabicNumber(pageCount)} صفحة</span>
+          </div>
         </div>
-        <div class="surah-card-body">
-          <span class="surah-list-name">سورة ${surah.name}</span>
-          <span class="surah-list-pages-count">${toArabicNumber(pageCount)} صفحة</span>
+
+        <div class="surah-item-left">
+          <div class="surah-item-badges">
+            <span class="surah-juz-pill">
+              <i class="fas fa-layer-group"></i> ${juzText}
+            </span>
+            <span class="surah-type-pill ${surah.type === "مدنية" ? "madani" : "makki"}">
+              ${surah.type}
+            </span>
+          </div>
+          <i class="fas fa-chevron-left surah-item-arrow"></i>
         </div>
       </button>`;
   });
@@ -1098,9 +1131,6 @@ function renderKhatmahDashboard() {
         </button>`
             : ""
         }
-
-        <!-- 📲 Offline Quran Download Button / Widget -->
-        ${renderOfflineQuranCardHtml()}
 
         <button class="khatmah-free-read-btn" onclick="renderSurahList()">
           <i class="fas fa-book-reader"></i>
