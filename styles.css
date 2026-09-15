@@ -5950,6 +5950,8 @@ body.light-mode .swiper-page-title {
   font-family: "Cairo", serif;
   white-space: nowrap;
   flex-shrink: 0;
+  direction: rtl;
+  unicode-bidi: isolate;
 }
 
 body.light-mode .swiper-prog-badge {
@@ -6076,8 +6078,7 @@ body.light-mode .swiper-floating-menu button {
   scroll-snap-type: x mandatory;
   scrollbar-width: none; /* Firefox */
   scroll-behavior: auto;
-  /* LTR so snap math is predictable */
-  direction: ltr;
+  direction: rtl;
 }
 
 .azkar-swiper-track::-webkit-scrollbar {
@@ -6330,6 +6331,8 @@ body.light-mode .slide-fadl p {
 .counter-num {
   display: block;
   line-height: 1;
+  direction: rtl;
+  unicode-bidi: isolate;
 }
 
 .counter-hint {
