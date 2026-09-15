@@ -845,106 +845,203 @@
 }
 
 .surah-list-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-@media (max-width: 600px) {
-  .surah-list-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.55rem;
-  }
-}
-
-.surah-list-card {
   display: flex;
   flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1.5rem;
+}
+
+.surah-list-item {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.85rem 0.95rem;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
   background: var(--quran-card-bg, #ffffff);
   border: 1px solid var(--quran-border, rgba(226, 232, 240, 0.9));
   border-radius: 14px;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: "Cairo", sans-serif;
   text-align: right;
-  position: relative;
-  overflow: hidden;
+  width: 100%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
-.mushaf-dark-mode .surah-list-card {
+
+.mushaf-dark-mode .surah-list-item {
   background: rgba(30, 41, 59, 0.7);
   border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.surah-list-card:hover {
-  transform: translateY(-3px);
+.surah-list-item:hover {
+  transform: translateX(-4px);
   border-color: var(--quran-primary, #10b981);
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
-}
-.surah-list-card:active {
-  transform: scale(0.97);
+  background: rgba(16, 185, 129, 0.04);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.12);
 }
 
-.surah-card-header {
+.mushaf-dark-mode .surah-list-item:hover {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.surah-list-item:active {
+  transform: scale(0.99);
+}
+
+.surah-item-right {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
+  gap: 0.85rem;
+  min-width: 0;
 }
 
 .surah-list-number {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(212, 168, 71, 0.2));
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(212, 168, 71, 0.18));
   color: var(--quran-primary, #10b981);
   border: 1px solid rgba(16, 185, 129, 0.3);
-  border-radius: 10px;
-  font-size: 0.88rem;
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 700;
   font-family: "Amiri", serif;
+  flex-shrink: 0;
 }
+
 .mushaf-dark-mode .surah-list-number {
   color: #34d399;
   background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.surah-item-title-group {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  min-width: 0;
+}
+
+.surah-list-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--quran-text, #1e293b);
+  font-family: "Amiri", serif;
+  line-height: 1.25;
+}
+
+.mushaf-dark-mode .surah-list-name {
+  color: #f8fafc;
 }
 
 .surah-list-page {
   font-size: 0.75rem;
   color: #64748b;
-  font-weight: 600;
+  font-weight: 500;
+  margin-top: 2px;
 }
+
 .mushaf-dark-mode .surah-list-page {
   color: #94a3b8;
 }
 
-.surah-card-body {
+.surah-item-left {
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
-.surah-list-name {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--quran-text, #1e293b);
-  font-family: "Amiri", serif;
-  line-height: 1.3;
-}
-.mushaf-dark-mode .surah-list-name {
-  color: #f8fafc;
+.surah-item-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
-.surah-list-pages-count {
+.surah-juz-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(99, 102, 241, 0.08);
+  color: #4f46e5;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 8px;
   font-size: 0.75rem;
-  color: var(--quran-gold, #d4a847);
   font-weight: 600;
+  white-space: nowrap;
+}
+
+.mushaf-dark-mode .surah-juz-pill {
+  background: rgba(129, 140, 248, 0.15);
+  color: #a5b4fc;
+  border-color: rgba(129, 140, 248, 0.25);
+}
+
+.surah-type-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.surah-type-pill.makki {
+  background: rgba(212, 168, 71, 0.12);
+  color: #b48314;
+  border: 1px solid rgba(212, 168, 71, 0.25);
+}
+
+.mushaf-dark-mode .surah-type-pill.makki {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.surah-type-pill.madani {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.mushaf-dark-mode .surah-type-pill.madani {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.surah-item-arrow {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+}
+
+.surah-list-item:hover .surah-item-arrow {
+  transform: translateX(-3px);
+  color: var(--quran-primary, #10b981);
+}
+
+@media (max-width: 540px) {
+  .surah-list-item {
+    padding: 0.75rem 0.85rem;
+    gap: 0.5rem;
+  }
+  .surah-item-badges {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+  }
+  .surah-juz-pill, .surah-type-pill {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.45rem;
+  }
 }
 
 .surah-highlight {

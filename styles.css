@@ -102,8 +102,16 @@ body {
 /* Welcome Section */
 .welcome-section {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 0.75rem;
   color: white;
+}
+
+#azkarListView .welcome-section {
+  margin-bottom: 0.4rem;
+}
+#azkarListView .welcome-title {
+  font-size: 1.8rem;
+  margin-bottom: 0.2rem;
 }
 
 .welcome-title {
@@ -6694,35 +6702,40 @@ body.light-mode .friday-banner-cta {
    MISBAHA (Digital Prayer Beads)
    ================================================================ */
 
-/* ── Launch Button ── */
+/* ── Launch Button (Minimal) ── */
 .misbaha-launch-wrap {
-  margin-bottom: 0.75rem;
-  padding: 0 0.25rem;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  padding: 0;
 }
 .misbaha-launch-btn {
-  width: 100%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.85rem;
-  padding: 0.85rem 1.2rem;
-  background: linear-gradient(135deg, rgba(212, 168, 71, 0.15) 0%, rgba(26, 138, 92, 0.12) 100%);
-  border: 1px solid rgba(212, 168, 71, 0.25);
-  border-radius: 16px;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.45rem 1.1rem;
+  max-width: 260px;
+  width: auto;
+  background: rgba(212, 168, 71, 0.12);
+  border: 1px solid rgba(212, 168, 71, 0.28);
+  border-radius: 30px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: "Cairo", sans-serif;
   color: inherit;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 }
 .misbaha-launch-btn:hover {
-  background: linear-gradient(135deg, rgba(212, 168, 71, 0.25) 0%, rgba(26, 138, 92, 0.2) 100%);
-  border-color: rgba(212, 168, 71, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 168, 71, 0.15);
+  background: rgba(212, 168, 71, 0.22);
+  border-color: rgba(212, 168, 71, 0.45);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(212, 168, 71, 0.18);
 }
 .misbaha-launch-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 .misbaha-launch-icon {
   flex-shrink: 0;
@@ -6734,22 +6747,22 @@ body.light-mode .misbaha-launch-icon {
   color: #b8860b;
 }
 .misbaha-launch-text {
-  flex: 1;
-  font-size: 1.05rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: #d4a847;
-  text-align: right;
+  text-align: center;
+  white-space: nowrap;
 }
 body.light-mode .misbaha-launch-text {
   color: #8b6914;
 }
 .misbaha-launch-arrow {
-  color: rgba(212, 168, 71, 0.5);
-  font-size: 0.85rem;
+  color: rgba(212, 168, 71, 0.6);
+  font-size: 0.75rem;
 }
 body.light-mode .misbaha-launch-btn {
-  background: linear-gradient(135deg, rgba(212, 168, 71, 0.1) 0%, rgba(26, 138, 92, 0.08) 100%);
-  border-color: rgba(184, 134, 11, 0.2);
+  background: rgba(212, 168, 71, 0.08);
+  border-color: rgba(184, 134, 11, 0.25);
 }
 
 /* ── Misbaha Overlay ── */
