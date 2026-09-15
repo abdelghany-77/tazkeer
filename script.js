@@ -2033,7 +2033,10 @@ function loadCategory(category) {
   }
   const validPos = Math.min(Math.max(0, savedPos), data.adhkar.length - 1);
   requestAnimationFrame(() => {
-    track.scrollLeft = validPos * track.clientWidth;
+    const slides = track.querySelectorAll(".azkar-slide");
+    if (slides[validPos]) {
+      slides[validPos].scrollIntoView({ behavior: "instant", inline: "start", block: "nearest" });
+    }
     updateSwiperUI(category, validPos);
   });
 
@@ -2104,7 +2107,7 @@ function createAdhkarSlide(zikr, index, category, track) {
           id="slideCounterBtn_${category}_${index}"
           ${isCompleted ? "disabled" : ""}
         >
-          <span class="counter-num">${isCompleted ? "✓" : zikr.currentCount + "/" + zikr.count}</span>
+          <span class="counter-num">${isCompleted ? "✓" : toArabicNumerals(zikr.currentCount) + " / " + toArabicNumerals(zikr.count)}</span>
         </button>
         <p class="counter-hint">${
           isCompleted
@@ -2343,7 +2346,7 @@ function resetCounter() {
 
 // Update counter display
 function updateCounterDisplay() {
-  countNumber.textContent = currentCount;
+  countNumber.textContent = toArabicNumerals(currentCount);
   const progress = (currentCount / totalCount) * 100;
   progressFill.style.width = `${progress}%`;
 
@@ -2376,7 +2379,7 @@ function updateCardProgress(category, index) {
     if (numEl)
       numEl.textContent = isCompleted
         ? "✓"
-        : zikr.currentCount + "/" + zikr.count;
+        : toArabicNumerals(zikr.currentCount) + " / " + toArabicNumerals(zikr.count);
     if (isCompleted) {
       swiperBtn.classList.add("completed");
       swiperBtn.disabled = true;
@@ -2415,7 +2418,9 @@ function updateCardProgress(category, index) {
         : "linear-gradient(90deg, #1a8a5c, #d4a847)";
     }
     if (progressText)
-      progressText.textContent = `${zikr.currentCount}/${zikr.count}`;
+      progressText.textContent = isCompleted
+        ? "مكتمل"
+        : `${toArabicNumerals(zikr.currentCount)} / ${toArabicNumerals(zikr.count)}`;
     if (countBtn) {
       if (isCompleted) {
         countBtn.style.background = "#b8860b";
@@ -2544,8 +2549,10 @@ function goToSlide(index) {
   // Lock the observer during programmatic scroll to prevent conflicts
   _swiperIsScrolling = true;
 
-  const slideWidth = track.clientWidth;
-  track.scrollTo({ left: index * slideWidth, behavior: "smooth" });
+  const slides = track.querySelectorAll(".azkar-slide");
+  if (slides[index]) {
+    slides[index].scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+  }
   updateSwiperUI(currentCategory, index);
   saveSwiperPosition(currentCategory, index);
 
@@ -5123,11 +5130,11 @@ function updateMisbahaUI() {
   const ringFill = document.getElementById("misbahaRingFill");
   const dhikrText = document.getElementById("mishbahaDhikrText");
 
-  if (countNum) countNum.textContent = misbahaCount;
+  if (countNum) countNum.textContent = toArabicNumerals(misbahaCount);
   if (countTarget)
-    countTarget.textContent = misbahaTarget > 0 ? "/ " + misbahaTarget : "∞";
-  if (roundsVal) roundsVal.textContent = misbahaRounds;
-  if (totalValue) totalValue.textContent = misbahaTotal;
+    countTarget.textContent = misbahaTarget > 0 ? "/ " + toArabicNumerals(misbahaTarget) : "∞";
+  if (roundsVal) roundsVal.textContent = toArabicNumerals(misbahaRounds);
+  if (totalValue) totalValue.textContent = toArabicNumerals(misbahaTotal);
   if (dhikrText) dhikrText.textContent = misbahaDhikr;
 
   // Update ring progress
