@@ -15,7 +15,8 @@ const imageCache = new Map();
 function normalizeArabic(str) {
   if (!str) return "";
   return str
-    .replace(/[\u064B-\u065F\u0670]/g, "") // Remove tashkeel (diacritics)
+    .replace(/[٠١٢٣٤٥٦٧٨٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)) // Convert Eastern Arabic digits to Western digits
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, "") // Remove tashkeel (diacritics) & tatweel
     .replace(/[أإآٱ]/g, "ا")             // Normalize alef
     .replace(/ة/g, "ه")                  // Normalize taa marbouta
     .replace(/ى/g, "ي")                  // Normalize alef maqsura
@@ -274,7 +275,7 @@ function scrollToJuz(juzNumber) {
     c.classList.toggle('active', c.getAttribute('data-juz') == juzNumber);
   });
 
-  const card = document.querySelector(`.surah-list-card[data-number="${targetSurah.number}"]`);
+  const card = document.querySelector(`.surah-list-card[data-number="${targetSurah.number}"], .surah-list-item[data-number="${targetSurah.number}"]`);
   if (card) {
     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
     card.classList.add('surah-highlight');
@@ -284,31 +285,40 @@ function scrollToJuz(juzNumber) {
 
 // ===== SURAH LIVE FILTER / SEARCH =====
 function filterSurahList(query) {
-  const normQuery = normalizeArabic(query);
-  const cards = document.querySelectorAll("#surahListGrid .surah-list-card");
+  const rawQuery = (query || "").trim();
+  const normQuery = normalizeArabic(rawQuery);
+  const cards = document.querySelectorAll("#surahListGrid .surah-list-card, #surahListGrid .surah-list-item");
   const clearBtn = document.getElementById("surahSearchClear");
   const emptyState = document.getElementById("surahSearchEmpty");
 
   if (clearBtn) {
-    clearBtn.style.display = query && query.trim().length > 0 ? "flex" : "none";
+    clearBtn.style.display = rawQuery.length > 0 ? "flex" : "none";
   }
 
   let visibleCount = 0;
+  const normQueryNoAl = normQuery.startsWith("ال") ? normQuery.slice(2) : normQuery;
 
   cards.forEach(card => {
     const name = card.getAttribute("data-name") || "";
     const number = card.getAttribute("data-number") || "";
+    const arabicNumber = card.getAttribute("data-arabic-number") || "";
     const type = card.getAttribute("data-type") || "";
     const juz = card.getAttribute("data-juz") || "";
     const normName = card.getAttribute("data-norm-name") || "";
+    const normNameNoAl = normName.startsWith("ال") ? normName.slice(2) : normName;
+    const normJuz = normalizeArabic(juz);
+    const startPage = card.getAttribute("data-page") || "";
 
     if (
       !normQuery ||
       normName.includes(normQuery) ||
+      (normQueryNoAl.length >= 2 && normNameNoAl.includes(normQueryNoAl)) ||
       number.includes(normQuery) ||
-      name.includes(normQuery) ||
+      arabicNumber.includes(rawQuery) ||
+      name.includes(rawQuery) ||
       type.includes(normQuery) ||
-      juz.includes(normQuery)
+      normJuz.includes(normQuery) ||
+      startPage.includes(normQuery)
     ) {
       card.style.display = "";
       visibleCount++;
@@ -906,9 +916,11 @@ function renderSurahList() {
     const juzSearchData = `جزء ${startJuz.number} جزء ${endJuz.number} ${startJuz.name} ${endJuz.name}`;
 
     html += `
-      <button class="surah-list-item"
+      <button class="surah-list-item surah-list-card"
         data-name="${surah.name}"
         data-number="${surah.number}"
+        data-arabic-number="${toArabicNumber(surah.number)}"
+        data-page="${surah.startPage}"
         data-type="${surah.type}"
         data-juz="${juzSearchData}"
         data-norm-name="${normName}"

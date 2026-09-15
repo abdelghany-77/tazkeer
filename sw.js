@@ -1,4 +1,4 @@
-const CACHE_NAME = "tazkeer-v8.3";
+const CACHE_NAME = "tazkeer-v8.4";
 const QURAN_CACHE_NAME = "tazkeer-quran-pages-v1";
 const urlsToCache = [
   "./",
