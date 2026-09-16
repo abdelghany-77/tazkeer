@@ -4045,6 +4045,37 @@ function startCountdown() {
   countdownInterval = setInterval(updateCountdown, 1000);
 }
 
+// Helper to format remaining time in proper Arabic grammar
+function formatArabicRemainingTime(hours, minutes, seconds) {
+  const getUnit = (count, singular, dual, plural) => {
+    if (count <= 0) return null;
+    if (count === 1) return singular;
+    if (count === 2) return dual;
+    if (count >= 3 && count <= 10) return `${count} ${plural}`;
+    return `${count} ${singular}`;
+  };
+
+  const hStr = getUnit(hours, "ساعة", "ساعتان", "ساعات");
+  const mStr = getUnit(minutes, "دقيقة", "دقيقتان", "دقائق");
+  const sStr = getUnit(seconds, "ثانية", "ثانيتان", "ثوانٍ");
+
+  const parts = [hStr, mStr, sStr].filter(Boolean);
+
+  if (parts.length === 0) return "متبقي أقل من ثانية";
+
+  let result = parts[0];
+  for (let i = 1; i < parts.length; i++) {
+    const part = parts[i];
+    if (/^\d/.test(part)) {
+      result += ` و ${part}`;
+    } else {
+      result += ` و${part}`;
+    }
+  }
+
+  return `متبقي ${result}`;
+}
+
 // Update countdown display
 function updateCountdown() {
   if (!prayerTimesData) return;
@@ -4098,14 +4129,7 @@ function updateCountdown() {
   }
 
   if (countdownTimeEl) {
-    const pad = (n) => String(n).padStart(2, "0");
-    if (hours > 0) {
-      countdownTimeEl.textContent = `متبقي ${hours} ساعة و${minutes} دقيقة و${pad(seconds)} ثانية`;
-    } else if (minutes > 0) {
-      countdownTimeEl.textContent = `متبقي ${minutes} دقيقة و${pad(seconds)} ثانية`;
-    } else {
-      countdownTimeEl.textContent = `متبقي ${pad(seconds)} ثانية`;
-    }
+    countdownTimeEl.textContent = formatArabicRemainingTime(hours, minutes, seconds);
   }
 
   // Highlight next prayer card
