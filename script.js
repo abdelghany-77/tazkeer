@@ -2080,6 +2080,10 @@ function createAdhkarSlide(zikr, index, category, track) {
     .replace(/'/g, "\\'")
     .replace(/\n/g, " ");
 
+  const totalSlides = adhkarData[category] ? adhkarData[category].adhkar.length : 0;
+  const isFirst = index === 0;
+  const isLast = index === totalSlides - 1;
+
   const slide = document.createElement("div");
   slide.className = "azkar-slide";
   slide.dataset.index = index;
@@ -2102,13 +2106,35 @@ function createAdhkarSlide(zikr, index, category, track) {
           : ""
       }
       <div class="slide-counter-area">
-        <button
-          class="slide-counter-btn${isCompleted ? " completed" : ""}"
-          id="slideCounterBtn_${category}_${index}"
-          ${isCompleted ? "disabled" : ""}
-        >
-          <span class="counter-num">${isCompleted ? "✓" : toArabicNumerals(zikr.currentCount) + " / " + toArabicNumerals(zikr.count)}</span>
-        </button>
+        <div class="slide-counter-row">
+          <button
+            class="slide-nav-arrow prev-arrow${isFirst ? " disabled" : ""}"
+            onclick="swiperPrevSlide()"
+            title="الذكر السابق"
+            aria-label="الذكر السابق"
+            ${isFirst ? "disabled" : ""}
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+
+          <button
+            class="slide-counter-btn${isCompleted ? " completed" : ""}"
+            id="slideCounterBtn_${category}_${index}"
+            ${isCompleted ? "disabled" : ""}
+          >
+            <span class="counter-num">${isCompleted ? "✓" : toArabicNumerals(zikr.currentCount) + " / " + toArabicNumerals(zikr.count)}</span>
+          </button>
+
+          <button
+            class="slide-nav-arrow next-arrow${isLast ? " disabled" : ""}"
+            onclick="swiperNextSlide()"
+            title="الذكر التالي"
+            aria-label="الذكر التالي"
+            ${isLast ? "disabled" : ""}
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+        </div>
         <p class="counter-hint">${
           isCompleted
             ? "بارك الله فيك"
@@ -2541,6 +2567,8 @@ function handleSwipe() {
 //  AZKAR SWIPER  –  helper functions
 // ═══════════════════════════════════════════════════════
 
+let _currentSwiperIndex = 0;
+
 /** Programmatically scroll to the slide at [index] with smooth animation */
 function goToSlide(index) {
   const track = document.getElementById("azkarSwiperTrack");
@@ -2562,9 +2590,26 @@ function goToSlide(index) {
   }, 450);
 }
 
-/** Sync progress badge, progress line, and dots to reflect current slide index */
+/** Navigate to next slide in swiper */
+function swiperNextSlide() {
+  if (!currentCategory || !adhkarData[currentCategory]) return;
+  const total = adhkarData[currentCategory].adhkar.length;
+  if (_currentSwiperIndex < total - 1) {
+    goToSlide(_currentSwiperIndex + 1);
+  }
+}
+
+/** Navigate to previous slide in swiper */
+function swiperPrevSlide() {
+  if (_currentSwiperIndex > 0) {
+    goToSlide(_currentSwiperIndex - 1);
+  }
+}
+
+/** Sync progress badge, progress line, dots, and nav arrows to reflect current slide index */
 function updateSwiperUI(category, index) {
   if (!category || !adhkarData[category]) return;
+  _currentSwiperIndex = index;
   const total = adhkarData[category].adhkar.length;
 
   // Convert to Arabic-Indic numerals for the badge
@@ -2583,7 +2628,24 @@ function updateSwiperUI(category, index) {
   document.querySelectorAll(".swiper-dot").forEach((dot, i) => {
     dot.classList.toggle("active", i === index);
   });
+
+  // Enable/disable navigation buttons
+  const prevBtn = document.getElementById("swiperPrevBtn");
+  const nextBtn = document.getElementById("swiperNextBtn");
+  if (prevBtn) prevBtn.classList.toggle("disabled", index <= 0);
+  if (nextBtn) nextBtn.classList.toggle("disabled", index >= total - 1);
 }
+
+// Keyboard arrow controls for Azkar swiper
+document.addEventListener("keydown", (e) => {
+  const catPage = document.getElementById("categoryPage");
+  if (!catPage || catPage.classList.contains("hidden")) return;
+  if (e.key === "ArrowLeft") {
+    swiperNextSlide();
+  } else if (e.key === "ArrowRight") {
+    swiperPrevSlide();
+  }
+});
 
 /**
  * Decrement the visual counter (internally increments currentCount toward
