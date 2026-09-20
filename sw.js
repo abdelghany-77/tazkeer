@@ -1,5 +1,6 @@
-const CACHE_NAME = "tazkeer-v8.4";
+const CACHE_NAME = "tazkeer-v8.5";
 const QURAN_CACHE_NAME = "tazkeer-quran-pages-v1";
+const PROPHETS_CACHE_NAME = "tazkeer-prophets-v1";
 const urlsToCache = [
   "./",
   "./index.html",
@@ -13,6 +14,8 @@ const urlsToCache = [
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-solid-900.woff2",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-regular-400.woff2",
+  "./prophets.js",
+  "./data/prophets-index.json",
 ];
 
 // Install event - cache resources
@@ -51,6 +54,26 @@ self.addEventListener("fetch", function (event) {
           return fetch(event.request).then(function (networkResponse) {
             if (networkResponse && networkResponse.status === 200) {
               quranCache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          });
+        });
+      })
+    );
+    return;
+  }
+
+  // Dedicated cache strategy for Prophet story JSON files (Cache-First)
+  if (url.pathname.includes("data/prophets/") && url.pathname.endsWith(".json")) {
+    event.respondWith(
+      caches.open(PROPHETS_CACHE_NAME).then(function (prophetsCache) {
+        return prophetsCache.match(event.request).then(function (response) {
+          if (response) {
+            return response;
+          }
+          return fetch(event.request).then(function (networkResponse) {
+            if (networkResponse && networkResponse.status === 200) {
+              prophetsCache.put(event.request, networkResponse.clone());
             }
             return networkResponse;
           });
@@ -122,7 +145,7 @@ self.addEventListener("activate", function (event) {
       .then(function (cacheNames) {
         return Promise.all(
           cacheNames.map(function (cacheName) {
-            if (cacheName !== CACHE_NAME && cacheName !== QURAN_CACHE_NAME) {
+            if (cacheName !== CACHE_NAME && cacheName !== QURAN_CACHE_NAME && cacheName !== PROPHETS_CACHE_NAME) {
               console.log("Deleting old cache:", cacheName);
               return caches.delete(cacheName);
             }

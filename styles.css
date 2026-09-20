@@ -7187,3 +7187,920 @@ body.light-mode .misbaha-stat-val {
     padding: 0.35rem 0.7rem;
   }
 }
+
+/* ================================================================
+   PROPHETS e-READER — Full Styling
+   ================================================================ */
+
+/* ── Loader & Error ─────────────────────────────────────────── */
+.prophets-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+  color: #64748b;
+  font-family: "Cairo", sans-serif;
+  font-size: 1rem;
+}
+
+.prophets-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(26, 138, 92, 0.2);
+  border-top-color: #1a8a5c;
+  border-radius: 50%;
+  animation: prSpin 0.8s linear infinite;
+}
+
+@keyframes prSpin {
+  to { transform: rotate(360deg); }
+}
+
+.prophets-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  gap: 0.75rem;
+  color: #94a3b8;
+  font-family: "Cairo", sans-serif;
+  text-align: center;
+  padding: 2rem;
+}
+
+.prophets-error i {
+  font-size: 2.5rem;
+  color: #f59e0b;
+}
+
+.prophets-retry-btn {
+  padding: 0.6rem 1.5rem;
+  background: linear-gradient(135deg, #1a8a5c, #10b981);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.prophets-retry-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(26, 138, 92, 0.3);
+}
+
+.prophets-retry-secondary {
+  background: transparent;
+  border: 1px solid #64748b;
+  color: #64748b;
+}
+
+/* ── Grid View ──────────────────────────────────────────────── */
+.prophets-grid-view {
+  padding-bottom: 80px;
+}
+
+.prophets-header-section {
+  text-align: center;
+  padding: 1.5rem 0 1rem;
+}
+
+.prophets-main-title {
+  font-family: "Cairo", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.prophets-main-title i {
+  color: #1a8a5c;
+}
+
+.prophets-subtitle {
+  font-family: "Cairo", sans-serif;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+.prophets-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  padding: 0 0.25rem;
+}
+
+@media (min-width: 640px) {
+  .prophets-cards-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.prophets-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: "Cairo", sans-serif;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+  -webkit-tap-highlight-color: transparent;
+  text-align: right;
+  overflow: hidden;
+}
+
+.prophets-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(26, 138, 92, 0.12);
+  border-color: rgba(26, 138, 92, 0.25);
+}
+
+.prophets-card--locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+}
+
+.prophets-card--locked:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.prophets-card-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 138, 92, 0.08);
+  border-radius: 14px;
+  color: #1a8a5c;
+  transition: all 0.2s ease;
+}
+
+.prophets-card-icon i {
+  font-size: 1.35rem;
+  color: #1a8a5c;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.prophets-card:hover .prophets-card-icon i {
+  transform: scale(1.12);
+}
+
+.prophets-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.prophets-card-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.prophets-card-title {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0.1rem 0 0;
+  line-height: 1.3;
+}
+
+.prophets-card-meta {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.prophets-card-meta i {
+  margin-left: 0.2rem;
+}
+
+.prophets-card-badge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  padding: 0.15rem 0.5rem;
+  background: linear-gradient(135deg, #1a8a5c, #10b981);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 8px;
+}
+
+.prophets-card-badge--soon {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+}
+
+.prophets-card-progress {
+  height: 3px;
+  background: rgba(26, 138, 92, 0.1);
+  border-radius: 3px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.prophets-card-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1a8a5c, #10b981);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+/* ── Reader — Top Bar ───────────────────────────────────────── */
+.pr-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.pr-back-btn,
+.pr-toc-btn {
+  background: none;
+  border: none;
+  color: #1a8a5c;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 10px;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pr-back-btn:hover,
+.pr-toc-btn:hover {
+  background: rgba(26, 138, 92, 0.08);
+}
+
+.pr-topbar-info {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.pr-topbar-name {
+  display: block;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.pr-topbar-chapter {
+  display: block;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.68rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Reading Progress Bar ───────────────────────────────────── */
+.pr-progress-bar {
+  height: 3px;
+  background: rgba(26, 138, 92, 0.1);
+  position: sticky;
+  top: 58px;
+  z-index: 99;
+}
+
+.pr-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1a8a5c, #10b981, #34d399);
+  border-radius: 0 3px 3px 0;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+/* ── Reader Controls ────────────────────────────────────────── */
+.pr-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(248, 250, 252, 0.9);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.pr-ctrl-btn {
+  background: rgba(26, 138, 92, 0.08);
+  border: 1px solid rgba(26, 138, 92, 0.15);
+  color: #1a8a5c;
+  padding: 0.35rem 0.7rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pr-ctrl-btn:hover {
+  background: rgba(26, 138, 92, 0.15);
+}
+
+.pr-font-label {
+  font-family: "Amiri", serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.pr-font-label--lg {
+  font-size: 1.05rem;
+}
+
+.pr-reading-time {
+  font-family: "Cairo", sans-serif;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-right: auto;
+}
+
+.pr-reading-time i {
+  margin-left: 0.2rem;
+}
+
+/* ── Chapter Content ────────────────────────────────────────── */
+.pr-chapter-content {
+  padding: 0 1rem 2rem;
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+.pr-article {
+  font-family: "Amiri", "Cairo", serif;
+  line-height: 2.1;
+  color: #1e293b;
+}
+
+.pr-chapter-title {
+  font-family: "Cairo", sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1a8a5c;
+  text-align: center;
+  margin: 1.5rem 0 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(26, 138, 92, 0.15);
+}
+
+.pr-chapter-meta {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+}
+
+.pr-chapter-meta i {
+  margin-left: 0.2rem;
+}
+
+.pr-paragraph {
+  margin-bottom: 1.2rem;
+  text-align: justify;
+  text-indent: 1.5rem;
+}
+
+/* ── Quranic Verse Callout ──────────────────────────────────── */
+.pr-quran-section,
+.pr-hadith-section {
+  margin: 2rem 0;
+}
+
+.pr-section-label {
+  font-family: "Cairo", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a8a5c;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pr-quran-verse {
+  position: relative;
+  margin: 1rem 0;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.06), rgba(245, 158, 11, 0.04));
+  border-right: 4px solid #d4a847;
+  border-radius: 0 14px 14px 0;
+  border: 1px solid rgba(212, 168, 71, 0.15);
+  border-right-width: 4px;
+  border-right-color: #d4a847;
+}
+
+.pr-quran-text {
+  font-family: "Amiri", serif;
+  font-size: 1.15em;
+  line-height: 2.2;
+  color: #92400e;
+  text-align: center;
+  margin: 0;
+}
+
+.pr-quran-cite {
+  display: block;
+  text-align: left;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.75rem;
+  color: #b45309;
+  margin-top: 0.5rem;
+  font-style: normal;
+}
+
+/* ── Hadith Callout ─────────────────────────────────────────── */
+.pr-hadith-box {
+  position: relative;
+  margin: 1rem 0;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, rgba(26, 138, 92, 0.04), rgba(16, 185, 129, 0.03));
+  border-right: 4px solid #1a8a5c;
+  border-radius: 0 14px 14px 0;
+  border: 1px solid rgba(26, 138, 92, 0.12);
+  border-right-width: 4px;
+  border-right-color: #1a8a5c;
+}
+
+.pr-hadith-text {
+  font-family: "Amiri", serif;
+  font-size: 1.05em;
+  line-height: 2;
+  color: #065f46;
+  margin: 0;
+}
+
+.pr-hadith-source {
+  display: block;
+  text-align: left;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.72rem;
+  color: #047857;
+  margin-top: 0.5rem;
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ── Chapter Navigation ─────────────────────────────────────── */
+.pr-chapter-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  max-width: 750px;
+  margin: 0 auto 5rem;
+  gap: 0.5rem;
+}
+
+.pr-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(135deg, #1a8a5c, #10b981);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pr-nav-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(26, 138, 92, 0.25);
+}
+
+.pr-nav-indicator {
+  font-family: "Cairo", sans-serif;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* ── Chapter Drawer ─────────────────────────────────────────── */
+.pr-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.pr-drawer-overlay--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pr-drawer {
+  position: fixed;
+  top: 0;
+  right: -320px;
+  width: 300px;
+  max-width: 85vw;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 201;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pr-drawer--open {
+  right: 0;
+}
+
+.pr-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.pr-drawer-header h3 {
+  font-family: "Cairo", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a8a5c;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.pr-drawer-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.pr-drawer-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.pr-drawer-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.pr-drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.75rem 0.8rem;
+  background: none;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: right;
+  font-family: "Cairo", sans-serif;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pr-drawer-item:hover {
+  background: rgba(26, 138, 92, 0.06);
+}
+
+.pr-drawer-item--active {
+  background: rgba(26, 138, 92, 0.1);
+}
+
+.pr-drawer-num {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 138, 92, 0.1);
+  color: #1a8a5c;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.pr-drawer-item--active .pr-drawer-num {
+  background: #1a8a5c;
+  color: #fff;
+}
+
+.pr-drawer-title {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.3;
+}
+
+.pr-drawer-time {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+/* ── Resume Toast ───────────────────────────────────────────── */
+.pr-resume-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.7rem 1.5rem;
+  background: rgba(26, 138, 92, 0.95);
+  color: #fff;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(26, 138, 92, 0.3);
+  z-index: 300;
+  animation: prToastIn 0.4s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pr-resume-toast.hidden {
+  display: none;
+}
+
+@keyframes prToastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ================================================================
+   PROPHETS e-READER — Dark Mode Overrides
+   ================================================================ */
+
+body.dark-mode .prophets-main-title {
+  color: #e2e8f0;
+}
+
+body.dark-mode .prophets-main-title i {
+  color: #68d391;
+}
+
+body.dark-mode .prophets-subtitle {
+  color: #94a3b8;
+}
+
+body.dark-mode .prophets-card {
+  background: rgba(45, 55, 72, 0.8);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .prophets-card:hover {
+  box-shadow: 0 8px 28px rgba(104, 211, 145, 0.1);
+  border-color: rgba(104, 211, 145, 0.2);
+}
+
+body.dark-mode .prophets-card-icon {
+  background: rgba(104, 211, 145, 0.1);
+  color: #68d391;
+}
+
+body.dark-mode .prophets-card-icon i {
+  color: #68d391;
+}
+
+body.dark-mode .prophets-card-name {
+  color: #e2e8f0;
+}
+
+body.dark-mode .prophets-card-title {
+  color: #94a3b8;
+}
+
+body.dark-mode .prophets-card-meta {
+  color: #718096;
+}
+
+body.dark-mode .prophets-card-badge {
+  background: linear-gradient(135deg, #047857, #10b981);
+}
+
+body.dark-mode .prophets-card-progress {
+  background: rgba(104, 211, 145, 0.1);
+}
+
+body.dark-mode .prophets-loader,
+body.dark-mode .prophets-error {
+  color: #94a3b8;
+}
+
+body.dark-mode .prophets-spinner {
+  border-color: rgba(104, 211, 145, 0.2);
+  border-top-color: #68d391;
+}
+
+/* ── Dark: Reader Top Bar ─────────────────────────────── */
+body.dark-mode .pr-topbar {
+  background: rgba(26, 32, 44, 0.96);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .pr-back-btn,
+body.dark-mode .pr-toc-btn {
+  color: #68d391;
+}
+
+body.dark-mode .pr-back-btn:hover,
+body.dark-mode .pr-toc-btn:hover {
+  background: rgba(104, 211, 145, 0.1);
+}
+
+body.dark-mode .pr-topbar-name {
+  color: #e2e8f0;
+}
+
+body.dark-mode .pr-topbar-chapter {
+  color: #94a3b8;
+}
+
+/* ── Dark: Progress Bar ──────────────────────────────── */
+body.dark-mode .pr-progress-bar {
+  background: rgba(104, 211, 145, 0.1);
+}
+
+body.dark-mode .pr-progress-fill {
+  background: linear-gradient(90deg, #047857, #10b981, #34d399);
+}
+
+/* ── Dark: Controls ──────────────────────────────────── */
+body.dark-mode .pr-controls {
+  background: rgba(26, 32, 44, 0.85);
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+body.dark-mode .pr-ctrl-btn {
+  background: rgba(104, 211, 145, 0.1);
+  border-color: rgba(104, 211, 145, 0.15);
+  color: #68d391;
+}
+
+body.dark-mode .pr-ctrl-btn:hover {
+  background: rgba(104, 211, 145, 0.18);
+}
+
+/* ── Dark: Article ───────────────────────────────────── */
+body.dark-mode .pr-article {
+  color: #cbd5e0;
+}
+
+body.dark-mode .pr-chapter-title {
+  color: #68d391;
+  border-bottom-color: rgba(104, 211, 145, 0.15);
+}
+
+body.dark-mode .pr-chapter-meta {
+  color: #718096;
+}
+
+/* ── Dark: Quran Verse ───────────────────────────────── */
+body.dark-mode .pr-quran-verse {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.06), rgba(245, 158, 11, 0.03));
+  border-color: rgba(212, 168, 71, 0.15);
+  border-right-color: #d4a847;
+}
+
+body.dark-mode .pr-quran-text {
+  color: #fbbf24;
+}
+
+body.dark-mode .pr-quran-cite {
+  color: #d97706;
+}
+
+/* ── Dark: Hadith ────────────────────────────────────── */
+body.dark-mode .pr-hadith-box {
+  background: linear-gradient(135deg, rgba(104, 211, 145, 0.05), rgba(16, 185, 129, 0.03));
+  border-color: rgba(104, 211, 145, 0.12);
+  border-right-color: #10b981;
+}
+
+body.dark-mode .pr-hadith-text {
+  color: #6ee7b7;
+}
+
+body.dark-mode .pr-hadith-source {
+  color: #34d399;
+}
+
+/* ── Dark: Chapter Nav ───────────────────────────────── */
+body.dark-mode .pr-nav-btn {
+  background: linear-gradient(135deg, #047857, #10b981);
+}
+
+body.dark-mode .pr-nav-indicator {
+  color: #718096;
+}
+
+/* ── Dark: Drawer ────────────────────────────────────── */
+body.dark-mode .pr-drawer {
+  background: rgba(26, 32, 44, 0.98);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .pr-drawer-header {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .pr-drawer-header h3 {
+  color: #68d391;
+}
+
+body.dark-mode .pr-drawer-close {
+  color: #718096;
+}
+
+body.dark-mode .pr-drawer-close:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-mode .pr-drawer-item:hover {
+  background: rgba(104, 211, 145, 0.06);
+}
+
+body.dark-mode .pr-drawer-item--active {
+  background: rgba(104, 211, 145, 0.1);
+}
+
+body.dark-mode .pr-drawer-num {
+  background: rgba(104, 211, 145, 0.1);
+  color: #68d391;
+}
+
+body.dark-mode .pr-drawer-item--active .pr-drawer-num {
+  background: #10b981;
+  color: #fff;
+}
+
+body.dark-mode .pr-drawer-title {
+  color: #cbd5e0;
+}
+
+body.dark-mode .pr-drawer-time {
+  color: #718096;
+}
+
+/* ── Dark: Resume Toast ──────────────────────────────── */
+body.dark-mode .pr-resume-toast {
+  background: rgba(16, 185, 129, 0.92);
+}
+
