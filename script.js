@@ -1442,6 +1442,8 @@ function switchTab(tabId) {
     // If user was in a category, preserve their position and progress
   } else if (tabId === "tab-quran") {
     if (typeof initQuranTab === "function") initQuranTab();
+  } else if (tabId === "tab-prophets") {
+    if (typeof initProphetsTab === "function") initProphetsTab();
   } else if (tabId === "tab-profile") {
     if (typeof updateProfileTab === "function") updateProfileTab();
     if (typeof updateStatsDashboard === "function") updateStatsDashboard();
