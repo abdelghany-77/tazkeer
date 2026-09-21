@@ -50,7 +50,7 @@
   function renderGrid(container) {
     var html = '<div class="prophets-grid-view">';
     html +=
-      '<div class="prophets-header-section"><h2 class="prophets-main-title"><i class="fas fa-book-open"></i> قصص الأنبياء</h2><p class="prophets-subtitle">اقرأ ملخص سيرة الأنبياء  </p></div>';
+      '<div class="prophets-header-section"><h2 class="prophets-main-title"><i class="fas fa-book-open"></i> قصص الأنبياء</h2><p class="prophets-subtitle">ملخص قصص الأنبياء — قراءة موثقة ومفصلة من القرآن الكريم والسنة النبوية والتفسير</p></div>';
     html += '<div class="prophets-cards-grid">';
 
     prophetsIndex.forEach(function (p) {
