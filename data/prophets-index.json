@@ -1,127 +1,302 @@
 [
   {
-    "id": 1, "slug": "adam", "name": "آدم عليه السلام", "title": "أبو البشر وأوّل الأنبياء",
-    "order": 1, "quranMentions": 25, "chapterCount": 8, "icon": "fas fa-seedling",
-    "readingTimeMinutes": 45, "brief": "قصة خلق آدم من طين، وسجود الملائكة، وإبليس، والهبوط إلى الأرض"
+    "id": 1,
+    "slug": "adam",
+    "name": "آدم عليه السلام",
+    "title": "أبو البشر وأوّل الأنبياء",
+    "order": 1,
+    "quranMentions": 25,
+    "chapterCount": 8,
+    "icon": "fas fa-seedling",
+    "readingTimeMinutes": 52,
+    "brief": "قصة خلق آدم من طين، وسجود الملائكة، وإبليس، والهبوط إلى الأرض"
   },
   {
-    "id": 2, "slug": "idris", "name": "إدريس عليه السلام", "title": "أوّل من خطّ بالقلم",
-    "order": 2, "quranMentions": 2, "chapterCount": 2, "icon": "fas fa-pen-nib",
-    "readingTimeMinutes": 12, "brief": "نبيّ رفعه الله مكانًا عليًّا وكان صادق الوعد"
+    "id": 2,
+    "slug": "idris",
+    "name": "إدريس عليه السلام",
+    "title": "أوّل من خطّ بالقلم",
+    "order": 2,
+    "quranMentions": 2,
+    "chapterCount": 2,
+    "icon": "fas fa-pen-nib",
+    "readingTimeMinutes": 12,
+    "brief": "نبيّ رفعه الله مكانًا عليًّا وكان صادق الوعد"
   },
   {
-    "id": 3, "slug": "nuh", "name": "نوح عليه السلام", "title": "شيخ المرسلين ونجيّ الله",
-    "order": 3, "quranMentions": 43, "chapterCount": 6, "icon": "fas fa-ship",
-    "readingTimeMinutes": 52, "brief": "أوّل رسول إلى أهل الأرض ودعوته ألف سنة إلّا خمسين عامًا"
+    "id": 3,
+    "slug": "nuh",
+    "name": "نوح عليه السلام",
+    "title": "شيخ المرسلين ونجيّ الله",
+    "order": 3,
+    "quranMentions": 43,
+    "chapterCount": 6,
+    "icon": "fas fa-ship",
+    "readingTimeMinutes": 52,
+    "brief": "أوّل رسول إلى أهل الأرض ودعوته ألف سنة إلّا خمسين عامًا"
   },
   {
-    "id": 4, "slug": "hud", "name": "هود عليه السلام", "title": "رسول الله إلى عاد",
-    "order": 4, "quranMentions": 7, "chapterCount": 3, "icon": "fas fa-wind",
-    "readingTimeMinutes": 21, "brief": "أُرسل إلى قوم عاد الذين كانوا يبنون بكل ريع آية"
+    "id": 4,
+    "slug": "hud",
+    "name": "هود عليه السلام",
+    "title": "رسول الله إلى عاد",
+    "order": 4,
+    "quranMentions": 7,
+    "chapterCount": 3,
+    "icon": "fas fa-wind",
+    "readingTimeMinutes": 21,
+    "brief": "أُرسل إلى قوم عاد الذين كانوا يبنون بكل ريع آية"
   },
   {
-    "id": 5, "slug": "salih", "name": "صالح عليه السلام", "title": "صاحب الناقة المعجزة",
-    "order": 5, "quranMentions": 9, "chapterCount": 3, "icon": "fas fa-mountain",
-    "readingTimeMinutes": 22, "brief": "أُرسل إلى ثمود وآتاه الله الناقة آيةً مبصرةً"
+    "id": 5,
+    "slug": "salih",
+    "name": "صالح عليه السلام",
+    "title": "صاحب الناقة المعجزة",
+    "order": 5,
+    "quranMentions": 9,
+    "chapterCount": 3,
+    "icon": "fas fa-mountain",
+    "readingTimeMinutes": 22,
+    "brief": "أُرسل إلى ثمود وآتاه الله الناقة آيةً مبصرةً"
   },
   {
-    "id": 6, "slug": "ibrahim", "name": "إبراهيم عليه السلام", "title": "خليل الرحمن وأبو الأنبياء",
-    "order": 6, "quranMentions": 69, "chapterCount": 7, "icon": "fas fa-kaaba",
-    "readingTimeMinutes": 62, "brief": "خليل الله الذي حطّم الأصنام وبنى الكعبة وابتُلي فصبر"
+    "id": 6,
+    "slug": "ibrahim",
+    "name": "إبراهيم عليه السلام",
+    "title": "خليل الرحمن وأبو الأنبياء",
+    "order": 6,
+    "quranMentions": 69,
+    "chapterCount": 7,
+    "icon": "fas fa-kaaba",
+    "readingTimeMinutes": 61,
+    "brief": "خليل الله الذي حطّم الأصنام وبنى الكعبة وابتُلي فصبر"
   },
   {
-    "id": 7, "slug": "lut", "name": "لوط عليه السلام", "title": "المنذر لقومه من الفاحشة",
-    "order": 7, "quranMentions": 27, "chapterCount": 3, "icon": "fas fa-bolt",
-    "readingTimeMinutes": 22, "brief": "ابن أخي إبراهيم أُرسل إلى قوم يأتون الفاحشة"
+    "id": 7,
+    "slug": "lut",
+    "name": "لوط عليه السلام",
+    "title": "المنذر لقومه من الفاحشة",
+    "order": 7,
+    "quranMentions": 27,
+    "chapterCount": 3,
+    "icon": "fas fa-bolt",
+    "readingTimeMinutes": 22,
+    "brief": "ابن أخي إبراهيم أُرسل إلى قوم يأتون الفاحشة"
   },
   {
-    "id": 8, "slug": "ismail", "name": "إسماعيل عليه السلام", "title": "الذبيح وأبو العرب",
-    "order": 8, "quranMentions": 12, "chapterCount": 2, "icon": "fas fa-hand-holding-heart",
-    "readingTimeMinutes": 14, "brief": "الذبيح الذي فداه الله بذبح عظيم وبنى الكعبة مع أبيه"
+    "id": 8,
+    "slug": "ismail",
+    "name": "إسماعيل عليه السلام",
+    "title": "الذبيح وأبو العرب",
+    "order": 8,
+    "quranMentions": 12,
+    "chapterCount": 2,
+    "icon": "fas fa-hand-holding-heart",
+    "readingTimeMinutes": 14,
+    "brief": "الذبيح الذي فداه الله بذبح عظيم وبنى الكعبة مع أبيه"
   },
   {
-    "id": 9, "slug": "ishaq", "name": "إسحاق عليه السلام", "title": "البشارة من الله",
-    "order": 9, "quranMentions": 17, "chapterCount": 2, "icon": "fas fa-star",
-    "readingTimeMinutes": 12, "brief": "ابن إبراهيم الذي بُشِّر به وهو غلام عليم"
+    "id": 9,
+    "slug": "ishaq",
+    "name": "إسحاق عليه السلام",
+    "title": "البشارة من الله",
+    "order": 9,
+    "quranMentions": 17,
+    "chapterCount": 2,
+    "icon": "fas fa-star",
+    "readingTimeMinutes": 12,
+    "brief": "ابن إبراهيم الذي بُشِّر به وهو غلام عليم"
   },
   {
-    "id": 10, "slug": "yaqub", "name": "يعقوب عليه السلام", "title": "إسرائيل وأبو الأسباط",
-    "order": 10, "quranMentions": 16, "chapterCount": 2, "icon": "fas fa-moon",
-    "readingTimeMinutes": 13, "brief": "صاحب الصبر الجميل على فراق يوسف حتى ابيضّت عيناه"
+    "id": 10,
+    "slug": "yaqub",
+    "name": "يعقوب عليه السلام",
+    "title": "إسرائيل وأبو الأسباط",
+    "order": 10,
+    "quranMentions": 16,
+    "chapterCount": 2,
+    "icon": "fas fa-moon",
+    "readingTimeMinutes": 13,
+    "brief": "صاحب الصبر الجميل على فراق يوسف حتى ابيضّت عيناه"
   },
   {
-    "id": 11, "slug": "yusuf", "name": "يوسف عليه السلام", "title": "الصدّيق وأحسن القصص",
-    "order": 11, "quranMentions": 27, "chapterCount": 7, "icon": "fas fa-crown",
-    "readingTimeMinutes": 59, "brief": "أحسن القصص: من الجُبّ إلى السجن إلى عزيز مصر"
+    "id": 11,
+    "slug": "yusuf",
+    "name": "يوسف عليه السلام",
+    "title": "الصدّيق وأحسن القصص",
+    "order": 11,
+    "quranMentions": 27,
+    "chapterCount": 7,
+    "icon": "fas fa-crown",
+    "readingTimeMinutes": 58,
+    "brief": "أحسن القصص: من الجُبّ إلى السجن إلى عزيز مصر"
   },
   {
-    "id": 12, "slug": "ayyub", "name": "أيوب عليه السلام", "title": "رمز الصبر على البلاء",
-    "order": 12, "quranMentions": 4, "chapterCount": 4, "icon": "fas fa-hands-praying",
-    "readingTimeMinutes": 30, "brief": "ابتلاه الله في ماله وجسده فصبر حتى كشف الله ضرّه"
+    "id": 12,
+    "slug": "ayyub",
+    "name": "أيوب عليه السلام",
+    "title": "رمز الصبر على البلاء",
+    "order": 12,
+    "quranMentions": 4,
+    "chapterCount": 4,
+    "icon": "fas fa-hands-praying",
+    "readingTimeMinutes": 30,
+    "brief": "ابتلاه الله في ماله وجسده فصبر حتى كشف الله ضرّه"
   },
   {
-    "id": 13, "slug": "shuayb", "name": "شعيب عليه السلام", "title": "خطيب الأنبياء",
-    "order": 13, "quranMentions": 11, "chapterCount": 3, "icon": "fas fa-scale-balanced",
-    "readingTimeMinutes": 21, "brief": "أُرسل إلى أهل مدين ينهاهم عن بخس الميزان"
+    "id": 13,
+    "slug": "shuayb",
+    "name": "شعيب عليه السلام",
+    "title": "خطيب الأنبياء",
+    "order": 13,
+    "quranMentions": 11,
+    "chapterCount": 3,
+    "icon": "fas fa-scale-balanced",
+    "readingTimeMinutes": 21,
+    "brief": "أُرسل إلى أهل مدين ينهاهم عن بخس الميزان"
   },
   {
-    "id": 14, "slug": "musa", "name": "موسى عليه السلام", "title": "كليم الله",
-    "order": 14, "quranMentions": 136, "chapterCount": 8, "icon": "fas fa-fire",
-    "readingTimeMinutes": 70, "brief": "أكثر الأنبياء ذكرًا في القرآن، كلّمه الله وأيّده بالمعجزات"
+    "id": 14,
+    "slug": "musa",
+    "name": "موسى عليه السلام",
+    "title": "كليم الله",
+    "order": 14,
+    "quranMentions": 136,
+    "chapterCount": 8,
+    "icon": "fas fa-fire",
+    "readingTimeMinutes": 71,
+    "brief": "أكثر الأنبياء ذكرًا في القرآن، كلّمه الله وأيّده بالمعجزات"
   },
   {
-    "id": 15, "slug": "harun", "name": "هارون عليه السلام", "title": "وزير موسى وأخوه",
-    "order": 15, "quranMentions": 20, "chapterCount": 2, "icon": "fas fa-user-shield",
-    "readingTimeMinutes": 14, "brief": "أخو موسى ووزيره الذي سأل الله أن يشدّ به أزره"
+    "id": 15,
+    "slug": "harun",
+    "name": "هارون عليه السلام",
+    "title": "وزير موسى وأخوه",
+    "order": 15,
+    "quranMentions": 20,
+    "chapterCount": 2,
+    "icon": "fas fa-user-shield",
+    "readingTimeMinutes": 14,
+    "brief": "أخو موسى ووزيره الذي سأل الله أن يشدّ به أزره"
   },
   {
-    "id": 16, "slug": "dhulkifl", "name": "ذو الكفل عليه السلام", "title": "الصابر المحتسب",
-    "order": 16, "quranMentions": 2, "chapterCount": 2, "icon": "fas fa-shield-halved",
-    "readingTimeMinutes": 10, "brief": "من الصابرين الذين ذكرهم الله في القرآن"
+    "id": 16,
+    "slug": "dhulkifl",
+    "name": "ذو الكفل عليه السلام",
+    "title": "الصابر المحتسب",
+    "order": 16,
+    "quranMentions": 2,
+    "chapterCount": 2,
+    "icon": "fas fa-shield-halved",
+    "readingTimeMinutes": 10,
+    "brief": "من الصابرين الذين ذكرهم الله في القرآن"
   },
   {
-    "id": 17, "slug": "dawud", "name": "داود عليه السلام", "title": "خليفة الله في الأرض",
-    "order": 17, "quranMentions": 16, "chapterCount": 4, "icon": "fas fa-hammer",
-    "readingTimeMinutes": 30, "brief": "آتاه الله الملك والحكمة وألان له الحديد وسبّحت معه الجبال"
+    "id": 17,
+    "slug": "dawud",
+    "name": "داود عليه السلام",
+    "title": "خليفة الله في الأرض",
+    "order": 17,
+    "quranMentions": 16,
+    "chapterCount": 4,
+    "icon": "fas fa-hammer",
+    "readingTimeMinutes": 30,
+    "brief": "آتاه الله الملك والحكمة وألان له الحديد وسبّحت معه الجبال"
   },
   {
-    "id": 18, "slug": "sulayman", "name": "سليمان عليه السلام", "title": "النبيّ الملك",
-    "order": 18, "quranMentions": 17, "chapterCount": 5, "icon": "fas fa-gem",
-    "readingTimeMinutes": 40, "brief": "سخّر الله له الريح والجنّ وعلّمه منطق الطير"
+    "id": 18,
+    "slug": "sulayman",
+    "name": "سليمان عليه السلام",
+    "title": "النبيّ الملك",
+    "order": 18,
+    "quranMentions": 17,
+    "chapterCount": 5,
+    "icon": "fas fa-gem",
+    "readingTimeMinutes": 40,
+    "brief": "سخّر الله له الريح والجنّ وعلّمه منطق الطير"
   },
   {
-    "id": 19, "slug": "ilyas", "name": "إلياس عليه السلام", "title": "المنكر لعبادة بعل",
-    "order": 19, "quranMentions": 2, "chapterCount": 2, "icon": "fas fa-leaf",
-    "readingTimeMinutes": 11, "brief": "أُرسل إلى قوم يعبدون بعلًا فدعاهم إلى التوحيد"
+    "id": 19,
+    "slug": "ilyas",
+    "name": "إلياس عليه السلام",
+    "title": "المنكر لعبادة بعل",
+    "order": 19,
+    "quranMentions": 2,
+    "chapterCount": 2,
+    "icon": "fas fa-leaf",
+    "readingTimeMinutes": 11,
+    "brief": "أُرسل إلى قوم يعبدون بعلًا فدعاهم إلى التوحيد"
   },
   {
-    "id": 20, "slug": "alyasa", "name": "اليسع عليه السلام", "title": "من المفضّلين على العالمين",
-    "order": 20, "quranMentions": 2, "chapterCount": 2, "icon": "fas fa-sun",
-    "readingTimeMinutes": 10, "brief": "فضّله الله على العالمين وكان من الأخيار الصالحين"
+    "id": 20,
+    "slug": "alyasa",
+    "name": "اليسع عليه السلام",
+    "title": "من المفضّلين على العالمين",
+    "order": 20,
+    "quranMentions": 2,
+    "chapterCount": 2,
+    "icon": "fas fa-sun",
+    "readingTimeMinutes": 10,
+    "brief": "فضّله الله على العالمين وكان من الأخيار الصالحين"
   },
   {
-    "id": 21, "slug": "yunus", "name": "يونس عليه السلام", "title": "صاحب الحوت",
-    "order": 21, "quranMentions": 4, "chapterCount": 4, "icon": "fas fa-fish",
-    "readingTimeMinutes": 30, "brief": "التقمه الحوت فنادى في الظلمات أن لا إله إلّا أنت سبحانك"
+    "id": 21,
+    "slug": "yunus",
+    "name": "يونس عليه السلام",
+    "title": "صاحب الحوت",
+    "order": 21,
+    "quranMentions": 4,
+    "chapterCount": 4,
+    "icon": "fas fa-fish",
+    "readingTimeMinutes": 29,
+    "brief": "التقمه الحوت فنادى في الظلمات أن لا إله إلّا أنت سبحانك"
   },
   {
-    "id": 22, "slug": "zakariya", "name": "زكريا عليه السلام", "title": "كافل مريم",
-    "order": 22, "quranMentions": 7, "chapterCount": 2, "icon": "fas fa-dove",
-    "readingTimeMinutes": 14, "brief": "دعا ربّه في الكبر فرزقه يحيى واسمًا لم يُجعل له من قبل سميّ"
+    "id": 22,
+    "slug": "zakariya",
+    "name": "زكريا عليه السلام",
+    "title": "كافل مريم",
+    "order": 22,
+    "quranMentions": 7,
+    "chapterCount": 2,
+    "icon": "fas fa-dove",
+    "readingTimeMinutes": 14,
+    "brief": "دعا ربّه في الكبر فرزقه يحيى واسمًا لم يُجعل له من قبل سميّ"
   },
   {
-    "id": 23, "slug": "yahya", "name": "يحيى عليه السلام", "title": "الحصور التقيّ",
-    "order": 23, "quranMentions": 5, "chapterCount": 2, "icon": "fas fa-book-open",
-    "readingTimeMinutes": 12, "brief": "آتاه الله الحكم صبيًّا وكان تقيًّا برًّا بوالديه"
+    "id": 23,
+    "slug": "yahya",
+    "name": "يحيى عليه السلام",
+    "title": "الحصور التقيّ",
+    "order": 23,
+    "quranMentions": 5,
+    "chapterCount": 2,
+    "icon": "fas fa-book-open",
+    "readingTimeMinutes": 12,
+    "brief": "آتاه الله الحكم صبيًّا وكان تقيًّا برًّا بوالديه"
   },
   {
-    "id": 24, "slug": "isa", "name": "عيسى عليه السلام", "title": "كلمة الله وروحه",
-    "order": 24, "quranMentions": 25, "chapterCount": 4, "icon": "fas fa-star-of-life",
-    "readingTimeMinutes": 35, "brief": "خُلق من غير أب وأيّده الله بروح القدس وكلّم الناس في المهد"
+    "id": 24,
+    "slug": "isa",
+    "name": "عيسى عليه السلام",
+    "title": "كلمة الله وروحه",
+    "order": 24,
+    "quranMentions": 25,
+    "chapterCount": 4,
+    "icon": "fas fa-star-of-life",
+    "readingTimeMinutes": 33,
+    "brief": "خُلق من غير أب وأيّده الله بروح القدس وكلّم الناس في المهد"
   },
   {
-    "id": 25, "slug": "muhammad", "name": "محمد ﷺ", "title": "سيّد ولد آدم وخاتم الأنبياء والمرسلين",
-    "order": 25, "quranMentions": 4, "chapterCount": 12, "icon": "fas fa-star-and-crescent",
-    "readingTimeMinutes": 90, "brief": "خاتم الأنبياء والمرسلين، أرسله الله رحمةً للعالمين بالهدى ودين الحق"
+    "id": 25,
+    "slug": "muhammad",
+    "name": "محمد ﷺ",
+    "title": "سيّد ولد آدم وخاتم الأنبياء والمرسلين",
+    "order": 25,
+    "quranMentions": 4,
+    "chapterCount": 12,
+    "icon": "fas fa-star-and-crescent",
+    "readingTimeMinutes": 92,
+    "brief": "خاتم الأنبياء والمرسلين، أرسله الله رحمةً للعالمين بالهدى ودين الحق"
   }
 ]
