@@ -6,24 +6,53 @@
   "use strict";
 
   // ── State ──────────────────────────────────────────────────
-  let prophetsIndex = null;
-  let prophetsCache = new Map(); // slug → full JSON
-  let currentProphet = null; // currently open prophet JSON
-  let currentChapterIdx = 0;
-  let readerFontSize = 18; // px
-  let isFullscreen = false;
-  let chapterDrawerOpen = false;
+  var prophetsIndex = null;
+  var prophetsCache = new Map(); // slug → full JSON
+  var currentProphet = null; // currently open prophet JSON
+  var currentChapterIdx = 0;
+  var readerFontSize = 18; // px
+  var isFullscreen = false;
+  var chapterDrawerOpen = false;
+  var scrollHandler = null; // stored reference for cleanup
 
-  const LS_FONT = "tazkeer_prophets_fontSize";
-  const LS_POS_PFX = "tazkeer_prophet_pos_";
+  var LS_FONT = "tazkeer_prophets_fontSize";
+  var LS_POS_PFX = "tazkeer_prophet_pos_";
+  var LS_READ_PFX = "tazkeer_prophet_read_"; // slug → JSON array of read chapter indices
+
+  // ── Read Tracking Helpers ─────────────────────────────────
+  function getReadChapters(slug) {
+    try {
+      var stored = localStorage.getItem(LS_READ_PFX + slug);
+      if (stored) return JSON.parse(stored);
+    } catch (e) { /* ignore */ }
+    return [];
+  }
+
+  function markChapterRead(slug, chapterIdx) {
+    var read = getReadChapters(slug);
+    if (read.indexOf(chapterIdx) === -1) {
+      read.push(chapterIdx);
+      localStorage.setItem(LS_READ_PFX + slug, JSON.stringify(read));
+    }
+    return read;
+  }
+
+  function isChapterRead(slug, chapterIdx) {
+    return getReadChapters(slug).indexOf(chapterIdx) !== -1;
+  }
+
+  function isStoryComplete(slug, totalChapters) {
+    var read = getReadChapters(slug);
+    return read.length >= totalChapters;
+  }
 
   // ── Bootstrap ──────────────────────────────────────────────
   window.initProphetsTab = function () {
-    const container = document.getElementById("prophetsPageContent");
+    var container = document.getElementById("prophetsPageContent");
     if (!container) return;
 
     // Load saved font size
-    const savedFont = localStorage.getItem(LS_FONT);
+    var savedFont = localStorage.getItem(LS_FONT);
     if (savedFont) readerFontSize = parseInt(savedFont, 10) || 18;
 
     if (prophetsIndex) {
@@ -62,19 +91,30 @@
         ? '<span class="prophets-card-badge">' + p.chapterCount + " فصول</span>"
         : '<span class="prophets-card-badge prophets-card-badge--soon">قريبًا</span>';
 
+      // Check if story is fully complete
+      var storyComplete = available && isStoryComplete(p.slug, p.chapterCount);
+
       // Check reading progress
-      var savedPos = localStorage.getItem(LS_POS_PFX + p.slug);
+      var readChapters = getReadChapters(p.slug);
       var progressHTML = "";
-      if (savedPos && available) {
-        try {
-          var pos = JSON.parse(savedPos);
-          var pct = Math.round(((pos.chapterIdx || 0) / p.chapterCount) * 100);
-          progressHTML =
-            '<div class="prophets-card-progress"><div class="prophets-card-progress-fill" style="width:' +
-            Math.min(pct, 100) +
-            '%"></div></div>';
-        } catch (e) {
-          /* ignore */
+      if (readChapters.length > 0 && available) {
+        var pct = Math.round((readChapters.length / p.chapterCount) * 100);
+        progressHTML =
+          '<div class="prophets-card-progress"><div class="prophets-card-progress-fill" style="width:' +
+          Math.min(pct, 100) +
+          '%"></div></div>';
+      } else {
+        // fallback to old scroll-based progress
+        var savedPos = localStorage.getItem(LS_POS_PFX + p.slug);
+        if (savedPos && available) {
+          try {
+            var pos = JSON.parse(savedPos);
+            var pct2 = Math.round(((pos.chapterIdx || 0) / p.chapterCount) * 100);
+            progressHTML =
+              '<div class="prophets-card-progress"><div class="prophets-card-progress-fill" style="width:' +
+              Math.min(pct2, 100) +
+              '%"></div></div>';
+          } catch (e) { /* ignore */ }
         }
       }
 
@@ -97,6 +137,12 @@
           ? "onclick=\"window._openProphet('" + p.slug + "')\""
           : "disabled") +
         ">";
+
+      // Completed badge
+      if (storyComplete) {
+        html += '<div class="prophets-card-completed-badge"><i class="fas fa-check"></i></div>';
+      }
+
       html += '<div class="prophets-card-icon">' + iconHTML + "</div>";
       html += '<div class="prophets-card-body">';
       html += '<h3 class="prophets-card-name">' + p.name + "</h3>";
@@ -219,6 +265,9 @@
     // Chapter content area
     html += '<div class="pr-chapter-content" id="prChapterContent"></div>';
 
+    // Complete reading button section
+    html += '<div class="pr-complete-section" id="prCompleteSection"></div>';
+
     // Chapter nav
     html += '<div class="pr-chapter-nav" id="prChapterNav">';
     html +=
@@ -237,8 +286,19 @@
     html +=
       '<button class="pr-drawer-close" onclick="window._toggleDrawer()"><i class="fas fa-times"></i></button>';
     html += "</div>";
+    // Drawer progress
+    html += '<div class="pr-drawer-progress" id="prDrawerProgress"></div>';
     html += '<div class="pr-drawer-list" id="prDrawerList"></div>';
     html += "</div>";
+
+    // Scroll progress circle
+    html += '<div class="pr-scroll-progress" id="prScrollProgress">';
+    html += '<svg viewBox="0 0 36 36">';
+    html += '<circle class="pr-scroll-progress-track" cx="18" cy="18" r="15.5"></circle>';
+    html += '<circle class="pr-scroll-progress-fill" id="prScrollCircle" cx="18" cy="18" r="15.5" stroke-dasharray="97.39" stroke-dashoffset="97.39"></circle>';
+    html += '</svg>';
+    html += '<span class="pr-scroll-pct" id="prScrollPct">٠٪</span>';
+    html += '</div>';
 
     // Resume toast
     html += '<div class="pr-resume-toast hidden" id="prResumeToast"></div>';
@@ -248,11 +308,21 @@
     // Populate drawer
     renderDrawer();
 
-    // Scroll listener for progress saving
-    var contentEl = document.getElementById("prChapterContent");
-    if (contentEl) {
-      window.addEventListener("scroll", debounce(savePosition, 1000));
+    // Setup scroll listener for real-time progress
+    if (scrollHandler) {
+      window.removeEventListener("scroll", scrollHandler);
     }
+    scrollHandler = function () {
+      updateScrollProgress();
+      debouncedSavePosition();
+    };
+    window.addEventListener("scroll", scrollHandler);
+  }
+
+  var saveTimer = null;
+  function debouncedSavePosition() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(savePosition, 1000);
   }
 
   function renderChapter() {
@@ -266,6 +336,10 @@
     var html =
       '<article class="pr-article" style="font-size:' + readerFontSize + 'px">';
     html += '<h2 class="pr-chapter-title">' + ch.title + "</h2>";
+
+    // Ornamental divider below title
+    html += '<div class="pr-chapter-ornament"><span>❖</span></div>';
+
     html +=
       '<div class="pr-chapter-meta"><span>الفصل ' +
       convertToArabicNum(ch.chapterId) +
@@ -279,13 +353,16 @@
         " دقيقة قراءة</span>";
     html += "</div>";
 
-    // Paragraphs
-    ch.paragraphs.forEach(function (para) {
-      html += '<p class="pr-paragraph">' + para + "</p>";
+    // Paragraphs with drop cap on first
+    ch.paragraphs.forEach(function (para, idx) {
+      var cls = idx === 0 ? "pr-paragraph pr-paragraph--first" : "pr-paragraph";
+      html += '<p class="' + cls + '">' + para + "</p>";
     });
 
     // Quranic verses
     if (ch.quranicVerses && ch.quranicVerses.length > 0) {
+      // Ornamental divider before Quran section
+      html += '<div class="pr-ornament-divider"><span>✦</span></div>';
       html += '<div class="pr-quran-section">';
       html +=
         '<h3 class="pr-section-label"><i class="fas fa-quran"></i> الآيات القرآنية</h3>';
@@ -300,6 +377,7 @@
 
     // Hadiths
     if (ch.hadiths && ch.hadiths.length > 0) {
+      html += '<div class="pr-ornament-divider"><span>✦</span></div>';
       html += '<div class="pr-hadith-section">';
       html +=
         '<h3 class="pr-section-label"><i class="fas fa-book"></i> الأحاديث النبوية</h3>';
@@ -312,8 +390,23 @@
       html += "</div>";
     }
 
+    // Sources section (show on last chapter or every chapter)
+    if (p.sources && p.sources.length > 0) {
+      html += '<div class="pr-sources-section">';
+      html += '<div class="pr-sources-title"><i class="fas fa-bookmark"></i> المراجع والمصادر</div>';
+      html += '<ul class="pr-sources-list">';
+      p.sources.forEach(function (src) {
+        html += '<li>' + src + '</li>';
+      });
+      html += '</ul>';
+      html += '</div>';
+    }
+
     html += "</article>";
     contentEl.innerHTML = html;
+
+    // Render complete button
+    renderCompleteButton();
 
     // Update topbar chapter
     var topbarCh = document.getElementById("prTopbarChapter");
@@ -349,11 +442,212 @@
     // Update drawer active state
     updateDrawerActive();
 
+    // Update drawer progress
+    updateDrawerProgress();
+
     // Save position
     savePosition();
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Reset scroll progress
+    setTimeout(updateScrollProgress, 100);
+  }
+
+  // ── Complete Reading Button ────────────────────────────────
+  function renderCompleteButton() {
+    var section = document.getElementById("prCompleteSection");
+    if (!section || !currentProphet) return;
+
+    var slug = currentProphet.slug;
+    var alreadyRead = isChapterRead(slug, currentChapterIdx);
+
+    var html = '';
+    if (alreadyRead) {
+      html += '<button class="pr-complete-btn pr-complete-btn--done" disabled>';
+      html += '<i class="fas fa-check-circle"></i>';
+      html += '<span>تمّت قراءة هذا الفصل ✓</span>';
+      html += '</button>';
+    } else {
+      html += '<button class="pr-complete-btn" onclick="window._completeChapter()">';
+      html += '<i class="fas fa-check-double"></i>';
+      html += '<span>أتممت القراءة</span>';
+      html += '</button>';
+    }
+
+    section.innerHTML = html;
+  }
+
+  // ── Complete Chapter Action ────────────────────────────────
+  window._completeChapter = function () {
+    if (!currentProphet) return;
+
+    var slug = currentProphet.slug;
+    var totalChapters = currentProphet.chapters.length;
+
+    // Mark as read
+    markChapterRead(slug, currentChapterIdx);
+
+    // Show check animation + confetti
+    showCompleteAnimation();
+
+    // Update button to "done" state
+    renderCompleteButton();
+
+    // Update drawer
+    updateDrawerActive();
+    updateDrawerProgress();
+
+    // Update progress bar
+    updateProgressBar();
+
+    // Check if all chapters are read → show completion screen
+    if (isStoryComplete(slug, totalChapters)) {
+      setTimeout(function () {
+        showCompletionScreen();
+      }, 1800);
+    } else if (currentChapterIdx < totalChapters - 1) {
+      // Auto-advance to next chapter after a short delay
+      setTimeout(function () {
+        currentChapterIdx++;
+        renderChapter();
+      }, 1800);
+    }
+  };
+
+  // ── Complete Animation (Check + Confetti) ──────────────────
+  function showCompleteAnimation() {
+    // Check circle
+    var animEl = document.createElement("div");
+    animEl.className = "pr-complete-anim";
+    animEl.innerHTML = '<div class="pr-check-circle"><i class="fas fa-check"></i></div>';
+    document.body.appendChild(animEl);
+
+    // Confetti
+    var confettiEl = document.createElement("div");
+    confettiEl.className = "pr-confetti";
+    var colors = ["#10b981", "#34d399", "#6ee7b7", "#fbbf24", "#f59e0b", "#3b82f6", "#8b5cf6", "#ec4899"];
+    for (var i = 0; i < 30; i++) {
+      var piece = document.createElement("div");
+      piece.className = "pr-confetti-piece";
+      piece.style.left = Math.random() * 100 + "%";
+      piece.style.top = (Math.random() * 40 + 20) + "%";
+      piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay = (Math.random() * 0.5) + "s";
+      piece.style.animationDuration = (1 + Math.random() * 1) + "s";
+      piece.style.width = (6 + Math.random() * 8) + "px";
+      piece.style.height = (6 + Math.random() * 8) + "px";
+      piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+      confettiEl.appendChild(piece);
+    }
+    document.body.appendChild(confettiEl);
+
+    // Cleanup
+    setTimeout(function () {
+      if (animEl.parentNode) animEl.parentNode.removeChild(animEl);
+      if (confettiEl.parentNode) confettiEl.parentNode.removeChild(confettiEl);
+    }, 2000);
+  }
+
+  // ── Story Completion Screen ────────────────────────────────
+  function showCompletionScreen() {
+    var container = document.getElementById("prophetsPageContent");
+    if (!container || !currentProphet) return;
+
+    var p = currentProphet;
+    var readCount = getReadChapters(p.slug).length;
+    var totalTime = 0;
+    p.chapters.forEach(function (ch) {
+      totalTime += ch.readingTimeMinutes || 0;
+    });
+
+    // Find next prophet
+    var nextProphet = null;
+    if (prophetsIndex) {
+      for (var i = 0; i < prophetsIndex.length; i++) {
+        if (prophetsIndex[i].slug === p.slug && i < prophetsIndex.length - 1) {
+          nextProphet = prophetsIndex[i + 1];
+          break;
+        }
+      }
+    }
+
+    var html = '<div class="pr-completion-screen">';
+
+    // Icon
+    html += '<div class="pr-completion-icon"><i class="fas fa-trophy"></i></div>';
+
+    // Title
+    html += '<h2 class="pr-completion-title">ما شاء الله! أتممت القصة</h2>';
+    html += '<p class="pr-completion-subtitle">أتممت قراءة قصة ' + p.name + ' بنجاح. بارك الله فيك وزادك علمًا ونورًا.</p>';
+
+    // Stats
+    html += '<div class="pr-completion-stats">';
+    html += '<div class="pr-completion-stat"><span class="pr-completion-stat-num">' + convertToArabicNum(readCount) + '</span><span class="pr-completion-stat-label">فصل مقروء</span></div>';
+    html += '<div class="pr-completion-stat"><span class="pr-completion-stat-num">' + convertToArabicNum(totalTime) + '</span><span class="pr-completion-stat-label">دقيقة قراءة</span></div>';
+    html += '<div class="pr-completion-stat"><span class="pr-completion-stat-num">' + convertToArabicNum(p.quranMentions) + '</span><span class="pr-completion-stat-label">ذكر في القرآن</span></div>';
+    html += '</div>';
+
+    // Dua
+    html += '<div class="pr-completion-dua">اللّهم اجعلنا ممّن يتّبعون هدي أنبيائك ورسلك، وارزقنا شفاعة نبيّك محمد ﷺ يوم القيامة</div>';
+
+    // Actions
+    html += '<div class="pr-completion-actions">';
+    if (nextProphet && nextProphet.chapterCount > 0) {
+      html += '<button class="pr-completion-btn pr-completion-btn--primary" onclick="window._exitReader(); setTimeout(function(){ window._openProphet(\'' + nextProphet.slug + '\'); }, 300);">';
+      html += '<i class="fas fa-arrow-left"></i>';
+      html += '<span>القصة التالية: ' + nextProphet.name + '</span>';
+      html += '</button>';
+    }
+    html += '<button class="pr-completion-btn pr-completion-btn--secondary" onclick="window._exitReader()">';
+    html += '<i class="fas fa-th-large"></i>';
+    html += '<span>العودة لقائمة الأنبياء</span>';
+    html += '</button>';
+    html += '</div>';
+
+    html += '</div>';
+
+    container.innerHTML = html;
+
+    // Show confetti for the completion too
+    showCompleteAnimation();
+  }
+
+  // ── Scroll Progress (Real-time) ────────────────────────────
+  function updateScrollProgress() {
+    var scrollProg = document.getElementById("prScrollProgress");
+    var circle = document.getElementById("prScrollCircle");
+    var pctEl = document.getElementById("prScrollPct");
+    var progressFill = document.getElementById("prProgressFill");
+
+    if (!scrollProg || !circle) return;
+
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (docHeight <= 0) {
+      scrollProg.classList.remove("pr-scroll-progress--visible");
+      return;
+    }
+
+    var pct = Math.min(Math.round((scrollTop / docHeight) * 100), 100);
+    var circumference = 97.39; // 2 * PI * 15.5
+    var offset = circumference - (pct / 100) * circumference;
+
+    circle.style.strokeDashoffset = offset;
+    if (pctEl) pctEl.textContent = convertToArabicNum(pct) + "٪";
+
+    // Show/hide based on scroll
+    if (scrollTop > 100) {
+      scrollProg.classList.add("pr-scroll-progress--visible");
+    } else {
+      scrollProg.classList.remove("pr-scroll-progress--visible");
+    }
+
+    // Also update the top progress bar based on scroll
+    if (progressFill) {
+      progressFill.style.width = pct + "%";
+    }
   }
 
   function renderDrawer() {
@@ -361,45 +655,83 @@
     var listEl = document.getElementById("prDrawerList");
     if (!listEl || !p) return;
 
+    var readChapters = getReadChapters(p.slug);
+
     var html = "";
     p.chapters.forEach(function (ch, idx) {
       var active = idx === currentChapterIdx ? " pr-drawer-item--active" : "";
+      var isRead = readChapters.indexOf(idx) !== -1;
+      var readCls = isRead ? " pr-drawer-item--read" : "";
+
       html +=
         '<button class="pr-drawer-item' +
         active +
+        readCls +
         '" data-idx="' +
         idx +
         '" onclick="window._jumpToChapter(' +
         idx +
         ')">';
-      html +=
-        '<span class="pr-drawer-num">' +
-        convertToArabicNum(ch.chapterId) +
-        "</span>";
+
+      if (isRead && !active) {
+        html += '<span class="pr-drawer-num"><i class="fas fa-check" style="font-size:0.65rem"></i></span>';
+      } else {
+        html +=
+          '<span class="pr-drawer-num">' +
+          convertToArabicNum(ch.chapterId) +
+          "</span>";
+      }
+
       html += '<span class="pr-drawer-title">' + ch.title + "</span>";
-      if (ch.readingTimeMinutes)
+
+      if (isRead) {
+        html += '<span class="pr-drawer-check"><i class="fas fa-check-circle"></i></span>';
+      }
+
+      if (ch.readingTimeMinutes && !isRead)
         html +=
           '<span class="pr-drawer-time">' + ch.readingTimeMinutes + " د</span>";
       html += "</button>";
     });
     listEl.innerHTML = html;
+
+    // Update drawer progress
+    updateDrawerProgress();
+  }
+
+  function updateDrawerProgress() {
+    var progressEl = document.getElementById("prDrawerProgress");
+    if (!progressEl || !currentProphet) return;
+
+    var readChapters = getReadChapters(currentProphet.slug);
+    var total = currentProphet.chapters.length;
+    var pct = Math.round((readChapters.length / total) * 100);
+
+    var html = '';
+    html += '<div class="pr-drawer-progress-bar"><div class="pr-drawer-progress-fill" style="width:' + pct + '%"></div></div>';
+    html += '<div class="pr-drawer-progress-text">' + convertToArabicNum(readChapters.length) + ' من ' + convertToArabicNum(total) + ' فصول مقروءة (' + convertToArabicNum(pct) + '٪)</div>';
+    progressEl.innerHTML = html;
   }
 
   function updateDrawerActive() {
     var items = document.querySelectorAll(".pr-drawer-item");
+    var readChapters = currentProphet ? getReadChapters(currentProphet.slug) : [];
+
     items.forEach(function (item, idx) {
-      item.classList.toggle(
-        "pr-drawer-item--active",
-        idx === currentChapterIdx,
-      );
+      item.classList.toggle("pr-drawer-item--active", idx === currentChapterIdx);
+      item.classList.toggle("pr-drawer-item--read", readChapters.indexOf(idx) !== -1);
     });
   }
 
   function updateProgressBar() {
     var fill = document.getElementById("prProgressFill");
     if (!fill || !currentProphet) return;
+    // Progress bar is now scroll-based, but we set a baseline based on chapter position
     var pct = ((currentChapterIdx + 1) / currentProphet.chapters.length) * 100;
-    fill.style.width = pct + "%";
+    // Don't override scroll-based progress if we're scrolled
+    if (window.scrollY < 100) {
+      fill.style.width = pct + "%";
+    }
   }
 
   // ── Navigation ─────────────────────────────────────────────
@@ -435,6 +767,11 @@
     if (drawer) drawer.classList.toggle("pr-drawer--open", chapterDrawerOpen);
     if (overlay)
       overlay.classList.toggle("pr-drawer-overlay--visible", chapterDrawerOpen);
+
+    // Re-render drawer to update read states
+    if (chapterDrawerOpen) {
+      renderDrawer();
+    }
   };
 
   // ── Reader Controls ────────────────────────────────────────
@@ -474,7 +811,10 @@
     }
 
     // Remove scroll listener
-    window.removeEventListener("scroll", debounce(savePosition, 1000));
+    if (scrollHandler) {
+      window.removeEventListener("scroll", scrollHandler);
+      scrollHandler = null;
+    }
 
     initProphetsTab();
   };
@@ -510,13 +850,5 @@
     return String(num).replace(/[0-9]/g, function (d) {
       return arabicDigits[parseInt(d)];
     });
-  }
-
-  function debounce(fn, delay) {
-    var timer;
-    return function () {
-      clearTimeout(timer);
-      timer = setTimeout(fn, delay);
-    };
   }
 })();
