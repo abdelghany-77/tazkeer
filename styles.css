@@ -7311,21 +7311,40 @@ body.light-mode .misbaha-stat-val {
   align-items: center;
   gap: 0.9rem;
   padding: 1rem 1.1rem;
-  background: rgba(255, 255, 255, 0.92);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
   border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 16px;
+  border-radius: 18px;
   cursor: pointer;
   font-family: "Cairo", sans-serif;
-  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s, border-color 0.3s;
   -webkit-tap-highlight-color: transparent;
   text-align: right;
   overflow: hidden;
 }
 
+.prophets-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(26, 138, 92, 0.04), transparent);
+  transition: left 0.6s ease;
+}
+
+.prophets-card:hover::before {
+  left: 100%;
+}
+
 .prophets-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(26, 138, 92, 0.12);
-  border-color: rgba(26, 138, 92, 0.25);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(26, 138, 92, 0.14);
+  border-color: rgba(26, 138, 92, 0.3);
+}
+
+.prophets-card:active {
+  transform: translateY(-1px) scale(0.99);
 }
 
 .prophets-card--locked {
@@ -7339,29 +7358,55 @@ body.light-mode .misbaha-stat-val {
   box-shadow: none;
 }
 
+.prophets-card--locked::before {
+  display: none;
+}
+
+/* ── Completed Badge on Card ────────────────────────────────── */
+.prophets-card-completed-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #10b981, #34d399);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.6rem;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  z-index: 2;
+}
+
 .prophets-card-icon {
   font-size: 1.5rem;
   line-height: 1;
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(26, 138, 92, 0.08);
-  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(26, 138, 92, 0.1), rgba(16, 185, 129, 0.06));
+  border-radius: 16px;
   color: #1a8a5c;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .prophets-card-icon i {
   font-size: 1.35rem;
   color: #1a8a5c;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.prophets-card:hover .prophets-card-icon {
+  background: linear-gradient(135deg, rgba(26, 138, 92, 0.15), rgba(16, 185, 129, 0.1));
 }
 
 .prophets-card:hover .prophets-card-icon i {
-  transform: scale(1.12);
+  transform: scale(1.15) rotate(-5deg);
 }
 
 .prophets-card-body {
@@ -7413,18 +7458,35 @@ body.light-mode .misbaha-stat-val {
 }
 
 .prophets-card-progress {
-  height: 3px;
-  background: rgba(26, 138, 92, 0.1);
-  border-radius: 3px;
+  height: 4px;
+  background: rgba(26, 138, 92, 0.08);
+  border-radius: 4px;
   margin-top: 0.5rem;
   overflow: hidden;
 }
 
 .prophets-card-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1a8a5c, #10b981);
-  border-radius: 3px;
-  transition: width 0.4s ease;
+  background: linear-gradient(90deg, #1a8a5c, #10b981, #34d399);
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.prophets-card-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: progressShine 2s ease-in-out infinite;
+}
+
+@keyframes progressShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 /* ── Reader — Top Bar ───────────────────────────────────────── */
@@ -7451,13 +7513,14 @@ body.light-mode .misbaha-stat-val {
   cursor: pointer;
   padding: 0.4rem;
   border-radius: 10px;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.2s;
   -webkit-tap-highlight-color: transparent;
 }
 
 .pr-back-btn:hover,
 .pr-toc-btn:hover {
   background: rgba(26, 138, 92, 0.08);
+  transform: scale(1.05);
 }
 
 .pr-topbar-info {
@@ -7498,8 +7561,21 @@ body.light-mode .misbaha-stat-val {
   height: 100%;
   background: linear-gradient(90deg, #1a8a5c, #10b981, #34d399);
   border-radius: 0 3px 3px 0;
-  transition: width 0.4s ease;
+  transition: width 0.15s linear;
   width: 0%;
+  position: relative;
+}
+
+.pr-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  background: #34d399;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.6);
 }
 
 /* ── Reader Controls ────────────────────────────────────────── */
@@ -7527,6 +7603,7 @@ body.light-mode .misbaha-stat-val {
 
 .pr-ctrl-btn:hover {
   background: rgba(26, 138, 92, 0.15);
+  transform: scale(1.05);
 }
 
 .pr-font-label {
@@ -7552,26 +7629,63 @@ body.light-mode .misbaha-stat-val {
 
 /* ── Chapter Content ────────────────────────────────────────── */
 .pr-chapter-content {
-  padding: 0 1rem 2rem;
-  max-width: 750px;
+  padding: 0 1.25rem 2rem;
+  max-width: 720px;
   margin: 0 auto;
 }
 
 .pr-article {
   font-family: "Amiri", "Cairo", serif;
-  line-height: 2.1;
+  line-height: 2.25;
   color: #1e293b;
+  animation: prFadeInUp 0.6s ease both;
 }
 
+@keyframes prFadeInUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Chapter Title with Ornaments ─────────────────────────── */
 .pr-chapter-title {
   font-family: "Cairo", sans-serif;
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #1a8a5c;
   text-align: center;
-  margin: 1.5rem 0 0.5rem;
+  margin: 2rem 0 0.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid rgba(26, 138, 92, 0.15);
+  position: relative;
+}
+
+.pr-chapter-title::after {
+  content: '﷽';
+  display: block;
+  font-family: "Amiri", serif;
+  font-size: 1.6rem;
+  color: rgba(26, 138, 92, 0.25);
+  margin-top: 0.5rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.pr-chapter-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0.5rem 0 1.5rem;
+  font-size: 0.85rem;
+  color: rgba(26, 138, 92, 0.3);
+}
+
+.pr-chapter-ornament::before,
+.pr-chapter-ornament::after {
+  content: '';
+  flex: 1;
+  max-width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(26, 138, 92, 0.2), transparent);
 }
 
 .pr-chapter-meta {
@@ -7588,16 +7702,61 @@ body.light-mode .misbaha-stat-val {
   margin-left: 0.2rem;
 }
 
+/* ── Paragraph Styles with Drop Cap ────────────────────────── */
 .pr-paragraph {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.4rem;
   text-align: justify;
   text-indent: 1.5rem;
+  letter-spacing: 0.01em;
 }
 
-/* ── Quranic Verse Callout ──────────────────────────────────── */
+.pr-paragraph--first {
+  text-indent: 0;
+  position: relative;
+}
+
+.pr-paragraph--first::first-letter {
+  font-family: "Amiri", serif;
+  font-size: 3.2em;
+  font-weight: 700;
+  float: right;
+  line-height: 0.85;
+  margin-left: 0.1em;
+  margin-top: 0.05em;
+  color: #1a8a5c;
+  padding: 0.05em 0.08em;
+}
+
+/* ── Section Ornamental Divider ────────────────────────────── */
+.pr-ornament-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2.5rem 0;
+  gap: 1rem;
+  opacity: 0.5;
+}
+
+.pr-ornament-divider::before,
+.pr-ornament-divider::after {
+  content: '';
+  flex: 1;
+  max-width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(26, 138, 92, 0.35), transparent);
+}
+
+.pr-ornament-divider span {
+  font-family: "Amiri", serif;
+  font-size: 1.2rem;
+  color: #1a8a5c;
+  line-height: 1;
+}
+
+/* ── Quranic Verse Callout (Enhanced) ──────────────────────── */
 .pr-quran-section,
 .pr-hadith-section {
-  margin: 2rem 0;
+  margin: 2.5rem 0;
 }
 
 .pr-section-label {
@@ -7614,22 +7773,34 @@ body.light-mode .misbaha-stat-val {
 .pr-quran-verse {
   position: relative;
   margin: 1rem 0;
-  padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.06), rgba(245, 158, 11, 0.04));
+  padding: 1.5rem 1.75rem;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.07), rgba(245, 158, 11, 0.03), rgba(252, 211, 77, 0.05));
+  border-radius: 16px;
+  border: 1px solid rgba(212, 168, 71, 0.18);
   border-right: 4px solid #d4a847;
-  border-radius: 0 14px 14px 0;
-  border: 1px solid rgba(212, 168, 71, 0.15);
-  border-right-width: 4px;
-  border-right-color: #d4a847;
+  overflow: hidden;
+}
+
+.pr-quran-verse::before {
+  content: '❝';
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  font-size: 3rem;
+  color: rgba(212, 168, 71, 0.12);
+  font-family: serif;
+  line-height: 1;
 }
 
 .pr-quran-text {
   font-family: "Amiri", serif;
-  font-size: 1.15em;
-  line-height: 2.2;
+  font-size: 1.2em;
+  line-height: 2.3;
   color: #92400e;
   text-align: center;
   margin: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .pr-quran-cite {
@@ -7638,29 +7809,47 @@ body.light-mode .misbaha-stat-val {
   font-family: "Cairo", sans-serif;
   font-size: 0.75rem;
   color: #b45309;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
   font-style: normal;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(212, 168, 71, 0.12);
 }
 
-/* ── Hadith Callout ─────────────────────────────────────────── */
+.pr-quran-cite::before {
+  content: '📖 ';
+}
+
+/* ── Hadith Callout (Enhanced) ─────────────────────────────── */
 .pr-hadith-box {
   position: relative;
   margin: 1rem 0;
-  padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, rgba(26, 138, 92, 0.04), rgba(16, 185, 129, 0.03));
+  padding: 1.5rem 1.75rem;
+  background: linear-gradient(135deg, rgba(26, 138, 92, 0.05), rgba(16, 185, 129, 0.03), rgba(52, 211, 153, 0.04));
+  border-radius: 16px;
+  border: 1px solid rgba(26, 138, 92, 0.14);
   border-right: 4px solid #1a8a5c;
-  border-radius: 0 14px 14px 0;
-  border: 1px solid rgba(26, 138, 92, 0.12);
-  border-right-width: 4px;
-  border-right-color: #1a8a5c;
+  overflow: hidden;
+}
+
+.pr-hadith-box::before {
+  content: '❝';
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  font-size: 3rem;
+  color: rgba(26, 138, 92, 0.08);
+  font-family: serif;
+  line-height: 1;
 }
 
 .pr-hadith-text {
   font-family: "Amiri", serif;
-  font-size: 1.05em;
-  line-height: 2;
+  font-size: 1.08em;
+  line-height: 2.1;
   color: #065f46;
   margin: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .pr-hadith-source {
@@ -7669,9 +7858,334 @@ body.light-mode .misbaha-stat-val {
   font-family: "Cairo", sans-serif;
   font-size: 0.72rem;
   color: #047857;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
   font-style: normal;
   font-weight: 600;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(26, 138, 92, 0.1);
+}
+
+.pr-hadith-source::before {
+  content: '📚 ';
+}
+
+/* ── Sources Section ───────────────────────────────────────── */
+.pr-sources-section {
+  margin: 2.5rem 0 1rem;
+  padding: 1.25rem 1.5rem;
+  background: rgba(248, 250, 252, 0.6);
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.pr-sources-title {
+  font-family: "Cairo", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pr-sources-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pr-sources-list li {
+  font-family: "Cairo", sans-serif;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  background: rgba(26, 138, 92, 0.06);
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid rgba(26, 138, 92, 0.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   "أتممت القراءة" COMPLETE READING BUTTON
+   ═══════════════════════════════════════════════════════════════ */
+.pr-complete-section {
+  max-width: 720px;
+  margin: 1.5rem auto 0;
+  padding: 0 1.25rem;
+  animation: prFadeInUp 0.6s ease 0.3s both;
+}
+
+.pr-complete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #1a8a5c, #10b981, #059669);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  font-family: "Cairo", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(26, 138, 92, 0.25);
+}
+
+.pr-complete-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition: left 0.5s ease;
+}
+
+.pr-complete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(26, 138, 92, 0.35);
+}
+
+.pr-complete-btn:hover::before {
+  left: 100%;
+}
+
+.pr-complete-btn:active {
+  transform: scale(0.98);
+}
+
+.pr-complete-btn--done {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+  box-shadow: none;
+  cursor: default;
+  pointer-events: none;
+}
+
+.pr-complete-btn i {
+  font-size: 1.15rem;
+  transition: transform 0.3s ease;
+}
+
+.pr-complete-btn:hover i {
+  transform: scale(1.2);
+}
+
+/* ── Completion Check Animation ────────────────────────────── */
+.pr-complete-anim {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pr-check-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #34d399);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: prCheckPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  box-shadow: 0 12px 48px rgba(16, 185, 129, 0.4);
+}
+
+.pr-check-circle i {
+  font-size: 2.8rem;
+  color: #fff;
+  animation: prCheckFade 0.6s ease 0.3s both;
+}
+
+@keyframes prCheckPop {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes prCheckFade {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Confetti Particles ────────────────────────────────────── */
+.pr-confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 499;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.pr-confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: prConfettiFall 1.5s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes prConfettiFall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) rotate(720deg) scale(0.5);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STORY COMPLETION SCREEN
+   ═══════════════════════════════════════════════════════════════ */
+.pr-completion-screen {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  animation: prFadeInUp 0.8s ease both;
+}
+
+.pr-completion-icon {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #34d399, #6ee7b7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 12px 48px rgba(16, 185, 129, 0.3);
+  animation: prCompletePulse 2s ease-in-out infinite;
+}
+
+.pr-completion-icon i {
+  font-size: 3rem;
+  color: #fff;
+}
+
+@keyframes prCompletePulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 12px 48px rgba(16, 185, 129, 0.3); }
+  50%      { transform: scale(1.05); box-shadow: 0 16px 56px rgba(16, 185, 129, 0.4); }
+}
+
+.pr-completion-title {
+  font-family: "Cairo", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1a8a5c;
+  margin-bottom: 0.5rem;
+}
+
+.pr-completion-subtitle {
+  font-family: "Cairo", sans-serif;
+  font-size: 1rem;
+  color: #64748b;
+  margin-bottom: 1.5rem;
+  max-width: 360px;
+}
+
+.pr-completion-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.pr-completion-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.pr-completion-stat-num {
+  font-family: "Cairo", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1a8a5c;
+}
+
+.pr-completion-stat-label {
+  font-family: "Cairo", sans-serif;
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.pr-completion-dua {
+  font-family: "Amiri", serif;
+  font-size: 1.1rem;
+  color: #92400e;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.04));
+  padding: 1.25rem 2rem;
+  border-radius: 16px;
+  border: 1px solid rgba(212, 168, 71, 0.15);
+  margin-bottom: 2rem;
+  max-width: 400px;
+  line-height: 2;
+  text-align: center;
+}
+
+.pr-completion-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pr-completion-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 14px;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pr-completion-btn:hover {
+  transform: translateY(-2px);
+}
+
+.pr-completion-btn--primary {
+  background: linear-gradient(135deg, #1a8a5c, #10b981);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(26, 138, 92, 0.25);
+}
+
+.pr-completion-btn--primary:hover {
+  box-shadow: 0 8px 28px rgba(26, 138, 92, 0.35);
+}
+
+.pr-completion-btn--secondary {
+  background: rgba(26, 138, 92, 0.08);
+  color: #1a8a5c;
+  border: 1px solid rgba(26, 138, 92, 0.15);
+}
+
+.pr-completion-btn--secondary:hover {
+  background: rgba(26, 138, 92, 0.12);
 }
 
 /* ── Chapter Navigation ─────────────────────────────────────── */
@@ -7680,7 +8194,7 @@ body.light-mode .misbaha-stat-val {
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  max-width: 750px;
+  max-width: 720px;
   margin: 0 auto 5rem;
   gap: 0.5rem;
 }
@@ -7689,22 +8203,27 @@ body.light-mode .misbaha-stat-val {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.6rem 1.2rem;
+  padding: 0.65rem 1.3rem;
   background: linear-gradient(135deg, #1a8a5c, #10b981);
   color: #fff;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   font-family: "Cairo", sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s;
   -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 2px 10px rgba(26, 138, 92, 0.15);
 }
 
 .pr-nav-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(26, 138, 92, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(26, 138, 92, 0.28);
+}
+
+.pr-nav-btn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .pr-nav-indicator {
@@ -7714,7 +8233,7 @@ body.light-mode .misbaha-stat-val {
   font-weight: 600;
 }
 
-/* ── Chapter Drawer ─────────────────────────────────────────── */
+/* ── Chapter Drawer (Enhanced) ─────────────────────────────── */
 .pr-drawer-overlay {
   position: fixed;
   inset: 0;
@@ -7787,6 +8306,35 @@ body.light-mode .misbaha-stat-val {
   background: rgba(0, 0, 0, 0.05);
 }
 
+/* ── Drawer Progress Summary ───────────────────────────────── */
+.pr-drawer-progress {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
+}
+
+.pr-drawer-progress-bar {
+  height: 6px;
+  background: rgba(26, 138, 92, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.3rem;
+}
+
+.pr-drawer-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1a8a5c, #10b981, #34d399);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.pr-drawer-progress-text {
+  font-family: "Cairo", sans-serif;
+  font-size: 0.68rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
 .pr-drawer-list {
   flex: 1;
   overflow-y: auto;
@@ -7805,12 +8353,13 @@ body.light-mode .misbaha-stat-val {
   cursor: pointer;
   text-align: right;
   font-family: "Cairo", sans-serif;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
 
 .pr-drawer-item:hover {
   background: rgba(26, 138, 92, 0.06);
+  transform: translateX(-2px);
 }
 
 .pr-drawer-item--active {
@@ -7829,11 +8378,25 @@ body.light-mode .misbaha-stat-val {
   font-size: 0.75rem;
   font-weight: 700;
   flex-shrink: 0;
+  transition: all 0.2s;
 }
 
 .pr-drawer-item--active .pr-drawer-num {
   background: #1a8a5c;
   color: #fff;
+}
+
+/* ── Drawer Read Check Icon ────────────────────────────────── */
+.pr-drawer-item--read .pr-drawer-num {
+  background: linear-gradient(135deg, #10b981, #34d399);
+  color: #fff;
+}
+
+.pr-drawer-check {
+  font-size: 0.6rem;
+  color: #10b981;
+  flex-shrink: 0;
+  animation: prCheckFade 0.3s ease both;
 }
 
 .pr-drawer-title {
@@ -7884,6 +8447,55 @@ body.light-mode .misbaha-stat-val {
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
+/* ── Scroll Progress (Real-time) ───────────────────────────── */
+.pr-scroll-progress {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  width: 44px;
+  height: 44px;
+  z-index: 150;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.pr-scroll-progress--visible {
+  opacity: 1;
+}
+
+.pr-scroll-progress svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.pr-scroll-progress-track {
+  fill: none;
+  stroke: rgba(26, 138, 92, 0.12);
+  stroke-width: 3;
+}
+
+.pr-scroll-progress-fill {
+  fill: none;
+  stroke: #1a8a5c;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+.pr-scroll-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #1a8a5c;
+}
+
 /* ================================================================
    PROPHETS e-READER — Dark Mode Overrides
    ================================================================ */
@@ -7901,17 +8513,21 @@ body.dark-mode .prophets-subtitle {
 }
 
 body.dark-mode .prophets-card {
-  background: rgba(45, 55, 72, 0.8);
+  background: linear-gradient(135deg, rgba(45, 55, 72, 0.85), rgba(26, 32, 44, 0.9));
   border-color: rgba(255, 255, 255, 0.06);
 }
 
+body.dark-mode .prophets-card::before {
+  background: linear-gradient(90deg, transparent, rgba(104, 211, 145, 0.04), transparent);
+}
+
 body.dark-mode .prophets-card:hover {
-  box-shadow: 0 8px 28px rgba(104, 211, 145, 0.1);
+  box-shadow: 0 12px 36px rgba(104, 211, 145, 0.1);
   border-color: rgba(104, 211, 145, 0.2);
 }
 
 body.dark-mode .prophets-card-icon {
-  background: rgba(104, 211, 145, 0.1);
+  background: linear-gradient(135deg, rgba(104, 211, 145, 0.12), rgba(16, 185, 129, 0.08));
   color: #68d391;
 }
 
@@ -8005,11 +8621,36 @@ body.dark-mode .pr-article {
 
 body.dark-mode .pr-chapter-title {
   color: #68d391;
-  border-bottom-color: rgba(104, 211, 145, 0.15);
+}
+
+body.dark-mode .pr-chapter-title::after {
+  color: rgba(104, 211, 145, 0.2);
+}
+
+body.dark-mode .pr-chapter-ornament {
+  color: rgba(104, 211, 145, 0.25);
+}
+
+body.dark-mode .pr-chapter-ornament::before,
+body.dark-mode .pr-chapter-ornament::after {
+  background: linear-gradient(90deg, transparent, rgba(104, 211, 145, 0.15), transparent);
 }
 
 body.dark-mode .pr-chapter-meta {
   color: #718096;
+}
+
+body.dark-mode .pr-paragraph--first::first-letter {
+  color: #68d391;
+}
+
+body.dark-mode .pr-ornament-divider::before,
+body.dark-mode .pr-ornament-divider::after {
+  background: linear-gradient(90deg, transparent, rgba(104, 211, 145, 0.2), transparent);
+}
+
+body.dark-mode .pr-ornament-divider span {
+  color: #68d391;
 }
 
 /* ── Dark: Quran Verse ───────────────────────────────── */
@@ -8019,12 +8660,17 @@ body.dark-mode .pr-quran-verse {
   border-right-color: #d4a847;
 }
 
+body.dark-mode .pr-quran-verse::before {
+  color: rgba(212, 168, 71, 0.1);
+}
+
 body.dark-mode .pr-quran-text {
   color: #fbbf24;
 }
 
 body.dark-mode .pr-quran-cite {
   color: #d97706;
+  border-top-color: rgba(212, 168, 71, 0.1);
 }
 
 /* ── Dark: Hadith ────────────────────────────────────── */
@@ -8034,12 +8680,75 @@ body.dark-mode .pr-hadith-box {
   border-right-color: #10b981;
 }
 
+body.dark-mode .pr-hadith-box::before {
+  color: rgba(104, 211, 145, 0.06);
+}
+
 body.dark-mode .pr-hadith-text {
   color: #6ee7b7;
 }
 
 body.dark-mode .pr-hadith-source {
   color: #34d399;
+  border-top-color: rgba(104, 211, 145, 0.08);
+}
+
+/* ── Dark: Sources ───────────────────────────────────── */
+body.dark-mode .pr-sources-section {
+  background: rgba(45, 55, 72, 0.4);
+  border-color: rgba(255, 255, 255, 0.04);
+}
+
+body.dark-mode .pr-sources-title {
+  color: #94a3b8;
+}
+
+body.dark-mode .pr-sources-list li {
+  color: #718096;
+  background: rgba(104, 211, 145, 0.06);
+  border-color: rgba(104, 211, 145, 0.08);
+}
+
+/* ── Dark: Complete Button ───────────────────────────── */
+body.dark-mode .pr-complete-btn {
+  background: linear-gradient(135deg, #047857, #10b981, #059669);
+}
+
+body.dark-mode .pr-complete-btn--done {
+  background: linear-gradient(135deg, #4a5568, #2d3748);
+}
+
+/* ── Dark: Completion Screen ─────────────────────────── */
+body.dark-mode .pr-completion-title {
+  color: #68d391;
+}
+
+body.dark-mode .pr-completion-subtitle {
+  color: #94a3b8;
+}
+
+body.dark-mode .pr-completion-stat-num {
+  color: #68d391;
+}
+
+body.dark-mode .pr-completion-stat-label {
+  color: #718096;
+}
+
+body.dark-mode .pr-completion-dua {
+  color: #fbbf24;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.06), rgba(245, 158, 11, 0.03));
+  border-color: rgba(212, 168, 71, 0.12);
+}
+
+body.dark-mode .pr-completion-btn--primary {
+  background: linear-gradient(135deg, #047857, #10b981);
+}
+
+body.dark-mode .pr-completion-btn--secondary {
+  background: rgba(104, 211, 145, 0.08);
+  color: #68d391;
+  border-color: rgba(104, 211, 145, 0.12);
 }
 
 /* ── Dark: Chapter Nav ───────────────────────────────── */
@@ -8073,6 +8782,18 @@ body.dark-mode .pr-drawer-close:hover {
   background: rgba(255, 255, 255, 0.06);
 }
 
+body.dark-mode .pr-drawer-progress {
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+body.dark-mode .pr-drawer-progress-bar {
+  background: rgba(104, 211, 145, 0.08);
+}
+
+body.dark-mode .pr-drawer-progress-text {
+  color: #718096;
+}
+
 body.dark-mode .pr-drawer-item:hover {
   background: rgba(104, 211, 145, 0.06);
 }
@@ -8091,6 +8812,15 @@ body.dark-mode .pr-drawer-item--active .pr-drawer-num {
   color: #fff;
 }
 
+body.dark-mode .pr-drawer-item--read .pr-drawer-num {
+  background: linear-gradient(135deg, #047857, #10b981);
+  color: #fff;
+}
+
+body.dark-mode .pr-drawer-check {
+  color: #34d399;
+}
+
 body.dark-mode .pr-drawer-title {
   color: #cbd5e0;
 }
@@ -8103,4 +8833,18 @@ body.dark-mode .pr-drawer-time {
 body.dark-mode .pr-resume-toast {
   background: rgba(16, 185, 129, 0.92);
 }
+
+/* ── Dark: Scroll Progress ───────────────────────────── */
+body.dark-mode .pr-scroll-progress-track {
+  stroke: rgba(104, 211, 145, 0.1);
+}
+
+body.dark-mode .pr-scroll-progress-fill {
+  stroke: #68d391;
+}
+
+body.dark-mode .pr-scroll-pct {
+  color: #68d391;
+}
+
 
