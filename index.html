@@ -81,22 +81,75 @@
           <p class="welcome-description">رفيقك اليومي في ذكر الله</p>
         </div> -->
 
-        <!-- Date Card -->
-        <div class="date-card-compact">
-          <div class="date-compact-icon">
-            <!-- <i class="fas fa-calendar-alt" style="font-size: 1.2rem; opacity: 0.9;"></i> -->
-          </div>
-          <div class="date-compact-body">
-            <div class="date-compact-title">
-              <span>تاريخ اليوم</span>
+        <!-- ==============================================
+             HERO ISLAMIC CALENDAR & FASTING SYSTEM
+             ============================================== -->
+        <div class="calendar-hero-card" id="islamicCalendarCard">
+          <!-- Top Bar: Live Clock & Fasting Sunnahs Guide -->
+          <div class="cal-hero-top">
+            <div class="cal-hero-clock" id="calHeroClock">
+              <i class="far fa-clock"></i>
+              <span id="liveClockText">--:--:--</span>
             </div>
-            <span class="date-compact-day" id="dayName">--</span>
-            <span class="date-compact-hijri">
-              <span id="hijriDate">--</span> <span id="hijriMonth">--</span>
-            </span>
-            <span class="date-compact-greg">
-              <span id="gregorianDate">--</span> <span id="gregorianMonth">--</span>
-            </span>
+            <button class="cal-guide-pill-btn" onclick="openFastingGuideModal()" title="دليل وفضائل صيام التطوع">
+              <i class="fas fa-calendar-check"></i>
+              <span>دليل سنن الصيام</span>
+            </button>
+          </div>
+
+          <!-- Hero Main Date Display -->
+          <div class="cal-hero-main">
+            <div class="cal-day-badge-wrap">
+              <span class="cal-hero-day" id="dayName">--</span>
+              <span class="cal-today-tag">اليوم</span>
+            </div>
+            
+            <div class="cal-dates-column">
+              <div class="cal-hijri-row">
+                <span class="cal-hijri-text" id="hijriFullDate">
+                  <!-- backward compatible IDs -->
+                  <span id="hijriDate">--</span> <span id="hijriMonth">--</span>
+                </span>
+              </div>
+              <div class="cal-greg-row">
+                <i class="far fa-calendar-alt cal-greg-icon"></i>
+                <span class="cal-greg-text" id="gregorianFullDate">
+                  <!-- backward compatible IDs -->
+                  <span id="gregorianDate">--</span> <span id="gregorianMonth">--</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fasting Notification Banner inside Calendar -->
+          <div class="cal-fasting-alert" id="calFastingAlert">
+            <div class="cal-fasting-alert-inner">
+              <div class="cal-fasting-alert-text">
+                <span class="cal-fasting-alert-title" id="calFastingAlertTitle">تذكير بصيام السنة</span>
+                <span class="cal-fasting-alert-desc" id="calFastingAlertDesc">جاري فحص أيام الصيام...</span>
+              </div>
+              <button class="cal-fasting-alert-btn" onclick="openFastingGuideModal()">
+                <span>الفضل</span>
+                <i class="fas fa-chevron-left"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Interactive 7-Day Week Strip -->
+          <div class="cal-week-section">
+            <div class="cal-week-header">
+              <span class="cal-week-title"><i class="fas fa-calendar-week"></i> أيام الأسبوع وصيام السنن</span>
+              <span class="cal-week-hint">اضغط على اليوم لمعرفة المناسبة</span>
+            </div>
+            <div class="cal-week-strip" id="calWeekStrip">
+              <!-- Dynamically populated by JS with 7 days -->
+            </div>
+          </div>
+
+          <!-- Day Fasting Detail Popover / Toast Panel -->
+          <div class="cal-day-detail-panel hidden" id="calDayDetailPanel">
+            <div class="cal-day-detail-content" id="calDayDetailContent"></div>
+            <button class="cal-day-detail-close" onclick="closeCalDayDetail()" title="إغلاق">&times;</button>
           </div>
         </div>
 
@@ -175,15 +228,111 @@
           </div>
         </div>
 
-        <!-- Duaa Card – Compact -->
-        <div class="duaa-card-compact">
-          <div class="duaa-compact-head">
-            <span id="duaaHeader">دعاء اليوم</span>
+        <!-- ==============================================
+             QUICK SPIRITUAL ACCESS
+             ============================================== -->
+        <div class="home-quick-actions-section">
+          <div class="home-quick-grid" id="homeQuickGrid">
+            <button class="quick-action-card qa-card--misbaha" onclick="openMisbaha()">
+              <div class="quick-action-icon-wrap">
+                <svg viewBox="0 -4 64 68" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2.5" opacity="0.3" />
+                  <circle cx="32" cy="6" r="5" fill="currentColor" opacity="0.9" />
+                  <circle cx="47" cy="10" r="4.5" fill="currentColor" opacity="0.8" />
+                  <circle cx="56" cy="22" r="4.5" fill="currentColor" opacity="0.7" />
+                  <circle cx="58" cy="37" r="4.5" fill="currentColor" opacity="0.65" />
+                  <circle cx="52" cy="50" r="4.5" fill="currentColor" opacity="0.6" />
+                  <circle cx="40" cy="58" r="4.5" fill="currentColor" opacity="0.55" />
+                  <circle cx="24" cy="58" r="4.5" fill="currentColor" opacity="0.55" />
+                  <circle cx="12" cy="50" r="4.5" fill="currentColor" opacity="0.6" />
+                  <circle cx="6" cy="37" r="4.5" fill="currentColor" opacity="0.65" />
+                  <circle cx="8" cy="22" r="4.5" fill="currentColor" opacity="0.7" />
+                  <circle cx="17" cy="10" r="4.5" fill="currentColor" opacity="0.8" />
+                  <line x1="32" y1="6" x2="32" y2="0" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  <circle cx="32" cy="-2" r="2.5" fill="#d4a847" />
+                </svg>
+              </div>
+              <span class="quick-action-label">المسبحة</span>
+            </button>
+
+            <button class="quick-action-card qa-card--quran" onclick="switchTab('tab-quran')">
+              <div class="quick-action-icon-wrap">
+                <i class="fas fa-book-quran"></i>
+              </div>
+              <span class="quick-action-label">القرآن الكريم</span>
+            </button>
+
+            <button class="quick-action-card qa-card--morning" onclick="showCategoryPage('morning')">
+              <div class="quick-action-icon-wrap">
+                <i class="fas fa-sun"></i>
+              </div>
+              <span class="quick-action-label">أذكار الصباح</span>
+            </button>
+
+            <button class="quick-action-card qa-card--evening" onclick="showCategoryPage('evening')">
+              <div class="quick-action-icon-wrap">
+                <i class="fas fa-moon"></i>
+              </div>
+              <span class="quick-action-label">أذكار المساء</span>
+            </button>
+
+            <button class="quick-action-card qa-card--qibla" onclick="scrollToQibla()">
+              <div class="quick-action-icon-wrap">
+                <i class="fas fa-compass"></i>
+              </div>
+              <span class="quick-action-label">اتجاه القبلة</span>
+            </button>
+
+            <button class="quick-action-card qa-card--fasting" onclick="openFastingGuideModal()">
+              <div class="quick-action-icon-wrap">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <span class="quick-action-label">سنن الصيام</span>
+            </button>
           </div>
-          <p class="duaa-compact-text" id="dailyDuaaText">جاري تحميل دعاء اليوم...</p>
+          <div class="home-quick-dots" id="homeQuickDots">
+            <span class="hq-dot active"></span>
+            <span class="hq-dot"></span>
+          </div>
         </div>
 
-        <!-- Prayer Times Section -->
+        <!-- ==============================================
+             DUAA CARD – COMPACT & SPIRITUAL
+             ============================================== -->
+        <div class="duaa-card-compact" id="dailyDuaaCard">
+          <div class="duaa-compact-head">
+            <div class="duaa-head-title">
+              <i class="fas fa-hands-praying duaa-head-icon"></i>
+              <span id="duaaHeader">دعاء اليوم</span>
+            </div>
+            <div class="duaa-actions">
+              <!-- <button class="duaa-action-btn" id="nextDuaaBtn" onclick="nextRandomDuaa()" title="دعاء آخر">
+                <i class="fas fa-sync-alt"></i>
+                <span class="duaa-btn-label">آخر</span>
+              </button> -->
+              <button class="duaa-action-btn" id="copyDuaaBtn" onclick="copyCurrentDuaa()" title="نسخ الدعاء">
+                <i class="far fa-copy"></i>
+                <span class="duaa-btn-label" id="copyDuaaLabel">نسخ</span>
+              </button>
+              <!-- <button class="duaa-action-btn" id="shareDuaaBtn" onclick="shareCurrentDuaa()" title="مشاركة الدعاء">
+                <i class="fas fa-share-alt"></i>
+              </button> -->
+            </div>
+          </div>
+          <div class="duaa-body-wrap">
+            <p class="duaa-compact-text" id="dailyDuaaText">جاري تحميل دعاء اليوم...</p>
+          </div>
+          <div class="duaa-footer" id="duaaFooter">
+            <span class="duaa-source-badge" id="duaaSourceBadge">
+              <i class="fas fa-bookmark"></i>
+              <span id="duaaSourceText">القرآن الكريم والسنة</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- ==============================================
+             PRAYER TIMES SECTION
+             ============================================== -->
         <div class="prayer-times-section" id="prayerTimesSection">
           <div class="prayer-times-header">
             <h3 class="prayer-times-title">
@@ -199,7 +348,7 @@
           </div>
 
           <div class="next-prayer-countdown" id="nextPrayerCountdown">
-            <span class="countdown-label">الصلاة القادمة</span>
+            <span class="countdown-label">الصلاة القادمة:</span>
             <span class="countdown-prayer" id="nextPrayerName">—</span>
             <span class="countdown-time" id="countdownTime">—</span>
           </div>
@@ -223,10 +372,15 @@
           </div>
         </div>
 
-        <!-- Qibla Card with Visual Compass -->
+        <!-- ==============================================
+             QIBLA CARD COMPACT
+             ============================================== -->
         <div class="qibla-card-compact" id="qiblaSection">
           <div class="qibla-compact-top">
-            <span class="qibla-compact-title">اتجاه القبلة</span>
+            <div class="qibla-title-group">
+              <!-- <i class="fas fa-kaaba qibla-title-icon"></i> -->
+              <span class="qibla-compact-title">اتجاه القبلة</span>
+            </div>
             <button class="qibla-compact-btn" id="qiblaCalibrateBtn" title="تفعيل البوصلة">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                 <polyline points="23 4 23 10 17 10" />
@@ -698,6 +852,104 @@
         </div>
         <div class="progress-bar">
           <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sunnah Fasting Guide Modal -->
+  <div id="fastingGuideModal" class="modal fasting-guide-modal">
+    <div class="modal-content fasting-modal-content">
+      <div class="modal-header">
+        <div class="fasting-modal-title">
+          <i class="fas fa-moon modal-gold-icon"></i>
+          <h3>دليل سنن ومناسبات الصيام</h3>
+        </div>
+        <span class="close" onclick="closeFastingGuideModal()">&times;</span>
+      </div>
+      <div class="modal-body fasting-modal-body">
+        <div class="fasting-guide-intro">
+          <i class="fas fa-quote-right intro-quote"></i>
+          <p>قال رسول الله ﷺ: «مَنْ صَامَ يَوْمًا فِي سَبِيلِ اللَّهِ، بَاعَدَ اللَّهُ وَجْهَهُ عَنِ النَّارِ سَبْعِينَ خَرِيفًا» <span class="hadith-ref">[متفق عليه]</span></p>
+        </div>
+
+        <div class="fasting-occasions-list">
+          <!-- عاشوراء وتاسوعاء -->
+          <div class="fasting-occasion-card foc-card--gold">
+            <div class="foc-head">
+              <span class="foc-badge foc-badge--gold">سنة مؤكدة</span>
+              <h4>صيام عاشوراء وتاسوعاء (٩ و١٠ محرم)</h4>
+            </div>
+            <p class="foc-hadith">
+              قال النبي ﷺ: «صِيَامُ يَوْمِ عَاشُورَاءَ، أَحْتَسِبُ عَلَى اللَّهِ أَنْ يُكَفِّرَ السَّنَةَ الَّتِي قَبْلَهُ» <span class="hadith-ref">[رواه مسلم]</span>. ويُستحب صيام التاسع معه مخالفةً لأهل الكتاب.
+            </p>
+          </div>
+
+          <!-- يوم عرفة -->
+          <div class="fasting-occasion-card foc-card--gold">
+            <div class="foc-head">
+              <span class="foc-badge foc-badge--gold">سنة مؤكدة</span>
+              <h4>صيام يوم عرفة (٩ ذو الحجة - لغير الحاج)</h4>
+            </div>
+            <p class="foc-hadith">
+              قال النبي ﷺ: «صِيَامُ يَوْمِ عَرَفَةَ، أَحْتَسِبُ عَلَى اللَّهِ أَنْ يُكَفِّرَ السَّنَةَ الَّتِي قَبْلَهُ، وَالسَّنَةَ الَّتِي بَعْدَهُ» <span class="hadith-ref">[رواه مسلم]</span>.
+            </p>
+          </div>
+
+          <!-- الأيام البيض -->
+          <div class="fasting-occasion-card foc-card--green">
+            <div class="foc-head">
+              <span class="foc-badge foc-badge--green">سنة شهرية</span>
+              <h4>الأيام البيض (١٣، ١٤، ١٥ من كل شهر هجري)</h4>
+            </div>
+            <p class="foc-hadith">
+              عن أبي ذر رضي الله عنه قال: أمرنا رسول الله ﷺ أن نصوم من الشهر ثلاثة أيام البيض: ثلاث عشرة، وأربع عشرة، وخمس عشرة، وقال: «هي كَصِيَامِ الدَّهْرِ» <span class="hadith-ref">[رواه النسائي وصححه الألباني]</span>.
+            </p>
+          </div>
+
+          <!-- الإثنين والخميس -->
+          <div class="fasting-occasion-card foc-card--green">
+            <div class="foc-head">
+              <span class="foc-badge foc-badge--green">سنة أسبوعية</span>
+              <h4>صيام يومي الإثنين والخميس</h4>
+            </div>
+            <p class="foc-hadith">
+              قال النبي ﷺ: «تُعْرَضُ الأَعْمَالُ يَوْمَ الاِثْنَيْنِ وَالْخَمِيسِ، فَأُحِبُّ أَنْ يُعْرَضَ عَمَلِي وَأَنَا صَائِمٌ» <span class="hadith-ref">[رواه الترمذي وقال حديث حسن]</span>.
+            </p>
+          </div>
+
+          <!-- ستة أيام من شوال -->
+          <div class="fasting-occasion-card foc-card--blue">
+            <div class="foc-head">
+              <span class="foc-badge foc-badge--blue">سنة سنوية</span>
+              <h4>صيام ستة أيام من شوال</h4>
+            </div>
+            <p class="foc-hadith">
+              قال رسول الله ﷺ: «مَنْ صَامَ رَمَضَانَ ثُمَّ أَتْبَعَهُ سِتًّا مِنْ شَوَّالٍ، كَانَ كَصِيَامِ الدَّهْرِ» <span class="hadith-ref">[رواه مسلم]</span>.
+            </p>
+          </div>
+
+          <!-- عشر ذي الحجة -->
+          <div class="fasting-occasion-card foc-card--purple">
+            <div class="foc-head">
+              <span class="foc-badge foc-badge--purple">مستحب</span>
+              <h4>صيام تسع ذي الحجة (١ - ٨ ذو الحجة + عرفة)</h4>
+            </div>
+            <p class="foc-hadith">
+              قال ﷺ: «مَا مِنْ أَيَّامٍ الْعَمَلُ الصَّالِحُ فِيهَا أَحَبُّ إِلَى اللَّهِ مِنْ هَذِهِ الأَيَّامِ» <span class="hadith-ref">[رواه البخاري]</span>، والصيام من أفضل الأعمال الصالحة.
+            </p>
+          </div>
+
+          <!-- شهر المحرم وشعبان -->
+          <div class="fasting-occasion-card foc-card--purple">
+            <div class="foc-head">
+              <span class="foc-badge foc-badge--purple">مستحب</span>
+              <h4>الإكثار من الصيام في شهر المحرّم وشهر شعبان</h4>
+            </div>
+            <p class="foc-hadith">
+              قال النبي ﷺ: «أَفْضَلُ الصِّيَامِ بَعْدَ شَهْرِ رَمَضَانَ صِيَامُ شَهْرِ اللَّهِ الْمُحَرَّمِ» <span class="hadith-ref">[رواه مسلم]</span>، وكان ﷺ يصوم غالب شهر شعبان.
+            </p>
+          </div>
         </div>
       </div>
     </div>
