@@ -6571,6 +6571,172 @@ body.light-mode .swiper-dot {
 }
 
 /* ═══════════════════════════════════════════════════════
+   FASTING REMINDER BANNER  –  Premium Warm Gold / Amber
+   ═══════════════════════════════════════════════════════ */
+
+.fasting-banner {
+  position: relative;
+  border-radius: 16px;
+  padding: 2px;
+  background: linear-gradient(135deg, #FFD700, #FFA500, #FF6B35, #FFD700);
+  background-size: 300% 300%;
+  animation: fastingBorderGlow 4s ease infinite;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.fasting-banner.hidden {
+  display: none !important;
+}
+
+@keyframes fastingBorderGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.fasting-banner-glow {
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 215, 0, 0.15) 0%,
+    rgba(255, 165, 0, 0.08) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: fastingGlowPulse 3s ease-in-out infinite;
+}
+
+@keyframes fastingGlowPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.fasting-banner-content {
+  position: relative;
+  z-index: 1;
+  background: rgba(10, 15, 26, 0.92);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-radius: 14px;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+body.light-mode .fasting-banner-content {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.fasting-banner-icon {
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.4));
+  animation: fastingIconFloat 3s ease-in-out infinite;
+}
+
+body.light-mode .fasting-banner-icon svg circle:nth-child(2) {
+  fill: #f8f9fa;
+}
+
+@keyframes fastingIconFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+.fasting-banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.fasting-banner-label {
+  font-family: "Cairo", serif;
+  font-size: clamp(1.1rem, 4vw, 1.4rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.02em;
+}
+
+body.light-mode .fasting-banner-label {
+  background: linear-gradient(135deg, #b8860b, #cc6600);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.fasting-banner-subtitle {
+  font-family: "Cairo", serif;
+  font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+  color: #e2e8f0;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+body.light-mode .fasting-banner-subtitle {
+  color: #4a5568;
+}
+
+.fasting-banner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 165, 0, 0.1));
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #FFD700;
+  font-family: "Cairo", serif;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
+  font-weight: 600;
+}
+
+.fasting-banner-badge i {
+  font-size: 0.8em;
+  animation: fastingStarPulse 2s ease-in-out infinite;
+}
+
+@keyframes fastingStarPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+body.light-mode .fasting-banner-badge {
+  background: linear-gradient(135deg, rgba(184, 134, 11, 0.12), rgba(204, 102, 0, 0.08));
+  border-color: rgba(184, 134, 11, 0.3);
+  color: #b8860b;
+}
+
+/* Responsive – Fasting Banner */
+@media (max-width: 360px) {
+  .fasting-banner-content {
+    padding: 1rem 0.75rem;
+    gap: 0.5rem;
+  }
+  .fasting-banner-icon svg {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (min-width: 768px) {
+  .fasting-banner-content {
+    flex-direction: row;
+    text-align: right;
+    padding: 1.5rem 2rem;
+  }
+  .fasting-banner-text {
+    flex: 1;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
    FRIDAY BANNER  –  Premium Dark Neon / Cyberpunk
    ═══════════════════════════════════════════════════════ */
 
