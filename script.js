@@ -2037,7 +2037,11 @@ function loadCategory(category) {
   requestAnimationFrame(() => {
     const slides = track.querySelectorAll(".azkar-slide");
     if (slides[validPos]) {
-      slides[validPos].scrollIntoView({ behavior: "instant", inline: "start", block: "nearest" });
+      slides[validPos].scrollIntoView({
+        behavior: "instant",
+        inline: "start",
+        block: "nearest",
+      });
     }
     updateSwiperUI(category, validPos);
   });
@@ -2082,7 +2086,9 @@ function createAdhkarSlide(zikr, index, category, track) {
     .replace(/'/g, "\\'")
     .replace(/\n/g, " ");
 
-  const totalSlides = adhkarData[category] ? adhkarData[category].adhkar.length : 0;
+  const totalSlides = adhkarData[category]
+    ? adhkarData[category].adhkar.length
+    : 0;
   const isFirst = index === 0;
   const isLast = index === totalSlides - 1;
 
@@ -2407,7 +2413,9 @@ function updateCardProgress(category, index) {
     if (numEl)
       numEl.textContent = isCompleted
         ? "✓"
-        : toArabicNumerals(zikr.currentCount) + " / " + toArabicNumerals(zikr.count);
+        : toArabicNumerals(zikr.currentCount) +
+          " / " +
+          toArabicNumerals(zikr.count);
     if (isCompleted) {
       swiperBtn.classList.add("completed");
       swiperBtn.disabled = true;
@@ -2581,7 +2589,11 @@ function goToSlide(index) {
 
   const slides = track.querySelectorAll(".azkar-slide");
   if (slides[index]) {
-    slides[index].scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+    slides[index].scrollIntoView({
+      behavior: "smooth",
+      inline: "start",
+      block: "nearest",
+    });
   }
   updateSwiperUI(currentCategory, index);
   saveSwiperPosition(currentCategory, index);
@@ -2681,10 +2693,13 @@ function decrementSlideCounter(category, index) {
 
 /** Persist which slide the user is on per category (with date for daily reset) */
 function saveSwiperPosition(category, index) {
-  localStorage.setItem("swiperPos_" + category, JSON.stringify({
-    index: index,
-    date: new Date().toDateString()
-  }));
+  localStorage.setItem(
+    "swiperPos_" + category,
+    JSON.stringify({
+      index: index,
+      date: new Date().toDateString(),
+    }),
+  );
 }
 
 // ── Font-size stepping ──────────────────────────────
@@ -3506,9 +3521,10 @@ function showEnhancedNotification(message, type = "success", duration = 3000) {
 
   // Calculate top position - push below offline banner if visible
   const offlineBanner = document.getElementById("offlineBanner");
-  const topOffset = offlineBanner && !offlineBanner.classList.contains("hidden")
-    ? offlineBanner.offsetHeight + 10
-    : 20;
+  const topOffset =
+    offlineBanner && !offlineBanner.classList.contains("hidden")
+      ? offlineBanner.offsetHeight + 10
+      : 20;
 
   // Add notification styles
   notification.style.cssText = `
@@ -4092,7 +4108,15 @@ function updateCountdown() {
     const timeStr = prayerTimesData[prayer];
     if (!timeStr) continue;
     const [hours, minutes] = timeStr.split(":").map(Number);
-    const pDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0, 0);
+    const pDate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      hours,
+      minutes,
+      0,
+      0,
+    );
 
     if (pDate > now) {
       nextPrayer = prayer;
@@ -4105,7 +4129,15 @@ function updateCountdown() {
   if (!nextPrayer) {
     nextPrayer = "Fajr";
     const [hours, minutes] = prayerTimesData.Fajr.split(":").map(Number);
-    targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, hours, minutes, 0, 0);
+    targetDate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+      hours,
+      minutes,
+      0,
+      0,
+    );
   }
 
   const diffMs = targetDate - now;
@@ -4131,7 +4163,11 @@ function updateCountdown() {
   }
 
   if (countdownTimeEl) {
-    countdownTimeEl.textContent = formatArabicRemainingTime(hours, minutes, seconds);
+    countdownTimeEl.textContent = formatArabicRemainingTime(
+      hours,
+      minutes,
+      seconds,
+    );
   }
 
   // Highlight next prayer card
@@ -4916,14 +4952,37 @@ document.addEventListener("keydown", function (e) {
  * Updates the date section with current Hijri and Gregorian dates
  * and displays a daily random Duaa.
  */
-function updateDailyInfo() {
-  const dateOptions = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+/**
+ * Live Digital Clock for the Hero Calendar
+ */
+let liveClockInterval = null;
+function startLiveClock() {
+  if (liveClockInterval) clearInterval(liveClockInterval);
+  const updateClock = () => {
+    const el = document.getElementById("liveClockText");
+    if (!el) return;
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    const period = hours >= 12 ? "م" : "ص";
+    hours = hours % 12 || 12;
+    el.textContent = `${hours}:${minutes}:${seconds} ${period}`;
   };
+  updateClock();
+  liveClockInterval = setInterval(updateClock, 1000);
+}
+
+/**
+ * Updates the date section with current Hijri and Gregorian dates,
+ * renders interactive calendar strip with fasting indicators,
+ * and displays a daily random Duaa.
+ */
+function updateDailyInfo() {
   const now = new Date();
+
+  // Start live clock
+  startLiveClock();
 
   // 1. Update Day Name
   const dayNameElement = document.getElementById("dayName");
@@ -4936,74 +4995,45 @@ function updateDailyInfo() {
   // 2. Update Gregorian Date
   const gregorianMonthElement = document.getElementById("gregorianMonth");
   const gregorianDateElement = document.getElementById("gregorianDate");
-  if (gregorianMonthElement && gregorianDateElement) {
-    const gregorianFormatter = new Intl.DateTimeFormat("ar-SA", {
-      month: "long",
-      year: "numeric",
-    });
-    const gregorianDayFormatter = new Intl.DateTimeFormat("en-US", {
-      day: "2-digit",
-    }); // Use English digits for consistency or Arabic if preferred
+  const gregorianFullDate = document.getElementById("gregorianFullDate");
 
-    // Customize to display "YYYY-MM-DD" or similar format per user request visualization
-    // Request: 2026-02-02 (YYYY-MM-DD)
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, "0");
-    const dd = String(now.getDate()).padStart(2, "0");
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  const gregMonthName = new Intl.DateTimeFormat("ar-EG", {
+    month: "long",
+  }).format(now);
 
+  if (gregorianDateElement) {
     gregorianDateElement.textContent = `${dd} / ${mm} / ${yyyy}`;
-
-    // Month Name - Year (e.g. فبراير - شباط)
-    // Using standard locale data
-    gregorianMonthElement.textContent = new Intl.DateTimeFormat("ar-EG", {
-      month: "long",
-    }).format(now);
+  }
+  if (gregorianMonthElement) {
+    gregorianMonthElement.textContent = gregMonthName;
+  }
+  if (gregorianFullDate) {
+    gregorianFullDate.textContent = `${dd} ${gregMonthName} ${yyyy} م`;
   }
 
   // 3. Update Hijri Date
   const hijriMonthElement = document.getElementById("hijriMonth");
   const hijriDateElement = document.getElementById("hijriDate");
+  const hijriFullDate = document.getElementById("hijriFullDate");
 
-  if (hijriMonthElement && hijriDateElement) {
-    const hijriNow = new Date(now);
+  const hijri = getHijriDate(now);
+  if (hijriDateElement) {
+    hijriDateElement.textContent = `${hijri.day} / ${hijri.month} / ${hijri.year}`;
+  }
+  if (hijriMonthElement) {
+    hijriMonthElement.textContent = hijri.monthName;
+  }
+  if (hijriFullDate) {
+    hijriFullDate.textContent = `${hijri.day} ${hijri.monthName} ${hijri.year} هـ`;
+  }
 
-    const hijriFormatter = new Intl.DateTimeFormat(
-      "ar-SA-u-ca-islamic-umalqura",
-      {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      },
-    );
-
-    const parts = hijriFormatter.formatToParts(hijriNow);
-    const hijriDay = parts.find((p) => p.type === "day")?.value;
-    const hijriMonth = parts.find((p) => p.type === "month")?.value;
-    const hijriYear = parts.find((p) => p.type === "year")?.value;
-
-    hijriMonthElement.textContent = hijriMonth;
-    // Format: 1447-08-14
-    // We need numerical month for the YYYY-MM-DD format
-    const hijriNumericFormatter = new Intl.DateTimeFormat(
-      "en-US-u-ca-islamic-umalqura",
-      {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      },
-    );
-    const numericParts = hijriNumericFormatter.formatToParts(hijriNow);
-    const hYear = numericParts.find((p) => p.type === "year")?.value;
-    const hMonth = numericParts.find((p) => p.type === "month")?.value;
-    const hDay = numericParts.find((p) => p.type === "day")?.value;
-
-    hijriDateElement.textContent = `${hDay} / ${hMonth} / ${hYear}`;
-
-    // Update Header with Hijri Date for Duaa
-    const duaaHeader = document.getElementById("duaaHeader");
-    if (duaaHeader) {
-      duaaHeader.textContent = `دعاء اليوم ${parseInt(hDay)} ${hijriMonth}`;
-    }
+  // Update Header with Hijri Date for Duaa
+  const duaaHeader = document.getElementById("duaaHeader");
+  if (duaaHeader) {
+    duaaHeader.textContent = `دعاء اليوم ${hijri.day} ${hijri.monthName}`;
   }
 
   // 4. Update Daily Duaa
@@ -5019,12 +5049,14 @@ function updateDailyInfo() {
     }
   }
 
-  // 6. Fasting Reminder Banner
+  // 6. Fasting Reminder Banner & Calendar Alert & 7-Day Strip
   updateFastingReminder(now);
+  updateCalendarFastingAlert(now);
+  renderInteractiveCalendar(now);
 }
 
 // ========================================
-// FASTING REMINDER SYSTEM (تذكير بالصيام)
+// FASTING REMINDER & CALENDAR SYSTEM
 // ========================================
 
 /**
@@ -5032,28 +5064,34 @@ function updateDailyInfo() {
  * Returns { day: number, month: number, year: number, monthName: string }
  */
 function getHijriDate(date) {
-  const hijriNumeric = new Intl.DateTimeFormat("en-US-u-ca-islamic-umalqura", {
-    day: "numeric",
-    month: "numeric",
-    year: "numeric",
-  });
-  const hijriNamed = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
-    month: "long",
-  });
+  try {
+    const hijriNumeric = new Intl.DateTimeFormat(
+      "en-US-u-ca-islamic-umalqura",
+      {
+        day: "numeric",
+        month: "numeric",
+        year: "numeric",
+      },
+    );
+    const hijriNamed = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
+      month: "long",
+    });
 
-  const parts = hijriNumeric.formatToParts(date);
-  const day = parseInt(parts.find((p) => p.type === "day")?.value || "0");
-  const month = parseInt(parts.find((p) => p.type === "month")?.value || "0");
-  const year = parseInt(parts.find((p) => p.type === "year")?.value || "0");
-  const monthName = hijriNamed.format(date);
+    const parts = hijriNumeric.formatToParts(date);
+    const day = parseInt(parts.find((p) => p.type === "day")?.value || "0");
+    const month = parseInt(parts.find((p) => p.type === "month")?.value || "0");
+    const year = parseInt(parts.find((p) => p.type === "year")?.value || "0");
+    const monthName = hijriNamed.format(date);
 
-  return { day, month, year, monthName };
+    return { day, month, year, monthName };
+  } catch (e) {
+    return { day: 1, month: 1, year: 1448, monthName: "محرم" };
+  }
 }
 
 /**
  * Checks all Islamic fasting occasions for a given date.
- * Returns an array of fasting events, each with { name, badge, priority }.
- * Priority: lower = more important (shown first).
+ * Returns an array of fasting events, each with { name, detail, badge, priority }.
  */
 function checkFastingOccasions(date) {
   const hijri = getHijriDate(date);
@@ -5072,7 +5110,7 @@ function checkFastingOccasions(date) {
   if (hijri.month === 1 && hijri.day === 9) {
     events.push({
       name: "يوم تاسوعاء",
-      detail: "٩ محرم — يُستحب صيامه مع عاشوراء",
+      detail: "٩ محرم — يُستحب صيامه مع عاشوراء مخالفةً لأهل الكتاب",
       badge: "سنة مؤكدة",
       priority: 1,
     });
@@ -5091,9 +5129,9 @@ function checkFastingOccasions(date) {
   // ── 3. الأيام البيض (13-14-15 من كل شهر هجري) ──
   if (hijri.day >= 13 && hijri.day <= 15) {
     events.push({
-      name: "الأيام البيض",
-      detail: `${hijri.day} ${hijri.monthName} — صيام ثلاثة أيام من كل شهر`,
-      badge: "سنة",
+      name: `الأيام البيض (${hijri.day} ${hijri.monthName})`,
+      detail: `صيام ثلاثة أيام من كل شهر كصيام الدهر كله`,
+      badge: "سنة شهرية",
       priority: 3,
     });
   }
@@ -5102,8 +5140,8 @@ function checkFastingOccasions(date) {
   if (hijri.month === 10 && hijri.day >= 2 && hijri.day <= 7) {
     events.push({
       name: "أيام شوال الستة",
-      detail: `${hijri.day} شوال — من صام رمضان ثم أتبعه ستًّا من شوال`,
-      badge: "سنة مؤكدة",
+      detail: `${hijri.day} شوال — من صام رمضان ثم أتبعه ستًّا من شوال كان كصيام الدهر`,
+      badge: "سنة سنوية",
       priority: 2,
     });
   }
@@ -5111,28 +5149,28 @@ function checkFastingOccasions(date) {
   // ── 5. صيام العشر الأوائل من ذي الحجة (1-8) ──
   if (hijri.month === 12 && hijri.day >= 1 && hijri.day <= 8) {
     events.push({
-      name: "العشر الأوائل من ذي الحجة",
-      detail: `${hijri.day} ذو الحجة — ما من أيام العمل الصالح فيها أحبّ إلى الله`,
+      name: "تسع ذي الحجة",
+      detail: `${hijri.day} ذو الحجة — ما من أيام العمل الصالح فيها أحبّ إلى الله من هذه الأيام`,
       badge: "مستحب",
       priority: 2,
     });
   }
 
-  // ── 6. صيام شعبان (أكثر الشهور صيامًا بعد رمضان) ──
+  // ── 6. صيام شعبان ──
   if (hijri.month === 8 && hijri.day >= 1 && hijri.day <= 15) {
     events.push({
       name: `صيام شعبان`,
-      detail: `${hijri.day} شعبان — شهرٌ يغفل عنه الناس`,
+      detail: `${hijri.day} شعبان — شهرٌ تُرفع فيه الأعمال إلى الله وكان النبي ﷺ يُكثر من صيامه`,
       badge: "مستحب",
       priority: 4,
     });
   }
 
-  // ── 7. صيام محرم (أفضل الصيام بعد رمضان) ──
+  // ── 7. صيام محرم ──
   if (hijri.month === 1 && hijri.day !== 9 && hijri.day !== 10) {
     events.push({
       name: "صيام المحرم",
-      detail: `${hijri.day} محرم — أفضل الصيام بعد رمضان`,
+      detail: `${hijri.day} محرم — أفضل الصيام بعد رمضان شهر الله المحرم`,
       badge: "مستحب",
       priority: 5,
     });
@@ -5143,7 +5181,7 @@ function checkFastingOccasions(date) {
     // Monday
     events.push({
       name: "صيام الإثنين",
-      detail: "يوم تُعرض فيه الأعمال على الله",
+      detail: "يوم تُعرض فيه الأعمال على الله وأحب أن يُعرض عملي وأنا صائم",
       badge: "سنة أسبوعية",
       priority: 6,
     });
@@ -5152,7 +5190,7 @@ function checkFastingOccasions(date) {
     // Thursday
     events.push({
       name: "صيام الخميس",
-      detail: "يوم تُعرض فيه الأعمال على الله",
+      detail: "يوم تُعرض فيه الأعمال على الله وأحب أن يُعرض عملي وأنا صائم",
       badge: "سنة أسبوعية",
       priority: 6,
     });
@@ -5164,9 +5202,194 @@ function checkFastingOccasions(date) {
 }
 
 /**
- * Updates the fasting reminder banner based on today's and tomorrow's fasting occasions.
- * Shows "اليوم صيام..." if today is a fasting day,
- * or "غدًا صيام..." if tomorrow is a fasting day.
+ * Renders the 7-day interactive week strip in the calendar card.
+ */
+function renderInteractiveCalendar(now) {
+  const strip = document.getElementById("calWeekStrip");
+  if (!strip) return;
+
+  const dayNamesArabic = [
+    "الأحد",
+    "الإثنين",
+    "الثلاثاء",
+    "الأربعاء",
+    "الخميس",
+    "الجمعة",
+    "السبت",
+  ];
+
+  // 7 days: 2 days before today up to 4 days ahead
+  const days = [];
+  for (let offset = -2; offset <= 4; offset++) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + offset);
+    days.push(d);
+  }
+
+  strip.innerHTML = days
+    .map((date) => {
+      const isToday = date.toDateString() === now.toDateString();
+      const dayOfWeek = date.getDay();
+      const dayName = dayNamesArabic[dayOfWeek];
+      const hijri = getHijriDate(date);
+      const gregDay = date.getDate();
+      const occasions = checkFastingOccasions(date);
+      const isFasting = occasions.length > 0;
+      const topOccasion = isFasting ? occasions[0] : null;
+
+      return `
+        <div class="cal-day-pill ${isToday ? "cal-day--today" : ""} ${isFasting ? "cal-day--fasting" : ""}"
+             onclick="selectCalendarDay('${date.toISOString()}', ${isToday}, ${isFasting})"
+             role="button"
+             tabindex="0"
+             title="${isToday ? "اليوم - " : ""}${isFasting ? topOccasion.name + " - " + topOccasion.detail : dayName}">
+          ${isToday ? '<span class="cal-today-top-bar"></span>' : ""}
+          <span class="cal-day-name">${dayName}</span>
+          <span class="cal-day-hijri-num">${hijri.day}</span>
+          <span class="cal-day-greg-num">${gregDay}</span>
+          ${isFasting ? '<span class="cal-fasting-tag">صيام</span>' : ""}
+        </div>
+      `;
+    })
+    .join("");
+}
+
+/**
+ * Handles clicking a day in the 7-day strip.
+ */
+function selectCalendarDay(dateStr, isToday, isFasting) {
+  const date = new Date(dateStr);
+  const panel = document.getElementById("calDayDetailPanel");
+  const content = document.getElementById("calDayDetailContent");
+  if (!panel || !content) return;
+
+  const dayNames = [
+    "الأحد",
+    "الإثنين",
+    "الثلاثاء",
+    "الأربعاء",
+    "الخميس",
+    "الجمعة",
+    "السبت",
+  ];
+  const dayName = dayNames[date.getDay()];
+  const hijri = getHijriDate(date);
+  const gregFormatted = `${date.getDate()} / ${date.getMonth() + 1} / ${date.getFullYear()}`;
+  const occasions = checkFastingOccasions(date);
+
+  let html = `
+    <div class="cal-panel-top">
+      <div class="cal-panel-header">
+        <span class="cal-panel-day">${dayName} ${isToday ? "— اليوم" : ""}</span>
+        <span class="cal-panel-date">${hijri.day} ${hijri.monthName} ${hijri.year} هـ &bull; ${gregFormatted} م</span>
+      </div>
+    </div>
+  `;
+
+  if (occasions.length > 0) {
+    html += `
+      <div class="cal-panel-fasting-box">
+        <div class="cal-panel-fasting-title">
+          <i class="fas fa-calendar-day modal-gold-icon"></i>
+          <strong>${occasions[0].name}</strong>
+          <span class="foc-badge foc-badge--gold">${occasions[0].badge}</span>
+        </div>
+        <p class="cal-panel-fasting-detail">${occasions[0].detail}</p>
+        ${
+          occasions.length > 1
+            ? `<p class="cal-panel-extra">وأيضاً: ${occasions
+                .slice(1)
+                .map((e) => e.name)
+                .join("، ")}</p>`
+            : ""
+        }
+        <button class="cal-panel-guide-btn" onclick="openFastingGuideModal()">
+          <i class="fas fa-book-open"></i> قراءة دليل وفضائل الصيام
+        </button>
+      </div>
+    `;
+  } else {
+    html += `
+      <div class="cal-panel-regular-box">
+        <p><i class="far fa-calendar-check"></i> يوم مبارك — رطّب لسانك بذكر الله وقراءة القرآن</p>
+      </div>
+    `;
+  }
+
+  content.innerHTML = html;
+  panel.classList.remove("hidden");
+}
+
+function closeCalDayDetail() {
+  const panel = document.getElementById("calDayDetailPanel");
+  if (panel) panel.classList.add("hidden");
+}
+
+/**
+ * Updates the fasting alert banner inside the Hero Calendar Card.
+ */
+function updateCalendarFastingAlert(now) {
+  const alertEl = document.getElementById("calFastingAlert");
+  const titleEl = document.getElementById("calFastingAlertTitle");
+  const descEl = document.getElementById("calFastingAlertDesc");
+  if (!alertEl || !titleEl || !descEl) return;
+
+  const todayEvents = checkFastingOccasions(now);
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowEvents = checkFastingOccasions(tomorrow);
+
+  if (todayEvents.length > 0) {
+    const ev = todayEvents[0];
+    alertEl.className = "cal-fasting-alert cal-fasting-alert--today";
+    titleEl.textContent = `🌙 اليوم صيام ${ev.name} (${ev.badge})`;
+    descEl.textContent = `${ev.detail} — تقبّل الله صيامكم وطاعتكم`;
+    alertEl.style.display = "block";
+  } else if (tomorrowEvents.length > 0) {
+    const ev = tomorrowEvents[0];
+    alertEl.className = "cal-fasting-alert cal-fasting-alert--tomorrow";
+    titleEl.textContent = `🌅 تذكير: غدًا صيام ${ev.name} (${ev.badge})`;
+    descEl.textContent = `${ev.detail} — انوِ الصيام وجهّز سحورك تقبل الله منك`;
+    alertEl.style.display = "block";
+  } else {
+    // Search next fasting day within 7 days
+    let nextEv = null;
+    let nextDate = null;
+    let diffDays = 0;
+    for (let i = 2; i <= 7; i++) {
+      const future = new Date(now);
+      future.setDate(future.getDate() + i);
+      const evs = checkFastingOccasions(future);
+      if (evs.length > 0) {
+        nextEv = evs[0];
+        nextDate = future;
+        diffDays = i;
+        break;
+      }
+    }
+
+    if (nextEv) {
+      const dayNames = [
+        "الأحد",
+        "الإثنين",
+        "الثلاثاء",
+        "الأربعاء",
+        "الخميس",
+        "الجمعة",
+        "السبت",
+      ];
+      alertEl.className = "cal-fasting-alert cal-fasting-alert--upcoming";
+      titleEl.textContent = ` موعد الصيام القادم: يوم ${dayNames[nextDate.getDay()]} (${nextEv.name})`;
+      descEl.textContent = `متبقي ${diffDays} أيام — ${nextEv.detail}`;
+      alertEl.style.display = "block";
+    } else {
+      alertEl.style.display = "none";
+    }
+  }
+}
+
+/**
+ * Updates the standalone fasting reminder banner.
  */
 function updateFastingReminder(now) {
   const banner = document.getElementById("fastingBanner");
@@ -5177,18 +5400,13 @@ function updateFastingReminder(now) {
   const badge = document.getElementById("fastingBadge");
   const badgeText = document.getElementById("fastingBadgeText");
 
-  // Check today
   const todayEvents = checkFastingOccasions(now);
-
-  // Check tomorrow
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowEvents = checkFastingOccasions(tomorrow);
 
-  // Build display messages
   const messages = [];
 
-  // Today's events (most important first)
   if (todayEvents.length > 0) {
     const mainEvent = todayEvents[0];
     messages.push({
@@ -5200,10 +5418,8 @@ function updateFastingReminder(now) {
     });
   }
 
-  // Tomorrow's events
   if (tomorrowEvents.length > 0) {
     const mainEvent = tomorrowEvents[0];
-    // If we already have a today message, only add tomorrow if it's higher priority
     if (messages.length === 0 || mainEvent.priority <= 3) {
       messages.push({
         label: `🌅 غدًا ${mainEvent.name}`,
@@ -5220,10 +5436,7 @@ function updateFastingReminder(now) {
     return;
   }
 
-  // Show the highest-priority message
-  // Prefer today's events, then tomorrow's for reminders
   const bestMsg = messages.sort((a, b) => {
-    // Today always comes first if same priority
     if (a.isToday && !b.isToday) return -1;
     if (!a.isToday && b.isToday) return 1;
     return a.priority - b.priority;
@@ -5231,9 +5444,7 @@ function updateFastingReminder(now) {
 
   if (label) label.textContent = bestMsg.label;
   if (subtitle) {
-    // Build a rich subtitle
     let subtitleText = bestMsg.subtitle;
-    // If there are multiple events, mention them
     const allEvents = bestMsg.isToday ? todayEvents : tomorrowEvents;
     if (allEvents.length > 1) {
       const otherNames = allEvents
@@ -5252,47 +5463,170 @@ function updateFastingReminder(now) {
 
 /**
  * Opens Surah Al-Kahf directly in the Mushaf reader.
- * Al-Kahf: pages 293–304 (Maryam starts at 305).
  */
 function openSurahAlKahf() {
-  // Switch to the Quran tab
   switchTab("tab-quran");
-
-  // Open the Mushaf reader directly at Surah Al-Kahf
-  // openFreeReader(startPage, endPage) renders the reader immediately
   setTimeout(() => {
     if (typeof openFreeReader === "function") {
       openFreeReader(293, 304);
     }
-  }, 150); // brief delay to let the tab render
+  }, 150);
 }
 
-function updateDailyDuaa(date) {
-  // Use the comprehensive dailyDuasCollection (60 duas from Quran & Sunnah)
-  // Falls back to adhkarData.dua if dailyDuasCollection is not available
-  let allDuaas = [];
+/**
+ * Duaa Management
+ */
+let currentDailyDuaa = null;
 
+function updateDailyDuaa(date) {
+  let allDuaas = [];
   if (
     typeof dailyDuasCollection !== "undefined" &&
     dailyDuasCollection.length > 0
   ) {
     allDuaas = dailyDuasCollection;
-  } else if (adhkarData.dua && adhkarData.dua.adhkar) {
+  } else if (
+    typeof adhkarData !== "undefined" &&
+    adhkarData.dua &&
+    adhkarData.dua.adhkar
+  ) {
     allDuaas = adhkarData.dua.adhkar;
   }
 
-  // Use current date string as seed: "YYYY-MM-DD"
+  if (allDuaas.length === 0) return;
+
   const seedString = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
   const seed = stringToSeed(seedString);
+  const randomIndex = Math.floor(random(seed) * allDuaas.length);
+  setDisplayedDuaa(allDuaas[randomIndex]);
+}
 
-  if (allDuaas.length > 0) {
-    const randomIndex = Math.floor(random(seed) * allDuaas.length);
-    const selectedDuaa = allDuaas[randomIndex];
+function setDisplayedDuaa(duaa) {
+  currentDailyDuaa = duaa;
+  const textEl = document.getElementById("dailyDuaaText");
+  const sourceEl = document.getElementById("duaaSourceText");
+  if (textEl && duaa) {
+    textEl.style.opacity = "0";
+    setTimeout(() => {
+      textEl.textContent = `«${duaa.text}»`;
+      if (sourceEl) {
+        sourceEl.textContent = duaa.source || "أدعية مختارة من الكتاب والسنة";
+      }
+      textEl.style.opacity = "1";
+    }, 150);
+  }
+}
 
-    const duaaTextElement = document.getElementById("dailyDuaaText");
-    if (duaaTextElement) {
-      duaaTextElement.textContent = `"${selectedDuaa.text}"`;
-    }
+function nextRandomDuaa() {
+  let allDuaas = [];
+  if (
+    typeof dailyDuasCollection !== "undefined" &&
+    dailyDuasCollection.length > 0
+  ) {
+    allDuaas = dailyDuasCollection;
+  } else if (
+    typeof adhkarData !== "undefined" &&
+    adhkarData.dua &&
+    adhkarData.dua.adhkar
+  ) {
+    allDuaas = adhkarData.dua.adhkar;
+  }
+  if (allDuaas.length === 0) return;
+
+  const nextIndex = Math.floor(Math.random() * allDuaas.length);
+  setDisplayedDuaa(allDuaas[nextIndex]);
+}
+
+function copyCurrentDuaa() {
+  if (!currentDailyDuaa || !currentDailyDuaa.text) return;
+  const fullText = `«${currentDailyDuaa.text}»\n${currentDailyDuaa.source ? "[" + currentDailyDuaa.source + "]" : ""}\n— عبر تطبيق ذَكِّرْ`;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard
+      .writeText(fullText)
+      .then(() => {
+        onDuaaCopied();
+      })
+      .catch(() => {
+        fallbackCopy(fullText);
+      });
+  } else {
+    fallbackCopy(fullText);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand("copy");
+    onDuaaCopied();
+  } catch (err) {}
+  document.body.removeChild(ta);
+}
+
+function onDuaaCopied() {
+  const label = document.getElementById("copyDuaaLabel");
+  if (label) {
+    const orig = label.textContent;
+    label.textContent = "تم النسخ ✓";
+    setTimeout(() => {
+      label.textContent = orig;
+    }, 2000);
+  }
+  const notif = document.getElementById("notification");
+  const notifText = document.getElementById("notificationText");
+  if (notif && notifText) {
+    notifText.textContent = "تم نسخ الدعاء بنجاح!";
+    notif.classList.add("show");
+    setTimeout(() => notif.classList.remove("show"), 2500);
+  }
+}
+
+function shareCurrentDuaa() {
+  if (!currentDailyDuaa || !currentDailyDuaa.text) return;
+  const fullText = `«${currentDailyDuaa.text}»\n${currentDailyDuaa.source ? "[" + currentDailyDuaa.source + "]" : ""}\n— عبر تطبيق ذَكِّرْ`;
+
+  if (navigator.share) {
+    navigator
+      .share({
+        title: "دعاء اليوم - تطبيق ذَكِّرْ",
+        text: fullText,
+      })
+      .catch(() => {});
+  } else {
+    copyCurrentDuaa();
+  }
+}
+
+/**
+ * Fasting Guide Modal Controller
+ */
+function openFastingGuideModal() {
+  const modal = document.getElementById("fastingGuideModal");
+  if (modal) {
+    modal.style.display = "flex";
+  }
+}
+
+function closeFastingGuideModal() {
+  const modal = document.getElementById("fastingGuideModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+/**
+ * Scroll smoothly to Qibla compass
+ */
+function scrollToQibla() {
+  const qibla = document.getElementById("qiblaSection");
+  if (qibla) {
+    qibla.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 }
 
@@ -5302,7 +5636,7 @@ function stringToSeed(str) {
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
     hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32bit integer
+    hash = hash & hash;
   }
   return Math.abs(hash);
 }
@@ -5311,6 +5645,14 @@ function random(seed) {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
 }
+
+// Close modals when clicking outside
+window.addEventListener("click", (e) => {
+  const fastingModal = document.getElementById("fastingGuideModal");
+  if (fastingModal && e.target === fastingModal) {
+    closeFastingGuideModal();
+  }
+});
 
 // Initialize on load
 document.addEventListener("DOMContentLoaded", () => {
@@ -5450,7 +5792,8 @@ function updateMisbahaUI() {
 
   if (countNum) countNum.textContent = toArabicNumerals(misbahaCount);
   if (countTarget)
-    countTarget.textContent = misbahaTarget > 0 ? "/ " + toArabicNumerals(misbahaTarget) : "∞";
+    countTarget.textContent =
+      misbahaTarget > 0 ? "/ " + toArabicNumerals(misbahaTarget) : "∞";
   if (roundsVal) roundsVal.textContent = toArabicNumerals(misbahaRounds);
   if (totalValue) totalValue.textContent = toArabicNumerals(misbahaTotal);
   if (dhikrText) dhikrText.textContent = misbahaDhikr;
@@ -5583,11 +5926,30 @@ function resetMisbaha() {
 }
 
 // Close misbaha on Escape key
-document.addEventListener("keydown", function(e) {
+document.addEventListener("keydown", function (e) {
   if (e.key === "Escape") {
     const overlay = document.getElementById("misbahaOverlay");
     if (overlay && !overlay.classList.contains("hidden")) {
       closeMisbaha();
     }
+  }
+});
+
+// Carousel scroll listener for Quick Actions indicator dots
+document.addEventListener("DOMContentLoaded", function () {
+  const quickGrid = document.getElementById("homeQuickGrid");
+  if (quickGrid) {
+    quickGrid.addEventListener("scroll", function () {
+      const dots = document.querySelectorAll("#homeQuickDots .hq-dot");
+      if (!dots.length) return;
+      const scrollLeft = Math.abs(quickGrid.scrollLeft);
+      const maxScroll = quickGrid.scrollWidth - quickGrid.clientWidth;
+      if (maxScroll <= 0) return;
+      const ratio = scrollLeft / maxScroll;
+      const activeIdx = ratio > 0.4 ? 1 : 0;
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle("active", idx === activeIdx);
+      });
+    });
   }
 });
