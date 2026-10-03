@@ -5018,6 +5018,236 @@ function updateDailyInfo() {
       fridayBanner.classList.add("hidden");
     }
   }
+
+  // 6. Fasting Reminder Banner
+  updateFastingReminder(now);
+}
+
+// ========================================
+// FASTING REMINDER SYSTEM (تذكير بالصيام)
+// ========================================
+
+/**
+ * Gets Hijri date parts for a given Gregorian date.
+ * Returns { day: number, month: number, year: number, monthName: string }
+ */
+function getHijriDate(date) {
+  const hijriNumeric = new Intl.DateTimeFormat("en-US-u-ca-islamic-umalqura", {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+  });
+  const hijriNamed = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
+    month: "long",
+  });
+
+  const parts = hijriNumeric.formatToParts(date);
+  const day = parseInt(parts.find((p) => p.type === "day")?.value || "0");
+  const month = parseInt(parts.find((p) => p.type === "month")?.value || "0");
+  const year = parseInt(parts.find((p) => p.type === "year")?.value || "0");
+  const monthName = hijriNamed.format(date);
+
+  return { day, month, year, monthName };
+}
+
+/**
+ * Checks all Islamic fasting occasions for a given date.
+ * Returns an array of fasting events, each with { name, badge, priority }.
+ * Priority: lower = more important (shown first).
+ */
+function checkFastingOccasions(date) {
+  const hijri = getHijriDate(date);
+  const dayOfWeek = date.getDay(); // 0=Sun, 1=Mon, ..., 4=Thu, 5=Fri, 6=Sat
+  const events = [];
+
+  // ── 1. يوم عاشوراء (10 محرم) + تاسوعاء (9 محرم) ──
+  if (hijri.month === 1 && hijri.day === 10) {
+    events.push({
+      name: "يوم عاشوراء",
+      detail: "١٠ محرم — يُكفِّر السنة التي قبله",
+      badge: "سنة مؤكدة",
+      priority: 1,
+    });
+  }
+  if (hijri.month === 1 && hijri.day === 9) {
+    events.push({
+      name: "يوم تاسوعاء",
+      detail: "٩ محرم — يُستحب صيامه مع عاشوراء",
+      badge: "سنة مؤكدة",
+      priority: 1,
+    });
+  }
+
+  // ── 2. يوم عرفة (9 ذو الحجة) لغير الحاج ──
+  if (hijri.month === 12 && hijri.day === 9) {
+    events.push({
+      name: "يوم عرفة",
+      detail: "٩ ذو الحجة — يُكفِّر سنتين (التي قبله والتي بعده)",
+      badge: "سنة مؤكدة",
+      priority: 1,
+    });
+  }
+
+  // ── 3. الأيام البيض (13-14-15 من كل شهر هجري) ──
+  if (hijri.day >= 13 && hijri.day <= 15) {
+    events.push({
+      name: "الأيام البيض",
+      detail: `${hijri.day} ${hijri.monthName} — صيام ثلاثة أيام من كل شهر`,
+      badge: "سنة",
+      priority: 3,
+    });
+  }
+
+  // ── 4. ستة أيام من شوال ──
+  if (hijri.month === 10 && hijri.day >= 2 && hijri.day <= 7) {
+    events.push({
+      name: "أيام شوال الستة",
+      detail: `${hijri.day} شوال — من صام رمضان ثم أتبعه ستًّا من شوال`,
+      badge: "سنة مؤكدة",
+      priority: 2,
+    });
+  }
+
+  // ── 5. صيام العشر الأوائل من ذي الحجة (1-8) ──
+  if (hijri.month === 12 && hijri.day >= 1 && hijri.day <= 8) {
+    events.push({
+      name: "العشر الأوائل من ذي الحجة",
+      detail: `${hijri.day} ذو الحجة — ما من أيام العمل الصالح فيها أحبّ إلى الله`,
+      badge: "مستحب",
+      priority: 2,
+    });
+  }
+
+  // ── 6. صيام شعبان (أكثر الشهور صيامًا بعد رمضان) ──
+  if (hijri.month === 8 && hijri.day >= 1 && hijri.day <= 15) {
+    events.push({
+      name: `صيام شعبان`,
+      detail: `${hijri.day} شعبان — شهرٌ يغفل عنه الناس`,
+      badge: "مستحب",
+      priority: 4,
+    });
+  }
+
+  // ── 7. صيام محرم (أفضل الصيام بعد رمضان) ──
+  if (hijri.month === 1 && hijri.day !== 9 && hijri.day !== 10) {
+    events.push({
+      name: "صيام المحرم",
+      detail: `${hijri.day} محرم — أفضل الصيام بعد رمضان`,
+      badge: "مستحب",
+      priority: 5,
+    });
+  }
+
+  // ── 8. الإثنين والخميس من كل أسبوع ──
+  if (dayOfWeek === 1) {
+    // Monday
+    events.push({
+      name: "صيام الإثنين",
+      detail: "يوم تُعرض فيه الأعمال على الله",
+      badge: "سنة أسبوعية",
+      priority: 6,
+    });
+  }
+  if (dayOfWeek === 4) {
+    // Thursday
+    events.push({
+      name: "صيام الخميس",
+      detail: "يوم تُعرض فيه الأعمال على الله",
+      badge: "سنة أسبوعية",
+      priority: 6,
+    });
+  }
+
+  // Sort by priority (lower = more important)
+  events.sort((a, b) => a.priority - b.priority);
+  return events;
+}
+
+/**
+ * Updates the fasting reminder banner based on today's and tomorrow's fasting occasions.
+ * Shows "اليوم صيام..." if today is a fasting day,
+ * or "غدًا صيام..." if tomorrow is a fasting day.
+ */
+function updateFastingReminder(now) {
+  const banner = document.getElementById("fastingBanner");
+  if (!banner) return;
+
+  const label = document.getElementById("fastingLabel");
+  const subtitle = document.getElementById("fastingSubtitle");
+  const badge = document.getElementById("fastingBadge");
+  const badgeText = document.getElementById("fastingBadgeText");
+
+  // Check today
+  const todayEvents = checkFastingOccasions(now);
+
+  // Check tomorrow
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowEvents = checkFastingOccasions(tomorrow);
+
+  // Build display messages
+  const messages = [];
+
+  // Today's events (most important first)
+  if (todayEvents.length > 0) {
+    const mainEvent = todayEvents[0];
+    messages.push({
+      label: `🌙 اليوم ${mainEvent.name}`,
+      subtitle: mainEvent.detail,
+      badge: mainEvent.badge,
+      isToday: true,
+      priority: mainEvent.priority,
+    });
+  }
+
+  // Tomorrow's events
+  if (tomorrowEvents.length > 0) {
+    const mainEvent = tomorrowEvents[0];
+    // If we already have a today message, only add tomorrow if it's higher priority
+    if (messages.length === 0 || mainEvent.priority <= 3) {
+      messages.push({
+        label: `🌅 غدًا ${mainEvent.name}`,
+        subtitle: mainEvent.detail,
+        badge: mainEvent.badge,
+        isToday: false,
+        priority: mainEvent.priority,
+      });
+    }
+  }
+
+  if (messages.length === 0) {
+    banner.classList.add("hidden");
+    return;
+  }
+
+  // Show the highest-priority message
+  // Prefer today's events, then tomorrow's for reminders
+  const bestMsg = messages.sort((a, b) => {
+    // Today always comes first if same priority
+    if (a.isToday && !b.isToday) return -1;
+    if (!a.isToday && b.isToday) return 1;
+    return a.priority - b.priority;
+  })[0];
+
+  if (label) label.textContent = bestMsg.label;
+  if (subtitle) {
+    // Build a rich subtitle
+    let subtitleText = bestMsg.subtitle;
+    // If there are multiple events, mention them
+    const allEvents = bestMsg.isToday ? todayEvents : tomorrowEvents;
+    if (allEvents.length > 1) {
+      const otherNames = allEvents
+        .slice(1, 3)
+        .map((e) => e.name)
+        .join("، ");
+      subtitleText += ` | وأيضًا: ${otherNames}`;
+    }
+    subtitle.textContent = subtitleText;
+  }
+  if (badgeText) badgeText.textContent = bestMsg.badge;
+  if (badge) badge.style.display = "";
+
+  banner.classList.remove("hidden");
 }
 
 /**
