@@ -5348,7 +5348,7 @@ function updateCalendarFastingAlert(now) {
   } else if (tomorrowEvents.length > 0) {
     const ev = tomorrowEvents[0];
     alertEl.className = "cal-fasting-alert cal-fasting-alert--tomorrow";
-    titleEl.textContent = `تذكير: غدًا صيام ${ev.name} (${ev.badge})`;
+    titleEl.textContent = `تذكير: غدًا  ${ev.name} (${ev.badge})`;
     descEl.textContent = `${ev.detail} — انوِ الصيام وجهّز سحورك تقبل الله منك`;
     alertEl.style.display = "block";
   } else {
