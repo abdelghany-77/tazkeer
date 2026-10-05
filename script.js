@@ -5342,7 +5342,7 @@ function updateCalendarFastingAlert(now) {
   if (todayEvents.length > 0) {
     const ev = todayEvents[0];
     alertEl.className = "cal-fasting-alert cal-fasting-alert--today";
-    titleEl.textContent = `🌙 اليوم صيام ${ev.name} (${ev.badge})`;
+    titleEl.textContent = `اليوم  ${ev.name} (${ev.badge})`;
     descEl.textContent = `${ev.detail} — تقبّل الله صيامكم وطاعتكم`;
     alertEl.style.display = "block";
   } else if (tomorrowEvents.length > 0) {
