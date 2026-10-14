@@ -1183,6 +1183,22 @@ function renderMushafViewer() {
     ((page - navStart + 1) / (navEnd - navStart + 1)) * 100,
   );
 
+  // Save global last reading for Home shortcut
+  try {
+    localStorage.setItem("tazkeer_last_reading", JSON.stringify({
+      type: "quran",
+      surahName: surah ? surah.name : "القرآن الكريم",
+      title: "سورة " + (surah ? surah.name : "القرآن الكريم"),
+      page: page,
+      juz: juz ? juz.number : 1,
+      percent: progressPercent,
+      timestamp: Date.now()
+    }));
+    if (typeof window.updateContinueReadingPill === "function") {
+      window.updateContinueReadingPill();
+    }
+  } catch (e) {}
+
   // Wird info for banner
   const wirdNum = isKM
     ? Math.floor(
@@ -1387,6 +1403,22 @@ function navigateToPage(newPage, direction) {
   const progressPercent = Math.round(
     ((newPage - navStart + 1) / (navEnd - navStart + 1)) * 100,
   );
+
+  // Save global last reading for Home shortcut
+  try {
+    localStorage.setItem("tazkeer_last_reading", JSON.stringify({
+      type: "quran",
+      surahName: surah ? surah.name : "القرآن الكريم",
+      title: "سورة " + (surah ? surah.name : "القرآن الكريم"),
+      page: newPage,
+      juz: juz ? juz.number : 1,
+      percent: progressPercent,
+      timestamp: Date.now()
+    }));
+    if (typeof window.updateContinueReadingPill === "function") {
+      window.updateContinueReadingPill();
+    }
+  } catch (e) {}
 
   // Update header
   const surahNameEl = document.querySelector(".mushaf-surah-name");

@@ -1432,7 +1432,11 @@ function switchTab(tabId) {
   // Persist
   localStorage.setItem("activeTab", tabId);
   // Tab-specific init
-  if (tabId === "tab-azkar") {
+  if (tabId === "tab-home") {
+    if (typeof updateDynamicHeroCard === "function") updateDynamicHeroCard();
+    if (typeof updateContinueReadingPill === "function")
+      updateContinueReadingPill();
+  } else if (tabId === "tab-azkar") {
     // Only show category list if user is NOT currently reading a category
     if (!currentCategory || categoryPage.classList.contains("hidden")) {
       if (azkarListView) azkarListView.classList.remove("hidden");
@@ -2159,7 +2163,42 @@ function createAdhkarSlide(zikr, index, category, track) {
   if (btn)
     btn.addEventListener("click", () => decrementSlideCounter(category, index));
 
+  // ── Tap Anywhere Mode ──────────────────────────────
+  // Allows user to tap anywhere on the slide to count without aiming at the button
+  slide.addEventListener("click", (e) => {
+    if (
+      e.target.closest(
+        "button, a, .slide-fadl, .slide-copy-btn, .slide-nav-arrow",
+      )
+    ) {
+      return;
+    }
+    decrementSlideCounter(category, index);
+    createTapRipple(e, slide);
+  });
+
   track.appendChild(slide);
+}
+
+// Visual feedback ripple for Tap Anywhere Mode
+function createTapRipple(e, container) {
+  if (!container) return;
+  const ripple = document.createElement("span");
+  ripple.className = "tap-anywhere-ripple";
+  const rect = container.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height) * 0.45;
+  const clientX = e.clientX || rect.left + rect.width / 2;
+  const clientY = e.clientY || rect.top + rect.height / 2;
+  const x = clientX - rect.left - size / 2;
+  const y = clientY - rect.top - size / 2;
+  ripple.style.width = `${size}px`;
+  ripple.style.height = `${size}px`;
+  ripple.style.left = `${x}px`;
+  ripple.style.top = `${y}px`;
+  container.appendChild(ripple);
+  setTimeout(() => {
+    if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
+  }, 600);
 }
 
 // Increment zikr count directly on card
@@ -5053,6 +5092,10 @@ function updateDailyInfo() {
   updateFastingReminder(now);
   updateCalendarFastingAlert(now);
   renderInteractiveCalendar(now);
+
+  // 7. Dynamic Time-Aware Hero Card & Continue Reading Pill
+  updateDynamicHeroCard(now);
+  updateContinueReadingPill();
 }
 
 // ========================================
@@ -5474,6 +5517,219 @@ function openSurahAlKahf() {
 }
 
 /**
+ * Opens Surah Al-Mulk directly in the Mushaf reader.
+ */
+function openSurahAlMulk() {
+  switchTab("tab-quran");
+  setTimeout(() => {
+    if (typeof openFreeReader === "function") {
+      openFreeReader(562, 564);
+    }
+  }, 150);
+}
+
+/**
+ * Dynamic Time-Aware Hero Card
+ * Contextually highlights what matters most right now:
+ * - Fajr to Sunrise / Morning: Morning Azkar
+ * - Asr to Maghrib / Evening: Evening Azkar
+ * - Friday: Surah Al-Kahf & Salawat with golden glow
+ * - Night / Pre-sleep: Sleep Azkar & Surah Al-Mulk
+ * - Midday: General Dhikr & Misbaha
+ */
+function updateDynamicHeroCard(now) {
+  const container = document.getElementById("dynamicHeroCard");
+  if (!container) return;
+  now = now || new Date();
+
+  const isFriday = now.getDay() === 5;
+  const hour = now.getHours();
+
+  let mode = "morning";
+  if (isFriday) {
+    mode = "friday";
+  } else if (hour >= 4 && hour < 12) {
+    mode = "morning";
+  } else if (hour >= 12 && hour < 15) {
+    mode = "midday";
+  } else if (hour >= 15 && hour < 20) {
+    mode = "evening";
+  } else {
+    mode = "night";
+  }
+
+  let badge = "";
+  let icon = "";
+  let title = "";
+  let subtitle = "";
+  let actions = "";
+
+  if (mode === "friday") {
+    badge = "يوم الجمعة المبارك";
+    icon = '<i class="fas fa-mosque"></i>';
+    title = "سورة الكهف والصلاة على النبي ﷺ";
+    subtitle =
+      "«مَنْ قَرَأَ سُورَةَ الْكَهْفِ فِي يَوْمِ الْجُمُعَةِ أَضَاءَ لَهُ مِنَ النُّورِ مَا بَيْنَ الْجُمُعَتَيْنِ»";
+    actions = `
+      <button class="dhc-btn dhc-btn--primary" onclick="openSurahAlKahf()">
+        <i class="fas fa-book-quran"></i>
+        <span>اقرأ سورة الكهف</span>
+      </button>
+      <button class="dhc-btn dhc-btn--secondary" onclick="openMisbaha()">
+        <i class="fas fa-hands-praying"></i>
+        <span>الصلاة على النبي ﷺ</span>
+      </button>
+    `;
+  } else if (mode === "morning") {
+    badge = "الصباح والبركة";
+    icon = '<i class="fas fa-sun"></i>';
+    title = "أذكار الصباح — حِصنك ليومك";
+    subtitle =
+      "«أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ»";
+    actions = `
+      <button class="dhc-btn dhc-btn--primary" onclick="showCategoryPage('morning')">
+        <i class="fas fa-play"></i>
+        <span>ابدأ أذكار الصباح الآن</span>
+      </button>
+    `;
+  } else if (mode === "evening") {
+    badge = "سكون المساء";
+    icon = '<i class="fas fa-cloud-moon"></i>';
+    title = "أذكار المساء — طمأنينة لقلبك";
+    subtitle =
+      "«أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ»";
+    actions = `
+      <button class="dhc-btn dhc-btn--primary" onclick="showCategoryPage('evening')">
+        <i class="fas fa-play"></i>
+        <span>ابدأ أذكار المساء الآن</span>
+      </button>
+    `;
+  } else if (mode === "night") {
+    badge = "ختام اليوم";
+    icon = '<i class="fas fa-moon"></i>';
+    title = "أذكار النوم وسورة الملك";
+    subtitle = "أذكار تحفظك حتى تصبح، وسورة الملك المنجية من عذاب القبر";
+    actions = `
+      <button class="dhc-btn dhc-btn--primary" onclick="showCategoryPage('sleep')">
+        <i class="fas fa-bed"></i>
+        <span>أذكار النوم</span>
+      </button>
+      <button class="dhc-btn dhc-btn--secondary" onclick="openSurahAlMulk()">
+        <i class="fas fa-book-quran"></i>
+        <span>سورة الملك</span>
+      </button>
+    `;
+  } else {
+    badge = "استراحة الذكر";
+    icon = '<i class="fas fa-heart"></i>';
+    title = "ألا بذكر الله تطمئن القلوب";
+    subtitle = "رطّب لسانك بذكر الله عز وجل واستغفاره في سائر يومك";
+    actions = `
+      <button class="dhc-btn dhc-btn--primary" onclick="openMisbaha()">
+        <i class="fas fa-circle-notch"></i>
+        <span>المسبحة الإلكترونية</span>
+      </button>
+    `;
+  }
+
+  container.className = "dynamic-hero-card dynamic-hero-card--" + mode;
+  container.innerHTML = `
+    <div class="dhc-glow"></div>
+    <div class="dhc-inner">
+      <div class="dhc-top">
+        <span class="dhc-badge">${badge}</span>
+        <div class="dhc-icon-wrap">${icon}</div>
+      </div>
+      <div class="dhc-body">
+        <h3 class="dhc-title">${title}</h3>
+        <p class="dhc-subtitle">${subtitle}</p>
+      </div>
+      <div class="dhc-actions">
+        ${actions}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Continue Reading Shortcut Pill
+ */
+function updateContinueReadingPill() {
+  const pill = document.getElementById("continueReadingPill");
+  if (!pill) return;
+
+  let lastRead = null;
+  try {
+    const raw = localStorage.getItem("tazkeer_last_reading");
+    if (raw) lastRead = JSON.parse(raw);
+  } catch (e) {}
+
+  if (!lastRead) {
+    pill.classList.add("hidden");
+    return;
+  }
+
+  let iconHTML = '<i class="fas fa-book-open"></i>';
+  let title = "";
+  let sub = "";
+  let pct = `${lastRead.percent || 0}%`;
+
+  if (lastRead.type === "prophet") {
+    iconHTML = '<i class="fas fa-feather-pointed"></i>';
+    title = `متابعة: ${lastRead.title}`;
+    sub = lastRead.chapterTitle ? lastRead.chapterTitle : "";
+  } else if (lastRead.type === "quran") {
+    iconHTML = '<i class="fas fa-book-quran"></i>';
+    title = `متابعة: ${lastRead.title}`;
+    sub = `صفحة ${toArabicNumerals(lastRead.page)} · جزء ${toArabicNumerals(lastRead.juz || 1)}`;
+  }
+
+  pill.innerHTML = `
+    <div class="cr-icon-wrap">${iconHTML}</div>
+    <div class="cr-info">
+      <div class="cr-title">${title}</div>
+      <div class="cr-sub">${sub}</div>
+    </div>
+    <div class="cr-actions">
+      <span class="cr-pct-badge">${pct}</span>
+      <button class="cr-resume-btn" onclick="resumeLastReading()" title="استئناف القراءة">
+        <span>متابعة</span>
+        <i class="fas fa-chevron-left"></i>
+      </button>
+    </div>
+  `;
+  pill.classList.remove("hidden");
+}
+
+function resumeLastReading() {
+  let lastRead = null;
+  try {
+    const raw = localStorage.getItem("tazkeer_last_reading");
+    if (raw) lastRead = JSON.parse(raw);
+  } catch (e) {}
+  if (!lastRead) return;
+
+  if (lastRead.type === "prophet") {
+    switchTab("tab-prophets");
+    setTimeout(() => {
+      if (typeof window._openProphet === "function") {
+        window._openProphet(lastRead.slug, lastRead.chapterIdx);
+      }
+    }, 150);
+  } else if (lastRead.type === "quran") {
+    switchTab("tab-quran");
+    setTimeout(() => {
+      if (typeof openFreeReader === "function") {
+        openFreeReader(lastRead.page);
+      }
+    }, 150);
+  }
+}
+
+window.updateContinueReadingPill = updateContinueReadingPill;
+window.resumeLastReading = resumeLastReading;
+
+/**
  * Duaa Management
  */
 let currentDailyDuaa = null;
@@ -5830,6 +6086,22 @@ function openMisbaha() {
   if (overlay) {
     overlay.classList.remove("hidden");
     updateMisbahaUI();
+
+    // Attach Tap Anywhere Mode for Misbaha
+    const card = overlay.querySelector(".misbaha-modal-card");
+    if (card && !card._hasTapAnywhere) {
+      card._hasTapAnywhere = true;
+      card.addEventListener("click", function (e) {
+        if (
+          e.target.closest(
+            "button, .misbaha-preset-btn, .misbaha-target-btn, .misbaha-close-btn, .misbaha-reset-btn, .misbaha-tap-btn",
+          )
+        )
+          return;
+        incrementMisbaha();
+        createTapRipple(e, card);
+      });
+    }
   }
 }
 

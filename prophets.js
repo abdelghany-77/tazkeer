@@ -170,13 +170,13 @@
   }
 
   // ── Open Prophet (lazy-load) ───────────────────────────────
-  window._openProphet = function (slug) {
+  window._openProphet = function (slug, targetChapterIdx) {
     var container = document.getElementById("prophetsPageContent");
     if (!container) return;
 
     if (prophetsCache.has(slug)) {
       currentProphet = prophetsCache.get(slug);
-      enterReader(container);
+      enterReader(container, targetChapterIdx);
       return;
     }
 
@@ -190,7 +190,7 @@
       .then(function (data) {
         prophetsCache.set(slug, data);
         currentProphet = data;
-        enterReader(container);
+        enterReader(container, targetChapterIdx);
       })
       .catch(function () {
         container.innerHTML =
@@ -200,20 +200,59 @@
       });
   };
 
+  // ── Auto-Hiding Chrome State ───────────────────────────────
+  var lastScrollY = 0;
+  var isChromeHidden = false;
+
+  function setChromeVisibility(visible) {
+    isChromeHidden = !visible;
+    var topbar = document.getElementById("prTopbar");
+    var pillBar = document.getElementById("prChapterPillBar");
+    if (topbar) {
+      topbar.classList.toggle("pr-topbar--hidden", !visible);
+    }
+    if (pillBar) {
+      pillBar.classList.toggle("pr-pill-bar--hidden", !visible);
+    }
+  }
+
+  function toggleChrome() {
+    setChromeVisibility(isChromeHidden);
+  }
+
+  function handleAutoHidingScroll() {
+    var currentY = window.scrollY;
+    var delta = currentY - lastScrollY;
+
+    if (Math.abs(delta) > 10) {
+      if (delta > 0 && currentY > 60 && !isChromeHidden) {
+        // Scrolling down -> hide chrome
+        setChromeVisibility(false);
+      } else if (delta < 0 && isChromeHidden) {
+        // Scrolling up -> show chrome
+        setChromeVisibility(true);
+      }
+      lastScrollY = currentY;
+    }
+  }
+
   // ── Reader View ────────────────────────────────────────────
-  function enterReader(container) {
+  function enterReader(container, targetChapterIdx) {
     var p = currentProphet;
     if (!p || !p.chapters || p.chapters.length === 0) return;
 
-    // Check for saved position
-    var savedPos = localStorage.getItem(LS_POS_PFX + p.slug);
     var resumeChapter = 0;
-    if (savedPos) {
-      try {
-        var pos = JSON.parse(savedPos);
-        resumeChapter = pos.chapterIdx || 0;
-      } catch (e) {
-        /* ignore */
+    if (typeof targetChapterIdx === "number" && targetChapterIdx >= 0 && targetChapterIdx < p.chapters.length) {
+      resumeChapter = targetChapterIdx;
+    } else {
+      var savedPos = localStorage.getItem(LS_POS_PFX + p.slug);
+      if (savedPos) {
+        try {
+          var pos = JSON.parse(savedPos);
+          resumeChapter = pos.chapterIdx || 0;
+        } catch (e) {
+          /* ignore */
+        }
       }
     }
     currentChapterIdx = resumeChapter;
@@ -235,16 +274,16 @@
     var p = currentProphet;
     var html = "";
 
-    // Top bar
+    // Top bar (auto-hiding)
     html += '<div class="pr-topbar" id="prTopbar">';
     html +=
-      '<button class="pr-back-btn" onclick="window._exitReader()"><i class="fas fa-arrow-right"></i></button>';
+      '<button class="pr-back-btn" onclick="window._exitReader()" title="العودة"><i class="fas fa-arrow-right"></i></button>';
     html += '<div class="pr-topbar-info">';
     html += '<span class="pr-topbar-name">' + p.name + "</span>";
     html += '<span class="pr-topbar-chapter" id="prTopbarChapter"></span>';
     html += "</div>";
     html +=
-      '<button class="pr-toc-btn" onclick="window._toggleDrawer()" title="فهرس الفصول"><i class="fas fa-list"></i></button>';
+      '<button class="pr-toc-btn" id="prTocBtn" onclick="window._toggleDrawer()" title="فهرس الفصول"><i class="fas fa-list-ol"></i></button>';
     html += "</div>";
 
     // Reading progress bar
@@ -265,31 +304,30 @@
     // Chapter content area
     html += '<div class="pr-chapter-content" id="prChapterContent"></div>';
 
-    // Complete reading button section
-    html += '<div class="pr-complete-section" id="prCompleteSection"></div>';
+    // Fast Chapter Navigation Pill Bar (fixed at bottom, auto-hiding with scroll)
+    html += '<div class="pr-chapter-pill-bar" id="prChapterPillBar">';
+    html += '  <div class="pr-pill-inner">';
+    html += '    <button class="pr-pill-btn pr-pill-btn--prev" id="prPrevBtn" onclick="window._prevChapter()" title="الفصل السابق"><i class="fas fa-chevron-right"></i> <span>السابق</span></button>';
+    html += '    <button class="pr-pill-btn pr-pill-btn--complete" id="prCompleteBtn" onclick="window._completeChapter()"><i class="fas fa-check-circle"></i> <span id="prCompleteBtnText">✓ أتممت الفصل</span></button>';
+    html += '    <button class="pr-pill-btn pr-pill-btn--next" id="prNextBtn" onclick="window._nextChapter()" title="الفصل التالي"><span>الفصل التالي</span> <i class="fas fa-chevron-left"></i></button>';
+    html += '  </div>';
+    html += '  <span class="pr-pill-indicator" id="prNavIndicator"></span>';
+    html += '</div>';
 
-    // Chapter nav
-    html += '<div class="pr-chapter-nav" id="prChapterNav">';
-    html +=
-      '<button class="pr-nav-btn pr-nav-prev" id="prPrevBtn" onclick="window._prevChapter()"><i class="fas fa-chevron-right"></i> الفصل السابق</button>';
-    html += '<span class="pr-nav-indicator" id="prNavIndicator"></span>';
-    html +=
-      '<button class="pr-nav-btn pr-nav-next" id="prNextBtn" onclick="window._nextChapter()">الفصل التالي <i class="fas fa-chevron-left"></i></button>';
-    html += "</div>";
-
-    // Chapter drawer (offscreen)
+    // Chapter drawer / bottom sheet for mobile
     html +=
       '<div class="pr-drawer-overlay" id="prDrawerOverlay" onclick="window._toggleDrawer()"></div>';
     html += '<div class="pr-drawer" id="prDrawer">';
-    html += '<div class="pr-drawer-header">';
-    html += '<h3><i class="fas fa-list-ol"></i> فهرس الفصول</h3>';
+    html += '  <div class="pr-sheet-handle"></div>';
+    html += '  <div class="pr-drawer-header">';
+    html += '    <h3><i class="fas fa-list-ol"></i> فهرس فصول القصة</h3>';
     html +=
-      '<button class="pr-drawer-close" onclick="window._toggleDrawer()"><i class="fas fa-times"></i></button>';
-    html += "</div>";
+      '    <button class="pr-drawer-close" onclick="window._toggleDrawer()" title="إغلاق"><i class="fas fa-times"></i></button>';
+    html += '  </div>';
     // Drawer progress
-    html += '<div class="pr-drawer-progress" id="prDrawerProgress"></div>';
-    html += '<div class="pr-drawer-list" id="prDrawerList"></div>';
-    html += "</div>";
+    html += '  <div class="pr-drawer-progress" id="prDrawerProgress"></div>';
+    html += '  <div class="pr-drawer-list" id="prDrawerList"></div>';
+    html += '</div>';
 
     // Scroll progress circle
     html += '<div class="pr-scroll-progress" id="prScrollProgress">';
@@ -305,15 +343,27 @@
 
     container.innerHTML = html;
 
+    // Tap in middle of screen to toggle chrome
+    var contentEl = document.getElementById("prChapterContent");
+    if (contentEl) {
+      contentEl.addEventListener("click", function (e) {
+        if (e.target.closest("button, a, .pr-quran-verse, .pr-hadith-box")) return;
+        toggleChrome();
+      });
+    }
+
     // Populate drawer
     renderDrawer();
 
-    // Setup scroll listener for real-time progress
+    // Setup scroll listener for real-time progress & auto-hiding chrome
+    lastScrollY = window.scrollY;
+    isChromeHidden = false;
     if (scrollHandler) {
       window.removeEventListener("scroll", scrollHandler);
     }
     scrollHandler = function () {
       updateScrollProgress();
+      handleAutoHidingScroll();
       debouncedSavePosition();
     };
     window.addEventListener("scroll", scrollHandler);
@@ -457,26 +507,24 @@
 
   // ── Complete Reading Button ────────────────────────────────
   function renderCompleteButton() {
-    var section = document.getElementById("prCompleteSection");
-    if (!section || !currentProphet) return;
+    if (!currentProphet) return;
 
     var slug = currentProphet.slug;
     var alreadyRead = isChapterRead(slug, currentChapterIdx);
 
-    var html = '';
-    if (alreadyRead) {
-      html += '<button class="pr-complete-btn pr-complete-btn--done" disabled>';
-      html += '<i class="fas fa-check-circle"></i>';
-      html += '<span>تمّت قراءة هذا الفصل ✓</span>';
-      html += '</button>';
-    } else {
-      html += '<button class="pr-complete-btn" onclick="window._completeChapter()">';
-      html += '<i class="fas fa-check-double"></i>';
-      html += '<span>أتممت القراءة</span>';
-      html += '</button>';
+    var btn = document.getElementById("prCompleteBtn");
+    var btnText = document.getElementById("prCompleteBtnText");
+    if (btn) {
+      if (alreadyRead) {
+        btn.classList.add("pr-pill-btn--done");
+        if (btnText) btnText.textContent = "تمّ الفصل ✓";
+        btn.disabled = true;
+      } else {
+        btn.classList.remove("pr-pill-btn--done");
+        if (btnText) btnText.textContent = "✓ أتممت الفصل";
+        btn.disabled = false;
+      }
     }
-
-    section.innerHTML = html;
   }
 
   // ── Complete Chapter Action ────────────────────────────────
@@ -801,6 +849,12 @@
     currentChapterIdx = 0;
     chapterDrawerOpen = false;
 
+    // Reset chrome classes
+    var topbar = document.getElementById("prTopbar");
+    var pillBar = document.getElementById("prChapterPillBar");
+    if (topbar) topbar.classList.remove("pr-topbar--hidden");
+    if (pillBar) pillBar.classList.remove("pr-pill-bar--hidden");
+
     // Restore bottom nav
     var bottomNav = document.getElementById("bottomNav");
     if (bottomNav) bottomNav.style.display = "";
@@ -817,6 +871,10 @@
     }
 
     initProphetsTab();
+
+    if (typeof window.updateContinueReadingPill === "function") {
+      window.updateContinueReadingPill();
+    }
   };
 
   // ── Persistence ────────────────────────────────────────────
@@ -831,6 +889,27 @@
       LS_POS_PFX + currentProphet.slug,
       JSON.stringify(data),
     );
+
+    // Save to global last reading for Home shortcut
+    try {
+      var ch = currentProphet.chapters[currentChapterIdx];
+      var totalChapters = currentProphet.chapters.length;
+      var pct = Math.round(((currentChapterIdx + 1) / totalChapters) * 100);
+      localStorage.setItem("tazkeer_last_reading", JSON.stringify({
+        type: "prophet",
+        slug: currentProphet.slug,
+        name: currentProphet.name,
+        title: "قصة " + currentProphet.name,
+        chapterIdx: currentChapterIdx,
+        chapterTitle: ch ? ch.title : ("الفصل " + (currentChapterIdx + 1)),
+        totalChapters: totalChapters,
+        percent: pct,
+        timestamp: Date.now()
+      }));
+      if (typeof window.updateContinueReadingPill === "function") {
+        window.updateContinueReadingPill();
+      }
+    } catch (e) {}
   }
 
   function showResumeToast(chapterTitle) {
