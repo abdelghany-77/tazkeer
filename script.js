@@ -5593,7 +5593,7 @@ function updateDynamicHeroCard(now) {
       </button>
     `;
   } else if (mode === "evening") {
-    badge = "سكون المساء";
+    badge = "أذكار المساء";
     icon = '<i class="fas fa-cloud-moon"></i>';
     title = "أذكار المساء — طمأنينة لقلبك";
     subtitle =
