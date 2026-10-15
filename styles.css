@@ -23,9 +23,11 @@ body {
 .header {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
   position: static;
   z-index: 1000;
+  padding-top: max(0.5rem, env(safe-area-inset-top));
 }
 
 .header-content {
@@ -92,6 +94,35 @@ body {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+/* Misbaha Header Button */
+.nav-btn.misbaha-header-btn {
+  background: rgba(26, 138, 92, 0.1);
+  color: #1a8a5c;
+  border: 1.5px solid rgba(26, 138, 92, 0.25);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.nav-btn.misbaha-header-btn:hover {
+  background: #1a8a5c;
+  color: #ffffff;
+  border-color: #1a8a5c;
+}
+
+body.dark-mode .nav-btn.misbaha-header-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 50% !important;
+}
+
+body.dark-mode .nav-btn.misbaha-header-btn:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #6ee7b7 !important;
 }
 
 /* Main Content */
@@ -975,20 +1006,30 @@ body {
 
   .nav {
     justify-content: flex-end;
+    align-items: center;
+    gap: 0.35rem;
   }
 
   .nav-btn {
     font-size: 0.8rem;
-    padding: 8px 12px;
+    padding: 6px 10px;
   }
 
+  .misbaha-header-btn .nav-btn-text,
+  .install-btn .nav-btn-text {
+    display: none;
+  }
+
+  .misbaha-header-btn,
+  .install-btn,
   .theme-toggle-btn {
     width: 38px;
     height: 38px;
     padding: 0 !important;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50% !important;
   }
 
   .welcome-title {
@@ -1165,12 +1206,16 @@ body.dark-mode .nav-btn.active {
 }
 
 body.dark-mode .theme-toggle-btn {
-  background: #1a8a5c !important;
-  color: white !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffd700 !important;
+  border-radius: 50% !important;
 }
 
 body.dark-mode .theme-toggle-btn:hover {
-  background: #15724e !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #ffd700 !important;
+  transform: translateY(-2px);
 }
 
 /* Dark Mode Welcome Section */
@@ -1545,12 +1590,27 @@ body.light-mode .nav-btn.install-btn {
 
 /* ── Theme Toggle Button ── */
 body.light-mode .theme-toggle-btn {
-  background: #e2e8f0 !important;
-  color: #475569 !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #b8860b !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 50% !important;
 }
 
 body.light-mode .theme-toggle-btn:hover {
-  background: #cbd5e0 !important;
+  background: rgba(184, 134, 11, 0.15) !important;
+  color: #854d0e !important;
+}
+
+body.light-mode .nav-btn.misbaha-header-btn {
+  background: rgba(26, 138, 92, 0.08) !important;
+  color: #1a8a5c !important;
+  border: 1px solid rgba(26, 138, 92, 0.2) !important;
+  border-radius: 50% !important;
+}
+
+body.light-mode .nav-btn.misbaha-header-btn:hover {
+  background: rgba(26, 138, 92, 0.16) !important;
+  color: #0f6240 !important;
 }
 
 /* ── Welcome Section ── */
@@ -3690,46 +3750,94 @@ body.dark-mode .install-prompt .install-btn.secondary:hover {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
+  gap: 0.5rem;
   position: relative;
   z-index: 1;
 }
 
 .prayer-times-title {
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: #2d3748;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .prayer-times-title i {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   color: #1a8a5c;
 }
 
-.prayer-times-location {
+.prayer-times-header-actions {
   display: flex;
   align-items: center;
+  gap: 0.35rem;
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
+}
+
+.qibla-header-btn {
+  background: rgba(26, 138, 92, 0.1);
+  border: 1.5px solid rgba(26, 138, 92, 0.25);
+  border-radius: 20px;
+  padding: 0.26rem 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #1a8a5c;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.qibla-header-btn:hover {
+  background: #1a8a5c;
+  color: #ffffff;
+  border-color: #1a8a5c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 138, 92, 0.25);
+}
+
+body.dark-mode .qibla-header-btn {
+  background: rgba(104, 211, 145, 0.12);
+  border-color: rgba(104, 211, 145, 0.25);
+  color: #68d391;
+}
+
+body.dark-mode .qibla-header-btn:hover {
+  background: #1a8a5c;
+  color: #ffffff;
 }
 
 .location-btn {
   background: #f7fafc;
-  border: 2px solid #e2e8f0;
+  border: 1.5px solid #e2e8f0;
   border-radius: 20px;
-  padding: 0.3rem 0.9rem;
+  padding: 0.26rem 0.65rem;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  color: #718096;
+  gap: 0.35rem;
+  color: #475569;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   font-family: "Cairo", sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
+  white-space: nowrap;
+}
+
+body.dark-mode .location-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #cbd5e0;
 }
 
 .location-btn i {
@@ -3737,10 +3845,14 @@ body.dark-mode .install-prompt .install-btn.secondary:hover {
   color: #1a8a5c;
 }
 
+body.dark-mode .location-btn i {
+  color: #68d391;
+}
+
 .location-btn:hover {
   background: #1a8a5c;
   color: white;
-  transform: scale(1.05);
+  transform: translateY(-1px);
   border-color: #1a8a5c;
 }
 
@@ -3748,8 +3860,9 @@ body.dark-mode .install-prompt .install-btn.secondary:hover {
   color: white;
 }
 
-.location-btn:active {
-  transform: scale(0.95);
+.location-btn:active,
+.qibla-header-btn:active {
+  transform: scale(0.96);
 }
 
 .next-prayer-countdown {
@@ -4149,7 +4262,20 @@ body.dark-mode .retry-btn:hover {
   }
 
   .prayer-times-title {
-    font-size: 1.05rem;
+    font-size: 1rem;
+    white-space: nowrap;
+    gap: 0.35rem;
+  }
+
+  .prayer-times-header-actions {
+    gap: 0.25rem;
+  }
+
+  .qibla-header-btn,
+  .location-btn {
+    padding: 0.22rem 0.5rem;
+    font-size: 0.75rem;
+    gap: 0.25rem;
   }
 
   .next-prayer-countdown {
@@ -5215,12 +5341,35 @@ body.light-mode .cal-greg-row {
 }
 
 /* Fasting Alert inside Calendar */
+.cal-fasting-smart-card,
 .cal-fasting-alert {
   position: relative;
-  z-index: 1;
-  border-radius: 12px;
-  margin-bottom: 0.65rem;
+  z-index: 2;
+  border-radius: 14px;
+  margin-top: 0.65rem;
   overflow: hidden;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.95rem;
+  background: rgba(212, 168, 71, 0.08);
+  border: 1px solid rgba(212, 168, 71, 0.22);
+}
+
+.cal-fasting-alert--today {
+  background: rgba(212, 168, 71, 0.12) !important;
+  border-color: rgba(212, 168, 71, 0.35) !important;
+}
+
+.cal-fasting-alert--tomorrow {
+  background: rgba(251, 146, 60, 0.1) !important;
+  border-color: rgba(251, 146, 60, 0.3) !important;
+}
+
+.cal-fasting-alert--upcoming {
+  background: rgba(56, 189, 248, 0.08) !important;
+  border-color: rgba(56, 189, 248, 0.25) !important;
 }
 
 .cal-fasting-alert-inner {
@@ -5303,6 +5452,114 @@ body.light-mode .cal-fasting-alert-btn {
   background: rgba(184, 134, 11, 0.12);
   border-color: rgba(184, 134, 11, 0.25);
   color: #b8860b;
+}
+
+/* ── Smart Compact Fasting Card ── */
+.cal-fasting-smart-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.95rem;
+  margin-top: 0.65rem;
+  background: rgba(212, 168, 71, 0.08);
+  border: 1px solid rgba(212, 168, 71, 0.22);
+  border-radius: 14px;
+  position: relative;
+  z-index: 2;
+}
+
+.cal-fasting-smart-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(212, 168, 71, 0.16);
+  color: #ffd700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.cal-fasting-smart-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-align: right;
+  min-width: 0;
+}
+
+.cal-fasting-smart-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #d4a847;
+  font-family: "Cairo", sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cal-fasting-smart-desc {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  font-family: "Cairo", sans-serif;
+  margin-top: 1px;
+  line-height: 1.35;
+}
+
+.cal-fasting-guide-btn {
+  background: linear-gradient(135deg, rgba(212, 168, 71, 0.22), rgba(212, 168, 71, 0.1));
+  border: 1px solid rgba(212, 168, 71, 0.35);
+  border-radius: 20px;
+  padding: 0.32rem 0.75rem;
+  color: #ffd700;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.cal-fasting-guide-btn:hover {
+  background: #d4a847;
+  color: #0f172a;
+  border-color: #ffd700;
+  transform: translateY(-1px);
+}
+
+body.light-mode .cal-fasting-smart-card {
+  background: rgba(184, 134, 11, 0.05);
+  border-color: rgba(184, 134, 11, 0.18);
+}
+
+body.light-mode .cal-fasting-smart-icon {
+  background: rgba(184, 134, 11, 0.1);
+  color: #b8860b;
+}
+
+body.light-mode .cal-fasting-smart-title {
+  color: #b8860b;
+}
+
+body.light-mode .cal-fasting-smart-desc {
+  color: #475569;
+}
+
+body.light-mode .cal-fasting-guide-btn {
+  background: rgba(184, 134, 11, 0.08);
+  border-color: rgba(184, 134, 11, 0.22);
+  color: #8b6914;
+}
+
+body.light-mode .cal-fasting-guide-btn:hover {
+  background: #b8860b;
+  color: #ffffff;
 }
 
 /* 7-Day Interactive Week Strip */
@@ -5850,6 +6107,131 @@ body.light-mode .qibla-compact-deg {
   text-align: center;
   max-width: 100px;
   line-height: 1.3;
+}
+
+/* ── Qibla Modal ── */
+.qibla-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10005;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.qibla-modal-content {
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(212, 168, 71, 0.28);
+  border-radius: 24px;
+  padding: 1.4rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  color: #e2e8f0;
+  animation: qiblaModalAnim 0.3s ease;
+}
+
+body.light-mode .qibla-modal-content {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-color: rgba(26, 138, 92, 0.22);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  color: #1e293b;
+}
+
+@keyframes qiblaModalAnim {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.qibla-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.qibla-modal-title h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-family: "Cairo", sans-serif;
+}
+
+.qibla-modal-compass-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.25rem 0 0.5rem;
+}
+
+.qibla-modal-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.qibla-deg-badge {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #d4a847;
+  font-family: "Cairo", sans-serif;
+  line-height: 1;
+}
+
+body.light-mode .qibla-deg-badge {
+  color: #1a8a5c;
+}
+
+.qibla-modal-status {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin: 0;
+  text-align: center;
+  font-family: "Cairo", sans-serif;
+}
+
+body.light-mode .qibla-modal-status {
+  color: #475569;
+}
+
+.qibla-calibrate-action-btn {
+  margin-top: 0.5rem;
+  padding: 0.55rem 1.3rem;
+  border-radius: 20px;
+  border: 1px solid rgba(212, 168, 71, 0.35);
+  background: rgba(212, 168, 71, 0.12);
+  color: #ffd700;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.25s ease;
+}
+
+.qibla-calibrate-action-btn:hover {
+  background: #d4a847;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+body.light-mode .qibla-calibrate-action-btn {
+  background: rgba(26, 138, 92, 0.08);
+  border-color: rgba(26, 138, 92, 0.25);
+  color: #166534;
+}
+
+body.light-mode .qibla-calibrate-action-btn:hover {
+  background: #1a8a5c;
+  color: #ffffff;
 }
 
 /* ── Compact Duaa Card – Enhanced Spiritual Design ── */

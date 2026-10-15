@@ -52,16 +52,20 @@
           ذَكِّرْ
         </h1>
         <nav class="nav" id="nav">
+          <button class="nav-btn misbaha-header-btn" onclick="openMisbaha()" title="المسبحة الإلكترونية" aria-label="المسبحة الإلكترونية">
+            <i class="fas fa-fingerprint"></i>
+            <span class="nav-btn-text">المسبحة</span>
+          </button>
           <button class="nav-btn install-btn hidden" id="installBtn">
             <i class="fas fa-download"></i>
-            تثبيت التطبيق
+            <span class="nav-btn-text">تثبيت التطبيق</span>
           </button>
-          <button class="nav-btn theme-toggle-btn" id="themeToggle">
+          <button class="nav-btn theme-toggle-btn" id="themeToggle" title="تبديل المظهر" aria-label="تبديل المظهر">
             <i class="fas fa-sun"></i>
           </button>
           <button class="nav-btn back-btn hidden" id="backBtn">
             <i class="fas fa-arrow-right"></i>
-            العودة
+            <span>العودة</span>
           </button>
         </nav>
       </div>
@@ -84,23 +88,14 @@
         <!-- ==============================================
              HERO ISLAMIC CALENDAR & FASTING SYSTEM
              ============================================== -->
+        <!-- ==============================================
+             HERO ISLAMIC CALENDAR & SMART FASTING
+             ============================================== -->
         <div class="calendar-hero-card" id="islamicCalendarCard">
-          <!-- Top Bar: Live Clock & Fasting Sunnahs Guide -->
-          <!-- <div class="cal-hero-top">
-            <div class="cal-hero-clock" id="calHeroClock">
-              <i class="far fa-clock"></i>
-              <span id="liveClockText">--:--:--</span>
-            </div>
-            <button class="cal-guide-pill-btn" onclick="openFastingGuideModal()" title="دليل وفضائل صيام التطوع">
-              <i class="fas fa-calendar-check"></i>
-              <span>دليل سنن الصيام</span>
-            </button>
-          </div> -->
-
           <!-- Hero Main Date Display -->
           <div class="cal-hero-main">
             <div class="cal-day-badge-wrap">
-              <span class="cal-hero-day" id="dayName">--</span>
+              <span class="cal-hero-day" id="dayName">اليوم</span>
               <span class="cal-today-tag">اليوم</span>
             </div>
             
@@ -108,45 +103,36 @@
               <div class="cal-hijri-row">
                 <span class="cal-hijri-text" id="hijriFullDate">
                   <!-- backward compatible IDs -->
-                  <span id="hijriDate">--</span> <span id="hijriMonth">--</span>
+                  <span id="hijriDate">التاريخ الهجري</span> <span id="hijriMonth"></span>
                 </span>
               </div>
               <div class="cal-greg-row">
                 <i class="far fa-calendar-alt cal-greg-icon"></i>
                 <span class="cal-greg-text" id="gregorianFullDate">
                   <!-- backward compatible IDs -->
-                  <span id="gregorianDate">--</span> <span id="gregorianMonth">--</span>
+                  <span id="gregorianDate">التاريخ الميلادي</span> <span id="gregorianMonth"></span>
                 </span>
               </div>
             </div>
           </div>
 
-          <!-- Fasting Notification Banner inside Calendar -->
-          <div class="cal-fasting-alert" id="calFastingAlert">
-            <div class="cal-fasting-alert-inner">
-              <div class="cal-fasting-alert-text">
-                <span class="cal-fasting-alert-title" id="calFastingAlertTitle">تذكير بصيام السنة</span>
-                <span class="cal-fasting-alert-desc" id="calFastingAlertDesc">جاري فحص أيام الصيام...</span>
-              </div>
-              <button class="cal-fasting-alert-btn" onclick="openFastingGuideModal()">
-                <span>الفضل</span>
-                <i class="fas fa-chevron-left"></i>
-              </button>
+          <!-- Smart Compact Fasting Bar -->
+          <div class="cal-fasting-smart-card" id="calFastingAlert">
+            <div class="cal-fasting-smart-icon">
+              <i class="fas fa-moon"></i>
             </div>
+            <div class="cal-fasting-smart-info">
+              <span class="cal-fasting-smart-title" id="calFastingAlertTitle">صيام السنن والتطوع</span>
+              <span class="cal-fasting-smart-desc" id="calFastingAlertDesc">الإثنين والخميس والأيام البيض</span>
+            </div>
+            <button class="cal-fasting-guide-btn" onclick="openFastingGuideModal()" title="دليل وفضائل صيام التطوع">
+              <i class="fas fa-info-circle"></i>
+              <span>دليل الصيام</span>
+            </button>
           </div>
 
-          <!-- Interactive 7-Day Week Strip -->
-          <div class="cal-week-section">
-            <div class="cal-week-header">
-              <span class="cal-week-title"><i class="fas fa-calendar-week"></i> أيام الأسبوع وصيام السنن</span>
-              <span class="cal-week-hint">اضغط على اليوم لمعرفة المناسبة</span>
-            </div>
-            <div class="cal-week-strip" id="calWeekStrip">
-              <!-- Dynamically populated by JS with 7 days -->
-            </div>
-          </div>
-
-          <!-- Day Fasting Detail Popover / Toast Panel -->
+          <!-- Compatibility shim for 7-day strip (kept in DOM for JS calculation, minimal UI) -->
+          <div class="cal-week-strip hidden" id="calWeekStrip"></div>
           <div class="cal-day-detail-panel hidden" id="calDayDetailPanel">
             <div class="cal-day-detail-content" id="calDayDetailContent"></div>
             <button class="cal-day-detail-close" onclick="closeCalDayDetail()" title="إغلاق">&times;</button>
@@ -154,17 +140,105 @@
         </div>
 
         <!-- ==============================================
-             DYNAMIC TIME-AWARE HERO CARD
+             PRAYER TIMES SECTION (PROMOTED TO TOP)
              ============================================== -->
-        <div class="dynamic-hero-card" id="dynamicHeroCard">
-          <!-- Populated dynamically based on time of day (Morning/Evening/Friday/Night) -->
+        <div class="prayer-times-section" id="prayerTimesSection">
+          <div class="prayer-times-header">
+            <h3 class="prayer-times-title">
+              <i class="fas fa-mosque"></i>
+              مواقيت الصلاة
+            </h3>
+            <div class="prayer-times-header-actions" id="prayerLocation">
+              <button class="qibla-header-btn" onclick="openQiblaModal()" title="تحديد اتجاه القبلة">
+                <i class="fas fa-compass"></i>
+                <span>القبلة</span>
+              </button>
+              <button class="location-btn" id="locationBtn" title="تحديث موقعي (GPS)">
+                <i class="fas fa-location-crosshairs"></i>
+                <span id="cityName">القاهرة</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="next-prayer-countdown" id="nextPrayerCountdown">
+            <!-- <div class="countdown-pulse-icon">
+              <i class="far fa-clock"></i>
+            </div> -->
+            <div class="countdown-text-group">
+              <span class="countdown-label">الصلاة القادمة:</span>
+              <span class="countdown-prayer" id="nextPrayerName">الفجر</span>
+              <span class="countdown-time" id="countdownTime">--:--</span>
+            </div>
+          </div>
+
+          <div class="prayer-times-grid" id="prayerTimesGrid">
+            <!-- Pre-filled default prayer cards to eliminate Flash of Empty Content -->
+            <div class="prayer-card" data-prayer="Fajr">
+              <div class="prayer-icon"><i class="fas fa-cloud-sun"></i></div>
+              <div class="prayer-info"><div class="prayer-name">الفجر</div><div class="prayer-time">04:30 ص</div></div>
+            </div>
+            <div class="prayer-card" data-prayer="Sunrise">
+              <div class="prayer-icon"><i class="fas fa-sun"></i></div>
+              <div class="prayer-info"><div class="prayer-name">الشروق</div><div class="prayer-time">06:00 ص</div></div>
+            </div>
+            <div class="prayer-card" data-prayer="Dhuhr">
+              <div class="prayer-icon"><i class="fas fa-sun"></i></div>
+              <div class="prayer-info"><div class="prayer-name">الظهر</div><div class="prayer-time">12:00 م</div></div>
+            </div>
+            <div class="prayer-card" data-prayer="Asr">
+              <div class="prayer-icon"><i class="fas fa-sun"></i></div>
+              <div class="prayer-info"><div class="prayer-name">العصر</div><div class="prayer-time">03:30 م</div></div>
+            </div>
+            <div class="prayer-card" data-prayer="Maghrib">
+              <div class="prayer-icon"><i class="fas fa-cloud-moon"></i></div>
+              <div class="prayer-info"><div class="prayer-name">المغرب</div><div class="prayer-time">06:15 م</div></div>
+            </div>
+            <div class="prayer-card" data-prayer="Isha">
+              <div class="prayer-icon"><i class="fas fa-moon"></i></div>
+              <div class="prayer-info"><div class="prayer-name">العشاء</div><div class="prayer-time">07:45 م</div></div>
+            </div>
+          </div>
+
+          <div class="prayer-times-loading hidden" id="prayerTimesLoading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>جاري تحديث المواقيت...</p>
+          </div>
+
+          <div class="prayer-times-error hidden" id="prayerTimesError">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>تعذر تحديث المواقيت</p>
+            <button class="retry-btn" id="retryPrayerTimes">
+              <i class="fas fa-redo"></i>
+              إعادة المحاولة
+            </button>
+          </div>
         </div>
 
         <!-- ==============================================
-             CONTINUE READING SHORTCUT PILL
+             DUAA CARD – COMPACT & SPIRITUAL
              ============================================== -->
-        <div class="continue-reading-pill hidden" id="continueReadingPill">
-          <!-- Populated dynamically from last read Quran page or Prophet story -->
+        <div class="duaa-card-compact" id="dailyDuaaCard">
+          <div class="duaa-compact-head">
+            <div class="duaa-head-title">
+              <i class="fas fa-hands-praying duaa-head-icon"></i>
+              <span id="duaaHeader">دعاء اليوم</span>
+            </div>
+            <div class="duaa-actions">
+              <button class="duaa-action-btn" id="copyDuaaBtn" onclick="copyCurrentDuaa()" title="نسخ الدعاء">
+                <i class="far fa-copy"></i>
+                <span class="duaa-btn-label" id="copyDuaaLabel">نسخ</span>
+              </button>
+            </div>
+          </div>
+          <div class="duaa-body-wrap">
+            <p class="duaa-compact-text" id="dailyDuaaText">رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ</p>
+          </div>
+          <div class="duaa-footer" id="duaaFooter">
+            <span class="duaa-source-badge" id="duaaSourceBadge">
+              <i class="fas fa-bookmark"></i>
+              <span id="duaaSourceText">سورة البقرة: ٢٠١</span>
+            </span>
+          </div>
         </div>
 
         <!-- Friday Banner (Surah Al-Kahf CTA) — shown only on Fridays -->
@@ -180,16 +254,11 @@
                       <stop offset="100%" style="stop-color:#00d9f5" />
                     </linearGradient>
                   </defs>
-                  <!-- Dome -->
                   <path d="M32 8 C20 8 12 20 12 28 L52 28 C52 20 44 8 32 8Z" fill="url(#mosqueGrad)" opacity="0.9" />
-                  <!-- Crescent -->
                   <circle cx="32" cy="10" r="3" fill="#FFD700" />
                   <circle cx="33.5" cy="9.5" r="2.5" fill="#0a0f1a" />
-                  <!-- Body -->
                   <rect x="12" y="28" width="40" height="24" rx="2" fill="url(#mosqueGrad)" opacity="0.7" />
-                  <!-- Door -->
                   <path d="M27 52 L27 38 Q32 32 37 38 L37 52Z" fill="#0a0f1a" opacity="0.6" />
-                  <!-- Minarets -->
                   <rect x="6" y="20" width="4" height="32" rx="2" fill="url(#mosqueGrad)" opacity="0.6" />
                   <rect x="54" y="20" width="4" height="32" rx="2" fill="url(#mosqueGrad)" opacity="0.6" />
                   <circle cx="8" cy="18" r="3" fill="#FFD700" opacity="0.8" />
@@ -208,223 +277,11 @@
           </div>
         </div>
 
-        <!-- Fasting Reminder Banner — shown when a fasting day is today or tomorrow -->
-        <!-- <div class="fasting-banner hidden" id="fastingBanner">
-          <div class="fasting-banner-glow"></div>
-          <div class="fasting-banner-content">
-            <div class="fasting-banner-icon">
-              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="48" height="48">
-                <defs>
-                  <linearGradient id="fastingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#FFD700" />
-                    <stop offset="50%" style="stop-color:#FFA500" />
-                    <stop offset="100%" style="stop-color:#FF8C00" />
-                  </linearGradient>
-                </defs> -->
-                <!-- Crescent Moon -->
-                <!-- <circle cx="32" cy="28" r="18" fill="url(#fastingGrad)" opacity="0.9" />
-                <circle cx="40" cy="24" r="15" fill="#0a0f1a" opacity="0.85" /> -->
-                <!-- Stars -->
-                <!-- <circle cx="46" cy="14" r="2" fill="#FFD700" opacity="0.9" />
-                <circle cx="52" cy="22" r="1.5" fill="#FFD700" opacity="0.7" />
-                <circle cx="50" cy="32" r="1.2" fill="#FFD700" opacity="0.5" /> -->
-                <!-- Plate / Bowl -->
-                <!-- <path d="M16 46 Q32 38 48 46 L46 50 Q32 44 18 50 Z" fill="url(#fastingGrad)" opacity="0.7" />
-                <ellipse cx="32" cy="50" rx="16" ry="3" fill="url(#fastingGrad)" opacity="0.5" />
-              </svg>
-            </div>
-            <div class="fasting-banner-text">
-              <span class="fasting-banner-label" id="fastingLabel">تذكير بالصيام</span>
-              <span class="fasting-banner-subtitle" id="fastingSubtitle">غدًا صيام يوم عرفة</span>
-            </div>
-            <div class="fasting-banner-badge" id="fastingBadge">
-              <i class="fas fa-star"></i>
-              <span id="fastingBadgeText">سنة مؤكدة</span>
-            </div>
-          </div>
-        </div> -->
+        <!-- Dynamic Time-Aware Hero Card -->
+        <div class="dynamic-hero-card" id="dynamicHeroCard"></div>
 
-        <!-- ==============================================
-             QUICK SPIRITUAL ACCESS
-             ============================================== -->
-        <!-- <div class="home-quick-actions-section">
-          <div class="home-quick-grid" id="homeQuickGrid">
-            <button class="quick-action-card qa-card--misbaha" onclick="openMisbaha()">
-              <div class="quick-action-icon-wrap">
-                <svg viewBox="0 -4 64 68" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2.5" opacity="0.3" />
-                  <circle cx="32" cy="6" r="5" fill="currentColor" opacity="0.9" />
-                  <circle cx="47" cy="10" r="4.5" fill="currentColor" opacity="0.8" />
-                  <circle cx="56" cy="22" r="4.5" fill="currentColor" opacity="0.7" />
-                  <circle cx="58" cy="37" r="4.5" fill="currentColor" opacity="0.65" />
-                  <circle cx="52" cy="50" r="4.5" fill="currentColor" opacity="0.6" />
-                  <circle cx="40" cy="58" r="4.5" fill="currentColor" opacity="0.55" />
-                  <circle cx="24" cy="58" r="4.5" fill="currentColor" opacity="0.55" />
-                  <circle cx="12" cy="50" r="4.5" fill="currentColor" opacity="0.6" />
-                  <circle cx="6" cy="37" r="4.5" fill="currentColor" opacity="0.65" />
-                  <circle cx="8" cy="22" r="4.5" fill="currentColor" opacity="0.7" />
-                  <circle cx="17" cy="10" r="4.5" fill="currentColor" opacity="0.8" />
-                  <line x1="32" y1="6" x2="32" y2="0" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                  <circle cx="32" cy="-2" r="2.5" fill="#d4a847" />
-                </svg>
-              </div>
-              <span class="quick-action-label">المسبحة</span>
-            </button>
-
-            <button class="quick-action-card qa-card--quran" onclick="switchTab('tab-quran')">
-              <div class="quick-action-icon-wrap">
-                <i class="fas fa-book-quran"></i>
-              </div>
-              <span class="quick-action-label">القرآن الكريم</span>
-            </button>
-
-            <button class="quick-action-card qa-card--morning" onclick="showCategoryPage('morning')">
-              <div class="quick-action-icon-wrap">
-                <i class="fas fa-sun"></i>
-              </div>
-              <span class="quick-action-label">أذكار الصباح</span>
-            </button>
-
-            <button class="quick-action-card qa-card--evening" onclick="showCategoryPage('evening')">
-              <div class="quick-action-icon-wrap">
-                <i class="fas fa-moon"></i>
-              </div>
-              <span class="quick-action-label">أذكار المساء</span>
-            </button>
-
-            <button class="quick-action-card qa-card--qibla" onclick="scrollToQibla()">
-              <div class="quick-action-icon-wrap">
-                <i class="fas fa-compass"></i>
-              </div>
-              <span class="quick-action-label">اتجاه القبلة</span>
-            </button>
-
-            <button class="quick-action-card qa-card--fasting" onclick="openFastingGuideModal()">
-              <div class="quick-action-icon-wrap">
-                <i class="fas fa-calendar-check"></i>
-              </div>
-              <span class="quick-action-label">سنن الصيام</span>
-            </button>
-          </div>
-          <div class="home-quick-dots" id="homeQuickDots">
-            <span class="hq-dot active"></span>
-            <span class="hq-dot"></span>
-          </div>
-        </div> -->
-
-        <!-- ==============================================
-             DUAA CARD – COMPACT & SPIRITUAL
-             ============================================== -->
-        <div class="duaa-card-compact" id="dailyDuaaCard">
-          <div class="duaa-compact-head">
-            <div class="duaa-head-title">
-              <i class="fas fa-hands-praying duaa-head-icon"></i>
-              <span id="duaaHeader">دعاء اليوم</span>
-            </div>
-            <div class="duaa-actions">
-              <!-- <button class="duaa-action-btn" id="nextDuaaBtn" onclick="nextRandomDuaa()" title="دعاء آخر">
-                <i class="fas fa-sync-alt"></i>
-                <span class="duaa-btn-label">آخر</span>
-              </button> -->
-              <button class="duaa-action-btn" id="copyDuaaBtn" onclick="copyCurrentDuaa()" title="نسخ الدعاء">
-                <i class="far fa-copy"></i>
-                <span class="duaa-btn-label" id="copyDuaaLabel">نسخ</span>
-              </button>
-              <!-- <button class="duaa-action-btn" id="shareDuaaBtn" onclick="shareCurrentDuaa()" title="مشاركة الدعاء">
-                <i class="fas fa-share-alt"></i>
-              </button> -->
-            </div>
-          </div>
-          <div class="duaa-body-wrap">
-            <p class="duaa-compact-text" id="dailyDuaaText">جاري تحميل دعاء اليوم...</p>
-          </div>
-          <div class="duaa-footer" id="duaaFooter">
-            <span class="duaa-source-badge" id="duaaSourceBadge">
-              <i class="fas fa-bookmark"></i>
-              <span id="duaaSourceText">القرآن الكريم والسنة</span>
-            </span>
-          </div>
-        </div>
-
-        <!-- ==============================================
-             PRAYER TIMES SECTION
-             ============================================== -->
-        <div class="prayer-times-section" id="prayerTimesSection">
-          <div class="prayer-times-header">
-            <h3 class="prayer-times-title">
-              <i class="fas fa-mosque"></i>
-              مواقيت الصلاة
-            </h3>
-            <div class="prayer-times-location" id="prayerLocation">
-              <button class="location-btn" id="locationBtn" title="تحديث الموقع">
-                <i class="fas fa-map-marker-alt"></i>
-                <span id="cityName">جاري تحديد الموقع...</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="next-prayer-countdown" id="nextPrayerCountdown">
-            <span class="countdown-label">الصلاة القادمة:</span>
-            <span class="countdown-prayer" id="nextPrayerName">—</span>
-            <span class="countdown-time" id="countdownTime">—</span>
-          </div>
-
-          <div class="prayer-times-grid" id="prayerTimesGrid">
-            <!-- Prayer cards will be populated by JavaScript -->
-          </div>
-
-          <div class="prayer-times-loading" id="prayerTimesLoading">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>جاري تحميل مواقيت الصلاة...</p>
-          </div>
-
-          <div class="prayer-times-error hidden" id="prayerTimesError">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p>تعذر تحميل مواقيت الصلاة</p>
-            <button class="retry-btn" id="retryPrayerTimes">
-              <i class="fas fa-redo"></i>
-              إعادة المحاولة
-            </button>
-          </div>
-        </div>
-
-        <!-- ==============================================
-             QIBLA CARD COMPACT
-             ============================================== -->
-        <div class="qibla-card-compact" id="qiblaSection">
-          <div class="qibla-compact-top">
-            <div class="qibla-title-group">
-              <!-- <i class="fas fa-kaaba qibla-title-icon"></i> -->
-              <span class="qibla-compact-title">اتجاه القبلة</span>
-            </div>
-            <button class="qibla-compact-btn" id="qiblaCalibrateBtn" title="تفعيل البوصلة">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                <polyline points="23 4 23 10 17 10" />
-                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-              </svg>
-            </button>
-          </div>
-          <!-- Mini Compass -->
-          <div class="qibla-mini-compass-wrap">
-            <div class="qibla-mini-compass" id="compass">
-              <div class="qibla-mini-dial">
-                <span class="qmc-dir qmc-n">🕋</span>
-                <span class="qmc-dir qmc-e">E</span>
-                <span class="qmc-dir qmc-s">S</span>
-                <span class="qmc-dir qmc-w">W</span>
-                <div class="qibla-mini-needle" id="compassNeedle">
-                  <div class="qmn-tip"></div>
-                  <div class="qmn-tail"></div>
-                </div>
-                <div class="qibla-mini-center"></div>
-              </div>
-            </div>
-            <div class="qibla-mini-info">
-              <span class="qibla-compact-deg" id="qiblaDegrees">—°</span>
-              <span class="qibla-compact-status" id="qiblaStatus">اضغط لتفعيل البوصلة</span>
-            </div>
-          </div>
-        </div>
+        <!-- Continue Reading Pill -->
+        <div class="continue-reading-pill hidden" id="continueReadingPill"></div>
 
       </section>
 
@@ -837,41 +694,7 @@
     </div>
   </main>
 
-  <!-- Counter Modal -->
-  <div id="counterModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modalTitle">عَدَّادُ الذِّكْر</h3>
-        <span class="close">&times;</span>
-      </div>
-      <div class="modal-body">
-        <div class="counter-display">
-          <div class="count-number" id="countNumber">٠</div>
-          <div class="count-total">مِن <span id="totalCount">٠</span></div>
-        </div>
 
-        <div class="fadl-section" id="fadlSection">
-          <div class="fadl-header">
-            <i class="fas fa-star"></i>
-          </div>
-          <p class="fadl-text" id="fadlText"></p>
-        </div>
-
-        <div class="counter-controls">
-          <button class="count-btn" id="countBtn">
-            <i class="fas fa-plus"></i>
-          </button>
-          <button class="reset-btn" id="resetBtn">
-            <i class="fas fa-redo"></i>
-            إعادة تعيين
-          </button>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Sunnah Fasting Guide Modal -->
   <div id="fastingGuideModal" class="modal fasting-guide-modal">
@@ -985,50 +808,42 @@
     <span id="notificationText">تم النسخ بنجاح!</span>
   </div>
 
-  <!-- Focus Mode Overlay -->
-  <div class="focus-mode-overlay hidden" id="focusModeOverlay">
-    <div class="focus-mode-content">
-      <button class="focus-close-btn" id="focusCloseBtn" onclick="exitFocusMode()">
-        <i class="fas fa-times"></i>
-      </button>
-      <div class="focus-navigation">
-        <button class="focus-nav-btn" id="focusPrevBtn" onclick="focusPrev()">
-          <i class="fas fa-chevron-right"></i>
-        </button>
-        <div class="focus-counter" id="focusCounter">1/10</div>
-        <button class="focus-nav-btn" id="focusNextBtn" onclick="focusNext()">
-          <i class="fas fa-chevron-left"></i>
-        </button>
-      </div>
-      <div class="focus-zikr">
-        <p class="focus-text" id="focusText">الذكر يظهر هنا...</p>
-        <p class="focus-source" id="focusSource">المصدر</p>
-        <p class="focus-fadl" id="focusFadl">الفضل</p>
-      </div>
-      <div class="focus-progress">
-        <div class="focus-progress-bar">
-          <div class="focus-progress-fill" id="focusProgressFill"></div>
+  <!-- Qibla Compass Modal -->
+  <div id="qiblaModal" class="modal qibla-modal">
+    <div class="modal-content qibla-modal-content">
+      <div class="modal-header">
+        <div class="qibla-modal-title">
+          <i class="fas fa-compass modal-gold-icon"></i>
+          <h3>اتجاه القبلة الشريفة</h3>
         </div>
-        <span class="focus-count-text" id="focusCountText">0/3</span>
+        <span class="close" onclick="closeQiblaModal()">&times;</span>
       </div>
-      <button class="focus-count-btn" id="focusCountBtn" onclick="incrementFocusCount()">
-        <i class="fas fa-plus"></i> عدّ
-      </button>
+      <div class="modal-body qibla-modal-body">
+        <div class="qibla-modal-compass-wrap">
+          <div class="qibla-mini-compass" id="compass">
+            <div class="qibla-mini-dial">
+              <span class="qmc-dir qmc-n">🕋</span>
+              <span class="qmc-dir qmc-e">E</span>
+              <span class="qmc-dir qmc-s">S</span>
+              <span class="qmc-dir qmc-w">W</span>
+              <div class="qibla-mini-needle" id="compassNeedle">
+                <div class="qmn-tip"></div>
+                <div class="qmn-tail"></div>
+              </div>
+              <div class="qibla-mini-center"></div>
+            </div>
+          </div>
+          <div class="qibla-modal-info">
+            <div class="qibla-deg-badge" id="qiblaDegrees">136°</div>
+            <p class="qibla-modal-status" id="qiblaStatus">وجّه هاتفك نحو الكعبة المشرفة</p>
+            <button class="qibla-calibrate-action-btn" id="qiblaCalibrateBtn" onclick="requestQiblaPermissions()">
+              <i class="fas fa-sync-alt"></i>
+              <span>تفعيل / معايرة البوصلة</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <!-- Auto-Scroll Speed Control -->
-  <div class="auto-scroll-control hidden" id="autoScrollControl">
-    <button class="scroll-speed-btn" onclick="changeScrollSpeed(-1)">
-      <i class="fas fa-minus"></i>
-    </button>
-    <span id="scrollSpeedLabel">سرعة: متوسطة</span>
-    <button class="scroll-speed-btn" onclick="changeScrollSpeed(1)">
-      <i class="fas fa-plus"></i>
-    </button>
-    <button class="stop-scroll-btn" onclick="toggleAutoScroll()">
-      <i class="fas fa-stop"></i> إيقاف
-    </button>
   </div>
 
   <!-- Offline Indicator -->
