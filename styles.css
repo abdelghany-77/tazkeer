@@ -3868,61 +3868,72 @@ body.dark-mode .location-btn i {
 .next-prayer-countdown {
   background: rgba(26, 138, 92, 0.08);
   border-radius: 14px;
-  padding: 0.65rem 0.9rem;
+  padding: 0.4rem 0.5rem;
   margin-bottom: 0.75rem;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   border: 1px solid rgba(26, 138, 92, 0.2);
   position: relative;
   z-index: 1;
-  flex-wrap: wrap;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
   text-align: center;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .countdown-pulse-icon {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: rgba(26, 138, 92, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #1a8a5c;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   flex-shrink: 0;
 }
 
 .countdown-text-group {
-  display: flex;
+  display: flex !important;
   align-items: center;
-  gap: 0.35rem;
-  flex-wrap: wrap;
   justify-content: center;
+  gap: 0.35rem;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .countdown-label {
-  font-size: 0.82rem;
+  font-size: clamp(0.68rem, 1.8vw, 0.82rem);
   color: #718096;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .countdown-prayer {
-  font-size: 0.96rem;
+  font-size: clamp(0.74rem, 2vw, 0.92rem);
   font-weight: 800;
   color: #2d3748;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .countdown-time {
   font-family: "Cairo", sans-serif;
-  font-size: 0.85rem;
+  font-size: clamp(0.68rem, 1.8vw, 0.82rem);
   color: #1a8a5c;
   font-weight: 700;
   background: rgba(26, 138, 92, 0.12);
-  padding: 0.2rem 0.65rem;
+  padding: 0.18rem 0.45rem;
   border-radius: 12px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .prayer-times-grid {
@@ -4214,23 +4225,30 @@ body.dark-mode .retry-btn:hover {
   }
 
   .next-prayer-countdown {
-    padding: 0.5rem 0.6rem;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-    white-space: normal;
+    padding: 0.35rem 0.45rem;
+    gap: 0.25rem;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
     justify-content: center;
   }
 
+  .countdown-text-group {
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+    gap: 0.25rem;
+  }
+
   .countdown-label {
-    font-size: 0.8rem;
+    font-size: 0.74rem;
   }
 
   .countdown-prayer {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
   }
 
   .countdown-time {
-    font-size: 0.78rem;
+    font-size: 0.74rem;
+    padding: 0.15rem 0.4rem;
   }
 
   .prayer-times-grid {
@@ -4279,23 +4297,30 @@ body.dark-mode .retry-btn:hover {
   }
 
   .next-prayer-countdown {
-    padding: 0.45rem 0.5rem;
-    gap: 0.35rem;
-    flex-wrap: wrap;
-    white-space: normal;
+    padding: 0.35rem 0.35rem;
+    gap: 0.2rem;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
     justify-content: center;
   }
 
+  .countdown-text-group {
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+    gap: 0.2rem;
+  }
+
   .countdown-label {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
   }
 
   .countdown-prayer {
-    font-size: 0.8rem;
+    font-size: 0.76rem;
   }
 
   .countdown-time {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
+    padding: 0.12rem 0.3rem;
   }
 
   .prayer-times-grid {
@@ -8644,6 +8669,23 @@ body.light-mode .swiper-dot {
 
 /* Tiny phones (iPhone SE, 4-inch) */
 @media (max-width: 360px) {
+  .next-prayer-countdown {
+    padding: 0.3rem 0.25rem;
+    gap: 0.15rem;
+  }
+  .countdown-text-group {
+    gap: 0.15rem;
+  }
+  .countdown-label {
+    font-size: 0.62rem;
+  }
+  .countdown-prayer {
+    font-size: 0.7rem;
+  }
+  .countdown-time {
+    font-size: 0.62rem;
+    padding: 0.1rem 0.25rem;
+  }
   .swiper-page-title {
     font-size: 0.85rem;
   }
