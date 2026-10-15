@@ -1693,20 +1693,24 @@ function dismissInstallModal(understood) {
 
 // Setup event listeners
 function setupEventListeners() {
-  // Modal events
-  closeModal.addEventListener("click", closeCounterModal);
+  // Modal events (safe guards for removed legacy modal)
+  if (closeModal) closeModal.addEventListener("click", closeCounterModal);
   window.addEventListener("click", function (e) {
-    if (e.target === modal) {
+    if (modal && e.target === modal) {
       closeCounterModal();
+    }
+    const qModal = document.getElementById("qiblaModal");
+    if (qModal && e.target === qModal) {
+      closeQiblaModal();
     }
   });
 
-  countBtn.addEventListener("click", incrementCounter);
-  resetBtn.addEventListener("click", resetCounter);
+  if (countBtn) countBtn.addEventListener("click", incrementCounter);
+  if (resetBtn) resetBtn.addEventListener("click", resetCounter);
 
   // Keyboard shortcuts
   document.addEventListener("keydown", function (e) {
-    if (modal.style.display === "block") {
+    if (modal && modal.style.display === "block") {
       if (e.key === "Escape") {
         closeCounterModal();
       } else if (e.key === " " || e.key === "Enter") {
@@ -3874,24 +3878,45 @@ const prayerIcons = {
   Isha: "fa-moon",
 };
 
-// Initialize Prayer Times
+// Initialize Prayer Times - Instant load with Cairo default and local cache
 async function initializePrayerTimes() {
   const section = document.getElementById("prayerTimesSection");
   if (!section) return;
 
-  // Get saved location or request new one
+  // 1. Instant Cache Check: Render immediately to eliminate FOEC
+  const cachedDataStr = localStorage.getItem("cachedPrayerTimes");
+  const cachedCity = localStorage.getItem("cachedPrayerCity") || "القاهرة";
+  if (cachedDataStr) {
+    try {
+      prayerTimesData = JSON.parse(cachedDataStr);
+      displayPrayerTimes(cachedCity);
+      startCountdown();
+      const loading = document.getElementById("prayerTimesLoading");
+      if (loading) loading.style.display = "none";
+    } catch (e) {
+      console.warn("Cached prayer times error", e);
+    }
+  }
+
+  // 2. Determine location: use saved or default to Cairo immediately
   const savedLocation = localStorage.getItem("prayerLocation");
+  let lat = 30.0444;
+  let lng = 31.2357;
+  let city = "القاهرة";
 
   if (savedLocation) {
-    const location = JSON.parse(savedLocation);
-    await fetchPrayerTimes(
-      location.latitude,
-      location.longitude,
-      location.city,
-    );
-  } else {
-    await requestLocation();
+    try {
+      const loc = JSON.parse(savedLocation);
+      lat = loc.latitude || lat;
+      lng = loc.longitude || lng;
+      city = loc.city || city;
+    } catch (e) {
+      console.warn("Saved location parse error", e);
+    }
   }
+
+  // 3. Seamlessly fetch fresh times in background
+  fetchPrayerTimes(lat, lng, city);
 
   // Setup event listeners
   const locationBtn = document.getElementById("locationBtn");
@@ -3902,7 +3927,7 @@ async function initializePrayerTimes() {
   }
 
   if (retryBtn) {
-    retryBtn.addEventListener("click", requestLocation);
+    retryBtn.addEventListener("click", () => fetchPrayerTimes(lat, lng, city));
   }
 }
 
@@ -4540,15 +4565,49 @@ const KAABA_LNG = 39.8262;
 
 function initializeQiblaCompass() {
   const calibrateBtn = document.getElementById("qiblaCalibrateBtn");
-
   if (calibrateBtn) {
     calibrateBtn.addEventListener("click", () => {
       requestQiblaPermissions();
     });
   }
+}
 
-  // Auto-initialize if possible
-  initQibla();
+// Open Qibla Compass Modal
+function openQiblaModal() {
+  const modal = document.getElementById("qiblaModal");
+  if (!modal) return;
+  modal.style.display = "flex";
+  document.body.style.overflow = "hidden";
+
+  // Use saved prayerLocation coords if userLocation not yet set
+  if (!userLocation) {
+    const saved = localStorage.getItem("prayerLocation");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        userLocation = { lat: parsed.latitude, lng: parsed.longitude };
+      } catch (e) {}
+    } else {
+      userLocation = { lat: 30.0444, lng: 31.2357 }; // Default Cairo
+    }
+  }
+
+  displayStaticQibla();
+  setupCompass();
+}
+
+// Close Qibla Compass Modal
+function closeQiblaModal() {
+  const modal = document.getElementById("qiblaModal");
+  if (!modal) return;
+  modal.style.display = "none";
+  document.body.style.overflow = "auto";
+
+  // Detach listeners to save device sensors/battery
+  if (typeof handleOrientation === "function") {
+    window.removeEventListener("deviceorientationabsolute", handleOrientation, true);
+    window.removeEventListener("deviceorientation", handleOrientation, true);
+  }
 }
 
 function initQibla() {
@@ -5384,16 +5443,16 @@ function updateCalendarFastingAlert(now) {
 
   if (todayEvents.length > 0) {
     const ev = todayEvents[0];
-    alertEl.className = "cal-fasting-alert cal-fasting-alert--today";
+    alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--today";
     titleEl.textContent = `اليوم  ${ev.name} (${ev.badge})`;
     descEl.textContent = `${ev.detail} — تقبّل الله صيامكم وطاعتكم`;
-    alertEl.style.display = "block";
+    alertEl.style.display = "flex";
   } else if (tomorrowEvents.length > 0) {
     const ev = tomorrowEvents[0];
-    alertEl.className = "cal-fasting-alert cal-fasting-alert--tomorrow";
+    alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--tomorrow";
     titleEl.textContent = `تذكير: غدًا  ${ev.name} (${ev.badge})`;
     descEl.textContent = `${ev.detail} — انوِ الصيام وجهّز سحورك تقبل الله منك`;
-    alertEl.style.display = "block";
+    alertEl.style.display = "flex";
   } else {
     // Search next fasting day within 7 days
     let nextEv = null;
@@ -5421,10 +5480,10 @@ function updateCalendarFastingAlert(now) {
         "الجمعة",
         "السبت",
       ];
-      alertEl.className = "cal-fasting-alert cal-fasting-alert--upcoming";
+      alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--upcoming";
       titleEl.textContent = ` موعد الصيام القادم: يوم ${dayNames[nextDate.getDay()]} (${nextEv.name})`;
       descEl.textContent = `متبقي ${diffDays} أيام — ${nextEv.detail}`;
-      alertEl.style.display = "block";
+      alertEl.style.display = "flex";
     } else {
       alertEl.style.display = "none";
     }
