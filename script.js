@@ -4147,12 +4147,7 @@ function formatArabicRemainingTime(hours, minutes, seconds) {
 
   let result = parts[0];
   for (let i = 1; i < parts.length; i++) {
-    const part = parts[i];
-    if (/^\d/.test(part)) {
-      result += ` و ${part}`;
-    } else {
-      result += ` و${part}`;
-    }
+    result += ` و${parts[i]}`;
   }
 
   return `متبقي ${result}`;
