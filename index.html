@@ -118,17 +118,21 @@
 
           <!-- Smart Compact Fasting Bar -->
           <div class="cal-fasting-smart-card" id="calFastingAlert">
-            <div class="cal-fasting-smart-icon">
-              <i class="fas fa-moon"></i>
+            <div class="cal-fasting-smart-header">
+              <div class="cal-fasting-smart-main">
+                <div class="cal-fasting-smart-icon">
+                  <i class="fas fa-moon"></i>
+                </div>
+                <div class="cal-fasting-smart-title" id="calFastingAlertTitle">
+                  <span class="cal-fasting-title-text">صيام السنن والتطوع</span>
+                </div>
+              </div>
+              <button class="cal-fasting-guide-btn" onclick="openFastingGuideModal()" title="دليل وفضائل صيام التطوع">
+                <i class="fas fa-info-circle"></i>
+                <span>دليل الصيام</span>
+              </button>
             </div>
-            <div class="cal-fasting-smart-info">
-              <span class="cal-fasting-smart-title" id="calFastingAlertTitle">صيام السنن والتطوع</span>
-              <span class="cal-fasting-smart-desc" id="calFastingAlertDesc">الإثنين والخميس والأيام البيض</span>
-            </div>
-            <button class="cal-fasting-guide-btn" onclick="openFastingGuideModal()" title="دليل وفضائل صيام التطوع">
-              <i class="fas fa-info-circle"></i>
-              <span>دليل الصيام</span>
-            </button>
+            <div class="cal-fasting-smart-desc" id="calFastingAlertDesc">الإثنين والخميس والأيام البيض</div>
           </div>
 
           <!-- Compatibility shim for 7-day strip (kept in DOM for JS calculation, minimal UI) -->
