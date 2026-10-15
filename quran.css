@@ -1990,3 +1990,118 @@
 .quran-offline-mini-del:hover {
   color: #ef4444;
 }
+
+/* ================================================================
+   LIGHT MODE – Quran & Khatmah Overrides
+   ================================================================ */
+body.light-mode .khatmah-setup-header,
+body.light-mode .khatmah-dashboard-header,
+body.light-mode .khatmah-surahs-header {
+  color: #1e293b !important;
+}
+
+body.light-mode .khatmah-setup-header h2,
+body.light-mode .khatmah-dashboard-header h2 {
+  color: #1e293b !important;
+}
+
+body.light-mode .khatmah-setup-header p,
+body.light-mode .khatmah-dashboard-header p {
+  color: #64748b !important;
+}
+
+body.light-mode .khatmah-setup-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+
+body.light-mode .goal-type-btn {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+body.light-mode .goal-type-btn.active {
+  background: rgba(26, 138, 92, 0.08) !important;
+  border-color: #1a8a5c !important;
+}
+
+body.light-mode .goal-type-btn .goal-label {
+  color: #1e293b !important;
+}
+
+body.light-mode .goal-type-btn .goal-desc {
+  color: #64748b !important;
+}
+
+body.light-mode .quick-read-btn {
+  border-color: #1a8a5c !important;
+  color: #1a8a5c !important;
+  background: rgba(26, 138, 92, 0.06) !important;
+}
+
+body.light-mode .quick-read-btn:hover {
+  background: #1a8a5c !important;
+  color: #ffffff !important;
+}
+
+body.light-mode .progress-ring-circle {
+  stroke: rgba(26, 138, 92, 0.12) !important;
+}
+
+body.light-mode .progress-ring-text {
+  color: #1e293b !important;
+}
+
+body.light-mode .progress-ring-percent {
+  color: #1e293b !important;
+}
+
+body.light-mode .progress-ring-label {
+  color: #64748b !important;
+}
+
+body.light-mode .khatmah-stat-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.light-mode .khatmah-stat-value {
+  color: #1e293b !important;
+}
+
+body.light-mode .khatmah-stat-label {
+  color: #64748b !important;
+}
+
+body.light-mode .wird-card {
+  background: #ffffff !important;
+  border: 2px solid rgba(212, 168, 71, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.light-mode .wird-card-pages {
+  color: #1e293b !important;
+}
+
+body.light-mode .surah-item {
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-mode .surah-number {
+  background: rgba(26, 138, 92, 0.08) !important;
+  color: #1a8a5c !important;
+}
+
+body.light-mode .surah-name {
+  color: #1e293b !important;
+}
+
+body.light-mode .surah-info {
+  color: #64748b !important;
+}
+

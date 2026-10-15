@@ -2104,8 +2104,8 @@ function createAdhkarSlide(zikr, index, category, track) {
     <div class="slide-body">
       <div class="slide-zikr-text">${zikr.text.replace(/\n/g, "<br>")}</div>
       <div class="slide-meta-row">
-        <span class="slide-source-label">${zikr.source}</span>
-        <button class="slide-copy-btn" onclick="copyText('${safeText}')">
+        <span class="slide-source-label"><i class="fas fa-book-open" style="margin-left: 5px; font-size: 0.72rem; opacity: 0.85;"></i>${zikr.source}</span>
+        <button class="slide-copy-btn" onclick="copyText('${safeText}')" title="نسخ الذكر" aria-label="نسخ الذكر">
           <i class="fas fa-copy"></i>
         </button>
       </div>
