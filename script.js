@@ -5444,13 +5444,13 @@ function updateCalendarFastingAlert(now) {
   if (todayEvents.length > 0) {
     const ev = todayEvents[0];
     alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--today";
-    titleEl.textContent = `اليوم  ${ev.name} (${ev.badge})`;
+    titleEl.innerHTML = `<span class="cal-fasting-title-text">اليوم ${ev.name}</span><span class="cal-fasting-badge">${ev.badge}</span>`;
     descEl.textContent = `${ev.detail} — تقبّل الله صيامكم وطاعتكم`;
     alertEl.style.display = "flex";
   } else if (tomorrowEvents.length > 0) {
     const ev = tomorrowEvents[0];
     alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--tomorrow";
-    titleEl.textContent = `تذكير: غدًا  ${ev.name} (${ev.badge})`;
+    titleEl.innerHTML = `<span class="cal-fasting-title-text">تذكير: غدًا ${ev.name}</span><span class="cal-fasting-badge">${ev.badge}</span>`;
     descEl.textContent = `${ev.detail} — انوِ الصيام وجهّز سحورك تقبل الله منك`;
     alertEl.style.display = "flex";
   } else {
@@ -5481,7 +5481,7 @@ function updateCalendarFastingAlert(now) {
         "السبت",
       ];
       alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--upcoming";
-      titleEl.textContent = ` موعد الصيام القادم: يوم ${dayNames[nextDate.getDay()]} (${nextEv.name})`;
+      titleEl.innerHTML = `<span class="cal-fasting-title-text">موعد الصيام القادم: يوم ${dayNames[nextDate.getDay()]}</span><span class="cal-fasting-badge">${nextEv.name}</span>`;
       descEl.textContent = `متبقي ${diffDays} أيام — ${nextEv.detail}`;
       alertEl.style.display = "flex";
     } else {

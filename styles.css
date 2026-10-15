@@ -5347,14 +5347,15 @@ body.light-mode .cal-greg-row {
   z-index: 2;
   border-radius: 14px;
   margin-top: 0.65rem;
-  overflow: hidden;
   display: flex !important;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.65rem 0.95rem;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.75rem 0.95rem;
   background: rgba(212, 168, 71, 0.08);
   border: 1px solid rgba(212, 168, 71, 0.22);
+  box-sizing: border-box;
+  width: 100%;
+  transition: all 0.25s ease;
 }
 
 .cal-fasting-alert--today {
@@ -5372,150 +5373,108 @@ body.light-mode .cal-greg-row {
   border-color: rgba(56, 189, 248, 0.25) !important;
 }
 
-.cal-fasting-alert-inner {
+.cal-fasting-smart-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.6rem;
-  padding: 0.55rem 0.8rem;
-  border-radius: 12px;
-  background: rgba(212, 168, 71, 0.08);
-  border: 1px solid rgba(212, 168, 71, 0.25);
+  gap: 0.65rem;
+  width: 100%;
 }
 
-.cal-fasting-alert--today .cal-fasting-alert-inner {
-  background: rgba(212, 168, 71, 0.12);
-  border-color: rgba(212, 168, 71, 0.35);
-}
-
-.cal-fasting-alert--tomorrow .cal-fasting-alert-inner {
-  background: rgba(251, 146, 60, 0.1);
-  border-color: rgba(251, 146, 60, 0.3);
-}
-
-.cal-fasting-alert--upcoming .cal-fasting-alert-inner {
-  background: rgba(56, 189, 248, 0.08);
-  border-color: rgba(56, 189, 248, 0.25);
-}
-
-.cal-fasting-alert-text {
+.cal-fasting-smart-main {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
   flex: 1;
   min-width: 0;
-  text-align: right;
-  gap: 0.1rem;
-}
-
-.cal-fasting-alert-title {
-  font-family: "Cairo", sans-serif;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #d4a847;
-}
-
-body.light-mode .cal-fasting-alert-title {
-  color: #b8860b;
-}
-
-.cal-fasting-alert-desc {
-  font-family: "Cairo", sans-serif;
-  font-size: 0.78rem;
-  color: #cbd5e1;
-  line-height: 1.4;
-  white-space: normal;
-  word-break: break-word;
-}
-
-body.light-mode .cal-fasting-alert-desc {
-  color: #475569;
-}
-
-.cal-fasting-alert-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  flex-shrink: 0;
-  padding: 0.25rem 0.65rem;
-  border-radius: 10px;
-  background: rgba(212, 168, 71, 0.15);
-  border: 1px solid rgba(212, 168, 71, 0.3);
-  color: #d4a847;
-  font-family: "Cairo", sans-serif;
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-body.light-mode .cal-fasting-alert-btn {
-  background: rgba(184, 134, 11, 0.12);
-  border-color: rgba(184, 134, 11, 0.25);
-  color: #b8860b;
-}
-
-/* ── Smart Compact Fasting Card ── */
-.cal-fasting-smart-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.65rem 0.95rem;
-  margin-top: 0.65rem;
-  background: rgba(212, 168, 71, 0.08);
-  border: 1px solid rgba(212, 168, 71, 0.22);
-  border-radius: 14px;
-  position: relative;
-  z-index: 2;
 }
 
 .cal-fasting-smart-icon {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 10px;
   background: rgba(212, 168, 71, 0.16);
   color: #ffd700;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 0.95rem;
   flex-shrink: 0;
 }
 
-.cal-fasting-smart-info {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  text-align: right;
-  min-width: 0;
+.cal-fasting-alert--tomorrow .cal-fasting-smart-icon {
+  background: rgba(251, 146, 60, 0.18);
+  color: #fb923c;
+}
+
+.cal-fasting-alert--upcoming .cal-fasting-smart-icon {
+  background: rgba(56, 189, 248, 0.18);
+  color: #38bdf8;
 }
 
 .cal-fasting-smart-title {
-  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  color: #d4a847;
+  color: #ffd700;
   font-family: "Cairo", sans-serif;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.35;
+  min-width: 0;
 }
 
-.cal-fasting-smart-desc {
-  font-size: 0.78rem;
-  color: #cbd5e1;
-  font-family: "Cairo", sans-serif;
-  margin-top: 1px;
-  line-height: 1.35;
+.cal-fasting-title-text {
+  color: #ffd700;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.cal-fasting-alert--tomorrow .cal-fasting-smart-title,
+.cal-fasting-alert--tomorrow .cal-fasting-title-text {
+  color: #fb923c;
+}
+
+.cal-fasting-alert--upcoming .cal-fasting-smart-title,
+.cal-fasting-alert--upcoming .cal-fasting-title-text {
+  color: #38bdf8;
+}
+
+.cal-fasting-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  border-radius: 6px;
+  background: rgba(212, 168, 71, 0.2);
+  color: #fef08a;
+  border: 1px solid rgba(212, 168, 71, 0.35);
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.cal-fasting-alert--tomorrow .cal-fasting-badge {
+  background: rgba(251, 146, 60, 0.2);
+  color: #fed7aa;
+  border-color: rgba(251, 146, 60, 0.35);
+}
+
+.cal-fasting-alert--upcoming .cal-fasting-badge {
+  background: rgba(56, 189, 248, 0.2);
+  color: #bae6fd;
+  border-color: rgba(56, 189, 248, 0.35);
 }
 
 .cal-fasting-guide-btn {
   background: linear-gradient(135deg, rgba(212, 168, 71, 0.22), rgba(212, 168, 71, 0.1));
   border: 1px solid rgba(212, 168, 71, 0.35);
   border-radius: 20px;
-  padding: 0.32rem 0.75rem;
+  padding: 0.3rem 0.7rem;
   color: #ffd700;
   font-family: "Cairo", sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -5533,22 +5492,124 @@ body.light-mode .cal-fasting-alert-btn {
   transform: translateY(-1px);
 }
 
+.cal-fasting-alert--tomorrow .cal-fasting-guide-btn {
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.22), rgba(251, 146, 60, 0.1));
+  border-color: rgba(251, 146, 60, 0.35);
+  color: #fb923c;
+}
+
+.cal-fasting-alert--upcoming .cal-fasting-guide-btn {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(56, 189, 248, 0.1));
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+}
+
+.cal-fasting-smart-desc {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  font-family: "Cairo", sans-serif;
+  line-height: 1.5;
+  padding-top: 0.45rem;
+  border-top: 1px dashed rgba(212, 168, 71, 0.2);
+  word-break: break-word;
+  white-space: normal;
+}
+
+.cal-fasting-alert--tomorrow .cal-fasting-smart-desc {
+  border-top-color: rgba(251, 146, 60, 0.2);
+}
+
+.cal-fasting-alert--upcoming .cal-fasting-smart-desc {
+  border-top-color: rgba(56, 189, 248, 0.2);
+}
+
+@media (max-width: 480px) {
+  .cal-fasting-guide-btn {
+    padding: 0.28rem 0.6rem;
+    font-size: 0.72rem;
+  }
+}
+
+/* Light mode support */
 body.light-mode .cal-fasting-smart-card {
   background: rgba(184, 134, 11, 0.05);
   border-color: rgba(184, 134, 11, 0.18);
 }
 
+body.light-mode .cal-fasting-alert--today {
+  background: rgba(184, 134, 11, 0.08) !important;
+  border-color: rgba(184, 134, 11, 0.28) !important;
+}
+
+body.light-mode .cal-fasting-alert--tomorrow {
+  background: rgba(234, 88, 12, 0.08) !important;
+  border-color: rgba(234, 88, 12, 0.25) !important;
+}
+
+body.light-mode .cal-fasting-alert--upcoming {
+  background: rgba(2, 132, 199, 0.08) !important;
+  border-color: rgba(2, 132, 199, 0.22) !important;
+}
+
 body.light-mode .cal-fasting-smart-icon {
-  background: rgba(184, 134, 11, 0.1);
+  background: rgba(184, 134, 11, 0.12);
   color: #b8860b;
 }
 
-body.light-mode .cal-fasting-smart-title {
-  color: #b8860b;
+body.light-mode .cal-fasting-alert--tomorrow .cal-fasting-smart-icon {
+  background: rgba(234, 88, 12, 0.12);
+  color: #c2410c;
+}
+
+body.light-mode .cal-fasting-alert--upcoming .cal-fasting-smart-icon {
+  background: rgba(2, 132, 199, 0.12);
+  color: #0369a1;
+}
+
+body.light-mode .cal-fasting-smart-title,
+body.light-mode .cal-fasting-title-text {
+  color: #92400e;
+}
+
+body.light-mode .cal-fasting-alert--tomorrow .cal-fasting-smart-title,
+body.light-mode .cal-fasting-alert--tomorrow .cal-fasting-title-text {
+  color: #9a3412;
+}
+
+body.light-mode .cal-fasting-alert--upcoming .cal-fasting-smart-title,
+body.light-mode .cal-fasting-alert--upcoming .cal-fasting-title-text {
+  color: #075985;
+}
+
+body.light-mode .cal-fasting-badge {
+  background: rgba(184, 134, 11, 0.12);
+  color: #78350f;
+  border-color: rgba(184, 134, 11, 0.25);
+}
+
+body.light-mode .cal-fasting-alert--tomorrow .cal-fasting-badge {
+  background: rgba(234, 88, 12, 0.12);
+  color: #9a3412;
+  border-color: rgba(234, 88, 12, 0.25);
+}
+
+body.light-mode .cal-fasting-alert--upcoming .cal-fasting-badge {
+  background: rgba(2, 132, 199, 0.12);
+  color: #075985;
+  border-color: rgba(2, 132, 199, 0.25);
 }
 
 body.light-mode .cal-fasting-smart-desc {
   color: #475569;
+  border-top-color: rgba(184, 134, 11, 0.15);
+}
+
+body.light-mode .cal-fasting-alert--tomorrow .cal-fasting-smart-desc {
+  border-top-color: rgba(234, 88, 12, 0.15);
+}
+
+body.light-mode .cal-fasting-alert--upcoming .cal-fasting-smart-desc {
+  border-top-color: rgba(2, 132, 199, 0.15);
 }
 
 body.light-mode .cal-fasting-guide-btn {
