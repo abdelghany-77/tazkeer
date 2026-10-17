@@ -2072,19 +2072,84 @@ function loadCategory(category) {
   });
 }
 
-// Create one swiper slide
+// Format Dhikr text for maximum visual clarity
+function formatZikrDisplayHtml(text) {
+  if (!text) return "";
+  let formatted = text.trim();
+
+  // Highlight Bismillah as an ornamental header if present at the start
+  const basmalaPattern = /^بِسْمِ اللهِ الرَّحْمنِ الرَّحِيم\s*/;
+  let hasBasmala = false;
+  if (basmalaPattern.test(formatted)) {
+    hasBasmala = true;
+    formatted = formatted.replace(basmalaPattern, "").trim();
+  }
+
+  // Format Ayah brackets e.g. ﴿١﴾ with ornamental gold styling
+  formatted = formatted.replace(
+    /﴿\s*([٠-٩\d]+)\s*﴾/g,
+    '<span class="quran-aya-num">﴿$1﴾</span>',
+  );
+
+  // Convert newlines to breaks
+  formatted = formatted.replace(/\n/g, "<br>");
+
+  if (hasBasmala) {
+    return `<div class="bismillah-header">بِسْمِ اللهِ الرَّحْمنِ الرَّحِيم</div><div class="zikr-content-lines">${formatted}</div>`;
+  }
+  return `<div class="zikr-content-lines">${formatted}</div>`;
+}
+
+// Toggle collapsible Fadl drawer
+function toggleSlideFadl(triggerEl) {
+  const card = triggerEl.closest(".slide-body");
+  if (!card) return;
+  const fadlBox = card.querySelector(".slide-fadl-box");
+  if (fadlBox) {
+    const isCollapsed = fadlBox.classList.contains("collapsed");
+    fadlBox.classList.toggle("collapsed", !isCollapsed);
+    triggerEl.classList.toggle("active", isCollapsed);
+  }
+}
+
+// Share Dhikr helper
+function shareZikr(text, source) {
+  const cleanText = text.replace(/<[^>]*>/g, "");
+  const shareData = {
+    title: "تطبيق ذَكِّرْ",
+    text: `${cleanText}\n[${source}]\n\nتم المشاركة من تطبيق ذَكِّرْ 🌙`,
+  };
+  if (navigator.share) {
+    navigator.share(shareData).catch(() => {});
+  } else {
+    copyText(`${cleanText}\n[${source}]`);
+    showNotification("تم نسخ الذكر للمشاركة");
+  }
+}
+
+// Create one swiper slide with Reader-First layout
 function createAdhkarSlide(zikr, index, category, track) {
   const isCompleted = zikr.currentCount >= zikr.count;
   const safeText = zikr.text
     .replace(/\\/g, "\\\\")
     .replace(/'/g, "\\'")
     .replace(/\n/g, " ");
+  const safeSource = (zikr.source || "")
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'");
 
   const totalSlides = adhkarData[category]
     ? adhkarData[category].adhkar.length
     : 0;
   const isFirst = index === 0;
   const isLast = index === totalSlides - 1;
+  const isLong = zikr.text.length > 180;
+
+  // Circular ring calculation (radius 44 → circumference ≈ 276.46)
+  const circumference = 276.46;
+  const progressRatio = Math.min(1, zikr.currentCount / zikr.count);
+  const ringOffset = circumference * (1 - progressRatio);
+  const remainingCount = Math.max(0, zikr.count - zikr.currentCount);
 
   const slide = document.createElement("div");
   slide.className = "azkar-slide";
@@ -2092,21 +2157,42 @@ function createAdhkarSlide(zikr, index, category, track) {
 
   slide.innerHTML = `
     <div class="slide-body">
-      <div class="slide-zikr-text">${zikr.text.replace(/\n/g, "<br>")}</div>
-      <div class="slide-meta-row">
-        <span class="slide-source-label"><i class="fas fa-book-open" style="margin-left: 5px; font-size: 0.72rem; opacity: 0.85;"></i>${zikr.source}</span>
-        <button class="slide-copy-btn" onclick="copyText('${safeText}')" title="نسخ الذكر" aria-label="نسخ الذكر">
-          <i class="fas fa-copy"></i>
-        </button>
+      <!-- ── Hero Reading Text Container ── -->
+      <div class="slide-text-container">
+        <div class="slide-zikr-text ${isLong ? "long-text" : ""}">
+          ${formatZikrDisplayHtml(zikr.text)}
+        </div>
       </div>
+
+      <!-- ── Meta Row (Source & Fadl Trigger & Copy) ── -->
+      <div class="slide-meta-row">
+        <span class="slide-source-label">
+          <i class="fas fa-book-open"></i> ${zikr.source}
+        </span>
+        <div class="slide-meta-actions">
+          ${
+            zikr.fadl
+              ? `<button class="slide-fadl-toggle" onclick="toggleSlideFadl(this)" title="فضل الذكر" aria-label="فضل الذكر">
+                   <i class="fas fa-star"></i> <span>فضل الذكر</span> <i class="fas fa-chevron-down arrow-indicator"></i>
+                 </button>`
+              : ""
+          }
+          <button class="slide-copy-btn" onclick="copyText('${safeText}')" title="نسخ الذكر" aria-label="نسخ الذكر">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Collapsible Fadl Box ── -->
       ${
         zikr.fadl
-          ? `<div class="slide-fadl" onclick="this.classList.toggle('collapsed')">
-              <div class="slide-fadl-header"><i class="fas fa-star"></i> فضل الذكر <i class="fas fa-chevron-down"></i></div>
-              <div class="slide-fadl-body"><p>${zikr.fadl}</p></div>
-            </div>`
+          ? `<div class="slide-fadl-box collapsed">
+               <div class="slide-fadl-content"><p>${zikr.fadl}</p></div>
+             </div>`
           : ""
       }
+
+      <!-- ── Ergonomic Thumb Counter Area ── -->
       <div class="slide-counter-area">
         <div class="slide-counter-row">
           <button
@@ -2119,12 +2205,28 @@ function createAdhkarSlide(zikr, index, category, track) {
             <i class="fas fa-chevron-right"></i>
           </button>
 
+          <!-- Circular Button with SVG Progress Ring -->
           <button
             class="slide-counter-btn${isCompleted ? " completed" : ""}"
             id="slideCounterBtn_${category}_${index}"
             ${isCompleted ? "disabled" : ""}
+            aria-label="عدّ الذكر"
           >
-            <span class="counter-num">${isCompleted ? "✓" : toArabicNumerals(zikr.currentCount) + " / " + toArabicNumerals(zikr.count)}</span>
+            <svg class="counter-ring-svg" viewBox="0 0 100 100">
+              <circle class="ring-bg" cx="50" cy="50" r="44" />
+              <circle 
+                class="ring-progress" 
+                id="ringProgress_${category}_${index}" 
+                cx="50" 
+                cy="50" 
+                r="44" 
+                style="stroke-dasharray: ${circumference}; stroke-dashoffset: ${ringOffset};" 
+              />
+            </svg>
+            <div class="counter-btn-inner">
+              <span class="counter-num">${isCompleted ? "✓" : toArabicNumerals(remainingCount)}</span>
+              <span class="counter-lbl">${isCompleted ? "مكتمل" : (zikr.count > 1 ? "متبقي" : "مرة")}</span>
+            </div>
           </button>
 
           <button
@@ -2137,13 +2239,15 @@ function createAdhkarSlide(zikr, index, category, track) {
             <i class="fas fa-chevron-left"></i>
           </button>
         </div>
-        <p class="counter-hint">${
-          isCompleted
-            ? "بارك الله فيك"
-            : zikr.count > 1
-              ? "اضغط للعدّ"
-              : "اضغط للإتمام"
-        }</p>
+        <div class="counter-status-hint">
+          <span class="counter-hint-text">${
+            isCompleted
+              ? "تقبل الله طاعتكم ✓"
+              : zikr.count > 1
+                ? "اضغط في أي مكان للعدّ"
+                : "اضغط للإتمام"
+          }</span>
+        </div>
       </div>
     </div>
   `;
@@ -2158,7 +2262,7 @@ function createAdhkarSlide(zikr, index, category, track) {
   slide.addEventListener("click", (e) => {
     if (
       e.target.closest(
-        "button, a, .slide-fadl, .slide-copy-btn, .slide-nav-arrow",
+        "button, a, .slide-fadl-toggle, .slide-fadl-box, .slide-copy-btn, .slide-nav-arrow",
       )
     ) {
       return;
@@ -2436,19 +2540,27 @@ function updateCardProgress(category, index) {
   );
   if (swiperBtn) {
     const numEl = swiperBtn.querySelector(".counter-num");
+    const lblEl = swiperBtn.querySelector(".counter-lbl");
+    const ringEl = document.getElementById(`ringProgress_${category}_${index}`);
     const areaEl = swiperBtn.closest(".slide-counter-area");
-    const hintEl = areaEl ? areaEl.querySelector(".counter-hint") : null;
+    const hintEl = areaEl ? areaEl.querySelector(".counter-hint-text") : null;
 
-    if (numEl)
-      numEl.textContent = isCompleted
-        ? "✓"
-        : toArabicNumerals(zikr.currentCount) +
-          " / " +
-          toArabicNumerals(zikr.count);
+    const remaining = Math.max(0, zikr.count - zikr.currentCount);
+    if (numEl) numEl.textContent = isCompleted ? "✓" : toArabicNumerals(remaining);
+    if (lblEl) lblEl.textContent = isCompleted ? "مكتمل" : (zikr.count > 1 ? "متبقي" : "مرة");
+
+    // Circular SVG Progress Ring update
+    if (ringEl) {
+      const circumference = 276.46; // 2 * PI * 44
+      const ratio = Math.min(1, zikr.currentCount / zikr.count);
+      const offset = circumference * (1 - ratio);
+      ringEl.style.strokeDashoffset = offset;
+    }
+
     if (isCompleted) {
       swiperBtn.classList.add("completed");
       swiperBtn.disabled = true;
-      if (hintEl) hintEl.textContent = "بارك الله فيك";
+      if (hintEl) hintEl.textContent = "تقبل الله طاعتكم ✓";
       swiperBtn.style.animation = "swiperCounterComplete 0.4s ease forwards";
       setTimeout(() => {
         if (swiperBtn) swiperBtn.style.animation = "";
@@ -2456,6 +2568,9 @@ function updateCardProgress(category, index) {
     } else {
       swiperBtn.classList.remove("completed");
       swiperBtn.disabled = false;
+      if (hintEl)
+        hintEl.textContent =
+          zikr.count > 1 ? "اضغط في أي مكان للعدّ" : "اضغط للإتمام";
       swiperBtn.style.animation = "swiperCounterPulse 0.18s ease";
       setTimeout(() => {
         if (swiperBtn) swiperBtn.style.animation = "";
@@ -2679,7 +2794,7 @@ function updateSwiperUI(category, index) {
   if (nextBtn) nextBtn.classList.toggle("disabled", index >= total - 1);
 }
 
-// Keyboard arrow controls for Azkar swiper
+// Keyboard arrow & spacebar controls for Azkar swiper
 document.addEventListener("keydown", (e) => {
   const catPage = document.getElementById("categoryPage");
   if (!catPage || catPage.classList.contains("hidden")) return;
@@ -2687,6 +2802,19 @@ document.addEventListener("keydown", (e) => {
     swiperNextSlide();
   } else if (e.key === "ArrowRight") {
     swiperPrevSlide();
+  } else if (e.code === "Space" || e.key === " ") {
+    // Spacebar to count on desktop
+    e.preventDefault();
+    if (currentCategory && _currentSwiperIndex !== null) {
+      decrementSlideCounter(currentCategory, _currentSwiperIndex);
+      const track = document.getElementById("azkarSwiperTrack");
+      if (track) {
+        const slides = track.querySelectorAll(".azkar-slide");
+        if (slides[_currentSwiperIndex]) {
+          createTapRipple({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 }, slides[_currentSwiperIndex]);
+        }
+      }
+    }
   }
 });
 
@@ -2764,7 +2892,11 @@ function adjustSwiperFont(delta) {
 function applyCurrentSwiperFont() {
   const size = SWIPER_FONT_SIZES[swiperFontSizeIndex];
   document.querySelectorAll(".slide-zikr-text").forEach((el) => {
-    el.style.fontSize = size + "rem";
+    if (el.classList.contains("long-text")) {
+      el.style.fontSize = (size * 0.88) + "rem";
+    } else {
+      el.style.fontSize = size + "rem";
+    }
   });
 }
 
