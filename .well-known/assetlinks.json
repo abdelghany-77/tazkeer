@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.abdelghany.tazkeer",
+        "sha256_cert_fingerprints": ["07:D5:CB:FE:B0:FC:92:93:45:4F:0A:95:14:DD:C5:31:7F:F9:84:91:30:D3:CB:A6:E4:0A:AE:A7:A3:65:65:6F"]
+      }
+    }]
