@@ -1,4 +1,4 @@
-const CACHE_NAME = "tazkeer-v8.14";
+const CACHE_NAME = "tazkeer-v8.15                                                                                ةةةةةةةةةةةةةةوة";
 const QURAN_CACHE_NAME = "tazkeer-quran-pages-v1";
 const PROPHETS_CACHE_NAME = "tazkeer-prophets-v1";
 const urlsToCache = [
@@ -58,13 +58,16 @@ self.addEventListener("fetch", function (event) {
             return networkResponse;
           });
         });
-      })
+      }),
     );
     return;
   }
 
   // Dedicated cache strategy for Prophet story JSON files (Cache-First)
-  if (url.pathname.includes("data/prophets/") && url.pathname.endsWith(".json")) {
+  if (
+    url.pathname.includes("data/prophets/") &&
+    url.pathname.endsWith(".json")
+  ) {
     event.respondWith(
       caches.open(PROPHETS_CACHE_NAME).then(function (prophetsCache) {
         return prophetsCache.match(event.request).then(function (response) {
@@ -78,7 +81,7 @@ self.addEventListener("fetch", function (event) {
             return networkResponse;
           });
         });
-      })
+      }),
     );
     return;
   }
@@ -145,7 +148,11 @@ self.addEventListener("activate", function (event) {
       .then(function (cacheNames) {
         return Promise.all(
           cacheNames.map(function (cacheName) {
-            if (cacheName !== CACHE_NAME && cacheName !== QURAN_CACHE_NAME && cacheName !== PROPHETS_CACHE_NAME) {
+            if (
+              cacheName !== CACHE_NAME &&
+              cacheName !== QURAN_CACHE_NAME &&
+              cacheName !== PROPHETS_CACHE_NAME
+            ) {
               console.log("Deleting old cache:", cacheName);
               return caches.delete(cacheName);
             }
@@ -162,8 +169,8 @@ self.addEventListener("activate", function (event) {
 self.addEventListener("push", function (event) {
   const options = {
     body: event.data ? event.data.text() : "حان وقت الذكر",
-    icon: "./favicon.svg",
-    badge: "./favicon.svg",
+    icon: "./images/icon-192.png",
+    badge: "./images/icon-192.png",
     vibrate: [100, 50, 100],
     dir: "rtl",
     lang: "ar",
