@@ -53,7 +53,8 @@
           ذَكِّرْ
         </h1>
         <nav class="nav" id="nav">
-          <button class="nav-btn misbaha-header-btn" onclick="openMisbaha()" title="المسبحة الإلكترونية" aria-label="المسبحة الإلكترونية">
+          <button class="nav-btn misbaha-header-btn" onclick="openMisbaha()" title="المسبحة الإلكترونية"
+            aria-label="المسبحة الإلكترونية">
             <i class="fas fa-fingerprint"></i>
             <span class="nav-btn-text">المسبحة</span>
           </button>
@@ -99,7 +100,7 @@
               <span class="cal-hero-day" id="dayName">اليوم</span>
               <span class="cal-today-tag">اليوم</span>
             </div>
-            
+
             <div class="cal-dates-column">
               <div class="cal-hijri-row">
                 <span class="cal-hijri-text" id="hijriFullDate">
@@ -165,27 +166,16 @@
             </div>
           </div>
 
-          <!-- Adhan Smart Status & Permission Bar -->
-          <div class="adhan-status-bar" id="adhanStatusBar">
-            <div class="adhan-status-info">
-              <span class="adhan-status-indicator" id="adhanStatusIndicator">
-                <i class="fas fa-bell"></i>
-              </span>
-              <div class="adhan-status-text">
-                <span class="adhan-status-title" id="adhanStatusTitle">إشعارات الأذان التلقائي</span>
-                <span class="adhan-status-desc" id="adhanStatusDesc">انقر للسماح بالتنبيهات عند دخول الوقت</span>
-              </div>
+          <!-- Compact Adhan Status & Permission Alert -->
+          <div class="adhan-perm-mini-bar" id="adhanPermMiniBar">
+            <div class="adhan-perm-mini-content">
+              <i class="fas fa-bell" id="adhanPermMiniIcon"></i>
+              <span id="adhanPermMiniText">تفعيل صوت الأذان</span>
             </div>
-            <div class="adhan-status-actions">
-              <button class="adhan-perm-action-btn" id="adhanPermActionBtn" onclick="window.TazkeerAdhan && window.TazkeerAdhan.handlePermissionButtonClick()" title="السماح بإشعارات الأذان">
-                <i class="fas fa-bell"></i>
-                <span id="adhanPermBtnText">السماح بالإشعارات</span>
-              </button>
-              <button class="adhan-test-action-btn" id="adhanTestActionBtn" onclick="window.TazkeerAdhan && window.TazkeerAdhan.testAdhanNotification()" title="تجربة تشغيل الأذان بعد 5 ثوانٍ">
-                <i class="fas fa-play"></i>
-                <span>تجربة (5 ثوانٍ)</span>
-              </button>
-            </div>
+            <button class="adhan-perm-mini-btn" id="adhanPermMiniBtn" type="button"
+              onclick="window.TazkeerAdhan && window.TazkeerAdhan.handlePermissionButtonClick()">
+              <span id="adhanPermMiniBtnText">تفعيل</span>
+            </button>
           </div>
 
           <div class="next-prayer-countdown" id="nextPrayerCountdown">
@@ -203,27 +193,45 @@
             <!-- Pre-filled default prayer cards to eliminate Flash of Empty Content -->
             <div class="prayer-card" data-prayer="Fajr">
               <div class="prayer-icon"><i class="fas fa-cloud-sun"></i></div>
-              <div class="prayer-info"><div class="prayer-name">الفجر</div><div class="prayer-time">04:30 ص</div></div>
+              <div class="prayer-info">
+                <div class="prayer-name">الفجر</div>
+                <div class="prayer-time">04:30 ص</div>
+              </div>
             </div>
             <div class="prayer-card" data-prayer="Sunrise">
               <div class="prayer-icon"><i class="fas fa-sun"></i></div>
-              <div class="prayer-info"><div class="prayer-name">الشروق</div><div class="prayer-time">06:00 ص</div></div>
+              <div class="prayer-info">
+                <div class="prayer-name">الشروق</div>
+                <div class="prayer-time">06:00 ص</div>
+              </div>
             </div>
             <div class="prayer-card" data-prayer="Dhuhr">
               <div class="prayer-icon"><i class="fas fa-sun"></i></div>
-              <div class="prayer-info"><div class="prayer-name">الظهر</div><div class="prayer-time">12:00 م</div></div>
+              <div class="prayer-info">
+                <div class="prayer-name">الظهر</div>
+                <div class="prayer-time">12:00 م</div>
+              </div>
             </div>
             <div class="prayer-card" data-prayer="Asr">
               <div class="prayer-icon"><i class="fas fa-sun"></i></div>
-              <div class="prayer-info"><div class="prayer-name">العصر</div><div class="prayer-time">03:30 م</div></div>
+              <div class="prayer-info">
+                <div class="prayer-name">العصر</div>
+                <div class="prayer-time">03:30 م</div>
+              </div>
             </div>
             <div class="prayer-card" data-prayer="Maghrib">
               <div class="prayer-icon"><i class="fas fa-cloud-moon"></i></div>
-              <div class="prayer-info"><div class="prayer-name">المغرب</div><div class="prayer-time">06:15 م</div></div>
+              <div class="prayer-info">
+                <div class="prayer-name">المغرب</div>
+                <div class="prayer-time">06:15 م</div>
+              </div>
             </div>
             <div class="prayer-card" data-prayer="Isha">
               <div class="prayer-icon"><i class="fas fa-moon"></i></div>
-              <div class="prayer-info"><div class="prayer-name">العشاء</div><div class="prayer-time">07:45 م</div></div>
+              <div class="prayer-info">
+                <div class="prayer-name">العشاء</div>
+                <div class="prayer-time">07:45 م</div>
+              </div>
             </div>
           </div>
 
@@ -259,7 +267,8 @@
             </div>
           </div>
           <div class="duaa-body-wrap">
-            <p class="duaa-compact-text" id="dailyDuaaText">رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ</p>
+            <p class="duaa-compact-text" id="dailyDuaaText">رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ
+              حَسَنَةً وَقِنَا عَذَابَ النَّارِ</p>
           </div>
           <div class="duaa-footer" id="duaaFooter">
             <span class="duaa-source-badge" id="duaaSourceBadge">
@@ -737,7 +746,8 @@
       <div class="modal-body fasting-modal-body">
         <div class="fasting-guide-intro">
           <i class="fas fa-quote-right intro-quote"></i>
-          <p>قال رسول الله ﷺ: «مَنْ صَامَ يَوْمًا فِي سَبِيلِ اللَّهِ، بَاعَدَ اللَّهُ وَجْهَهُ عَنِ النَّارِ سَبْعِينَ خَرِيفًا» <span class="hadith-ref">[متفق عليه]</span></p>
+          <p>قال رسول الله ﷺ: «مَنْ صَامَ يَوْمًا فِي سَبِيلِ اللَّهِ، بَاعَدَ اللَّهُ وَجْهَهُ عَنِ النَّارِ سَبْعِينَ
+            خَرِيفًا» <span class="hadith-ref">[متفق عليه]</span></p>
         </div>
 
         <div class="fasting-occasions-list">
@@ -748,7 +758,8 @@
               <h4>صيام عاشوراء وتاسوعاء (٩ و١٠ محرم)</h4>
             </div>
             <p class="foc-hadith">
-              قال النبي ﷺ: «صِيَامُ يَوْمِ عَاشُورَاءَ، أَحْتَسِبُ عَلَى اللَّهِ أَنْ يُكَفِّرَ السَّنَةَ الَّتِي قَبْلَهُ» <span class="hadith-ref">[رواه مسلم]</span>. ويُستحب صيام التاسع معه مخالفةً لأهل الكتاب.
+              قال النبي ﷺ: «صِيَامُ يَوْمِ عَاشُورَاءَ، أَحْتَسِبُ عَلَى اللَّهِ أَنْ يُكَفِّرَ السَّنَةَ الَّتِي
+              قَبْلَهُ» <span class="hadith-ref">[رواه مسلم]</span>. ويُستحب صيام التاسع معه مخالفةً لأهل الكتاب.
             </p>
           </div>
 
@@ -759,7 +770,8 @@
               <h4>صيام يوم عرفة (٩ ذو الحجة - لغير الحاج)</h4>
             </div>
             <p class="foc-hadith">
-              قال النبي ﷺ: «صِيَامُ يَوْمِ عَرَفَةَ، أَحْتَسِبُ عَلَى اللَّهِ أَنْ يُكَفِّرَ السَّنَةَ الَّتِي قَبْلَهُ، وَالسَّنَةَ الَّتِي بَعْدَهُ» <span class="hadith-ref">[رواه مسلم]</span>.
+              قال النبي ﷺ: «صِيَامُ يَوْمِ عَرَفَةَ، أَحْتَسِبُ عَلَى اللَّهِ أَنْ يُكَفِّرَ السَّنَةَ الَّتِي قَبْلَهُ،
+              وَالسَّنَةَ الَّتِي بَعْدَهُ» <span class="hadith-ref">[رواه مسلم]</span>.
             </p>
           </div>
 
@@ -770,7 +782,8 @@
               <h4>الأيام البيض (١٣، ١٤، ١٥ من كل شهر هجري)</h4>
             </div>
             <p class="foc-hadith">
-              عن أبي ذر رضي الله عنه قال: أمرنا رسول الله ﷺ أن نصوم من الشهر ثلاثة أيام البيض: ثلاث عشرة، وأربع عشرة، وخمس عشرة، وقال: «هي كَصِيَامِ الدَّهْرِ» <span class="hadith-ref">[رواه النسائي وصححه الألباني]</span>.
+              عن أبي ذر رضي الله عنه قال: أمرنا رسول الله ﷺ أن نصوم من الشهر ثلاثة أيام البيض: ثلاث عشرة، وأربع عشرة،
+              وخمس عشرة، وقال: «هي كَصِيَامِ الدَّهْرِ» <span class="hadith-ref">[رواه النسائي وصححه الألباني]</span>.
             </p>
           </div>
 
@@ -781,7 +794,8 @@
               <h4>صيام يومي الإثنين والخميس</h4>
             </div>
             <p class="foc-hadith">
-              قال النبي ﷺ: «تُعْرَضُ الأَعْمَالُ يَوْمَ الاِثْنَيْنِ وَالْخَمِيسِ، فَأُحِبُّ أَنْ يُعْرَضَ عَمَلِي وَأَنَا صَائِمٌ» <span class="hadith-ref">[رواه الترمذي وقال حديث حسن]</span>.
+              قال النبي ﷺ: «تُعْرَضُ الأَعْمَالُ يَوْمَ الاِثْنَيْنِ وَالْخَمِيسِ، فَأُحِبُّ أَنْ يُعْرَضَ عَمَلِي
+              وَأَنَا صَائِمٌ» <span class="hadith-ref">[رواه الترمذي وقال حديث حسن]</span>.
             </p>
           </div>
 
@@ -792,7 +806,8 @@
               <h4>صيام ستة أيام من شوال</h4>
             </div>
             <p class="foc-hadith">
-              قال رسول الله ﷺ: «مَنْ صَامَ رَمَضَانَ ثُمَّ أَتْبَعَهُ سِتًّا مِنْ شَوَّالٍ، كَانَ كَصِيَامِ الدَّهْرِ» <span class="hadith-ref">[رواه مسلم]</span>.
+              قال رسول الله ﷺ: «مَنْ صَامَ رَمَضَانَ ثُمَّ أَتْبَعَهُ سِتًّا مِنْ شَوَّالٍ، كَانَ كَصِيَامِ الدَّهْرِ»
+              <span class="hadith-ref">[رواه مسلم]</span>.
             </p>
           </div>
 
@@ -803,7 +818,8 @@
               <h4>صيام تسع ذي الحجة (١ - ٨ ذو الحجة + عرفة)</h4>
             </div>
             <p class="foc-hadith">
-              قال ﷺ: «مَا مِنْ أَيَّامٍ الْعَمَلُ الصَّالِحُ فِيهَا أَحَبُّ إِلَى اللَّهِ مِنْ هَذِهِ الأَيَّامِ» <span class="hadith-ref">[رواه البخاري]</span>، والصيام من أفضل الأعمال الصالحة.
+              قال ﷺ: «مَا مِنْ أَيَّامٍ الْعَمَلُ الصَّالِحُ فِيهَا أَحَبُّ إِلَى اللَّهِ مِنْ هَذِهِ الأَيَّامِ» <span
+                class="hadith-ref">[رواه البخاري]</span>، والصيام من أفضل الأعمال الصالحة.
             </p>
           </div>
 
@@ -814,7 +830,8 @@
               <h4>الإكثار من الصيام في شهر المحرّم وشهر شعبان</h4>
             </div>
             <p class="foc-hadith">
-              قال النبي ﷺ: «أَفْضَلُ الصِّيَامِ بَعْدَ شَهْرِ رَمَضَانَ صِيَامُ شَهْرِ اللَّهِ الْمُحَرَّمِ» <span class="hadith-ref">[رواه مسلم]</span>، وكان ﷺ يصوم غالب شهر شعبان.
+              قال النبي ﷺ: «أَفْضَلُ الصِّيَامِ بَعْدَ شَهْرِ رَمَضَانَ صِيَامُ شَهْرِ اللَّهِ الْمُحَرَّمِ» <span
+                class="hadith-ref">[رواه مسلم]</span>، وكان ﷺ يصوم غالب شهر شعبان.
             </p>
           </div>
         </div>
@@ -925,8 +942,12 @@
     </button>
     <button class="bottom-nav-item" data-tab="tab-prophets" onclick="switchTab('tab-prophets')">
       <svg viewBox="0 0 24 24" fill="none" width="24" height="24" class="nav-icon-svg">
-        <path d="M4 4C4 2.89543 4.89543 2 6 2H18C19.1046 2 20 2.89543 20 4V20C20 21.1046 19.1046 22 18 22H6C4.89543 22 4 21.1046 4 20V4Z" fill="currentColor" fill-opacity="0.12" />
-        <path d="M4 4C4 2.89543 4.89543 2 6 2H18C19.1046 2 20 2.89543 20 4V20C20 21.1046 19.1046 22 18 22H6C4.89543 22 4 21.1046 4 20V4Z" stroke="currentColor" stroke-width="1.6" />
+        <path
+          d="M4 4C4 2.89543 4.89543 2 6 2H18C19.1046 2 20 2.89543 20 4V20C20 21.1046 19.1046 22 18 22H6C4.89543 22 4 21.1046 4 20V4Z"
+          fill="currentColor" fill-opacity="0.12" />
+        <path
+          d="M4 4C4 2.89543 4.89543 2 6 2H18C19.1046 2 20 2.89543 20 4V20C20 21.1046 19.1046 22 18 22H6C4.89543 22 4 21.1046 4 20V4Z"
+          stroke="currentColor" stroke-width="1.6" />
         <path d="M8 7H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
         <path d="M8 11H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
         <path d="M8 15H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />

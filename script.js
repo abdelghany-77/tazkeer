@@ -1399,6 +1399,10 @@ const resetAllBtn = document.getElementById("resetAllBtn");
 
 /* ─── Tab Switching System ─── */
 function switchTab(tabId) {
+  // Always restore bottom nav visibility when switching tabs
+  var bottomNav = document.getElementById("bottomNav");
+  if (bottomNav) bottomNav.style.display = "";
+
   // Hide all tab sections
   document.querySelectorAll(".tab-content").forEach(function (section) {
     section.classList.remove("active-tab");
@@ -4293,12 +4297,43 @@ function formatArabicRemainingTime(hours, minutes, seconds) {
   return `متبقي ${result}`;
 }
 
+// State to avoid multi-triggering the adhan in the same minute
+let triggeredPrayersToday = {};
+
 // Update countdown display
 function updateCountdown() {
   if (!prayerTimesData) return;
 
   const now = new Date();
   const prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
+  // ── Auto Adhan Trigger for Prayer Times ──
+  const todayKeyPrefix = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + "_";
+  for (const prayer of prayers) {
+    const timeStr = prayerTimesData[prayer];
+    if (!timeStr) continue;
+    const [pHours, pMinutes] = timeStr.split(":").map(Number);
+    const prayerTimestamp = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      pHours,
+      pMinutes,
+      0,
+      0
+    ).getTime();
+
+    const timeDiff = now.getTime() - prayerTimestamp;
+    const triggerKey = todayKeyPrefix + prayer;
+
+    // Trigger Adhan if within the first 45 seconds of the prayer time and hasn't fired yet
+    if (timeDiff >= 0 && timeDiff < 45000 && !triggeredPrayersToday[triggerKey]) {
+      triggeredPrayersToday[triggerKey] = true;
+      if (window.TazkeerAdhan && typeof window.TazkeerAdhan.onPrayerTimeReached === "function") {
+        window.TazkeerAdhan.onPrayerTimeReached(prayer);
+      }
+    }
+  }
 
   let nextPrayer = null;
   let targetDate = null;
@@ -5365,8 +5400,14 @@ function checkFastingOccasions(date) {
 
   // ── 3. الأيام البيض (13-14-15 من كل شهر هجري) ──
   if (hijri.day >= 13 && hijri.day <= 15) {
+    const whiteDaysMap = {
+      13: "أول الأيام البيض",
+      14: "ثاني الأيام البيض",
+      15: "ثالث الأيام البيض",
+    };
+    const dayLabel = whiteDaysMap[hijri.day] || "الأيام البيض";
     events.push({
-      name: `الأيام البيض (${hijri.day} ${hijri.monthName})`,
+      name: `صيام ${dayLabel} (${hijri.day} ${hijri.monthName})`,
       detail: `صيام ثلاثة أيام من كل شهر كصيام الدهر كله`,
       badge: "سنة شهرية",
       priority: 3,
@@ -5579,13 +5620,13 @@ function updateCalendarFastingAlert(now) {
   if (todayEvents.length > 0) {
     const ev = todayEvents[0];
     alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--today";
-    titleEl.innerHTML = `<span class="cal-fasting-title-text">اليوم ${ev.name}</span><span class="cal-fasting-badge">${ev.badge}</span>`;
+    titleEl.innerHTML = `<span class="cal-fasting-title-text">${ev.name}</span><span class="cal-fasting-badge">${ev.badge}</span>`;
     descEl.textContent = `${ev.detail} — تقبّل الله صيامكم وطاعتكم`;
     alertEl.style.display = "flex";
   } else if (tomorrowEvents.length > 0) {
     const ev = tomorrowEvents[0];
     alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--tomorrow";
-    titleEl.innerHTML = `<span class="cal-fasting-title-text">تذكير: غدًا ${ev.name}</span><span class="cal-fasting-badge">${ev.badge}</span>`;
+    titleEl.innerHTML = `<span class="cal-fasting-title-text">تذكير: ${ev.name} غداً</span><span class="cal-fasting-badge">${ev.badge}</span>`;
     descEl.textContent = `${ev.detail} — انوِ الصيام وجهّز سحورك تقبل الله منك`;
     alertEl.style.display = "flex";
   } else {
