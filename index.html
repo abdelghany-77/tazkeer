@@ -165,6 +165,29 @@
             </div>
           </div>
 
+          <!-- Adhan Smart Status & Permission Bar -->
+          <div class="adhan-status-bar" id="adhanStatusBar">
+            <div class="adhan-status-info">
+              <span class="adhan-status-indicator" id="adhanStatusIndicator">
+                <i class="fas fa-bell"></i>
+              </span>
+              <div class="adhan-status-text">
+                <span class="adhan-status-title" id="adhanStatusTitle">إشعارات الأذان التلقائي</span>
+                <span class="adhan-status-desc" id="adhanStatusDesc">انقر للسماح بالتنبيهات عند دخول الوقت</span>
+              </div>
+            </div>
+            <div class="adhan-status-actions">
+              <button class="adhan-perm-action-btn" id="adhanPermActionBtn" onclick="window.TazkeerAdhan && window.TazkeerAdhan.handlePermissionButtonClick()" title="السماح بإشعارات الأذان">
+                <i class="fas fa-bell"></i>
+                <span id="adhanPermBtnText">السماح بالإشعارات</span>
+              </button>
+              <button class="adhan-test-action-btn" id="adhanTestActionBtn" onclick="window.TazkeerAdhan && window.TazkeerAdhan.testAdhanNotification()" title="تجربة تشغيل الأذان بعد 5 ثوانٍ">
+                <i class="fas fa-play"></i>
+                <span>تجربة (5 ثوانٍ)</span>
+              </button>
+            </div>
+          </div>
+
           <div class="next-prayer-countdown" id="nextPrayerCountdown">
             <!-- <div class="countdown-pulse-icon">
               <i class="far fa-clock"></i>
@@ -992,6 +1015,7 @@
   </div>
 
   <script src="dailyDuas.js"></script>
+  <script src="adhan-native.js"></script>
   <script src="script.js"></script>
   <script src="quran.js"></script>
   <script src="prophets.js"></script>

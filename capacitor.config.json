@@ -1,0 +1,15 @@
+{
+  "appId": "com.abdelghany.tazkeer",
+  "appName": "ذَكِّرْ",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#1a202c",
+      "sound": "adhan.mp3"
+    }
+  }
+}

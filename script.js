@@ -4153,6 +4153,11 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
       displayPrayerTimes(cityName);
       startCountdown();
 
+      // Trigger Native Adhan Scheduler for upcoming 7 days
+      if (window.TazkeerAdhan && typeof window.TazkeerAdhan.schedule7DaysAdhan === "function") {
+        window.TazkeerAdhan.schedule7DaysAdhan(latitude, longitude, prayerTimesData);
+      }
+
       if (loading) loading.style.display = "none";
       if (error) error.classList.add("hidden");
     } else {
@@ -4170,6 +4175,11 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
         prayerTimesData = JSON.parse(cachedDataStr);
         displayPrayerTimes(cachedCity || cityName);
         startCountdown();
+
+        // Trigger Native Adhan Scheduler with cached times
+        if (window.TazkeerAdhan && typeof window.TazkeerAdhan.schedule7DaysAdhan === "function") {
+          window.TazkeerAdhan.schedule7DaysAdhan(latitude, longitude, prayerTimesData);
+        }
 
         if (loading) loading.style.display = "none";
         if (error) error.classList.add("hidden");
@@ -4209,8 +4219,20 @@ function displayPrayerTimes(cityName) {
       const name = prayerNames[prayer];
       const icon = prayerIcons[prayer];
 
+      const hasAdhan = prayer !== "Sunrise";
+      const isEnabled = hasAdhan && (window.TazkeerAdhan ? window.TazkeerAdhan.isAdhanEnabled(prayer) : true);
+      const toggleHtml = hasAdhan ? `
+        <button class="prayer-adhan-btn ${isEnabled ? 'active' : 'muted'}" 
+                onclick="event.stopPropagation(); window.TazkeerAdhan && window.TazkeerAdhan.toggleAdhan('${prayer}', event);" 
+                title="${isEnabled ? 'كتم أذان ' + name : 'تفعيل أذان ' + name}"
+                aria-label="تبديل صوت أذان ${name}">
+          <i class="fas ${isEnabled ? 'fa-bell' : 'fa-bell-slash'}"></i>
+        </button>
+      ` : '';
+
       return `
         <div class="prayer-card" data-prayer="${prayer}">
+          ${toggleHtml}
           <div class="prayer-icon">
             <i class="fas ${icon}"></i>
           </div>
