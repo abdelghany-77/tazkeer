@@ -15,8 +15,8 @@
 
   // Constants
   const STORAGE_KEY_SETTINGS = "tazkeer_adhan_settings";
-  const CHANNEL_REGULAR_ID = "adhan_regular_channel";
-  const CHANNEL_FAJR_ID = "adhan_fajr_channel";
+  const CHANNEL_REGULAR_ID = "adhan_regular_v2";
+  const CHANNEL_FAJR_ID = "adhan_fajr_v2";
 
   const PRAYER_NAMES = {
     Fajr: "الفجر",
@@ -232,14 +232,25 @@
   }
 
   /**
-   * Show modal / guidance on how to enable notifications if blocked
+   * Show modal / guidance on how to enable notifications and exact alarms
    */
   function showPermissionHelpModal() {
+    if (isNativePlatform()) {
+      const msg =
+        "لضمان سماع صوت الأذان في موعده بدقة والتطبيق مغلق:\n\n" +
+        "1. إعدادات الهاتف > التطبيقات > تطبيق (ذَكِّرْ)\n" +
+        "2. الإشعارات: تفعيل السماح بالإشعارات وصوت التنبيه.\n" +
+        "3. المنبهات والتذكيرات (Alarms & Reminders): تفعيل السماح.\n" +
+        "4. البطارية: اختر (غير مقيّد / Unrestricted) لمنع النظام من تجميد التطبيق في الخلفية.";
+      alert(msg);
+      return;
+    }
     const msg =
       "لتفعيل الأذان التلقائي في المتصفح:\n\n" +
-      "1. اضغط على رمز إعدادات الموقع أو علامة القفل بجوار الرابط أعلى الصفحة.\n" +
+      "1. اضغط على رمز إعدادات الموقع أو علامة القفل بجوار الرابط أعلى المتصفح.\n" +
       "2. اضبط خيار (الإشعارات / Notifications) على (سماح / Allow).\n" +
-      "3. أعد تحميل الصفحة ليتم جدولة الأذان تلقائياً في مواقيت الصلاة.";
+      "3. أعد تحميل الصفحة ليتم جدولة الأذان تلقائياً في مواقيت الصلاة.\n\n" +
+      "ملاحظة: لتشغيل الأذان في الخلفية بشكل موثوق والتطبيق مغلق وشاشة الهاتف مقفلة، يرجى تثبيت واستخدام نسخة تطبيق الأندرويد (APK).";
     alert(msg);
   }
 
@@ -252,10 +263,18 @@
     if (!plugin) return false;
 
     try {
-      // 1. Regular Adhan Channel (Dhuhr, Asr, Maghrib, Isha)
+      // Clean up previous channel versions if present
+      try {
+        await plugin.deleteChannel({ id: "adhan_regular_channel" });
+        await plugin.deleteChannel({ id: "adhan_fajr_channel" });
+      } catch (e) {
+        // Ignore if channels did not exist
+      }
+
+      // 1. Regular Adhan Channel (Dhuhr, Asr, Maghrib, Isha) - Sheikh Mishary Alafasy
       await plugin.createChannel({
         id: CHANNEL_REGULAR_ID,
-        name: "أذان الصلوات المفروضة",
+        name: "أذان الصلوات المفروضة (مشاري العفاسي)",
         description:
           "صوت الأذان لمواقيت الصلوات الخمس (الظهر، العصر، المغرب، العشاء)",
         sound: "adhan.mp3", // points to res/raw/adhan.mp3
@@ -266,10 +285,10 @@
         lightColor: "#10B981",
       });
 
-      // 2. Fajr Adhan Channel (Fajr with "الصلاة خير من النوم")
+      // 2. Fajr Adhan Channel - Sheikh Mishary Alafasy Fajr
       await plugin.createChannel({
         id: CHANNEL_FAJR_ID,
-        name: "أذان صلاة الفجر",
+        name: "أذان صلاة الفجر (مشاري العفاسي)",
         description: "صوت أذان صلاة الفجر بصوت ندي وبنداء الصلاة خير من النوم",
         sound: "adhan_fajr.mp3", // points to res/raw/adhan_fajr.mp3
         importance: 5, // NotificationManager.IMPORTANCE_MAX
@@ -281,7 +300,7 @@
 
       channelsInitialized = true;
       console.log(
-        "[AdhanEngine] Native notification channels created successfully.",
+        "[AdhanEngine] Native notification channels created successfully (v2).",
       );
       return true;
     } catch (err) {
@@ -749,6 +768,23 @@
 
     updateToggleButtonsUI();
     updateStatusBarUI();
+
+    // Auto-schedule upcoming 7 days on startup if prayer data is cached
+    try {
+      const cachedDataStr = localStorage.getItem("cachedPrayerTimes");
+      const locStr = localStorage.getItem("prayerLocation");
+      if (cachedDataStr && locStr) {
+        const timings = JSON.parse(cachedDataStr);
+        const loc = JSON.parse(locStr);
+        schedule7DaysAdhan(
+          loc.latitude || 30.0444,
+          loc.longitude || 31.2357,
+          timings,
+        );
+      }
+    } catch (e) {
+      console.warn("[AdhanEngine] Auto-scheduling on init error:", e);
+    }
   }
 
   // Auto-init on DOMContentLoaded or immediate if already loaded
