@@ -3376,39 +3376,56 @@ function updateInstallButtonVisibility() {
   const installBtn = document.getElementById("installBtn");
   if (!installBtn) return;
 
-  if (isStandaloneMode()) {
+  // Hide button only when running inside the already installed native/standalone app
+  if (
+    isStandaloneMode() ||
+    (typeof window !== "undefined" &&
+      window.Capacitor &&
+      typeof window.Capacitor.isNativePlatform === "function" &&
+      window.Capacitor.isNativePlatform())
+  ) {
     installBtn.classList.add("hidden");
     return;
   }
 
-  if (deferredInstallPrompt || isIOSDevice()) {
-    installBtn.classList.remove("hidden");
-  } else {
-    installBtn.classList.add("hidden");
+  // Always visible on web browsers so visitors can download the APK
+  installBtn.classList.remove("hidden");
+}
+
+function downloadApk() {
+  const apkPath = "apk/tazkeer.apk";
+  const link = document.createElement("a");
+  link.href = apkPath;
+  link.setAttribute("download", "ذَكِّرْ.apk");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  if (typeof showEnhancedNotification === "function") {
+    showEnhancedNotification(
+      "جاري تنزيل تطبيق ذَكِّرْ (APK)... يرجى فتح الملف بعد اكتمال التحميل لتثبيته.",
+      "success",
+      7000
+    );
+  } else if (typeof showNotification === "function") {
+    showNotification("جاري تنزيل تطبيق ذَكِّرْ (APK)...");
   }
 }
 
 async function showInstallModal() {
-  if (isStandaloneMode()) {
-    showNotification("التطبيق مثبت بالفعل على جهازك");
+  if (
+    isStandaloneMode() ||
+    (typeof window !== "undefined" &&
+      window.Capacitor &&
+      typeof window.Capacitor.isNativePlatform === "function" &&
+      window.Capacitor.isNativePlatform())
+  ) {
+    showNotification("أنت تستخدم بالفعل التطبيق المثبت على جهازك");
     updateInstallButtonVisibility();
     return;
   }
 
-  if (deferredInstallPrompt) {
-    deferredInstallPrompt.prompt();
-    const choiceResult = await deferredInstallPrompt.userChoice;
-
-    if (choiceResult.outcome === "accepted") {
-      showNotification("تم بدء تثبيت التطبيق");
-    }
-
-    deferredInstallPrompt = null;
-    updateInstallButtonVisibility();
-    return;
-  }
-
-  showManualInstallInstructions();
+  downloadApk();
 }
 
 window.addEventListener("beforeinstallprompt", (event) => {

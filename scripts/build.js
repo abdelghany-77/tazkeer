@@ -27,7 +27,9 @@ const filesToCopy = [
 const dirsToCopy = [
   'images',
   'data',
-  'audio'
+  'audio',
+  'apk',
+  'APK Donwload'
 ];
 
 // Copy individual files
