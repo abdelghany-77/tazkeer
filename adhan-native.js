@@ -1,22 +1,26 @@
 /**
- * tazkeer - Background Adhan Scheduler Engine (CapacitorJS Native & Web Fallback)
+ * tazkeer - Background Adhan Scheduler & Playback Engine (CapacitorJS Native & Web Fallback)
  *
- * Supports:
+ * Capabilities:
  * - Native Android exact alarms (AlarmManager.setExactAndAllowWhileIdle)
- * - Custom high-importance notification channels (sound: res/raw/adhan.mp3, res/raw/adhan_fajr.mp3)
- * - Screen-locked and app-killed playback
- * - 7-day upcoming prayer schedule
+ * - Native ForegroundService media playback (MediaPlayer with AudioFocus and WakeLock)
+ * - Notification with interactive "Stop Adhan" action button
+ * - Native BootReceiver to restore scheduled alarms on device reboot / timezone change
+ * - App-killed and screen-locked full Adhan playback
+ * - 7-day upcoming prayer schedule with offline caching
  * - Per-prayer mute/unmute toggles
- * - Standard Web Audio fallback for web browsers
+ * - Multiple muezzin selection (Mishary Alafasy, Abdulbasit, Makkah)
+ * - Standard Web Audio and notification fallback for browsers
  */
 
 (function () {
   "use strict";
 
-  // Constants
+  // Storage Keys & Channels
   const STORAGE_KEY_SETTINGS = "tazkeer_adhan_settings";
-  const CHANNEL_REGULAR_ID = "adhan_regular_v2";
-  const CHANNEL_FAJR_ID = "adhan_fajr_v2";
+  const STORAGE_KEY_MUEZZIN = "tazkeer_adhan_muezzin";
+  const CHANNEL_REGULAR_ID = "adhan_regular_v3";
+  const CHANNEL_FAJR_ID = "adhan_fajr_v3";
 
   const PRAYER_NAMES = {
     Fajr: "الفجر",
@@ -24,6 +28,27 @@
     Asr: "العصر",
     Maghrib: "المغرب",
     Isha: "العشاء",
+  };
+
+  const MUEZZINS = {
+    alafasy: {
+      id: "alafasy",
+      name: "مشاري راشد العفاسي",
+      regularSound: "adhan.mp3",
+      fajrSound: "adhan_fajr.mp3",
+    },
+    abdulbasit: {
+      id: "abdulbasit",
+      name: "عبد الباسط عبد الصمد",
+      regularSound: "adhan_abdulbasit.mp3",
+      fajrSound: "adhan_fajr.mp3",
+    },
+    makkah: {
+      id: "makkah",
+      name: "أذان الحرم المكي الشريف",
+      regularSound: "adhan_makkah.mp3",
+      fajrSound: "adhan_makkah_fajr.mp3",
+    },
   };
 
   // State
@@ -40,6 +65,16 @@
       typeof window.Capacitor.isNativePlatform === "function" &&
       window.Capacitor.isNativePlatform(),
     );
+  }
+
+  /**
+   * Get AdhanScheduler native plugin safely
+   */
+  function getAdhanSchedulerPlugin() {
+    if (isNativePlatform() && window.Capacitor && window.Capacitor.Plugins) {
+      return window.Capacitor.Plugins.AdhanScheduler || null;
+    }
+    return null;
   }
 
   /**
@@ -64,7 +99,6 @@
     } catch (e) {
       console.warn("[AdhanEngine] Error reading adhan settings:", e);
     }
-    // Default: all 5 prayers enabled
     return {
       Fajr: true,
       Dhuhr: true,
@@ -86,6 +120,31 @@
   }
 
   /**
+   * Get selected Muezzin ID
+   */
+  function getSelectedMuezzin() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_MUEZZIN);
+      if (saved && MUEZZINS[saved]) {
+        return saved;
+      }
+    } catch (e) {}
+    return "alafasy";
+  }
+
+  /**
+   * Set selected Muezzin ID
+   */
+  function setSelectedMuezzin(muezzinId) {
+    if (!MUEZZINS[muezzinId]) return;
+    localStorage.setItem(STORAGE_KEY_MUEZZIN, muezzinId);
+    showToast(`تم اختيار صوت: ${MUEZZINS[muezzinId].name}`, "success");
+
+    // Auto reschedule alarms with new muezzin sound
+    triggerReschedule();
+  }
+
+  /**
    * Check if adhan is enabled for a specific prayer
    */
   function isAdhanEnabled(prayer) {
@@ -95,33 +154,57 @@
   }
 
   /**
-   * Get current notification permission status: 'granted' | 'denied' | 'default' | 'unsupported'
+   * Get permissions summary: notifications, exact alarms, battery optimization
+   */
+  async function checkDetailedPermissions() {
+    const nativePlugin = getAdhanSchedulerPlugin();
+    if (nativePlugin) {
+      try {
+        const perms = await nativePlugin.checkPermissions();
+        return {
+          platform: "native",
+          notifications: perms.notifications || "denied",
+          exactAlarm: perms.exactAlarm || "denied",
+          canScheduleExact: Boolean(perms.canScheduleExact),
+          batteryOptimizationIgnored: Boolean(perms.batteryOptimizationIgnored),
+        };
+      } catch (err) {
+        console.warn("[AdhanEngine] Native checkPermissions error:", err);
+      }
+    }
+
+    // Web fallback check
+    let notif = "unsupported";
+    if (typeof Notification !== "undefined") {
+      notif = Notification.permission;
+    }
+    return {
+      platform: "web",
+      notifications: notif,
+      exactAlarm: "unsupported",
+      canScheduleExact: false,
+      batteryOptimizationIgnored: false,
+    };
+  }
+
+  /**
+   * Get notification permission status
    */
   async function getNotificationPermissionStatus() {
-    const plugin = getLocalNotificationsPlugin();
-    if (plugin) {
-      try {
-        const check = await plugin.checkPermissions();
-        return check.display; // 'granted', 'denied', or 'prompt'
-      } catch (e) {
-        return "prompt";
-      }
-    } else if (typeof Notification !== "undefined") {
-      return Notification.permission; // 'granted', 'denied', 'default'
-    }
-    return "unsupported";
+    const perms = await checkDetailedPermissions();
+    return perms.notifications;
   }
 
   /**
    * Request native or web notification permissions
    */
   async function requestNotificationPermissions() {
-    const plugin = getLocalNotificationsPlugin();
-    if (plugin) {
+    const localPlugin = getLocalNotificationsPlugin();
+    if (localPlugin) {
       try {
-        const check = await plugin.checkPermissions();
+        const check = await localPlugin.checkPermissions();
         if (check.display !== "granted") {
-          const req = await plugin.requestPermissions();
+          const req = await localPlugin.requestPermissions();
           return req.display === "granted";
         }
         return true;
@@ -145,6 +228,49 @@
   }
 
   /**
+   * Request Exact Alarm Permission from Android system settings
+   */
+  async function requestExactAlarmPermission() {
+    const nativePlugin = getAdhanSchedulerPlugin();
+    if (nativePlugin) {
+      const confirmPrompt =
+        "يتطلب نظام أندرويد إذناً خاصاً لتشغيل الأذان في موعده بالثانية.\n\n" +
+        "سيتم الآن فتح إعدادات الهاتف (المنبهات والتذكيرات / Alarms & Reminders).\n" +
+        "يرجى تفعيل خيار 'السماح بضبط المنبهات والتذكيرات' ثم العودة للتطبيق.";
+
+      if (confirm(confirmPrompt)) {
+        try {
+          await nativePlugin.requestExactAlarmPermission();
+        } catch (e) {
+          console.error("[AdhanEngine] Error opening exact alarm settings:", e);
+        }
+      }
+    } else {
+      showPermissionHelpModal();
+    }
+  }
+
+  /**
+   * Request Battery Optimization Exemption
+   */
+  async function requestBatteryOptimizationExemption() {
+    const nativePlugin = getAdhanSchedulerPlugin();
+    if (nativePlugin) {
+      const confirmPrompt =
+        "لمنع نظام أندرويد من تجميد التطبيق أو إيقاف صوت الأذان في الخلفية:\n\n" +
+        "يرجى اختيار 'غير مقيّد / Unrestricted' أو استثناء التطبيق من تحسين البطارية.";
+
+      if (confirm(confirmPrompt)) {
+        try {
+          await nativePlugin.requestBatteryOptimizationExemption();
+        } catch (e) {
+          console.error("[AdhanEngine] Error requesting battery exemption:", e);
+        }
+      }
+    }
+  }
+
+  /**
    * Update the Compact Adhan Permission Alert in UI
    */
   async function updateStatusBarUI() {
@@ -156,79 +282,92 @@
     const btn = document.getElementById("adhanPermMiniBtn");
     const btnText = document.getElementById("adhanPermMiniBtnText");
 
-    if (status === "granted") {
+    const perms = await checkDetailedPermissions();
+
+    if (perms.platform === "native") {
+      if (perms.notifications !== "granted") {
+        bar.classList.remove("hidden", "granted");
+        bar.classList.add("denied");
+        if (icon) icon.className = "fas fa-bell-slash";
+        if (text) text.textContent = "إشعارات الأذان معطلة";
+        if (btnText) btnText.textContent = "سماح";
+        if (btn) btn.onclick = () => handlePermissionButtonClick();
+        return;
+      }
+
+      if (!perms.canScheduleExact) {
+        bar.classList.remove("hidden", "granted");
+        bar.classList.add("denied");
+        if (icon) icon.className = "fas fa-clock";
+        if (text) text.textContent = "مطلوب إذن المنبه الدقيق ليعمل بالخلفية";
+        if (btnText) btnText.textContent = "تفعيل";
+        if (btn) btn.onclick = () => requestExactAlarmPermission();
+        return;
+      }
+
+      // Everything granted natively
       bar.classList.remove("hidden", "denied");
       bar.classList.add("granted");
       if (icon) icon.className = "fas fa-volume-high";
-      if (text) text.textContent = "صوت الأذان مفعّل لجميع الصلوات";
+      if (text) text.textContent = "صوت الأذان";
       if (btnText) btnText.textContent = "مفعّل ✓";
       if (btn) {
         btn.className = "adhan-perm-mini-btn active-granted";
-        btn.onclick = () =>
-          showToast(
-            "صوت الأذان مفعّل.. يمكنك كتم أي صلاة من علامة الجرس على بطاقتها",
-            "info",
-          );
+        btn.onclick = () => openAdhanSettingsModal();
       }
-    } else if (status === "denied") {
-      bar.classList.remove("hidden");
-      bar.classList.add("denied");
-      if (icon) icon.className = "fas fa-exclamation-triangle";
-      if (text) text.textContent = "الإشعارات محظورة في المتصفح";
-      if (btnText) btnText.textContent = "طريقة السماح";
-      if (btn) btn.onclick = () => showPermissionHelpModal();
     } else {
-      // 'default' or 'prompt'
-      bar.classList.remove("hidden", "denied");
-      if (icon) icon.className = "fas fa-bell";
-      if (text) text.textContent = "تفعيل صوت الأذان";
-      if (btnText) btnText.textContent = "تفعيل";
-      if (btn) btn.onclick = () => handlePermissionButtonClick();
+      // Web platform
+      if (perms.notifications === "granted") {
+        bar.classList.remove("hidden", "denied");
+        bar.classList.add("granted");
+        if (icon) icon.className = "fas fa-volume-high";
+        if (text) text.textContent = "صوت الأذان";
+        if (btnText) btnText.textContent = "مفعّل ✓";
+        if (btn) {
+          btn.className = "adhan-perm-mini-btn active-granted";
+          btn.onclick = () => openAdhanSettingsModal();
+        }
+      } else if (perms.notifications === "denied") {
+        bar.classList.remove("hidden");
+        bar.classList.add("denied");
+        if (icon) icon.className = "fas fa-exclamation-triangle";
+        if (text) text.textContent = "الإشعارات محظورة في المتصفح";
+        if (btnText) btnText.textContent = "طريقة السماح";
+        if (btn) btn.onclick = () => showPermissionHelpModal();
+      } else {
+        bar.classList.remove("hidden", "denied");
+        if (icon) icon.className = "fas fa-bell";
+        if (text) text.textContent = "تفعيل صوت الأذان";
+        if (btnText) btnText.textContent = "تفعيل";
+        if (btn) btn.onclick = () => handlePermissionButtonClick();
+      }
     }
   }
 
   /**
-   * Handle click on the permission button
+   * Handle click on the mini permission button
    */
   async function handlePermissionButtonClick() {
-    const status = await getNotificationPermissionStatus();
-    if (status === "granted") {
-      showToast("إشعارات الأذان مفعّلة بالفعل على هذا الجهاز", "success");
+    const perms = await checkDetailedPermissions();
+
+    if (perms.notifications !== "granted") {
+      const granted = await requestNotificationPermissions();
+      await updateStatusBarUI();
+      if (!granted) {
+        showPermissionHelpModal();
+        return;
+      }
+    }
+
+    if (perms.platform === "native" && !perms.canScheduleExact) {
+      await requestExactAlarmPermission();
       await updateStatusBarUI();
       return;
     }
-    if (status === "denied") {
-      showPermissionHelpModal();
-      return;
-    }
 
-    // Request permission now from direct user click
-    const granted = await requestNotificationPermissions();
+    showToast("صوت الأذان مفعّل بنجاح", "success");
+    triggerReschedule();
     await updateStatusBarUI();
-
-    if (granted) {
-      showToast("تم تفعيل إشعارات الأذان بنجاح", "success");
-      try {
-        const cachedDataStr = localStorage.getItem("cachedPrayerTimes");
-        const locStr = localStorage.getItem("prayerLocation");
-        if (cachedDataStr && locStr) {
-          const timings = JSON.parse(cachedDataStr);
-          const loc = JSON.parse(locStr);
-          schedule7DaysAdhan(
-            loc.latitude || 30.0444,
-            loc.longitude || 31.2357,
-            timings,
-          );
-        }
-      } catch (e) {
-        console.warn(e);
-      }
-    } else {
-      const newStatus = await getNotificationPermissionStatus();
-      if (newStatus === "denied") {
-        showPermissionHelpModal();
-      }
-    }
   }
 
   /**
@@ -237,10 +376,10 @@
   function showPermissionHelpModal() {
     if (isNativePlatform()) {
       const msg =
-        "لضمان سماع صوت الأذان في موعده بدقة والتطبيق مغلق:\n\n" +
+        "لضمان سماع صوت الأذان في موعده بدقة والتطبيق مغلق وشاشة الهاتف مقفلة:\n\n" +
         "1. إعدادات الهاتف > التطبيقات > تطبيق (ذَكِّرْ)\n" +
         "2. الإشعارات: تفعيل السماح بالإشعارات وصوت التنبيه.\n" +
-        "3. المنبهات والتذكيرات (Alarms & Reminders): تفعيل السماح.\n" +
+        "3. المنبهات والتذكيرات (Alarms & Reminders): تفعيل السماح بضبط المنبهات الدقيقة.\n" +
         "4. البطارية: اختر (غير مقيّد / Unrestricted) لمنع النظام من تجميد التطبيق في الخلفية.";
       alert(msg);
       return;
@@ -250,61 +389,47 @@
       "1. اضغط على رمز إعدادات الموقع أو علامة القفل بجوار الرابط أعلى المتصفح.\n" +
       "2. اضبط خيار (الإشعارات / Notifications) على (سماح / Allow).\n" +
       "3. أعد تحميل الصفحة ليتم جدولة الأذان تلقائياً في مواقيت الصلاة.\n\n" +
-      "ملاحظة: لتشغيل الأذان في الخلفية بشكل موثوق والتطبيق مغلق وشاشة الهاتف مقفلة، يرجى تثبيت واستخدام نسخة تطبيق الأندرويد (APK).";
+      "ملاحظة: لتشغيل الأذان في الخلفية بشكل موثوق والتطبيق مغلق، يرجى استخدام نسخة تطبيق الأندرويد (APK).";
     alert(msg);
   }
 
   /**
-   * Initialize Android Notification Channels with Custom Raw Audio
+   * Initialize Android Notification Channels
    */
   async function setupNotificationChannels() {
     if (channelsInitialized) return true;
-    const plugin = getLocalNotificationsPlugin();
-    if (!plugin) return false;
+    const localPlugin = getLocalNotificationsPlugin();
+    if (!localPlugin) return false;
 
     try {
-      // Clean up previous channel versions if present
-      try {
-        await plugin.deleteChannel({ id: "adhan_regular_channel" });
-        await plugin.deleteChannel({ id: "adhan_fajr_channel" });
-      } catch (e) {
-        // Ignore if channels did not exist
-      }
-
-      // 1. Regular Adhan Channel (Dhuhr, Asr, Maghrib, Isha) - Sheikh Mishary Alafasy
-      await plugin.createChannel({
+      await localPlugin.createChannel({
         id: CHANNEL_REGULAR_ID,
-        name: "أذان الصلوات المفروضة (مشاري العفاسي)",
-        description:
-          "صوت الأذان لمواقيت الصلوات الخمس (الظهر، العصر، المغرب، العشاء)",
-        sound: "adhan.mp3", // points to res/raw/adhan.mp3
-        importance: 5, // NotificationManager.IMPORTANCE_MAX (High priority, pops on screen)
-        visibility: 1, // NotificationCompat.VISIBILITY_PUBLIC (Shows on Lockscreen)
+        name: "أذان الصلوات المفروضة",
+        description: "صوت الأذان لمواقيت الصلوات الخمس",
+        sound: "adhan.mp3",
+        importance: 5,
+        visibility: 1,
         vibration: true,
         lights: true,
         lightColor: "#10B981",
       });
 
-      // 2. Fajr Adhan Channel - Sheikh Mishary Alafasy Fajr
-      await plugin.createChannel({
+      await localPlugin.createChannel({
         id: CHANNEL_FAJR_ID,
-        name: "أذان صلاة الفجر (مشاري العفاسي)",
-        description: "صوت أذان صلاة الفجر بصوت ندي وبنداء الصلاة خير من النوم",
-        sound: "adhan_fajr.mp3", // points to res/raw/adhan_fajr.mp3
-        importance: 5, // NotificationManager.IMPORTANCE_MAX
-        visibility: 1, // VISIBILITY_PUBLIC
+        name: "أذان صلاة الفجر",
+        description: "صوت أذان صلاة الفجر بنداء الصلاة خير من النوم",
+        sound: "adhan_fajr.mp3",
+        importance: 5,
+        visibility: 1,
         vibration: true,
         lights: true,
         lightColor: "#10B981",
       });
 
       channelsInitialized = true;
-      console.log(
-        "[AdhanEngine] Native notification channels created successfully (v2).",
-      );
       return true;
     } catch (err) {
-      console.error(
+      console.warn(
         "[AdhanEngine] Failed to create notification channels:",
         err,
       );
@@ -338,25 +463,48 @@
   }
 
   /**
-   * Schedule 7 days of upcoming prayer adhans using Exact Alarms
+   * Helper: Trigger recalculation and reschedule from saved prayer times
+   */
+  function triggerReschedule() {
+    try {
+      const cachedDataStr = localStorage.getItem("cachedPrayerTimes");
+      const locStr = localStorage.getItem("prayerLocation");
+      if (cachedDataStr && locStr) {
+        const timings = JSON.parse(cachedDataStr);
+        const loc = JSON.parse(locStr);
+        schedule7DaysAdhan(
+          loc.latitude || 30.0444,
+          loc.longitude || 31.2357,
+          timings,
+        );
+      }
+    } catch (e) {
+      console.warn("[AdhanEngine] Failed to auto-reschedule:", e);
+    }
+  }
+
+  /**
+   * Schedule 7 days of upcoming prayer adhans using Native Exact Alarms
    */
   async function schedule7DaysAdhan(latitude, longitude, todayTimings) {
     console.log("[AdhanEngine] Scheduling upcoming 7 days of Adhan...");
 
-    const plugin = getLocalNotificationsPlugin();
+    const nativePlugin = getAdhanSchedulerPlugin();
+    const localPlugin = getLocalNotificationsPlugin();
     const settings = getAdhanSettings();
+    const selectedMuezzinKey = getSelectedMuezzin();
+    const muezzinObj = MUEZZINS[selectedMuezzinKey] || MUEZZINS.alafasy;
 
-    // Ensure permissions and channels
-    if (plugin) {
-      await requestNotificationPermissions();
+    if (localPlugin) {
       await setupNotificationChannels();
     }
 
     const prayerKeys = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
     const now = new Date();
-    const notificationsToSchedule = [];
+    const nativeAlarmsList = [];
+    const localNotificationsList = [];
 
-    // Attempt to fetch exact monthly calendar for optimal 7-day accuracy
+    // Attempt to fetch exact monthly calendar for 7-day astronomical accuracy
     let monthlyCalendar = null;
     try {
       const year = now.getFullYear();
@@ -371,13 +519,9 @@
         }
       }
     } catch (e) {
-      console.warn(
-        "[AdhanEngine] Could not fetch calendar, projecting from today timings:",
-        e,
-      );
+      console.warn("[AdhanEngine] Using today's timings projection:", e);
     }
 
-    // Build schedule for the upcoming 7 days
     for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
       const targetDay = new Date(
         now.getFullYear(),
@@ -400,10 +544,7 @@
       if (!dayTimings) continue;
 
       prayerKeys.forEach((prayer, prayerIndex) => {
-        // Skip if muted by user
-        if (settings[prayer] === false) {
-          return;
-        }
+        if (settings[prayer] === false) return; // Muted by user
 
         const rawTime = dayTimings[prayer];
         const parsed = parseTimeString(rawTime);
@@ -419,20 +560,27 @@
           0,
         );
 
-        // Skip if already in the past
-        if (prayerDate.getTime() <= now.getTime()) {
-          return;
-        }
+        if (prayerDate.getTime() <= now.getTime()) return; // In the past
 
         const isFajr = prayer === "Fajr";
         const prayerNameAr = PRAYER_NAMES[prayer];
+        const soundFile = isFajr
+          ? muezzinObj.fajrSound
+          : muezzinObj.regularSound;
         const channelId = isFajr ? CHANNEL_FAJR_ID : CHANNEL_REGULAR_ID;
-        const soundFile = isFajr ? "adhan_fajr.mp3" : "adhan.mp3";
-
-        // Unique deterministic 32-bit ID
         const notificationId = (dayOffset + 1) * 100 + prayerIndex;
 
-        const notificationObj = {
+        // Native Alarm item for AlarmManager & ForegroundService
+        nativeAlarmsList.push({
+          id: notificationId,
+          timeMillis: prayerDate.getTime(),
+          prayerKey: prayer,
+          prayerName: `صلاة ${prayerNameAr}`,
+          soundRes: soundFile,
+        });
+
+        // Backup LocalNotification
+        localNotificationsList.push({
           id: notificationId,
           title: `حان الآن موعد أذان ${prayerNameAr}`,
           body: isFajr
@@ -444,57 +592,51 @@
           iconColor: "#10B981",
           schedule: {
             at: prayerDate,
-            allowWhileIdle: true, // Uses AlarmManager.setExactAndAllowWhileIdle natively!
+            allowWhileIdle: true,
           },
-          extra: {
-            prayer: prayer,
-            dayOffset: dayOffset,
-            scheduledTime: prayerDate.toISOString(),
-          },
-        };
-
-        notificationsToSchedule.push(notificationObj);
+        });
       });
     }
 
-    if (plugin) {
+    // 1. Native Scheduling via AdhanScheduler Plugin (ForegroundService + AlarmManager)
+    if (nativePlugin) {
       try {
-        // Cancel previously scheduled prayer notifications to avoid duplicate alarms
-        const pending = await plugin.getPending();
+        const res = await nativePlugin.scheduleAlarms({
+          alarms: nativeAlarmsList,
+        });
+        console.log(
+          `[AdhanEngine] Native AlarmManager scheduled ${res.scheduledCount} exact alarms.`,
+        );
+      } catch (err) {
+        console.error("[AdhanEngine] Error scheduling native alarms:", err);
+      }
+    }
+
+    // 2. Schedule LocalNotifications
+    if (localPlugin) {
+      try {
+        const pending = await localPlugin.getPending();
         if (
           pending &&
           pending.notifications &&
           pending.notifications.length > 0
         ) {
-          // Cancel any scheduled notifications with ID < 90000 (reserving 99999 for test)
           const idsToCancel = pending.notifications
             .filter((n) => n.id < 90000)
             .map((n) => ({ id: n.id }));
-
           if (idsToCancel.length > 0) {
-            await plugin.cancel({ notifications: idsToCancel });
-            console.log(
-              `[AdhanEngine] Cancelled ${idsToCancel.length} previous alarms.`,
-            );
+            await localPlugin.cancel({ notifications: idsToCancel });
           }
         }
-
-        if (notificationsToSchedule.length > 0) {
-          await plugin.schedule({ notifications: notificationsToSchedule });
-          console.log(
-            `[AdhanEngine] Successfully scheduled ${notificationsToSchedule.length} native exact alarms.`,
-          );
+        if (localNotificationsList.length > 0) {
+          await localPlugin.schedule({ notifications: localNotificationsList });
         }
       } catch (err) {
-        console.error("[AdhanEngine] Native scheduling error:", err);
+        console.warn("[AdhanEngine] LocalNotifications scheduling error:", err);
       }
-    } else {
-      console.log(
-        `[AdhanEngine] Web environment: ${notificationsToSchedule.length} prayer times registered for countdown.`,
-      );
     }
 
-    return notificationsToSchedule.length;
+    return nativeAlarmsList.length;
   }
 
   /**
@@ -506,7 +648,13 @@
         currentAudio.pause();
         currentAudio.currentTime = 0;
       }
-      const audioPath = isFajr ? "audio/adhan_fajr.mp3" : "audio/adhan.mp3";
+      const selectedMuezzinKey = getSelectedMuezzin();
+      const muezzinObj = MUEZZINS[selectedMuezzinKey] || MUEZZINS.alafasy;
+      const audioFileName = isFajr
+        ? muezzinObj.fajrSound
+        : muezzinObj.regularSound;
+      const audioPath = `audio/${audioFileName}`;
+
       currentAudio = new Audio(audioPath);
       currentAudio
         .play()
@@ -521,123 +669,149 @@
           showToast("حان وقت الصلاة (يرجى النقر لتشغيل الأذان)", "warning");
         });
     } catch (e) {
-      console.error("[AdhanEngine] Audio playback error:", e);
+      console.error("[AdhanEngine] Web Audio playback error:", e);
     }
   }
 
   /**
-   * Called automatically when exact prayer time is reached
+   * Called automatically when exact prayer time is reached in foreground
    */
-  function onPrayerTimeReached(prayer) {
-    if (prayer === 'Sunrise') return;
+  async function onPrayerTimeReached(prayer) {
+    if (prayer === "Sunrise") return;
+    if (!isAdhanEnabled(prayer)) return;
 
-    if (!isAdhanEnabled(prayer)) {
-      console.log(`[AdhanEngine] Adhan for ${prayer} is muted by user.`);
+    // Check if native Android audio is already running via ForegroundService
+    const nativePlugin = getAdhanSchedulerPlugin();
+    if (nativePlugin) {
+      try {
+        const res = await nativePlugin.isPlaying();
+        if (res && res.isPlaying) {
+          console.log(
+            "[AdhanEngine] Native Adhan is already playing via ForegroundService.",
+          );
+          return;
+        }
+      } catch (e) {}
+      // On native platform, native AlarmManager and ForegroundService handle playback.
+      // Do not duplicate audio in WebView.
       return;
     }
 
+    // On Web only:
     const prayerNameAr = PRAYER_NAMES[prayer] || prayer;
-    const isFajr = prayer === 'Fajr';
-
-    console.log(`[AdhanEngine] Prayer time reached: ${prayer}. Triggering Adhan...`);
-
-    // 1. Play audio
+    const isFajr = prayer === "Fajr";
+    console.log(`[AdhanEngine] Web prayer reached: ${prayer}`);
     playWebAdhan(isFajr);
 
-    // 2. Web Notification
-    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+    if (
+      typeof Notification !== "undefined" &&
+      Notification.permission === "granted"
+    ) {
       try {
         new Notification(`حان الآن موعد أذان ${prayerNameAr}`, {
           body: isFajr
-            ? 'حي على الصلاة، حي على الفلاح (الصلاة خير من النوم)'
+            ? "حي على الصلاة، حي على الفلاح (الصلاة خير من النوم)"
             : `حي على الصلاة، حي على الفلاح - صلاة ${prayerNameAr} يرحمكم الله`,
-          icon: 'icon.png'
+          icon: "icon.png",
         });
-      } catch (e) {
-        console.warn('[AdhanEngine] Notification error:', e);
-      }
+      } catch (e) {}
     }
 
-    // 3. User feedback
-    showToast(`حان الآن موعد أذان ${prayerNameAr}.. تقبل الله طاعتكم`, 'success');
+    showToast(
+      `حان الآن موعد أذان ${prayerNameAr}.. تقبل الله طاعتكم`,
+      "success",
+    );
   }
 
-  // Pre-unlock Web Audio on first user interaction to comply with browser autoplay policy
+  /**
+   * Prime Web Audio on user gesture to bypass browser autoplay restrictions
+   */
   let audioUnlocked = false;
   function primeAudio() {
     if (audioUnlocked) return;
     try {
-      const silent = new Audio('audio/adhan.mp3');
+      const silent = new Audio("audio/adhan.mp3");
       silent.volume = 0.01;
-      silent.play().then(() => {
-        silent.pause();
-        silent.currentTime = 0;
-        audioUnlocked = true;
-        console.log('[AdhanEngine] Web Audio unlocked for auto-play.');
-      }).catch(() => {});
-    } catch(e) {}
+      silent
+        .play()
+        .then(() => {
+          silent.pause();
+          silent.currentTime = 0;
+          audioUnlocked = true;
+          console.log("[AdhanEngine] Web Audio primed for autoplay.");
+        })
+        .catch(() => {});
+    } catch (e) {}
   }
-  document.addEventListener('click', primeAudio, { once: true });
-  document.addEventListener('touchstart', primeAudio, { once: true });
+  document.addEventListener("click", primeAudio, { once: true });
+  document.addEventListener("touchstart", primeAudio, { once: true });
 
   /**
-   * Stop currently playing Adhan audio
+   * Stop currently playing Adhan audio (Native + Web)
    */
-  function stopAdhan() {
+  async function stopAdhan() {
+    const nativePlugin = getAdhanSchedulerPlugin();
+    if (nativePlugin) {
+      try {
+        await nativePlugin.stopPlayback();
+      } catch (e) {
+        console.warn("[AdhanEngine] Error stopping native Adhan:", e);
+      }
+    }
+
     if (currentAudio) {
       currentAudio.pause();
       currentAudio.currentTime = 0;
       currentAudio = null;
     }
+
+    showToast("تم إيقاف صوت الأذان", "info");
   }
 
   /**
-   * Test Native Adhan Notification after 5 seconds
+   * Test Native / Web Adhan Notification after specified seconds
    */
-  async function testAdhanNotification(isFajr = false) {
+  async function testAdhanNotification(isFajr = false, delaySeconds = 5) {
     const isGranted = await requestNotificationPermissions();
     if (!isGranted) {
       showToast("يرجى السماح بالإشعارات لتجربة الأذان التلقائي", "warning");
       return;
     }
 
-    const testTime = new Date(Date.now() + 5000);
-    const plugin = getLocalNotificationsPlugin();
+    const nativePlugin = getAdhanSchedulerPlugin();
+    const selectedMuezzinKey = getSelectedMuezzin();
+    const muezzinObj = MUEZZINS[selectedMuezzinKey] || MUEZZINS.alafasy;
+    const soundRes = isFajr ? muezzinObj.fajrSound : muezzinObj.regularSound;
 
-    if (plugin) {
-      await setupNotificationChannels();
+    if (nativePlugin) {
       try {
-        await plugin.schedule({
-          notifications: [
-            {
-              id: 99999,
-              title: isFajr
-                ? "تجربة أذان الفجر (ذَكِّرْ)"
-                : "تجربة الأذان (ذَكِّرْ)",
-              body: "الله أكبر الله أكبر.. يعمل الأذان التلقائي بنجاح حتى والشاشة مقفلة!",
-              channelId: isFajr ? CHANNEL_FAJR_ID : CHANNEL_REGULAR_ID,
-              sound: isFajr ? "adhan_fajr.mp3" : "adhan.mp3",
-              smallIcon: "ic_stat_icon_config_sample",
-              iconColor: "#10B981",
-              schedule: {
-                at: testTime,
-                allowWhileIdle: true, // Triggers AlarmManager.setExactAndAllowWhileIdle
-              },
-            },
-          ],
+        await nativePlugin.testAdhan({
+          delaySeconds: delaySeconds,
+          prayerKey: isFajr ? "Fajr" : "Dhuhr",
+          prayerName: isFajr ? "صلاة الفجر" : "صلاة الظهر",
+          soundRes: soundRes,
         });
 
-        showToast(
-          "🔔 سيعمل الأذان خلال 5 ثوانٍ.. يمكنك قفل الشاشة لاختباره الآن!",
-          "success",
-        );
+        if (delaySeconds > 0) {
+          showToast(
+            `🔔 سيبدأ الأذان (${muezzinObj.name}) خلال ${delaySeconds} ثوانٍ.. يمكنك قفل الشاشة لاختباره الآن!`,
+            "success",
+          );
+        } else {
+          showToast(`🔔 بدأ تشغيل الأذان (${muezzinObj.name}) الآن`, "success");
+        }
+        return;
       } catch (err) {
-        console.error("[AdhanEngine] Native test schedule error:", err);
-        showToast("حدث خطأ أثناء جدولة الأذان التجريبي", "error");
+        console.error("[AdhanEngine] Native testAdhan error:", err);
       }
-    } else {
-      // Web Fallback
-      showToast("🔔 سيعمل الأذان التجريبي خلال 5 ثوانٍ..", "info");
+    }
+
+    // Web Fallback
+    if (delaySeconds > 0) {
+      showToast(
+        `🔔 سيبدأ الأذان التجريبي خلال ${delaySeconds} ثوانٍ..`,
+        "info",
+      );
       setTimeout(() => {
         playWebAdhan(isFajr);
         if (
@@ -649,7 +823,9 @@
             icon: "icon.png",
           });
         }
-      }, 5000);
+      }, delaySeconds * 1000);
+    } else {
+      playWebAdhan(isFajr);
     }
   }
 
@@ -676,26 +852,8 @@
       showToast(`تم كتم أذان ${prayerNameAr}`, "info");
     }
 
-    // Refresh UI toggle button in prayer cards
     updateToggleButtonsUI();
-
-    // Reschedule alarms with new settings
-    try {
-      const cachedDataStr = localStorage.getItem("cachedPrayerTimes");
-      const locStr = localStorage.getItem("prayerLocation");
-      if (cachedDataStr && locStr) {
-        const timings = JSON.parse(cachedDataStr);
-        const loc = JSON.parse(locStr);
-        schedule7DaysAdhan(
-          loc.latitude || 30.0444,
-          loc.longitude || 31.2357,
-          timings,
-        );
-      }
-    } catch (e) {
-      console.warn("[AdhanEngine] Failed to auto-reschedule on toggle:", e);
-    }
-
+    triggerReschedule();
     return newState;
   }
 
@@ -729,33 +887,203 @@
   }
 
   /**
+   * Open Adhan Settings & Diagnostics Modal
+   */
+  async function openAdhanSettingsModal() {
+    let modal = document.getElementById("adhanSettingsModal");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "adhanSettingsModal";
+      modal.className = "modal-overlay hidden";
+      modal.innerHTML = `
+        <div class="modal-card adhan-settings-card">
+          <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-sliders"></i> إعدادات الأذان والتنبيهات</h3>
+            <button class="modal-close-btn" onclick="window.TazkeerAdhan.closeAdhanSettingsModal()">&times;</button>
+          </div>
+          <div class="modal-body" id="adhanSettingsModalBody">
+            <div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> جاري فحص الإعدادات...</div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    modal.classList.remove("hidden");
+    await renderAdhanSettingsContent();
+  }
+
+  /**
+   * Close Adhan Settings Modal
+   */
+  function closeAdhanSettingsModal() {
+    const modal = document.getElementById("adhanSettingsModal");
+    if (modal) {
+      modal.classList.add("hidden");
+    }
+  }
+
+  /**
+   * Render settings and permission diagnostic details
+   */
+  async function renderAdhanSettingsContent() {
+    const container = document.getElementById("adhanSettingsModalBody");
+    if (!container) return;
+
+    const perms = await checkDetailedPermissions();
+    const selectedMuezzin = getSelectedMuezzin();
+    const settings = getAdhanSettings();
+
+    let nextAlarmInfo = "غير مجدول حالياً";
+    const nativePlugin = getAdhanSchedulerPlugin();
+    if (nativePlugin) {
+      try {
+        const alarmsData = await nativePlugin.getScheduledAlarms();
+        if (alarmsData && alarmsData.nextAlarm) {
+          const nextDate = new Date(alarmsData.nextAlarm.timeMillis);
+          nextAlarmInfo = `${alarmsData.nextAlarm.prayerName} - ${nextDate.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}`;
+        }
+      } catch (e) {}
+    }
+
+    const notifGranted = perms.notifications === "granted";
+    const exactGranted =
+      perms.exactAlarm === "granted" || perms.canScheduleExact;
+    const batteryOptimized = perms.batteryOptimizationIgnored;
+
+    container.innerHTML = `
+      <div class="adhan-diagnostic-list">
+        <!-- Status Row: Notifications -->
+        <div class="diag-item">
+          <div class="diag-info">
+            <span class="diag-label"><i class="fas fa-bell"></i> إذن الإشعارات</span>
+            <span class="diag-sub">مطلوب لعرض تنبيه الصلاة على الشاشة</span>
+          </div>
+          <div class="diag-action">
+            ${
+              notifGranted
+                ? '<span class="status-badge success">مسموح ✓</span>'
+                : '<button class="diag-btn warning" onclick="window.TazkeerAdhan.requestNotificationPermissions().then(() => window.TazkeerAdhan.renderAdhanSettingsContent())">تفعيل</button>'
+            }
+          </div>
+        </div>
+
+        <!-- Status Row: Exact Alarms (Android 12+) -->
+        ${
+          perms.platform === "native"
+            ? `
+        <div class="diag-item">
+          <div class="diag-info">
+            <span class="diag-label"><i class="fas fa-clock"></i> المنبهات الدقيقة (Exact Alarms)</span>
+            <span class="diag-sub">مطلوب لتشغيل الأذان في موعده بالثانية والتطبيق مغلق</span>
+          </div>
+          <div class="diag-action">
+            ${
+              exactGranted
+                ? '<span class="status-badge success">مسموح ✓</span>'
+                : '<button class="diag-btn warning" onclick="window.TazkeerAdhan.requestExactAlarmPermission()">تفعيل</button>'
+            }
+          </div>
+        </div>
+
+        <!-- Status Row: Battery Optimization -->
+        <div class="diag-item">
+          <div class="diag-info">
+            <span class="diag-label"><i class="fas fa-battery-full"></i> استثناء توفير البطارية</span>
+            <span class="diag-sub">لمنع أندرويد من تجميد التطبيق بعد فترة خمول</span>
+          </div>
+          <div class="diag-action">
+            ${
+              batteryOptimized
+                ? '<span class="status-badge success">غير مقيّد ✓</span>'
+                : '<button class="diag-btn secondary" onclick="window.TazkeerAdhan.requestBatteryOptimizationExemption()">ضبط</button>'
+            }
+          </div>
+        </div>
+        `
+            : ""
+        }
+
+        <!-- Status Row: Next Scheduled Alarm -->
+        <div class="diag-item highlight">
+          <div class="diag-info">
+            <span class="diag-label"><i class="fas fa-calendar-check"></i> موعد الأذان القادم</span>
+            <span class="diag-sub" id="nextAlarmDisplay">${nextAlarmInfo}</span>
+          </div>
+          <div class="diag-action">
+            <button class="diag-btn secondary" onclick="window.TazkeerAdhan.triggerReschedule(); window.TazkeerAdhan.renderAdhanSettingsContent();">
+              <i class="fas fa-sync-alt"></i> تحديث
+            </button>
+          </div>
+        </div>
+
+        <!-- Muezzin Selection -->
+        <div class="muezzin-select-section">
+          <label class="muezzin-section-title"><i class="fas fa-microphone"></i> اختيار صوت المؤذن:</label>
+          <div class="muezzin-options-grid">
+            ${Object.values(MUEZZINS)
+              .map(
+                (m) => `
+              <button type="button" class="muezzin-card-btn ${selectedMuezzin === m.id ? "active" : ""}" 
+                      onclick="window.TazkeerAdhan.setSelectedMuezzin('${m.id}'); window.TazkeerAdhan.renderAdhanSettingsContent();">
+                <i class="fas ${selectedMuezzin === m.id ? "fa-circle-check" : "fa-circle"}"></i>
+                <span>${m.name}</span>
+              </button>
+            `,
+              )
+              .join("")}
+          </div>
+        </div>
+
+        <!-- Action Buttons: Test and Stop -->
+        <div class="adhan-settings-actions">
+          <button type="button" class="test-adhan-btn" onclick="window.TazkeerAdhan.testAdhanNotification(false, 5)">
+            <i class="fas fa-play"></i> تجربة الأذان (بعد 5 ثوانٍ)
+          </button>
+          <button type="button" class="stop-adhan-btn" onclick="window.TazkeerAdhan.stopAdhan()">
+            <i class="fas fa-stop"></i> إيقاف الأذان
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
    * Initialize Engine
    */
   async function init() {
     console.log(
-      "[AdhanEngine] Initializing Adhan Engine (Native:",
-      isNativePlatform(),
+      "[AdhanEngine] Initializing Native Background Adhan Engine (Platform:",
+      isNativePlatform() ? "Android Native" : "Web",
       ")...",
     );
 
     if (isNativePlatform()) {
       await setupNotificationChannels();
 
-      const plugin = getLocalNotificationsPlugin();
-      if (plugin) {
-        // Listen to notification clicks/actions
+      const localPlugin = getLocalNotificationsPlugin();
+      if (localPlugin) {
         try {
-          plugin.addListener(
+          localPlugin.addListener(
             "localNotificationActionPerformed",
             (notification) => {
               console.log("[AdhanEngine] Notification clicked:", notification);
             },
           );
-        } catch (e) {
-          console.warn("[AdhanEngine] Listener error:", e);
-        }
+        } catch (e) {}
       }
     }
+
+    // Reconcile alarms when the application resumes from background
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        console.log(
+          "[AdhanEngine] App resumed to foreground, reconciling alarms and UI...",
+        );
+        updateStatusBarUI();
+        updateToggleButtonsUI();
+      }
+    });
 
     // Observe prayer grid updates to attach toggles
     const grid = document.getElementById("prayerTimesGrid");
@@ -769,22 +1097,8 @@
     updateToggleButtonsUI();
     updateStatusBarUI();
 
-    // Auto-schedule upcoming 7 days on startup if prayer data is cached
-    try {
-      const cachedDataStr = localStorage.getItem("cachedPrayerTimes");
-      const locStr = localStorage.getItem("prayerLocation");
-      if (cachedDataStr && locStr) {
-        const timings = JSON.parse(cachedDataStr);
-        const loc = JSON.parse(locStr);
-        schedule7DaysAdhan(
-          loc.latitude || 30.0444,
-          loc.longitude || 31.2357,
-          timings,
-        );
-      }
-    } catch (e) {
-      console.warn("[AdhanEngine] Auto-scheduling on init error:", e);
-    }
+    // Auto-schedule on startup from cached prayer times
+    triggerReschedule();
   }
 
   // Auto-init on DOMContentLoaded or immediate if already loaded
@@ -806,9 +1120,18 @@
     stopAdhan,
     updateToggleButtonsUI,
     updateStatusBarUI,
+    checkDetailedPermissions,
     requestNotificationPermissions,
+    requestExactAlarmPermission,
+    requestBatteryOptimizationExemption,
     handlePermissionButtonClick,
     getNotificationPermissionStatus,
     showPermissionHelpModal,
+    openAdhanSettingsModal,
+    closeAdhanSettingsModal,
+    renderAdhanSettingsContent,
+    setSelectedMuezzin,
+    getSelectedMuezzin,
+    triggerReschedule,
   };
 })();

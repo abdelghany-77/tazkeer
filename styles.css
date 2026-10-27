@@ -12389,5 +12389,296 @@ body.light-mode .cr-pct-badge {
   }
 }
 
+/* ==================== Adhan Header Button & Settings Modal ==================== */
+.adhan-header-btn {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1.5px solid rgba(16, 185, 129, 0.25);
+  border-radius: 20px;
+  padding: 0.26rem 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #10b981;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
 
+.adhan-header-btn:hover {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
 
+body.dark-mode .adhan-header-btn {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.25);
+  color: #34d399;
+}
+
+body.dark-mode .adhan-header-btn:hover {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.adhan-settings-card {
+  max-width: 480px;
+  width: 92%;
+  border-radius: 20px;
+  background: var(--bg-card, #ffffff);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  direction: rtl;
+  font-family: 'Cairo', sans-serif;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .modal-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-color, #1a202c);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-title i {
+  color: #10b981;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #718096;
+  transition: color 0.2s;
+}
+
+.modal-close-btn:hover {
+  color: #e53e3e;
+}
+
+.modal-body {
+  padding: 1.25rem;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.adhan-diagnostic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.diag-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+}
+
+body.dark-mode .diag-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+.diag-item.highlight {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.diag-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.diag-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-color, #2d3748);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.diag-label i {
+  color: #10b981;
+}
+
+.diag-sub {
+  font-size: 0.78rem;
+  color: #718096;
+}
+
+body.dark-mode .diag-sub {
+  color: #a0aec0;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+}
+
+.status-badge.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.diag-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.diag-btn.warning {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+.diag-btn.warning:hover {
+  background: #d97706;
+}
+
+.diag-btn.secondary {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.diag-btn.secondary:hover {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.muezzin-select-section {
+  margin-top: 0.5rem;
+}
+
+.muezzin-section-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-color, #2d3748);
+}
+
+.muezzin-options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.muezzin-card-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-color, #2d3748);
+  transition: all 0.2s ease;
+  text-align: right;
+  width: 100%;
+}
+
+body.dark-mode .muezzin-card-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+}
+
+.muezzin-card-btn i {
+  color: #a0aec0;
+  font-size: 0.95rem;
+}
+
+.muezzin-card-btn.active {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: #10b981;
+  color: #059669;
+}
+
+body.dark-mode .muezzin-card-btn.active {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: #34d399;
+  color: #34d399;
+}
+
+.muezzin-card-btn.active i {
+  color: #10b981;
+}
+
+.adhan-settings-actions {
+  display: flex;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+
+.test-adhan-btn,
+.stop-adhan-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 0.5rem;
+  border-radius: 10px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.test-adhan-btn {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.test-adhan-btn:hover {
+  background: #059669;
+}
+
+.stop-adhan-btn {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.stop-adhan-btn:hover {
+  background: #dc2626;
+}
