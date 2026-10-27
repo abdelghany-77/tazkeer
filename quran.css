@@ -1461,39 +1461,133 @@
   background: #157a4f;
 }
 
-/* ---- Bottom Bar (Progress) ---- */
+/* ---- Bottom Bar (Fixed-Height Morphing Footer) ---- */
 .mushaf-bottom-bar {
   flex-shrink: 0;
+  height: calc(56px + env(safe-area-inset-bottom, 0px));
+  min-height: calc(56px + env(safe-area-inset-bottom, 0px));
+  max-height: calc(56px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
   background: var(--quran-header-bg);
-  padding: 0.35rem 0.8rem calc(0.45rem + env(safe-area-inset-bottom, 0px));
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  direction: rtl;
+  position: relative;
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* Progress wrapper */
+.mushaf-progress-wrapper {
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  direction: rtl;
+  justify-content: center;
+  gap: 5px;
 }
 
 .mushaf-bottom-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.7);
-  font-family: "Cairo", serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: "Cairo", sans-serif;
+  line-height: 1.2;
 }
 
 .mushaf-progress-track {
-  height: 5px;
+  height: 6px;
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
+  border-radius: 9999px;
   overflow: hidden;
 }
 
 .mushaf-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1a8a5c, #2eb872, #1a8a5c);
-  border-radius: 3px;
-  transition: width 0.4s ease;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
   min-width: 1%;
+}
+
+/* Complete Wird Button (Full-width pill button) */
+.wird-complete-btn {
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 1.25rem;
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: "Cairo", sans-serif;
+  cursor: pointer;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  transition: all 0.25s ease;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wird-complete-btn:hover {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
+}
+
+.wird-complete-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.wird-complete-btn i {
+  font-size: 1.05rem;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* Zero-Layout-Shift Swap Morph State */
+.mushaf-bottom-bar .wird-complete-btn {
+  display: none !important;
+}
+
+.mushaf-bottom-bar:not(.at-wird-end) .mushaf-progress-wrapper {
+  display: flex;
+  animation: wirdMorphIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.mushaf-bottom-bar.at-wird-end .mushaf-progress-wrapper {
+  display: none !important;
+}
+
+.mushaf-bottom-bar.at-wird-end .wird-complete-btn {
+  display: flex !important;
+  animation: wirdMorphIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes wirdMorphIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ===== Khatmah Completion Modal ===== */
@@ -1574,30 +1668,7 @@
   font-family: "Cairo", sans-serif;
   flex-shrink: 0;
 }
-.wird-complete-btn {
-  display: block;
-  width: calc(100% - 1.6rem);
-  margin: 0.3rem 0.8rem;
-  padding: 0.35rem 1rem;
-  background: rgba(40, 167, 69, 0.15);
-  color: #28a745;
-  border: 1px solid rgba(40, 167, 69, 0.3);
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  font-family: "Cairo", sans-serif;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-}
-.wird-complete-btn:hover {
-  background: rgba(40, 167, 69, 0.25);
-  border-color: rgba(40, 167, 69, 0.5);
-}
-.wird-complete-btn i {
-  margin-left: 0.3rem;
-  font-size: 0.75rem;
-}
+
 
 /* Page flip animation */
 .mushaf-page-img.flip-next {

@@ -1293,23 +1293,25 @@ function renderMushafViewer() {
         </div>
       </div>
 
-      ${
-        atWirdEnd
-          ? `<button class="wird-complete-btn" onclick="completeWirdAndReturn()">
-        <i class="fas fa-check-circle"></i> أتممت الورد
-      </button>`
-          : ""
-      }
+      <!-- Bottom Bar (Fixed Height Morphing Footer) -->
+      <div class="mushaf-bottom-bar ${atWirdEnd ? "at-wird-end" : ""}" id="mushafBottomBar">
+        <div class="mushaf-progress-wrapper" id="mushafProgressWrapper">
+          <div class="mushaf-bottom-info">
+            <span class="mushaf-page-counter">${page - navStart + 1} / ${navEnd - navStart + 1}</span>
+            <span class="mushaf-progress-percent">${progressPercent}%</span>
+          </div>
+          <div class="mushaf-progress-track">
+            <div class="mushaf-progress-fill" style="width: ${progressPercent}%"></div>
+          </div>
+        </div>
 
-      <!-- Bottom Bar (Progress) -->
-      <div class="mushaf-bottom-bar">
-        <div class="mushaf-bottom-info">
-          <span>${page - navStart + 1} / ${navEnd - navStart + 1}</span>
-          <span>${progressPercent}%</span>
-        </div>
-        <div class="mushaf-progress-track">
-          <div class="mushaf-progress-fill" style="width: ${progressPercent}%"></div>
-        </div>
+        ${
+          isKM
+            ? `<button class="wird-complete-btn" id="wirdCompleteBtn" onclick="completeWirdAndReturn()" aria-label="أتممت الورد">
+          <i class="fas fa-check-circle"></i> <span>أتممت الورد</span>
+        </button>`
+            : ""
+        }
       </div>
     </div>
   `;
@@ -1456,21 +1458,29 @@ function navigateToPage(newPage, direction) {
   const jumpInput = document.getElementById("pageJumpInput");
   if (jumpInput) jumpInput.placeholder = newPage;
 
-  // Show/hide wird complete button
+  // Toggle bottom bar state between progress and completion button
   const atWirdEnd = isKM && newPage >= navEnd;
-  let wirdBtn = document.querySelector(".wird-complete-btn");
-  if (atWirdEnd && !wirdBtn) {
-    const bottomBar = document.querySelector(".mushaf-bottom-bar");
-    if (bottomBar) {
-      const btn = document.createElement("button");
-      btn.className = "wird-complete-btn";
-      btn.innerHTML = '<i class="fas fa-check-circle"></i> أتممت الورد';
-      btn.onclick = completeWirdAndReturn;
-      bottomBar.parentNode.insertBefore(btn, bottomBar);
+  const bottomBar = document.querySelector(".mushaf-bottom-bar");
+  if (bottomBar) {
+    bottomBar.classList.toggle("at-wird-end", atWirdEnd);
+
+    if (isKM) {
+      let wirdBtn = bottomBar.querySelector(".wird-complete-btn");
+      if (!wirdBtn) {
+        wirdBtn = document.createElement("button");
+        wirdBtn.className = "wird-complete-btn";
+        wirdBtn.id = "wirdCompleteBtn";
+        wirdBtn.setAttribute("aria-label", "أتممت الورد");
+        wirdBtn.innerHTML = '<i class="fas fa-check-circle"></i> <span>أتممت الورد</span>';
+        wirdBtn.onclick = completeWirdAndReturn;
+        bottomBar.appendChild(wirdBtn);
+      }
     }
-  } else if (!atWirdEnd && wirdBtn) {
-    wirdBtn.remove();
   }
+
+  // Defensive clean-up in case an old external button exists
+  const strayWirdBtn = document.querySelector(".mushaf-container > .wird-complete-btn");
+  if (strayWirdBtn) strayWirdBtn.remove();
 
   // Animate and swap image
   const imgEl = document.getElementById("mushafPageImg");
