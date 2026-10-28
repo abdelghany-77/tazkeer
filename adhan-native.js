@@ -446,13 +446,111 @@
    */
   function parseTimeString(timeStr) {
     if (!timeStr) return null;
-    const clean = timeStr.split(" ")[0].trim();
+    const normalized = String(timeStr).replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+    const clean = normalized.split(" ")[0].trim();
     const parts = clean.split(":");
     if (parts.length < 2) return null;
+    const hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
+    if (isNaN(hours) || isNaN(minutes)) return null;
     return {
-      hours: parseInt(parts[0], 10),
-      minutes: parseInt(parts[1], 10),
+      hours,
+      minutes,
     };
+  }
+
+  /**
+   * Helper: Format Date object to Arabic 12-hour string (e.g. "2:47 م")
+   */
+  function formatArabicTime(date) {
+    if (!(date instanceof Date) || isNaN(date.getTime())) return "";
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const period = hours >= 12 ? "م" : "ص";
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes} ${period}`;
+  }
+
+  /**
+   * Helper: Get cached timings from localStorage or in-memory
+   */
+  function getCachedTimings() {
+    try {
+      const cachedDataStr = localStorage.getItem("cachedPrayerTimes");
+      if (cachedDataStr) {
+        const parsed = JSON.parse(cachedDataStr);
+        if (parsed && typeof parsed === "object") return parsed;
+      }
+    } catch (e) {}
+    if (typeof window.prayerTimesData === "object" && window.prayerTimesData) {
+      return window.prayerTimesData;
+    }
+    return null;
+  }
+
+  /**
+   * Helper: Calculate next upcoming enabled prayer from timings
+   */
+  function getNextPrayerInfo(settings, timings) {
+    if (!timings) return null;
+    const now = new Date();
+    const prayerKeys = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
+    // 1. Check remaining prayers today
+    for (const prayer of prayerKeys) {
+      if (settings && settings[prayer] === false) continue;
+      const rawTime = timings[prayer];
+      const parsed = parseTimeString(rawTime);
+      if (!parsed) continue;
+
+      const pDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        parsed.hours,
+        parsed.minutes,
+        0,
+        0,
+      );
+
+      if (pDate.getTime() > now.getTime()) {
+        const prayerNameAr = PRAYER_NAMES[prayer] || prayer;
+        return {
+          prayerKey: prayer,
+          name: `صلاة ${prayerNameAr}`,
+          date: pDate,
+          isTomorrow: false,
+        };
+      }
+    }
+
+    // 2. If no remaining prayers today, find the first enabled prayer tomorrow
+    for (const prayer of prayerKeys) {
+      if (settings && settings[prayer] === false) continue;
+      const rawTime = timings[prayer];
+      const parsed = parseTimeString(rawTime);
+      if (!parsed) continue;
+
+      const pDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+        parsed.hours,
+        parsed.minutes,
+        0,
+        0,
+      );
+
+      const prayerNameAr = PRAYER_NAMES[prayer] || prayer;
+      return {
+        prayerKey: prayer,
+        name: `صلاة ${prayerNameAr} (غداً)`,
+        date: pDate,
+        isTomorrow: true,
+      };
+    }
+
+    return null;
   }
 
   /**
@@ -469,22 +567,43 @@
   /**
    * Helper: Trigger recalculation and reschedule from saved prayer times
    */
-  function triggerReschedule() {
+  async function triggerReschedule() {
     try {
-      const cachedDataStr = localStorage.getItem("cachedPrayerTimes");
+      let timings = getCachedTimings();
+
+      let lat = 30.0444;
+      let lng = 31.2357;
+      let city = "القاهرة";
       const locStr = localStorage.getItem("prayerLocation");
-      if (cachedDataStr && locStr) {
-        const timings = JSON.parse(cachedDataStr);
-        const loc = JSON.parse(locStr);
-        schedule7DaysAdhan(
-          loc.latitude || 30.0444,
-          loc.longitude || 31.2357,
-          timings,
-        );
+      if (locStr) {
+        try {
+          const loc = JSON.parse(locStr);
+          if (loc.latitude) lat = loc.latitude;
+          if (loc.longitude) lng = loc.longitude;
+          if (loc.city) city = loc.city;
+        } catch (e) {}
+      } else {
+        try {
+          localStorage.setItem(
+            "prayerLocation",
+            JSON.stringify({ latitude: lat, longitude: lng, city }),
+          );
+        } catch (e) {}
+      }
+
+      // If timings still not available, trigger fetch
+      if (!timings && typeof window.fetchPrayerTimes === "function") {
+        await window.fetchPrayerTimes(lat, lng, city);
+        timings = getCachedTimings();
+      }
+
+      if (timings) {
+        return await schedule7DaysAdhan(lat, lng, timings);
       }
     } catch (e) {
       console.warn("[AdhanEngine] Failed to auto-reschedule:", e);
     }
+    return 0;
   }
 
   /**
@@ -508,14 +627,18 @@
     const nativeAlarmsList = [];
     const localNotificationsList = [];
 
-    // Attempt to fetch exact monthly calendar for 7-day astronomical accuracy
+    // Attempt to fetch exact monthly calendar for 7-day astronomical accuracy with timeout
     let monthlyCalendar = null;
     try {
       const year = now.getFullYear();
       const month = now.getMonth() + 1;
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 2500);
       const res = await fetch(
         `https://api.aladhan.com/v1/calendar/${year}/${month}?latitude=${latitude}&longitude=${longitude}&method=5`,
+        { signal: controller.signal },
       );
+      clearTimeout(timer);
       if (res.ok) {
         const json = await res.json();
         if (json.code === 200 && Array.isArray(json.data)) {
@@ -523,7 +646,7 @@
         }
       }
     } catch (e) {
-      console.warn("[AdhanEngine] Using today's timings projection:", e);
+      console.warn("[AdhanEngine] Using today's timings projection (offline / fast fallback):", e);
     }
 
     for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
@@ -535,10 +658,15 @@
       let dayTimings = todayTimings;
 
       if (monthlyCalendar) {
+        const targetMonth = targetDay.getMonth() + 1;
         const dayOfMonth = targetDay.getDate();
         const found = monthlyCalendar.find((d) => {
           const dateObj = d.date && d.date.gregorian;
-          return dateObj && parseInt(dateObj.day, 10) === dayOfMonth;
+          return (
+            dateObj &&
+            parseInt(dateObj.day, 10) === dayOfMonth &&
+            parseInt(dateObj.month && dateObj.month.number, 10) === targetMonth
+          );
         });
         if (found && found.timings) {
           dayTimings = found.timings;
@@ -946,6 +1074,25 @@
   }
 
   /**
+   * Handle user clicking the "Refresh" (تحديث) button in the modal
+   */
+  async function handleManualReschedule(btnEl) {
+    if (btnEl) {
+      btnEl.disabled = true;
+      btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحديث...';
+    }
+    try {
+      await triggerReschedule();
+      await renderAdhanSettingsContent();
+      showToast("تم تحديث مواعيد وجدولة الأذان بنجاح ✓", "success");
+    } catch (err) {
+      console.error("[AdhanEngine] Manual reschedule error:", err);
+      await renderAdhanSettingsContent();
+      showToast("حدث خطأ أثناء التحديث، يرجى المحاولة لاحقاً", "error");
+    }
+  }
+
+  /**
    * Render settings and permission diagnostic details
    */
   async function renderAdhanSettingsContent() {
@@ -955,17 +1102,39 @@
     const perms = await checkDetailedPermissions();
     const selectedMuezzin = getSelectedMuezzin();
     const settings = getAdhanSettings();
+    const prayerKeys = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
     let nextAlarmInfo = "غير مجدول حالياً";
     const nativePlugin = getAdhanSchedulerPlugin();
     if (nativePlugin) {
       try {
-        const alarmsData = await nativePlugin.getScheduledAlarms();
+        let alarmsData = await nativePlugin.getScheduledAlarms();
+        // If native plugin is available but has 0 scheduled alarms, auto-reschedule once
+        if (!alarmsData || !alarmsData.nextAlarm) {
+          await triggerReschedule();
+          alarmsData = await nativePlugin.getScheduledAlarms();
+        }
         if (alarmsData && alarmsData.nextAlarm) {
           const nextDate = new Date(alarmsData.nextAlarm.timeMillis);
-          nextAlarmInfo = `${alarmsData.nextAlarm.prayerName} - ${nextDate.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}`;
+          nextAlarmInfo = `${alarmsData.nextAlarm.prayerName} - ${formatArabicTime(nextDate)}`;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn("[AdhanEngine] Error querying native alarms:", e);
+      }
+    }
+
+    // Web Fallback or secondary calculation if native plugin not present or returned null
+    if (nextAlarmInfo === "غير مجدول حالياً") {
+      const timings = getCachedTimings();
+      const nextInfo = getNextPrayerInfo(settings, timings);
+      if (nextInfo) {
+        nextAlarmInfo = `${nextInfo.name} - ${formatArabicTime(nextInfo.date)}`;
+      } else {
+        const anyEnabled = prayerKeys.some((p) => settings[p] !== false);
+        if (!anyEnabled) {
+          nextAlarmInfo = "جميع أصوات الأذان مكتومة في الإعدادات";
+        }
+      }
     }
 
     const notifGranted = perms.notifications === "granted";
@@ -1033,7 +1202,7 @@
             <span class="diag-sub" id="nextAlarmDisplay">${nextAlarmInfo}</span>
           </div>
           <div class="diag-action">
-            <button class="diag-btn secondary" onclick="window.TazkeerAdhan.triggerReschedule(); window.TazkeerAdhan.renderAdhanSettingsContent();">
+            <button class="diag-btn secondary" onclick="window.TazkeerAdhan.handleManualReschedule(this)">
               <i class="fas fa-sync-alt"></i> تحديث
             </button>
           </div>
@@ -1168,5 +1337,9 @@
     setSelectedMuezzin,
     getSelectedMuezzin,
     triggerReschedule,
+    handleManualReschedule,
+    getNextPrayerInfo,
+    formatArabicTime,
+    getCachedTimings,
   };
 })();

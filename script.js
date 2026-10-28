@@ -4052,6 +4052,14 @@ async function initializePrayerTimes() {
     } catch (e) {
       console.warn("Saved location parse error", e);
     }
+  } else {
+    // Save default location so adhan scheduler has coordinates immediately
+    try {
+      localStorage.setItem(
+        "prayerLocation",
+        JSON.stringify({ latitude: lat, longitude: lng, city }),
+      );
+    } catch (e) {}
   }
 
   // 3. Seamlessly fetch fresh times in background
@@ -4146,6 +4154,7 @@ async function getCityName(latitude, longitude) {
 
 // Fetch prayer times from API
 async function fetchPrayerTimes(latitude, longitude, cityName) {
+  window.fetchPrayerTimes = fetchPrayerTimes;
   const loading = document.getElementById("prayerTimesLoading");
   const error = document.getElementById("prayerTimesError");
 
@@ -4163,6 +4172,7 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
 
     if (data.code === 200 && data.data) {
       prayerTimesData = data.data.timings;
+      window.prayerTimesData = prayerTimesData;
 
       // Cache the prayer times for offline use
       localStorage.setItem(
@@ -4170,6 +4180,10 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
         JSON.stringify(prayerTimesData),
       );
       localStorage.setItem("cachedPrayerCity", cityName);
+      localStorage.setItem(
+        "prayerLocation",
+        JSON.stringify({ latitude, longitude, city: cityName }),
+      );
 
       displayPrayerTimes(cityName);
       startCountdown();
