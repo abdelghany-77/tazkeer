@@ -4088,6 +4088,49 @@ body.dark-mode .prayer-adhan-btn:hover {
   font-size: 0.9rem;
 }
 
+.adhan-perm-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.adhan-settings-mini-btn {
+  background: rgba(16, 185, 129, 0.12);
+  color: #0f766e;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.adhan-settings-mini-btn:hover {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+  transform: translateY(-1px);
+}
+
+body.dark-mode .adhan-settings-mini-btn {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+body.dark-mode .adhan-settings-mini-btn:hover {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+}
+
 .adhan-perm-mini-btn {
   background: #1a8a5c;
   color: #ffffff;
@@ -12426,15 +12469,60 @@ body.dark-mode .adhan-header-btn:hover {
   color: #ffffff;
 }
 
+/* ==================== Adhan Settings Popup Modal ==================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  overflow-y: auto;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+  box-sizing: border-box;
+}
+
+.modal-overlay.hidden {
+  display: none !important;
+}
+
 .adhan-settings-card {
   max-width: 480px;
-  width: 92%;
+  width: 100%;
   border-radius: 20px;
-  background: var(--bg-card, #ffffff);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  background: #ffffff;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
   overflow: hidden;
   direction: rtl;
   font-family: 'Cairo', sans-serif;
+  animation: adhanModalScaleIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  margin: auto;
+}
+
+@keyframes adhanModalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+body.dark-mode .adhan-settings-card {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7);
+  color: #f1f5f9;
 }
 
 .modal-header {
@@ -12453,14 +12541,22 @@ body.dark-mode .modal-header {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--text-color, #1a202c);
+  color: #1a202c;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
+body.dark-mode .modal-title {
+  color: #f1f5f9;
+}
+
 .modal-title i {
   color: #10b981;
+}
+
+body.dark-mode .modal-title i {
+  color: #34d399;
 }
 
 .modal-close-btn {
@@ -12470,11 +12566,24 @@ body.dark-mode .modal-header {
   line-height: 1;
   cursor: pointer;
   color: #718096;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-close-btn:hover {
   color: #e53e3e;
+  transform: rotate(90deg);
+}
+
+body.dark-mode .modal-close-btn {
+  color: #94a3b8;
+}
+
+body.dark-mode .modal-close-btn:hover {
+  color: #f87171;
 }
 
 .modal-body {
@@ -12500,13 +12609,18 @@ body.dark-mode .modal-header {
 }
 
 body.dark-mode .diag-item {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .diag-item.highlight {
   background: rgba(16, 185, 129, 0.08);
   border-color: rgba(16, 185, 129, 0.2);
+}
+
+body.dark-mode .diag-item.highlight {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(52, 211, 153, 0.25);
 }
 
 .diag-info {
@@ -12518,14 +12632,22 @@ body.dark-mode .diag-item {
 .diag-label {
   font-weight: 700;
   font-size: 0.9rem;
-  color: var(--text-color, #2d3748);
+  color: #2d3748;
   display: flex;
   align-items: center;
   gap: 0.45rem;
 }
 
+body.dark-mode .diag-label {
+  color: #f1f5f9;
+}
+
 .diag-label i {
   color: #10b981;
+}
+
+body.dark-mode .diag-label i {
+  color: #34d399;
 }
 
 .diag-sub {
@@ -12534,7 +12656,7 @@ body.dark-mode .diag-item {
 }
 
 body.dark-mode .diag-sub {
-  color: #a0aec0;
+  color: #94a3b8;
 }
 
 .status-badge {
@@ -12547,6 +12669,11 @@ body.dark-mode .diag-sub {
 .status-badge.success {
   background: rgba(16, 185, 129, 0.15);
   color: #059669;
+}
+
+body.dark-mode .status-badge.success {
+  background: rgba(52, 211, 153, 0.2);
+  color: #34d399;
 }
 
 .diag-btn {
@@ -12579,6 +12706,16 @@ body.dark-mode .diag-sub {
   color: #ffffff;
 }
 
+body.dark-mode .diag-btn.secondary {
+  background: rgba(52, 211, 153, 0.2);
+  color: #34d399;
+}
+
+body.dark-mode .diag-btn.secondary:hover {
+  background: #10b981;
+  color: #ffffff;
+}
+
 .muezzin-select-section {
   margin-top: 0.5rem;
 }
@@ -12588,7 +12725,11 @@ body.dark-mode .diag-sub {
   font-size: 0.9rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: var(--text-color, #2d3748);
+  color: #2d3748;
+}
+
+body.dark-mode .muezzin-section-title {
+  color: #f1f5f9;
 }
 
 .muezzin-options-grid {
@@ -12609,14 +12750,14 @@ body.dark-mode .diag-sub {
   font-family: inherit;
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--text-color, #2d3748);
+  color: #2d3748;
   transition: all 0.2s ease;
   text-align: right;
   width: 100%;
 }
 
 body.dark-mode .muezzin-card-btn {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.08);
   color: #e2e8f0;
 }
@@ -12640,6 +12781,10 @@ body.dark-mode .muezzin-card-btn.active {
 
 .muezzin-card-btn.active i {
   color: #10b981;
+}
+
+body.dark-mode .muezzin-card-btn.active i {
+  color: #34d399;
 }
 
 .adhan-settings-actions {
@@ -12681,4 +12826,33 @@ body.dark-mode .muezzin-card-btn.active {
 
 .stop-adhan-btn:hover {
   background: #dc2626;
+}
+
+.save-adhan-settings-btn {
+  width: 100%;
+  margin-top: 0.85rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s ease;
+}
+
+.save-adhan-settings-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.save-adhan-settings-btn:active {
+  transform: translateY(0);
 }

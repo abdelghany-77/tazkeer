@@ -172,10 +172,18 @@
               <i class="fas fa-bell" id="adhanPermMiniIcon"></i>
               <span id="adhanPermMiniText">تفعيل صوت الأذان</span>
             </div>
-            <button class="adhan-perm-mini-btn" id="adhanPermMiniBtn" type="button"
-              onclick="window.TazkeerAdhan && window.TazkeerAdhan.handlePermissionButtonClick()">
-              <span id="adhanPermMiniBtnText">تفعيل</span>
-            </button>
+            <div class="adhan-perm-actions">
+              <button class="adhan-settings-mini-btn" id="adhanSettingsMiniBtn" type="button"
+                title="إعدادات الأذان والتنبيهات" aria-label="إعدادات الأذان والتنبيهات"
+                onclick="window.TazkeerAdhan && window.TazkeerAdhan.openAdhanSettingsModal()">
+                <i class="fas fa-sliders"></i>
+                <span>الإعدادات</span>
+              </button>
+              <button class="adhan-perm-mini-btn" id="adhanPermMiniBtn" type="button"
+                onclick="window.TazkeerAdhan && window.TazkeerAdhan.handlePermissionButtonClick()">
+                <span id="adhanPermMiniBtnText">تفعيل</span>
+              </button>
+            </div>
           </div>
 
           <div class="next-prayer-countdown" id="nextPrayerCountdown">

@@ -313,7 +313,9 @@
       if (btnText) btnText.textContent = "مفعّل ✓";
       if (btn) {
         btn.className = "adhan-perm-mini-btn active-granted";
-        btn.onclick = () => openAdhanSettingsModal();
+        btn.onclick = () => {
+          showToast("صوت وتنبيهات الأذان مفعّلة بنجاح ✓", "info");
+        };
       }
     } else {
       // Web platform
@@ -325,7 +327,9 @@
         if (btnText) btnText.textContent = "مفعّل ✓";
         if (btn) {
           btn.className = "adhan-perm-mini-btn active-granted";
-          btn.onclick = () => openAdhanSettingsModal();
+          btn.onclick = () => {
+            showToast("صوت وتنبيهات الأذان مفعّلة بنجاح ✓", "info");
+          };
         }
       } else if (perms.notifications === "denied") {
         bar.classList.remove("hidden");
@@ -896,20 +900,29 @@
       modal.id = "adhanSettingsModal";
       modal.className = "modal-overlay hidden";
       modal.innerHTML = `
-        <div class="modal-card adhan-settings-card">
+        <div class="modal-card adhan-settings-card" role="dialog" aria-modal="true" aria-labelledby="adhanSettingsTitle">
           <div class="modal-header">
-            <h3 class="modal-title"><i class="fas fa-sliders"></i> إعدادات الأذان والتنبيهات</h3>
-            <button class="modal-close-btn" onclick="window.TazkeerAdhan.closeAdhanSettingsModal()">&times;</button>
+            <h3 class="modal-title" id="adhanSettingsTitle"><i class="fas fa-sliders"></i> إعدادات الأذان والتنبيهات</h3>
+            <button class="modal-close-btn" type="button" aria-label="إغلاق" onclick="window.TazkeerAdhan.closeAdhanSettingsModal()">&times;</button>
           </div>
           <div class="modal-body" id="adhanSettingsModalBody">
             <div class="loading-spinner"><i class="fas fa-circle-notch fa-spin"></i> جاري فحص الإعدادات...</div>
           </div>
         </div>
       `;
+
+      // Close when clicking outside on the backdrop overlay
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          closeAdhanSettingsModal();
+        }
+      });
+
       document.body.appendChild(modal);
     }
 
     modal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
     await renderAdhanSettingsContent();
   }
 
@@ -920,7 +933,16 @@
     const modal = document.getElementById("adhanSettingsModal");
     if (modal) {
       modal.classList.add("hidden");
+      document.body.style.overflow = "";
     }
+  }
+
+  /**
+   * Save settings and close modal
+   */
+  function saveAndCloseSettings() {
+    closeAdhanSettingsModal();
+    showToast("تم حفظ إعدادات الأذان بنجاح ✓", "success");
   }
 
   /**
@@ -1044,6 +1066,11 @@
             <i class="fas fa-stop"></i> إيقاف الأذان
           </button>
         </div>
+
+        <!-- Save Button -->
+        <button type="button" class="save-adhan-settings-btn" onclick="window.TazkeerAdhan.saveAndCloseSettings()">
+          <i class="fas fa-check-circle"></i> حفظ الإعدادات
+        </button>
       </div>
     `;
   }
@@ -1097,6 +1124,13 @@
     updateToggleButtonsUI();
     updateStatusBarUI();
 
+    // Close settings modal on Escape key press
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeAdhanSettingsModal();
+      }
+    });
+
     // Auto-schedule on startup from cached prayer times
     triggerReschedule();
   }
@@ -1129,6 +1163,7 @@
     showPermissionHelpModal,
     openAdhanSettingsModal,
     closeAdhanSettingsModal,
+    saveAndCloseSettings,
     renderAdhanSettingsContent,
     setSelectedMuezzin,
     getSelectedMuezzin,
