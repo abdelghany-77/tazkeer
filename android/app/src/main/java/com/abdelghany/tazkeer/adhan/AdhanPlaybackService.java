@@ -224,7 +224,7 @@ public class AdhanPlaybackService extends Service implements
         stopIntent.setAction(ACTION_STOP_ADHAN);
         PendingIntent stopPendingIntent = PendingIntent.getService(this, 1002, stopIntent, piFlags);
 
-        int smallIcon = getResources().getIdentifier("ic_stat_icon_config_sample", "drawable", getPackageName());
+        int smallIcon = getResources().getIdentifier("ic_stat_name", "drawable", getPackageName());
         if (smallIcon == 0) {
             smallIcon = R.mipmap.ic_launcher;
         }

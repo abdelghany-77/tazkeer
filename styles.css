@@ -8176,6 +8176,117 @@ body.light-mode .dash-sadaqa {
   color: #4a5568;
 }
 
+/* ── Backup & Restore card ── */
+.backup-card {
+  margin-top: 0.85rem;
+}
+.backup-hint {
+  margin: 0 0 0.9rem;
+  font-size: 0.82rem;
+  line-height: 1.8;
+  color: #a0aec0;
+}
+body.light-mode .backup-hint {
+  color: #718096;
+}
+.backup-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+.backup-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 46px;
+  padding: 0.65rem 0.5rem;
+  border: 1px solid rgba(26, 138, 92, 0.28);
+  border-radius: 12px;
+  background: rgba(26, 138, 92, 0.08);
+  color: #68d391;
+  font-family: "Cairo", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.5;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.15s;
+}
+.backup-btn:hover {
+  background: #1a8a5c;
+  color: #fff;
+}
+.backup-btn:active {
+  transform: scale(0.97);
+}
+.backup-btn-primary {
+  background: linear-gradient(135deg, #1a8a5c, #0d6b4e);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(26, 138, 92, 0.28);
+}
+.backup-btn-primary:hover {
+  background: linear-gradient(135deg, #14805a, #095a42);
+}
+body.light-mode .backup-btn {
+  background: rgba(26, 138, 92, 0.06);
+  border-color: rgba(26, 138, 92, 0.2);
+  color: #276749;
+}
+body.light-mode .backup-btn:hover {
+  background: #1a8a5c;
+  color: #fff;
+}
+body.light-mode .backup-btn-primary {
+  background: linear-gradient(135deg, #1a8a5c, #0d6b4e);
+  color: #fff;
+}
+.backup-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.75rem 0;
+  color: #718096;
+  font-size: 0.72rem;
+}
+.backup-divider::before,
+.backup-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+body.light-mode .backup-divider::before,
+body.light-mode .backup-divider::after {
+  background: rgba(0, 0, 0, 0.08);
+}
+.backup-file-input {
+  display: none;
+}
+.backup-status {
+  margin: 0.7rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  text-align: center;
+  min-height: 1.2em;
+  color: #a0aec0;
+}
+.backup-status.success {
+  color: #68d391;
+}
+.backup-status.error {
+  color: #fc8181;
+}
+body.light-mode .backup-status.success {
+  color: #1a8a5c;
+}
+body.light-mode .backup-status.error {
+  color: #c53030;
+}
+
 /* ── Responsive ── */
 @media (max-width: 480px) {
   .dash-summary {

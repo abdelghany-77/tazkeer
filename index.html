@@ -727,6 +727,38 @@
 
         </div>
 
+        <!-- ─ Section: النسخ الاحتياطي واستعادة التقدم ─ -->
+        <div class="dash-card backup-card" id="backupCard">
+          <div class="dash-card-head">
+            <svg class="dash-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+            </svg>
+            <h3>☁️ حفظ واستعادة بيانات التقدم (نسخ احتياطي)</h3>
+          </div>
+          <p class="backup-hint">انقل تقدمك من متصفحك إلى التطبيق، أو احتفظ بنسخة آمنة قبل تحديث التطبيق حتى لا تفقد الختمة والأذكار والأيام المتتالية.</p>
+          <div class="backup-actions">
+            <button type="button" class="backup-btn backup-btn-primary" onclick="copyProgressBackup()">
+              📋 نسخ كود التقدم
+            </button>
+            <button type="button" class="backup-btn" onclick="restoreProgressFromClipboard()">
+              📥 لصق واستعادة التقدم
+            </button>
+          </div>
+          <div class="backup-divider"><span>أو</span></div>
+          <div class="backup-actions">
+            <button type="button" class="backup-btn" onclick="exportProgressFile()">
+              💾 تصدير ملف احتياطي (.json)
+            </button>
+            <button type="button" class="backup-btn" onclick="triggerImportProgressFile()">
+              📂 استيراد ملف
+            </button>
+          </div>
+          <input type="file" id="progressImportInput" class="backup-file-input" accept=".json,application/json"
+            onchange="handleProgressImportFile(event)">
+          <p class="backup-status" id="backupStatus" aria-live="polite"></p>
+        </div>
+
         <!-- Sadaqa Jariyah -->
         <div class="dash-card dash-sadaqa">
           <p>اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد عَبْدالغَنِي

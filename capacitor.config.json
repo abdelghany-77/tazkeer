@@ -7,8 +7,8 @@
   },
   "plugins": {
     "LocalNotifications": {
-      "smallIcon": "ic_stat_icon_config_sample",
-      "iconColor": "#1a202c",
+      "smallIcon": "ic_stat_name",
+      "iconColor": "#10B981",
       "sound": "adhan.mp3"
     }
   }

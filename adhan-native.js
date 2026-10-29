@@ -756,7 +756,7 @@
               : `حي على الصلاة، حي على الفلاح - صلاة ${prayerNameAr} يرحمكم الله`,
             channelId: channelId,
             sound: soundFile,
-            smallIcon: "ic_stat_icon_config_sample",
+            smallIcon: "ic_stat_name",
             iconColor: "#10B981",
             schedule: {
               at: prayerDate,
