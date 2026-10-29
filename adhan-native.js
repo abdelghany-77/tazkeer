@@ -19,8 +19,8 @@
   // Storage Keys & Channels
   const STORAGE_KEY_SETTINGS = "tazkeer_adhan_settings";
   const STORAGE_KEY_MUEZZIN = "tazkeer_adhan_muezzin";
-  const CHANNEL_REGULAR_ID = "adhan_regular_v3";
-  const CHANNEL_FAJR_ID = "adhan_fajr_v3";
+  const CHANNEL_REGULAR_ID = "adhan_regular_v4";
+  const CHANNEL_FAJR_ID = "adhan_fajr_v4";
 
   const PRAYER_NAMES = {
     Fajr: "الفجر",
@@ -54,6 +54,7 @@
   // State
   let currentAudio = null;
   let channelsInitialized = false;
+  let exactAlarmWarningShown = false;
 
   /**
    * Detect if running inside Capacitor native container (Android/iOS)
@@ -68,13 +69,26 @@
   }
 
   /**
-   * Get AdhanScheduler native plugin safely
+   * Get AdhanScheduler native plugin safely.
+   * Falls back to Capacitor.registerPlugin() for custom plugins that are not
+   * listed in capacitor.plugins.json (this plugin is registered from MainActivity).
    */
+  let cachedAdhanPlugin = null;
   function getAdhanSchedulerPlugin() {
-    if (isNativePlatform() && window.Capacitor && window.Capacitor.Plugins) {
-      return window.Capacitor.Plugins.AdhanScheduler || null;
+    if (!isNativePlatform() || !window.Capacitor) return null;
+
+    if (window.Capacitor.Plugins && window.Capacitor.Plugins.AdhanScheduler) {
+      return window.Capacitor.Plugins.AdhanScheduler;
     }
-    return null;
+
+    if (!cachedAdhanPlugin && typeof window.Capacitor.registerPlugin === "function") {
+      try {
+        cachedAdhanPlugin = window.Capacitor.registerPlugin("AdhanScheduler");
+      } catch (e) {
+        console.warn("[AdhanEngine] Could not register AdhanScheduler plugin:", e);
+      }
+    }
+    return cachedAdhanPlugin || null;
   }
 
   /**
@@ -739,6 +753,18 @@
         console.log(
           `[AdhanEngine] Native AlarmManager scheduled ${res.scheduledCount} exact alarms.`,
         );
+
+        // Without the exact-alarm permission Android cannot reliably wake the
+        // app in the background, so the adhan may be silent when the app is
+        // closed. Warn the user once per session.
+        const perms = await nativePlugin.checkPermissions();
+        if (!perms.canScheduleExact && !exactAlarmWarningShown) {
+          exactAlarmWarningShown = true;
+          showToast(
+            "لسماع الأذان والتطبيق مغلق، فعّل إذن (المنبهات والتذكيرات) من شريط الأذان أعلى الصفحة",
+            "warning",
+          );
+        }
       } catch (err) {
         console.error("[AdhanEngine] Error scheduling native alarms:", err);
       }
@@ -824,8 +850,23 @@
           return;
         }
       } catch (e) {}
-      // On native platform, native AlarmManager and ForegroundService handle playback.
-      // Do not duplicate audio in WebView.
+
+      // Give the native alarm a moment to launch the foreground service, then
+      // re-check. If it still did not start (e.g. the exact-alarm permission
+      // was revoked), fall back to WebView playback while the app is visible
+      // instead of staying silent.
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      try {
+        const res2 = await nativePlugin.isPlaying();
+        if (res2 && res2.isPlaying) return;
+      } catch (e) {}
+
+      console.warn(
+        "[AdhanEngine] Native adhan did not start, falling back to in-app playback.",
+      );
+      if (document.visibilityState === "visible") {
+        playWebAdhan(prayer === "Fajr");
+      }
       return;
     }
 
@@ -1271,6 +1312,7 @@
     }
 
     // Reconcile alarms when the application resumes from background
+    let lastResumeReschedule = 0;
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         console.log(
@@ -1278,6 +1320,14 @@
         );
         updateStatusBarUI();
         updateToggleButtonsUI();
+
+        // Re-register the upcoming alarms (throttled) so a schedule that was
+        // lost while the app was killed / force-stopped is restored immediately.
+        const nowTs = Date.now();
+        if (nowTs - lastResumeReschedule > 60000) {
+          lastResumeReschedule = nowTs;
+          triggerReschedule();
+        }
       }
     });
 

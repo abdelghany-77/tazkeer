@@ -47,6 +47,7 @@ public class AdhanPlaybackService extends Service implements
     private AudioManager audioManager;
     private AudioFocusRequest audioFocusRequest;
     private PowerManager.WakeLock wakeLock;
+    private boolean isStopping = false;
 
     public static boolean isPlaying() {
         return sIsPlaying;
@@ -78,6 +79,7 @@ public class AdhanPlaybackService extends Service implements
         }
 
         if (ACTION_START_ADHAN.equals(action)) {
+            isStopping = false;
             String prayerKey = intent.getStringExtra(EXTRA_PRAYER_KEY);
             String prayerName = intent.getStringExtra(EXTRA_PRAYER_NAME);
             String soundRes = intent.getStringExtra(EXTRA_SOUND_RES);
@@ -137,6 +139,8 @@ public class AdhanPlaybackService extends Service implements
                     .build();
             mediaPlayer.setAudioAttributes(audioAttributes);
             mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+            mediaPlayer.setVolume(1.0f, 1.0f);
+            mediaPlayer.setLooping(false);
             mediaPlayer.setOnCompletionListener(this);
             mediaPlayer.setOnErrorListener(this);
 
@@ -304,6 +308,8 @@ public class AdhanPlaybackService extends Service implements
     }
 
     private void stopPlaybackAndService() {
+        if (isStopping) return;
+        isStopping = true;
         sIsPlaying = false;
         try {
             if (mediaPlayer != null) {
@@ -326,11 +332,22 @@ public class AdhanPlaybackService extends Service implements
         }
 
         try {
-            stopForeground(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                stopForeground(STOP_FOREGROUND_REMOVE);
+            } else {
+                stopForeground(true);
+            }
         } catch (Exception ignored) {}
 
         stopSelf();
         Log.i(TAG, "Adhan playback service stopped and cleaned up.");
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        // Keep the adhan playing even if the user swipes the app away from recents.
+        Log.i(TAG, "Task removed while Adhan is playing, keeping service alive.");
+        super.onTaskRemoved(rootIntent);
     }
 
     @Override

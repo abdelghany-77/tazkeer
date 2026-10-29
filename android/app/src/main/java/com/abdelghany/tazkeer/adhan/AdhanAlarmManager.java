@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
+import com.abdelghany.tazkeer.MainActivity;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,14 +82,45 @@ public class AdhanAlarmManager {
     }
 
     public synchronized int scheduleAlarms(List<AlarmItem> alarms) {
-        cancelAllAlarms();
+        return scheduleAlarms(alarms, true);
+    }
 
+    /**
+     * Schedule a single alarm without cancelling the already scheduled prayer alarms.
+     * Used by the "test adhan" button so testing never wipes the real schedule.
+     */
+    public synchronized int scheduleSingleAlarm(AlarmItem alarm) {
+        List<AlarmItem> list = new ArrayList<>();
+        if (alarm != null) {
+            list.add(alarm);
+        }
+        return scheduleAlarms(list, false);
+    }
+
+    /**
+     * @param replaceExisting when true all previously scheduled alarms are cancelled first.
+     */
+    public synchronized int scheduleAlarms(List<AlarmItem> alarms, boolean replaceExisting) {
         if (alarms == null || alarms.isEmpty() || alarmManager == null) {
             return 0;
         }
 
+        if (replaceExisting) {
+            cancelAllAlarms();
+        }
+
         long now = System.currentTimeMillis();
         List<AlarmItem> validAlarms = new ArrayList<>();
+
+        int piFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            piFlags |= PendingIntent.FLAG_IMMUTABLE;
+        }
+
+        // Intent used by the system "show alarm" affordance of setAlarmClock().
+        Intent showIntent = new Intent(context, MainActivity.class);
+        showIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent showPendingIntent = PendingIntent.getActivity(context, 2000, showIntent, piFlags);
 
         for (AlarmItem item : alarms) {
             if (item.timeMillis <= now) {
@@ -101,34 +134,45 @@ public class AdhanAlarmManager {
             intent.putExtra(AdhanAlarmReceiver.EXTRA_PRAYER_NAME, item.prayerName);
             intent.putExtra(AdhanAlarmReceiver.EXTRA_SOUND_RES, item.soundRes);
 
-            int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                flags |= PendingIntent.FLAG_IMMUTABLE;
-            }
-
             PendingIntent pendingIntent = PendingIntent.getBroadcast(
                     context,
                     item.id,
                     intent,
-                    flags
+                    piFlags
             );
 
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        if (alarmManager.canScheduleExactAlarms()) {
+                boolean scheduled = false;
+
+                if (canScheduleExactAlarms()) {
+                    // setAlarmClock is the most reliable option: it is exact, wakes the
+                    // device from Doze and grants a short background-start allowlist so
+                    // the foreground playback service can be launched while the app is
+                    // killed. This is what makes the adhan audible outside the app.
+                    try {
+                        alarmManager.setAlarmClock(
+                                new AlarmManager.AlarmClockInfo(item.timeMillis, showPendingIntent),
+                                pendingIntent
+                        );
+                        scheduled = true;
+                    } catch (SecurityException se) {
+                        Log.w(TAG, "setAlarmClock rejected, trying setExactAndAllowWhileIdle", se);
+                    }
+                }
+
+                if (!scheduled) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (canScheduleExactAlarms()) {
                             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, item.timeMillis, pendingIntent);
                         } else {
                             Log.w(TAG, "Exact alarm permission not granted, falling back to setAndAllowWhileIdle");
                             alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, item.timeMillis, pendingIntent);
                         }
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.timeMillis, pendingIntent);
                     } else {
-                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, item.timeMillis, pendingIntent);
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, item.timeMillis, pendingIntent);
                     }
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, item.timeMillis, pendingIntent);
-                } else {
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, item.timeMillis, pendingIntent);
                 }
 
                 validAlarms.add(item);
@@ -145,8 +189,12 @@ public class AdhanAlarmManager {
             }
         }
 
-        saveAlarmsToPrefs(validAlarms);
-        Log.i(TAG, "Successfully scheduled " + validAlarms.size() + " native Adhan alarms.");
+        if (replaceExisting) {
+            saveAlarmsToPrefs(validAlarms);
+        } else {
+            appendAlarmsToPrefs(validAlarms);
+        }
+        Log.i(TAG, "Successfully scheduled " + validAlarms.size() + " native Adhan alarms (replace=" + replaceExisting + ").");
         return validAlarms.size();
     }
 
@@ -240,6 +288,30 @@ public class AdhanAlarmManager {
             arr.put(item.toJson());
         }
         prefs.edit().putString(KEY_SCHEDULED_ALARMS, arr.toString()).apply();
+    }
+
+    private void appendAlarmsToPrefs(List<AlarmItem> alarms) {
+        long now = System.currentTimeMillis();
+        List<AlarmItem> merged = new ArrayList<>();
+        for (AlarmItem existing : getSavedAlarms()) {
+            if (existing.timeMillis > now) {
+                merged.add(existing);
+            }
+        }
+        for (AlarmItem item : alarms) {
+            boolean replaced = false;
+            for (int i = 0; i < merged.size(); i++) {
+                if (merged.get(i).id == item.id) {
+                    merged.set(i, item);
+                    replaced = true;
+                    break;
+                }
+            }
+            if (!replaced) {
+                merged.add(item);
+            }
+        }
+        saveAlarmsToPrefs(merged);
     }
 
     private void clearSavedAlarms() {

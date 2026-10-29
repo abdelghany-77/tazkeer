@@ -3393,7 +3393,7 @@ function updateInstallButtonVisibility() {
 }
 
 function downloadApk() {
-  const apkPath = "apk/tazkeer.apk";
+  const apkPath = "apk/" + encodeURIComponent("ذَكِّرْ.apk");
   const link = document.createElement("a");
   link.href = apkPath;
   link.setAttribute("download", "ذَكِّرْ.apk");

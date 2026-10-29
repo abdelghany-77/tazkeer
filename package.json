@@ -6,7 +6,7 @@
     "build": "node scripts/build.js",
     "sync": "node scripts/build.js && npx cap sync android",
     "open": "npx cap open android",
-    "build:apk": "cd android && gradlew assembleDebug"
+    "build:apk": "npm run sync && cd android && gradlew assembleDebug"
   },
   "repository": {
     "type": "git",

@@ -221,9 +221,8 @@ public class AdhanSchedulerPlugin extends Plugin {
             item.prayerName = prayerName;
             item.soundRes = soundRes;
 
-            List<AdhanAlarmManager.AlarmItem> list = new ArrayList<>();
-            list.add(item);
-            AdhanAlarmManager.getInstance(getContext()).scheduleAlarms(list);
+            // Schedule only the test alarm so the real prayer alarms are not wiped.
+            AdhanAlarmManager.getInstance(getContext()).scheduleSingleAlarm(item);
 
             JSObject ret = new JSObject();
             ret.put("success", true);

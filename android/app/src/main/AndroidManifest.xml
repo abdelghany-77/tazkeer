@@ -39,9 +39,13 @@
             android:name=".adhan.AdhanAlarmReceiver"
             android:exported="false" />
 
+        <!-- Must be exported so the system can deliver the protected boot /
+             time-change broadcasts after a reboot. All actions below are
+             protected system broadcasts, so this does not expose the app. -->
         <receiver
             android:name=".adhan.AdhanBootReceiver"
-            android:exported="false">
+            android:exported="true"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
