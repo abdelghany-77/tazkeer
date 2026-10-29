@@ -1,0 +1,32 @@
+{
+  "name": "tazkeer",
+  "version": "1.0.0",
+  "description": "تطبيق ذَكِّرْ - رفيق المسلم اليومي مع مواقيت الصلاة والأذان التلقائي",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "generate:icons": "node scripts/generate-icons.js",
+    "sync": "node scripts/build.js && npx cap sync android",
+    "open": "npx cap open android",
+    "build:apk": "npm run sync && cd android && gradlew assembleDebug && cd .. && node scripts/copy-apk.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abdelghany-77/tazkeer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abdelghany-77/tazkeer/issues"
+  },
+  "homepage": "https://github.com/abdelghany-77/tazkeer#readme",
+  "dependencies": {
+    "@capacitor/android": "^6.2.2",
+    "@capacitor/cli": "^6.2.2",
+    "@capacitor/core": "^6.2.2",
+    "@capacitor/local-notifications": "^6.1.3"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5"
+  }
+}

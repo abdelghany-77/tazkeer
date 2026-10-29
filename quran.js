@@ -745,10 +745,14 @@ function showQuranPage() {
 
   if (quranViewerState.currentView === "reader") {
     renderMushafViewer();
-  } else if (khatmahState.isActive) {
-    renderKhatmahDashboard();
   } else {
-    renderKhatmahSetup();
+    const bottomNav = document.getElementById("bottomNav");
+    if (bottomNav) bottomNav.style.display = "";
+    if (khatmahState.isActive) {
+      renderKhatmahDashboard();
+    } else {
+      renderKhatmahSetup();
+    }
   }
 }
 
@@ -756,6 +760,8 @@ function showQuranPage() {
  * Render Khatmah Setup Screen
  */
 function renderKhatmahSetup() {
+  const bottomNav = document.getElementById("bottomNav");
+  if (bottomNav) bottomNav.style.display = "";
   quranViewerState.currentView = "setup";
   const container = document.getElementById("quranPageContent");
   if (!container) return;
@@ -859,6 +865,8 @@ function renderKhatmahSetup() {
  * Render Surah List for free reading mode with Search & Offline Downloader
  */
 function renderSurahList() {
+  const bottomNav = document.getElementById("bottomNav");
+  if (bottomNav) bottomNav.style.display = "";
   quranViewerState.currentView = "surah-list";
   const container = document.getElementById("quranPageContent");
   if (!container) return;
@@ -1009,8 +1017,10 @@ function openKhatmahReader() {
  * Called when user finishes reading all pages in a wird
  */
 function completeWirdAndReturn() {
+  const bottomNav = document.getElementById("bottomNav");
+  if (bottomNav) bottomNav.style.display = "";
   if (typeof showNotification === "function") {
-    showNotification("أتممت الورد! بارك الله فيك ");
+    showNotification("أتممت الورد! بارك الله فيك");
   }
   renderKhatmahDashboard();
 }
@@ -1019,6 +1029,8 @@ function completeWirdAndReturn() {
  * Render Khatmah Dashboard
  */
 function renderKhatmahDashboard() {
+  const bottomNav = document.getElementById("bottomNav");
+  if (bottomNav) bottomNav.style.display = "";
   quranViewerState.currentView = "dashboard";
   const container = document.getElementById("quranPageContent");
   if (!container) return;

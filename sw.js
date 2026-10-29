@@ -1,4 +1,4 @@
-const CACHE_NAME = "tazkeer-v8.15";
+const CACHE_NAME = "tazkeer-v8.18";
 const QURAN_CACHE_NAME = "tazkeer-quran-pages-v1";
 const PROPHETS_CACHE_NAME = "tazkeer-prophets-v1";
 const urlsToCache = [
@@ -7,6 +7,7 @@ const urlsToCache = [
   "./styles.css",
   "./quran.css",
   "./dailyDuas.js",
+  "./adhan-native.js",
   "./script.js",
   "./quran.js",
   "./manifest.json",
