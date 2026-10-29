@@ -7,7 +7,7 @@
  * - Notification with interactive "Stop Adhan" action button
  * - Native BootReceiver to restore scheduled alarms on device reboot / timezone change
  * - App-killed and screen-locked full Adhan playback
- * - 7-day upcoming prayer schedule with offline caching
+ * - 30-day upcoming prayer schedule with offline caching
  * - Per-prayer mute/unmute toggles
  * - Multiple muezzin selection (Mishary Alafasy, Abdulbasit, Makkah)
  * - Standard Web Audio and notification fallback for browsers
@@ -21,6 +21,7 @@
   const STORAGE_KEY_MUEZZIN = "tazkeer_adhan_muezzin";
   const CHANNEL_REGULAR_ID = "adhan_regular_v4";
   const CHANNEL_FAJR_ID = "adhan_fajr_v4";
+  const SCHEDULE_DAYS = 30;
 
   const PRAYER_NAMES = {
     Fajr: "الفجر",
@@ -621,10 +622,10 @@
   }
 
   /**
-   * Schedule 7 days of upcoming prayer adhans using Native Exact Alarms
+   * Schedule 30 days of upcoming prayer adhans using Native Exact Alarms
    */
   async function schedule7DaysAdhan(latitude, longitude, todayTimings) {
-    console.log("[AdhanEngine] Scheduling upcoming 7 days of Adhan...");
+    console.log("[AdhanEngine] Scheduling upcoming 30 days of Adhan...");
 
     const nativePlugin = getAdhanSchedulerPlugin();
     const localPlugin = getLocalNotificationsPlugin();
@@ -641,29 +642,47 @@
     const nativeAlarmsList = [];
     const localNotificationsList = [];
 
-    // Attempt to fetch exact monthly calendar for 7-day astronomical accuracy with timeout
+    // Attempt to fetch exact monthly calendars covering the whole scheduling
+    // window (current month + next 2 months) with a shared timeout.
     let monthlyCalendar = null;
     try {
-      const year = now.getFullYear();
-      const month = now.getMonth() + 1;
+      const monthsToFetch = [];
+      for (let i = 0; i < 3; i++) {
+        const monthDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
+        monthsToFetch.push({
+          year: monthDate.getFullYear(),
+          month: monthDate.getMonth() + 1,
+        });
+      }
+
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 2500);
-      const res = await fetch(
-        `https://api.aladhan.com/v1/calendar/${year}/${month}?latitude=${latitude}&longitude=${longitude}&method=5`,
-        { signal: controller.signal },
+      const timer = setTimeout(() => controller.abort(), 4000);
+      const responses = await Promise.all(
+        monthsToFetch.map(({ year, month }) =>
+          fetch(
+            `https://api.aladhan.com/v1/calendar/${year}/${month}?latitude=${latitude}&longitude=${longitude}&method=5`,
+            { signal: controller.signal },
+          )
+            .then((res) => (res.ok ? res.json() : null))
+            .catch(() => null),
+        ),
       );
       clearTimeout(timer);
-      if (res.ok) {
-        const json = await res.json();
-        if (json.code === 200 && Array.isArray(json.data)) {
-          monthlyCalendar = json.data;
+
+      const combinedCalendar = [];
+      for (const json of responses) {
+        if (json && json.code === 200 && Array.isArray(json.data)) {
+          combinedCalendar.push(...json.data);
         }
+      }
+      if (combinedCalendar.length > 0) {
+        monthlyCalendar = combinedCalendar;
       }
     } catch (e) {
       console.warn("[AdhanEngine] Using today's timings projection (offline / fast fallback):", e);
     }
 
-    for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+    for (let dayOffset = 0; dayOffset < SCHEDULE_DAYS; dayOffset++) {
       const targetDay = new Date(
         now.getFullYear(),
         now.getMonth(),
@@ -725,22 +744,26 @@
           soundRes: soundFile,
         });
 
-        // Backup LocalNotification
-        localNotificationsList.push({
-          id: notificationId,
-          title: `حان الآن موعد أذان ${prayerNameAr}`,
-          body: isFajr
-            ? "حي على الصلاة، حي على الفلاح (الصلاة خير من النوم)"
-            : `حي على الصلاة، حي على الفلاح - صلاة ${prayerNameAr} يرحمكم الله`,
-          channelId: channelId,
-          sound: soundFile,
-          smallIcon: "ic_stat_icon_config_sample",
-          iconColor: "#10B981",
-          schedule: {
-            at: prayerDate,
-            allowWhileIdle: true,
-          },
-        });
+        // LocalNotifications are only a fallback for builds where the native
+        // AdhanScheduler plugin is missing. Scheduling them alongside the
+        // native alarms would play the adhan twice at the same second.
+        if (!nativePlugin) {
+          localNotificationsList.push({
+            id: notificationId,
+            title: `حان الآن موعد أذان ${prayerNameAr}`,
+            body: isFajr
+              ? "حي على الصلاة، حي على الفلاح (الصلاة خير من النوم)"
+              : `حي على الصلاة، حي على الفلاح - صلاة ${prayerNameAr} يرحمكم الله`,
+            channelId: channelId,
+            sound: soundFile,
+            smallIcon: "ic_stat_icon_config_sample",
+            iconColor: "#10B981",
+            schedule: {
+              at: prayerDate,
+              allowWhileIdle: true,
+            },
+          });
+        }
       });
     }
 
@@ -770,8 +793,8 @@
       }
     }
 
-    // 2. Schedule LocalNotifications
-    if (localPlugin) {
+    // 2. Schedule LocalNotifications only as a fallback without native alarms
+    if (localPlugin && !nativePlugin) {
       try {
         const pending = await localPlugin.getPending();
         if (
@@ -1308,6 +1331,26 @@
             },
           );
         } catch (e) {}
+      }
+
+      // Cancel notifications scheduled by older builds, which fired in
+      // addition to the native foreground service and played the adhan twice.
+      const nativePlugin = getAdhanSchedulerPlugin();
+      if (nativePlugin && localPlugin) {
+        try {
+          const pending = await localPlugin.getPending();
+          const legacyIds = (pending.notifications || [])
+            .filter((n) => n.id < 90000)
+            .map((n) => ({ id: n.id }));
+          if (legacyIds.length > 0) {
+            await localPlugin.cancel({ notifications: legacyIds });
+          }
+        } catch (e) {
+          console.warn(
+            "[AdhanEngine] Error clearing legacy local notifications:",
+            e,
+          );
+        }
       }
     }
 

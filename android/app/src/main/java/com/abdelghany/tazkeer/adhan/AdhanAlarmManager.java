@@ -101,12 +101,14 @@ public class AdhanAlarmManager {
      * @param replaceExisting when true all previously scheduled alarms are cancelled first.
      */
     public synchronized int scheduleAlarms(List<AlarmItem> alarms, boolean replaceExisting) {
-        if (alarms == null || alarms.isEmpty() || alarmManager == null) {
-            return 0;
-        }
-
+        // Cancel first even when the new list is empty, so muting every prayer
+        // (or having no future alarms left) removes previously scheduled ones.
         if (replaceExisting) {
             cancelAllAlarms();
+        }
+
+        if (alarms == null || alarms.isEmpty() || alarmManager == null) {
+            return 0;
         }
 
         long now = System.currentTimeMillis();
