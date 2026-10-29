@@ -1399,10 +1399,6 @@ const resetAllBtn = document.getElementById("resetAllBtn");
 
 /* ─── Tab Switching System ─── */
 function switchTab(tabId) {
-  // Always restore bottom nav visibility when switching tabs
-  var bottomNav = document.getElementById("bottomNav");
-  if (bottomNav) bottomNav.style.display = "";
-
   // Hide all tab sections
   document.querySelectorAll(".tab-content").forEach(function (section) {
     section.classList.remove("active-tab");
@@ -2914,7 +2910,6 @@ function loadSwiperFontSize() {
 
 // Save progress to localStorage (date-aware)
 function saveProgress() {
-  if (window.__tazkeerBackupRestoring) return;
   localStorage.setItem(
     "adhkarProgress",
     JSON.stringify({
@@ -3377,56 +3372,39 @@ function updateInstallButtonVisibility() {
   const installBtn = document.getElementById("installBtn");
   if (!installBtn) return;
 
-  // Hide button only when running inside the already installed native/standalone app
-  if (
-    isStandaloneMode() ||
-    (typeof window !== "undefined" &&
-      window.Capacitor &&
-      typeof window.Capacitor.isNativePlatform === "function" &&
-      window.Capacitor.isNativePlatform())
-  ) {
+  if (isStandaloneMode()) {
     installBtn.classList.add("hidden");
     return;
   }
 
-  // Always visible on web browsers so visitors can download the APK
-  installBtn.classList.remove("hidden");
-}
-
-function downloadApk() {
-  const apkPath = "apk/" + encodeURIComponent("ذَكِّرْ.apk");
-  const link = document.createElement("a");
-  link.href = apkPath;
-  link.setAttribute("download", "ذَكِّرْ.apk");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  if (typeof showEnhancedNotification === "function") {
-    showEnhancedNotification(
-      "جاري تنزيل تطبيق ذَكِّرْ (APK)... يرجى فتح الملف بعد اكتمال التحميل لتثبيته.",
-      "success",
-      7000
-    );
-  } else if (typeof showNotification === "function") {
-    showNotification("جاري تنزيل تطبيق ذَكِّرْ (APK)...");
+  if (deferredInstallPrompt || isIOSDevice()) {
+    installBtn.classList.remove("hidden");
+  } else {
+    installBtn.classList.add("hidden");
   }
 }
 
 async function showInstallModal() {
-  if (
-    isStandaloneMode() ||
-    (typeof window !== "undefined" &&
-      window.Capacitor &&
-      typeof window.Capacitor.isNativePlatform === "function" &&
-      window.Capacitor.isNativePlatform())
-  ) {
-    showNotification("أنت تستخدم بالفعل التطبيق المثبت على جهازك");
+  if (isStandaloneMode()) {
+    showNotification("التطبيق مثبت بالفعل على جهازك");
     updateInstallButtonVisibility();
     return;
   }
 
-  downloadApk();
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    const choiceResult = await deferredInstallPrompt.userChoice;
+
+    if (choiceResult.outcome === "accepted") {
+      showNotification("تم بدء تثبيت التطبيق");
+    }
+
+    deferredInstallPrompt = null;
+    updateInstallButtonVisibility();
+    return;
+  }
+
+  showManualInstallInstructions();
 }
 
 window.addEventListener("beforeinstallprompt", (event) => {
@@ -4053,14 +4031,6 @@ async function initializePrayerTimes() {
     } catch (e) {
       console.warn("Saved location parse error", e);
     }
-  } else {
-    // Save default location so adhan scheduler has coordinates immediately
-    try {
-      localStorage.setItem(
-        "prayerLocation",
-        JSON.stringify({ latitude: lat, longitude: lng, city }),
-      );
-    } catch (e) {}
   }
 
   // 3. Seamlessly fetch fresh times in background
@@ -4155,7 +4125,6 @@ async function getCityName(latitude, longitude) {
 
 // Fetch prayer times from API
 async function fetchPrayerTimes(latitude, longitude, cityName) {
-  window.fetchPrayerTimes = fetchPrayerTimes;
   const loading = document.getElementById("prayerTimesLoading");
   const error = document.getElementById("prayerTimesError");
 
@@ -4173,7 +4142,6 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
 
     if (data.code === 200 && data.data) {
       prayerTimesData = data.data.timings;
-      window.prayerTimesData = prayerTimesData;
 
       // Cache the prayer times for offline use
       localStorage.setItem(
@@ -4181,18 +4149,9 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
         JSON.stringify(prayerTimesData),
       );
       localStorage.setItem("cachedPrayerCity", cityName);
-      localStorage.setItem(
-        "prayerLocation",
-        JSON.stringify({ latitude, longitude, city: cityName }),
-      );
 
       displayPrayerTimes(cityName);
       startCountdown();
-
-      // Trigger Native Adhan Scheduler for upcoming 7 days
-      if (window.TazkeerAdhan && typeof window.TazkeerAdhan.schedule7DaysAdhan === "function") {
-        window.TazkeerAdhan.schedule7DaysAdhan(latitude, longitude, prayerTimesData);
-      }
 
       if (loading) loading.style.display = "none";
       if (error) error.classList.add("hidden");
@@ -4211,11 +4170,6 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
         prayerTimesData = JSON.parse(cachedDataStr);
         displayPrayerTimes(cachedCity || cityName);
         startCountdown();
-
-        // Trigger Native Adhan Scheduler with cached times
-        if (window.TazkeerAdhan && typeof window.TazkeerAdhan.schedule7DaysAdhan === "function") {
-          window.TazkeerAdhan.schedule7DaysAdhan(latitude, longitude, prayerTimesData);
-        }
 
         if (loading) loading.style.display = "none";
         if (error) error.classList.add("hidden");
@@ -4255,20 +4209,8 @@ function displayPrayerTimes(cityName) {
       const name = prayerNames[prayer];
       const icon = prayerIcons[prayer];
 
-      const hasAdhan = prayer !== "Sunrise";
-      const isEnabled = hasAdhan && (window.TazkeerAdhan ? window.TazkeerAdhan.isAdhanEnabled(prayer) : true);
-      const toggleHtml = hasAdhan ? `
-        <button class="prayer-adhan-btn ${isEnabled ? 'active' : 'muted'}" 
-                onclick="event.stopPropagation(); window.TazkeerAdhan && window.TazkeerAdhan.toggleAdhan('${prayer}', event);" 
-                title="${isEnabled ? 'كتم أذان ' + name : 'تفعيل أذان ' + name}"
-                aria-label="تبديل صوت أذان ${name}">
-          <i class="fas ${isEnabled ? 'fa-bell' : 'fa-bell-slash'}"></i>
-        </button>
-      ` : '';
-
       return `
         <div class="prayer-card" data-prayer="${prayer}">
-          ${toggleHtml}
           <div class="prayer-icon">
             <i class="fas ${icon}"></i>
           </div>
@@ -4329,43 +4271,12 @@ function formatArabicRemainingTime(hours, minutes, seconds) {
   return `متبقي ${result}`;
 }
 
-// State to avoid multi-triggering the adhan in the same minute
-let triggeredPrayersToday = {};
-
 // Update countdown display
 function updateCountdown() {
   if (!prayerTimesData) return;
 
   const now = new Date();
   const prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-
-  // ── Auto Adhan Trigger for Prayer Times ──
-  const todayKeyPrefix = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + "_";
-  for (const prayer of prayers) {
-    const timeStr = prayerTimesData[prayer];
-    if (!timeStr) continue;
-    const [pHours, pMinutes] = timeStr.split(":").map(Number);
-    const prayerTimestamp = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      pHours,
-      pMinutes,
-      0,
-      0
-    ).getTime();
-
-    const timeDiff = now.getTime() - prayerTimestamp;
-    const triggerKey = todayKeyPrefix + prayer;
-
-    // Trigger Adhan if within the first 45 seconds of the prayer time and hasn't fired yet
-    if (timeDiff >= 0 && timeDiff < 45000 && !triggeredPrayersToday[triggerKey]) {
-      triggeredPrayersToday[triggerKey] = true;
-      if (window.TazkeerAdhan && typeof window.TazkeerAdhan.onPrayerTimeReached === "function") {
-        window.TazkeerAdhan.onPrayerTimeReached(prayer);
-      }
-    }
-  }
 
   let nextPrayer = null;
   let targetDate = null;
@@ -5432,14 +5343,8 @@ function checkFastingOccasions(date) {
 
   // ── 3. الأيام البيض (13-14-15 من كل شهر هجري) ──
   if (hijri.day >= 13 && hijri.day <= 15) {
-    const whiteDaysMap = {
-      13: "أول الأيام البيض",
-      14: "ثاني الأيام البيض",
-      15: "ثالث الأيام البيض",
-    };
-    const dayLabel = whiteDaysMap[hijri.day] || "الأيام البيض";
     events.push({
-      name: `صيام ${dayLabel} (${hijri.day} ${hijri.monthName})`,
+      name: `الأيام البيض (${hijri.day} ${hijri.monthName})`,
       detail: `صيام ثلاثة أيام من كل شهر كصيام الدهر كله`,
       badge: "سنة شهرية",
       priority: 3,
@@ -5652,13 +5557,13 @@ function updateCalendarFastingAlert(now) {
   if (todayEvents.length > 0) {
     const ev = todayEvents[0];
     alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--today";
-    titleEl.innerHTML = `<span class="cal-fasting-title-text">${ev.name}</span><span class="cal-fasting-badge">${ev.badge}</span>`;
+    titleEl.innerHTML = `<span class="cal-fasting-title-text">اليوم ${ev.name}</span><span class="cal-fasting-badge">${ev.badge}</span>`;
     descEl.textContent = `${ev.detail} — تقبّل الله صيامكم وطاعتكم`;
     alertEl.style.display = "flex";
   } else if (tomorrowEvents.length > 0) {
     const ev = tomorrowEvents[0];
     alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--tomorrow";
-    titleEl.innerHTML = `<span class="cal-fasting-title-text">تذكير: ${ev.name} غداً</span><span class="cal-fasting-badge">${ev.badge}</span>`;
+    titleEl.innerHTML = `<span class="cal-fasting-title-text">تذكير: غدًا ${ev.name}</span><span class="cal-fasting-badge">${ev.badge}</span>`;
     descEl.textContent = `${ev.detail} — انوِ الصيام وجهّز سحورك تقبل الله منك`;
     alertEl.style.display = "flex";
   } else {
@@ -6492,396 +6397,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
-
-const BACKUP_STORAGE_TYPE = "tazkeer-progress-backup";
-const BACKUP_STORAGE_VERSION = 1;
-const BACKUP_STORAGE_PREFIX = "TZK1:";
-const BACKUP_APP_KEYS = [
-  "activeTab",
-  "adhkar-theme",
-  "adhkarProgress",
-  "cachedPrayerCity",
-  "cachedPrayerTimes",
-  "categoryFavorites",
-  "completedKhatmahCount",
-  "dailyProgress",
-  "dailyStreak",
-  "fontSize",
-  "hasSeenInstallPrompt",
-  "installInstructionsDismissed",
-  "installInstructionsDismissedDate",
-  "installInstructionsRemindLater",
-  "misbahaState",
-  "mushaf-theme",
-  "nightReading",
-  "prayerLocation",
-  "quranWeeklyProgress",
-  "swiperFontSizeIndex",
-  "totalCompletions",
-  "userPreferences",
-  "weeklyProgress",
-  "zekrFavorites",
-];
-const BACKUP_APP_PREFIXES = [
-  "swiperPos_",
-  "tazkeer_",
-  "tazkeer_prophet_pos_",
-  "tazkeer_prophet_read_",
-];
-
-function isTazkeerBackupKey(key) {
-  if (!key) return false;
-  if (BACKUP_APP_KEYS.indexOf(key) !== -1) return true;
-  return BACKUP_APP_PREFIXES.some(function (prefix) {
-    return key.indexOf(prefix) === 0;
-  });
-}
-
-function collectTazkeerStorage() {
-  const data = {};
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (!isTazkeerBackupKey(key)) continue;
-      const value = localStorage.getItem(key);
-      if (value !== null) data[key] = value;
-    }
-  } catch (error) {
-    console.warn("[Backup] Unable to read localStorage:", error);
-  }
-  return data;
-}
-
-function createBackupPayload() {
-  return {
-    app: "tazkeer",
-    type: BACKUP_STORAGE_TYPE,
-    version: BACKUP_STORAGE_VERSION,
-    exportedAt: new Date().toISOString(),
-    keys: collectTazkeerStorage(),
-  };
-}
-
-function utf8ToBase64(value) {
-  const bytes = new TextEncoder().encode(value);
-  let binary = "";
-  const chunkSize = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    binary += String.fromCharCode.apply(
-      null,
-      bytes.subarray(i, Math.min(i + chunkSize, bytes.length))
-    );
-  }
-  return btoa(binary);
-}
-
-function base64ToUtf8(value) {
-  let normalized = String(value || "")
-    .replace(/\s+/g, "")
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
-  while (normalized.length % 4 !== 0) normalized += "=";
-  const binary = atob(normalized);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return new TextDecoder("utf-8").decode(bytes);
-}
-
-function normalizeBackupPayload(input) {
-  if (!input || typeof input !== "object" || Array.isArray(input)) {
-    throw new Error("صيغة البيانات غير صحيحة");
-  }
-
-  let keys = null;
-  if (input.type === BACKUP_STORAGE_TYPE && input.keys && typeof input.keys === "object") {
-    keys = input.keys;
-  } else if (input.keys && typeof input.keys === "object" && !Array.isArray(input.keys)) {
-    keys = input.keys;
-  } else if (input.data && typeof input.data === "object" && !Array.isArray(input.data)) {
-    keys = input.data;
-  } else if (!input.type && !input.keys) {
-    keys = input;
-  }
-
-  if (!keys || Array.isArray(keys)) {
-    throw new Error("لم يتم العثور على بيانات تقدم صالحة");
-  }
-
-  const cleanKeys = {};
-  Object.keys(keys).forEach(function (key) {
-    if (!key) return;
-    const value = keys[key];
-    if (typeof value === "string") {
-      cleanKeys[key] = value;
-    } else if (value !== null && typeof value !== "undefined") {
-      cleanKeys[key] = JSON.stringify(value);
-    }
-  });
-
-  if (Object.keys(cleanKeys).length === 0) {
-    throw new Error("النسخة الاحتياطية فارغة");
-  }
-
-  return {
-    keys: cleanKeys,
-    exportedAt: input.exportedAt || null,
-    version: input.version || null,
-  };
-}
-
-function parseTazkeerBackup(text) {
-  let raw = String(text || "").replace(/^\uFEFF/, "").trim();
-  if (!raw) throw new Error("الكود فارغ");
-
-  raw = raw.replace(/^(?:TZK1|TAZKEER|Tazkeer|ذَكِّرْ)\s*[:\-]\s*/i, "").trim();
-  if (raw.charAt(0) === "{") {
-    return normalizeBackupPayload(JSON.parse(raw));
-  }
-
-  return normalizeBackupPayload(JSON.parse(base64ToUtf8(raw)));
-}
-
-function setBackupStatus(message, type) {
-  const status = document.getElementById("backupStatus");
-  if (!status) return;
-  status.textContent = message || "";
-  status.className = "backup-status" + (type ? " " + type : "");
-}
-
-function writeProgressClipboard(text) {
-  return new Promise(function (resolve) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard
-        .writeText(text)
-        .then(function () {
-          resolve(true);
-        })
-        .catch(function () {
-          resolve(fallbackCopy(text));
-        });
-      return;
-    }
-    resolve(fallbackCopy(text));
-  });
-}
-
-function fallbackCopy(text) {
-  try {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.setAttribute("readonly", "");
-    textarea.style.position = "fixed";
-    textarea.style.top = "-1000px";
-    textarea.style.opacity = "0";
-    document.body.appendChild(textarea);
-    textarea.select();
-    textarea.setSelectionRange(0, textarea.value.length);
-    const copied = document.execCommand("copy");
-    document.body.removeChild(textarea);
-    return copied;
-  } catch (error) {
-    return false;
-  }
-}
-
-async function copyProgressBackup() {
-  try {
-    const payload = createBackupPayload();
-    if (Object.keys(payload.keys).length === 0) {
-      setBackupStatus("لا توجد بيانات تقدم لحفظها بعد.", "error");
-      return;
-    }
-
-    const code = BACKUP_STORAGE_PREFIX + utf8ToBase64(JSON.stringify(payload));
-    const copied = await writeProgressClipboard(code);
-    if (copied) {
-      setBackupStatus("✅ تم نسخ كود التقدم. احتفظ به في مكان آمن ثم الصقه في التطبيق أو المتصفح الآخر.", "success");
-      if (navigator.vibrate) navigator.vibrate(25);
-      return;
-    }
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "نسخة احتياطية - ذَكِّرْ", text: code });
-        setBackupStatus("✅ تم فتح نافذة المشاركة لحفظ كود التقدم.", "success");
-        return;
-      } catch (error) {
-        if (error && error.name === "AbortError") return;
-      }
-    }
-
-    window.prompt("تعذر النسخ التلقائي. انسخ كود التقدم يدويًا:", code);
-    setBackupStatus("انسخ الكود الظاهر واحتفظ به في مكان آمن.", "success");
-  } catch (error) {
-    setBackupStatus("❌ تعذر إنشاء النسخة الاحتياطية: " + error.message, "error");
-  }
-}
-
-async function restoreProgressFromClipboard() {
-  let text = "";
-  try {
-    if (navigator.clipboard && navigator.clipboard.readText) {
-      text = await navigator.clipboard.readText();
-    }
-  } catch (error) {
-    text = "";
-  }
-
-  if (!text || !text.trim()) {
-    text = window.prompt("الصق كود التقدم أو محتوى ملف النسخة الاحتياطية هنا:") || "";
-  }
-
-  if (!text.trim()) return;
-  applyProgressBackup(text);
-}
-
-function applyProgressBackup(text) {
-  let backup;
-  try {
-    backup = parseTazkeerBackup(text);
-  } catch (error) {
-    setBackupStatus("❌ كود أو ملف غير صالح: " + error.message, "error");
-    return false;
-  }
-
-  const keys = backup.keys;
-  const keyCount = Object.keys(keys).length;
-  const existing = collectTazkeerStorage();
-
-  if (Object.keys(existing).length > 0) {
-    const confirmed = window.confirm(
-      "سيتم استبدال بيانات التقدم الحالية بالبيانات الموجودة في النسخة الاحتياطية (" +
-        keyCount +
-        " عنصرًا). هل تريد المتابعة؟"
-    );
-    if (!confirmed) return false;
-  }
-
-  try {
-    window.__tazkeerBackupRestoring = true;
-    Object.keys(existing).forEach(function (key) {
-      if (!Object.prototype.hasOwnProperty.call(keys, key)) {
-        localStorage.removeItem(key);
-      }
-    });
-    Object.keys(keys).forEach(function (key) {
-      localStorage.setItem(key, keys[key]);
-    });
-  } catch (error) {
-    window.__tazkeerBackupRestoring = false;
-    setBackupStatus("❌ تعذر حفظ البيانات المستعادة: " + error.message, "error");
-    return false;
-  }
-
-  setBackupStatus("✅ تم استعادة " + keyCount + " عنصرًا. جارٍ إعادة تحميل التطبيق...", "success");
-  try {
-    sessionStorage.setItem("tazkeer_backup_restored", String(keyCount));
-  } catch (error) {}
-  if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
-
-  setTimeout(function () {
-    window.location.reload();
-  }, 900);
-  return true;
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  let restoredCount = 0;
-  try {
-    restoredCount = parseInt(sessionStorage.getItem("tazkeer_backup_restored"), 10) || 0;
-    sessionStorage.removeItem("tazkeer_backup_restored");
-  } catch (error) {}
-  if (!restoredCount) return;
-
-  setBackupStatus("✅ تمت استعادة بيانات التقدم بنجاح (" + restoredCount + " عنصرًا).", "success");
-  if (typeof showEnhancedNotification === "function") {
-    try {
-      showEnhancedNotification("تمت استعادة بيانات التقدم بنجاح", "success", 3500);
-    } catch (error) {}
-  }
-});
-
-async function saveProgressFileNative(json, fileName) {
-  try {
-    const plugins = window.Capacitor && window.Capacitor.Plugins;
-    if (!plugins || !plugins.ProgressBackup) return false;
-    await plugins.ProgressBackup.saveFile({ fileName: fileName, content: json });
-    setBackupStatus("✅ تم حفظ الملف في مجلد التنزيلات: " + fileName, "success");
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
-async function exportProgressFile() {
-  try {
-    const payload = createBackupPayload();
-    if (Object.keys(payload.keys).length === 0) {
-      setBackupStatus("لا توجد بيانات تقدم لتصديرها بعد.", "error");
-      return;
-    }
-
-    const json = JSON.stringify(payload, null, 2);
-    const fileName = "tazkeer-backup-" + new Date().toISOString().slice(0, 10) + ".json";
-
-    if (await saveProgressFileNative(json, fileName)) return;
-
-    const blob = new Blob([json], { type: "application/json;charset=utf-8" });
-    let shareFile = null;
-    try {
-      shareFile = new File([blob], fileName, { type: "application/json" });
-    } catch (error) {
-      shareFile = null;
-    }
-
-    if (shareFile && navigator.canShare && navigator.canShare({ files: [shareFile] })) {
-      try {
-        await navigator.share({
-          files: [shareFile],
-          title: "نسخة احتياطية - ذَكِّرْ",
-          text: "نسخة احتياطية لبيانات التقدم",
-        });
-        setBackupStatus("✅ تم فتح نافذة المشاركة لحفظ الملف.", "success");
-        return;
-      } catch (error) {
-        if (error && error.name === "AbortError") return;
-      }
-    }
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(function () {
-      URL.revokeObjectURL(url);
-    }, 4000);
-    setBackupStatus("✅ تم تصدير الملف: " + fileName, "success");
-  } catch (error) {
-    setBackupStatus("❌ تعذر تصدير الملف: " + error.message, "error");
-  }
-}
-
-function triggerImportProgressFile() {
-  const input = document.getElementById("progressImportInput");
-  if (input) input.click();
-}
-
-function handleProgressImportFile(event) {
-  const input = event.target;
-  const file = input.files && input.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function () {
-    applyProgressBackup(String(reader.result || ""));
-    input.value = "";
-  };
-  reader.onerror = function () {
-    setBackupStatus("❌ تعذر قراءة الملف المحدد.", "error");
-    input.value = "";
-  };
-  reader.readAsText(file, "utf-8");
-}
