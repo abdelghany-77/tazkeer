@@ -559,9 +559,10 @@ function getDefaultKhatmahState() {
 
 function loadKhatmahState() {
   try {
-    const saved = localStorage.getItem(KHATMAH_STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
+    const parsed = window.SafeStorage
+      ? window.SafeStorage.getJSON(KHATMAH_STORAGE_KEY)
+      : JSON.parse(localStorage.getItem(KHATMAH_STORAGE_KEY) || "null");
+    if (parsed) {
       return { ...getDefaultKhatmahState(), ...parsed };
     }
   } catch (e) {
@@ -572,7 +573,11 @@ function loadKhatmahState() {
 
 function saveKhatmahState(state) {
   try {
-    localStorage.setItem(KHATMAH_STORAGE_KEY, JSON.stringify(state));
+    if (window.SafeStorage) {
+      window.SafeStorage.setJSON(KHATMAH_STORAGE_KEY, state);
+    } else {
+      localStorage.setItem(KHATMAH_STORAGE_KEY, JSON.stringify(state));
+    }
   } catch (e) {
     console.error("Error saving khatmah state:", e);
   }
@@ -666,7 +671,9 @@ function getCurrentWird(state) {
 
 function loadBookmark() {
   try {
-    const saved = localStorage.getItem(QURAN_BOOKMARK_KEY);
+    const saved = window.SafeStorage
+      ? window.SafeStorage.get(QURAN_BOOKMARK_KEY)
+      : localStorage.getItem(QURAN_BOOKMARK_KEY);
     return saved ? parseInt(saved) : null;
   } catch (e) {
     return null;
@@ -674,11 +681,23 @@ function loadBookmark() {
 }
 
 function saveBookmark(page) {
-  localStorage.setItem(QURAN_BOOKMARK_KEY, String(page));
+  if (window.SafeStorage) {
+    window.SafeStorage.set(QURAN_BOOKMARK_KEY, String(page));
+  } else {
+    try {
+      localStorage.setItem(QURAN_BOOKMARK_KEY, String(page));
+    } catch (e) {}
+  }
 }
 
 function removeBookmark() {
-  localStorage.removeItem(QURAN_BOOKMARK_KEY);
+  if (window.SafeStorage) {
+    window.SafeStorage.remove(QURAN_BOOKMARK_KEY);
+  } else {
+    try {
+      localStorage.removeItem(QURAN_BOOKMARK_KEY);
+    } catch (e) {}
+  }
 }
 
 // ===== QURAN VIEWER STATE =====
@@ -1168,6 +1187,13 @@ function renderMushafViewer() {
   quranViewerState.currentView = "reader";
   const container = document.getElementById("quranPageContent");
   if (!container) return;
+
+  // Register with AppRouter for Hardware Back Button handling
+  if (window.AppRouter && !window.AppRouter.isModalOpen("quranReader")) {
+    window.AppRouter.pushModal("quranReader", function () {
+      exitMushafViewer(false);
+    });
+  }
 
   const page = quranViewerState.currentPage;
   const surah = getSurahForPage(page);
@@ -1872,7 +1898,12 @@ function openMushafViewer(page) {
   renderMushafViewer();
 }
 
-function exitMushafViewer() {
+function exitMushafViewer(syncRouter) {
+  if (syncRouter !== false && window.AppRouter && window.AppRouter.isModalOpen("quranReader")) {
+    window.AppRouter.closeModal("quranReader");
+    return;
+  }
+
   // Restore bottom nav visibility
   const bottomNav = document.getElementById("bottomNav");
   if (bottomNav) bottomNav.style.display = "";

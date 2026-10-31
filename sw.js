@@ -1,38 +1,68 @@
-const CACHE_NAME = "tazkeer-v8.15";
+const CACHE_NAME = "tazkeer-v9.0.0";
 const QURAN_CACHE_NAME = "tazkeer-quran-pages-v1";
 const PROPHETS_CACHE_NAME = "tazkeer-prophets-v1";
-const urlsToCache = [
+
+// 1. Critical local app shell assets (cached atomically)
+const CORE_LOCAL_ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./quran.css",
+  "./manifest.json",
+  "./js/core/storage.js",
+  "./js/core/router.js",
+  "./js/modules/qibla.js",
+  "./js/modules/misbaha.js",
   "./dailyDuas.js",
   "./script.js",
   "./quran.js",
-  "./manifest.json",
+  "./prophets.js",
+  "./data/prophets-index.json",
+  "./images/icon.png",
+  "./images/icon-192.png",
+  "./images/icon-512.png"
+];
+
+// 2. External CDN assets (cached fault-tolerantly so CDN slowdowns never block install)
+const EXTERNAL_CDN_ASSETS = [
   "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Cairo:wght@300;400;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-solid-900.woff2",
-  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-regular-400.woff2",
-  "./prophets.js",
-  "./data/prophets-index.json",
+  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-regular-400.woff2"
 ];
 
-// Install event - cache resources
+// Install event - cache resources with zero-failure resilience
 self.addEventListener("install", function (event) {
-  // Force the waiting service worker to become the active service worker
   self.skipWaiting();
 
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then(function (cache) {
-        console.log("Opened cache");
-        return cache.addAll(urlsToCache);
+      .then(async function (cache) {
+        // A) Atomic cache for all local files
+        try {
+          await cache.addAll(CORE_LOCAL_ASSETS);
+        } catch (err) {
+          console.error("[SW] Core local assets cache failed:", err);
+        }
+
+        // B) Fault-tolerant cache for CDN assets
+        await Promise.allSettled(
+          EXTERNAL_CDN_ASSETS.map(async function (url) {
+            try {
+              const resp = await fetch(url, { mode: "cors" });
+              if (resp && resp.status === 200) {
+                await cache.put(url, resp);
+              }
+            } catch (cdnErr) {
+              console.warn("[SW] External CDN asset skipped/failed:", url, cdnErr);
+            }
+          })
+        );
       })
       .catch(function (error) {
-        console.error("Cache install failed:", error);
-      }),
+        console.error("[SW] Cache install failed:", error);
+      })
   );
 });
 

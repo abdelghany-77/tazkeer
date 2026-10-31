@@ -22,6 +22,10 @@
   // ── Read Tracking Helpers ─────────────────────────────────
   function getReadChapters(slug) {
     try {
+      if (window.SafeStorage) {
+        var res = window.SafeStorage.getJSON(LS_READ_PFX + slug);
+        if (Array.isArray(res)) return res;
+      }
       var stored = localStorage.getItem(LS_READ_PFX + slug);
       if (stored) return JSON.parse(stored);
     } catch (e) { /* ignore */ }
@@ -32,7 +36,13 @@
     var read = getReadChapters(slug);
     if (read.indexOf(chapterIdx) === -1) {
       read.push(chapterIdx);
-      localStorage.setItem(LS_READ_PFX + slug, JSON.stringify(read));
+      if (window.SafeStorage) {
+        window.SafeStorage.setJSON(LS_READ_PFX + slug, read);
+      } else {
+        try {
+          localStorage.setItem(LS_READ_PFX + slug, JSON.stringify(read));
+        } catch (e) {}
+      }
     }
     return read;
   }
@@ -52,7 +62,7 @@
     if (!container) return;
 
     // Load saved font size
-    var savedFont = localStorage.getItem(LS_FONT);
+    var savedFont = window.SafeStorage ? window.SafeStorage.get(LS_FONT) : localStorage.getItem(LS_FONT);
     if (savedFont) readerFontSize = parseInt(savedFont, 10) || 18;
 
     if (prophetsIndex) {
@@ -256,6 +266,13 @@
       }
     }
     currentChapterIdx = resumeChapter;
+
+    // Register with AppRouter for Hardware Back Button handling
+    if (window.AppRouter && !window.AppRouter.isModalOpen("prophetReader")) {
+      window.AppRouter.pushModal("prophetReader", function () {
+        window._exitReader(false);
+      });
+    }
 
     renderReaderShell(container);
     renderChapter();
@@ -844,7 +861,12 @@
   };
 
   // ── Exit Reader ────────────────────────────────────────────
-  window._exitReader = function () {
+  window._exitReader = function (syncRouter) {
+    if (syncRouter !== false && window.AppRouter && window.AppRouter.isModalOpen("prophetReader")) {
+      window.AppRouter.closeModal("prophetReader");
+      return;
+    }
+
     currentProphet = null;
     currentChapterIdx = 0;
     chapterDrawerOpen = false;
@@ -885,17 +907,20 @@
       scrollY: window.scrollY,
       timestamp: Date.now(),
     };
-    localStorage.setItem(
-      LS_POS_PFX + currentProphet.slug,
-      JSON.stringify(data),
-    );
+    if (window.SafeStorage) {
+      window.SafeStorage.setJSON(LS_POS_PFX + currentProphet.slug, data);
+    } else {
+      try {
+        localStorage.setItem(LS_POS_PFX + currentProphet.slug, JSON.stringify(data));
+      } catch (e) {}
+    }
 
     // Save to global last reading for Home shortcut
     try {
       var ch = currentProphet.chapters[currentChapterIdx];
       var totalChapters = currentProphet.chapters.length;
       var pct = Math.round(((currentChapterIdx + 1) / totalChapters) * 100);
-      localStorage.setItem("tazkeer_last_reading", JSON.stringify({
+      var lastReadData = {
         type: "prophet",
         slug: currentProphet.slug,
         name: currentProphet.name,
@@ -905,7 +930,12 @@
         totalChapters: totalChapters,
         percent: pct,
         timestamp: Date.now()
-      }));
+      };
+      if (window.SafeStorage) {
+        window.SafeStorage.setJSON("tazkeer_last_reading", lastReadData);
+      } else {
+        localStorage.setItem("tazkeer_last_reading", JSON.stringify(lastReadData));
+      }
       if (typeof window.updateContinueReadingPill === "function") {
         window.updateContinueReadingPill();
       }

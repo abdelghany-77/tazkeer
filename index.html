@@ -30,10 +30,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="ذَكِّرْ" />
-  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#1a202cf2" />
   <link rel="manifest" href="manifest.json" />
 
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="quran.css" />
   <link
@@ -991,6 +992,13 @@
     </div>
   </div>
 
+  <!-- Application Core Modules -->
+  <script src="js/core/storage.js"></script>
+  <script src="js/core/router.js"></script>
+  <script src="js/modules/qibla.js"></script>
+  <script src="js/modules/misbaha.js"></script>
+
+  <!-- Feature Engines -->
   <script src="dailyDuas.js"></script>
   <script src="script.js"></script>
   <script src="quran.js"></script>

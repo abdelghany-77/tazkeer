@@ -1,3 +1,11 @@
+/* Root Typography & Safe-Area Variables */
+:root {
+  --font-sans: "Cairo", system-ui, -apple-system, sans-serif;
+  --font-quran: "Amiri Quran", "Amiri", "Noto Naskh Arabic", serif;
+  --font-hadith: "Amiri", "Noto Naskh Arabic", serif;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* Reset and Base Styles */
 * {
   margin: 0;
@@ -6,11 +14,25 @@
 }
 
 body {
-  font-family: "Cairo", "Amiri", serif;
+  font-family: var(--font-sans);
   background: linear-gradient(135deg, #1a8a5c 0%, #0d6b4e 100%);
   min-height: 100vh;
   color: #333;
   line-height: 1.6;
+}
+
+/* Enhanced Arabic Typography & Diacritics Collision Prevention */
+.duaa-compact-text,
+.pr-quran-text,
+.quran-text,
+.azkar-slide-text,
+.dhikr-text,
+.pr-paragraph,
+.foc-hadith,
+.duaa-body-wrap p {
+  line-height: 2.3 !important;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv01" on, "calt" on;
 }
 
 .container {
@@ -3940,6 +3962,7 @@ body.dark-mode .location-btn i {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.7rem;
+  min-height: 155px;
   position: relative;
   z-index: 1;
 }
@@ -6987,17 +7010,20 @@ body.dark-mode .quote-icon {
 /* Tab Content Sections */
 .tab-content {
   display: none;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 1200px;
 }
 
 .tab-content.active-tab {
   display: block;
-  animation: tabFadeIn 0.3s ease;
+  content-visibility: visible;
+  animation: tabFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes tabFadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -7007,7 +7033,7 @@ body.dark-mode .quote-icon {
 
 /* Give main enough bottom padding so content is never hidden behind bottom nav */
 .main {
-  padding-bottom: 80px !important;
+  padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
 /* Hide the old footer (content moved to profile tab) */
@@ -7021,7 +7047,9 @@ body.dark-mode .quote-icon {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: calc(64px + env(safe-area-inset-bottom, 0px));
+  min-height: calc(64px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -7032,7 +7060,7 @@ body.dark-mode .quote-icon {
   box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.06);
   z-index: 9999;
   padding: 0 4px;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
 }
 
 .bottom-nav-item {
@@ -11522,6 +11550,7 @@ body.dark-mode .pr-pill-indicator {
 
 .dynamic-hero-card {
   position: relative;
+  min-height: 120px;
   border-radius: 20px;
   padding: 1rem 1.15rem;
   margin-bottom: 0.55rem;

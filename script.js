@@ -1399,48 +1399,28 @@ const resetAllBtn = document.getElementById("resetAllBtn");
 
 /* ─── Tab Switching System ─── */
 function switchTab(tabId) {
-  // Hide all tab sections
+  if (window.AppRouter) {
+    window.AppRouter.switchTab(tabId, true);
+    return;
+  }
+  // Fallback if AppRouter not yet ready
   document.querySelectorAll(".tab-content").forEach(function (section) {
     section.classList.remove("active-tab");
   });
-  // Show target
   var target = document.getElementById(tabId);
   if (target) target.classList.add("active-tab");
-  // Update bottom nav active state
   document.querySelectorAll(".bottom-nav-item").forEach(function (btn) {
     btn.classList.toggle("active", btn.getAttribute("data-tab") === tabId);
   });
-  // Show header only on the home tab
   var header = document.querySelector(".header");
   if (header) {
     header.style.display = tabId === "tab-home" ? "" : "none";
   }
-  // Persist
-  localStorage.setItem("activeTab", tabId);
-  // Tab-specific init
-  if (tabId === "tab-home") {
-    if (typeof updateDynamicHeroCard === "function") updateDynamicHeroCard();
-    if (typeof updateContinueReadingPill === "function")
-      updateContinueReadingPill();
-  } else if (tabId === "tab-azkar") {
-    // Only show category list if user is NOT currently reading a category
-    if (!currentCategory || categoryPage.classList.contains("hidden")) {
-      if (azkarListView) azkarListView.classList.remove("hidden");
-      if (categoryPage) categoryPage.classList.add("hidden");
-      showHomePage(); // populate categories
-    }
-    // If user was in a category, preserve their position and progress
-  } else if (tabId === "tab-quran") {
-    if (typeof initQuranTab === "function") initQuranTab();
-  } else if (tabId === "tab-prophets") {
-    if (typeof initProphetsTab === "function") initProphetsTab();
-  } else if (tabId === "tab-profile") {
-    if (typeof updateProfileTab === "function") updateProfileTab();
-    if (typeof updateStatsDashboard === "function") updateStatsDashboard();
-    if (typeof updateWeeklyChart === "function") updateWeeklyChart();
+  if (window.SafeStorage) {
+    window.SafeStorage.set("activeTab", tabId);
+  } else {
+    try { localStorage.setItem("activeTab", tabId); } catch (e) {}
   }
-  // Scroll top
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Theme management functions
@@ -1710,7 +1690,7 @@ function setupEventListeners() {
 }
 
 // Show azkar list (populate categories)
-function showHomePage() {
+function _showHomePageInternal() {
   // Don't reset counters when leaving — preserve progress
   // Counters only reset when ALL azkar in a category are completed
 
@@ -1735,6 +1715,14 @@ function showHomePage() {
   });
 }
 
+function showHomePage(syncRouter) {
+  if (syncRouter !== false && window.AppRouter && window.AppRouter.isModalOpen("azkarCategory")) {
+    window.AppRouter.closeModal("azkarCategory");
+    return;
+  }
+  _showHomePageInternal();
+}
+
 // Show category page with adhkar
 function showCategoryPage(categoryKey) {
   // Switch to azkar tab first
@@ -1750,6 +1738,13 @@ function showCategoryPage(categoryKey) {
 
   // Scroll to top of page
   window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // Register with AppRouter for Hardware Back Button handling
+  if (window.AppRouter && !window.AppRouter.isModalOpen("azkarCategory")) {
+    window.AppRouter.pushModal("azkarCategory", function () {
+      _showHomePageInternal();
+    });
+  }
 }
 
 // SVG icons for category cards (matching the reference design)
@@ -2625,49 +2620,6 @@ function showCompletionMessage() {
   }, 2000);
 }
 
-// Show notification
-function showNotification(message) {
-  // Create notification element
-  const notification = document.createElement("div");
-  notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #b8860b;
-    color: white;
-    padding: 15px 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    z-index: 3000;
-    font-family: 'Cairo', serif;
-    font-weight: 600;
-    animation: slideIn 0.3s ease;
-  `;
-  notification.textContent = message;
-
-  // Add animation styles
-  const style = document.createElement("style");
-  style.textContent = `
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-  `;
-  document.head.appendChild(style);
-
-  document.body.appendChild(notification);
-
-  // Remove after 3 seconds
-  setTimeout(() => {
-    notification.style.animation = "slideIn 0.3s ease reverse";
-    setTimeout(() => {
-      if (document.body.contains(notification))
-        document.body.removeChild(notification);
-      if (document.head.contains(style)) document.head.removeChild(style);
-    }, 300);
-  }, 3000);
-}
-
 // Copy text to clipboard
 function copyText(text) {
   const textArea = document.createElement("textarea");
@@ -3128,38 +3080,6 @@ function count() {
   }
 }
 
-// Install Prompt Functions
-function showInstallPrompt() {
-  // Check if user has already seen the prompt
-  const hasSeenPrompt = localStorage.getItem("hasSeenInstallPrompt");
-  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-  const isInWebAppiOS = window.navigator.standalone == true;
-
-  // Don't show if already seen, already installed, or in app mode
-  if (hasSeenPrompt || isStandalone || isInWebAppiOS) {
-    return;
-  }
-
-  // Show after a short delay for better UX
-  setTimeout(() => {
-    const prompt = document.getElementById("installPrompt");
-    if (prompt) {
-      prompt.classList.add("show");
-    }
-  }, 3000);
-}
-
-function hideInstallPrompt(dontShowAgain = false) {
-  const prompt = document.getElementById("installPrompt");
-  if (prompt) {
-    prompt.classList.remove("show");
-  }
-
-  if (dontShowAgain) {
-    localStorage.setItem("hasSeenInstallPrompt", "true");
-  }
-}
-
 // Category favorite functions
 function toggleCategoryFavorite(categoryKey, event) {
   if (event) event.stopPropagation();
@@ -3221,135 +3141,6 @@ function addFavoriteButtonToCategory(card, categoryKey) {
   // Add to card
   card.style.position = "relative";
   card.appendChild(favoriteBtn);
-}
-
-// Install Prompt Functions
-function showInstallPrompt() {
-  // Check if user has already seen the prompt
-  const hasSeenPrompt = localStorage.getItem("hasSeenInstallPrompt");
-  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-  const isInWebAppiOS = window.navigator.standalone == true;
-
-  // Don't show if already seen, already installed, or in app mode
-  if (hasSeenPrompt || isStandalone || isInWebAppiOS) {
-    return;
-  }
-
-  // Show after a short delay for better UX
-  setTimeout(() => {
-    const prompt = document.getElementById("installPrompt");
-    if (prompt) {
-      prompt.classList.add("show");
-    }
-  }, 3000);
-}
-
-function hideInstallPrompt(dontShowAgain = false) {
-  const prompt = document.getElementById("installPrompt");
-  if (prompt) {
-    prompt.classList.remove("show");
-  }
-
-  if (dontShowAgain) {
-    localStorage.setItem("hasSeenInstallPrompt", "true");
-  }
-}
-
-// Function to show different device steps
-function showDeviceSteps(device) {
-  // Remove active class from all tabs
-  const tabs = document.querySelectorAll(".device-tab");
-  tabs.forEach((tab) => {
-    tab.classList.remove("active");
-  });
-
-  // Hide all step sections
-  const stepSections = document.querySelectorAll(".install-steps");
-  stepSections.forEach((section) => {
-    section.classList.remove("active");
-  });
-
-  // Show selected tab and steps
-  const selectedTab = document.querySelector(`[data-device="${device}"]`);
-  const selectedSteps = document.getElementById(`${device}Steps`);
-
-  if (selectedTab) {
-    selectedTab.classList.add("active");
-  }
-
-  if (selectedSteps) {
-    selectedSteps.classList.add("active");
-  }
-}
-
-// Function to detect device and show appropriate steps
-function detectAndShowDeviceSteps() {
-  let deviceType = "desktop"; // default
-
-  // Detect iOS
-  if (
-    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
-  ) {
-    deviceType = "ios";
-  }
-  // Detect Android
-  else if (/Android/.test(navigator.userAgent)) {
-    deviceType = "android";
-  }
-  // Desktop includes all other devices
-  else {
-    deviceType = "desktop";
-  }
-
-  showDeviceSteps(deviceType);
-}
-
-// Initialize device detection when install prompt is shown
-function initializeInstallPrompt() {
-  // Set up device detection when modal is shown
-  const installPrompt = document.getElementById("installPrompt");
-  if (installPrompt) {
-    // Create observer to detect when modal is shown
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (
-          mutation.type === "attributes" &&
-          mutation.attributeName === "class"
-        ) {
-          if (installPrompt.classList.contains("show")) {
-            detectAndShowDeviceSteps();
-          }
-        }
-      });
-    });
-
-    observer.observe(installPrompt, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    // Close modal when clicking on backdrop
-    installPrompt.addEventListener("click", (e) => {
-      if (e.target === installPrompt) {
-        hideInstallPrompt(false);
-      }
-    });
-
-    // Close modal with Escape key
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && installPrompt.classList.contains("show")) {
-        hideInstallPrompt(false);
-      }
-    });
-
-    // Development helper: press Ctrl+Shift+I to reset install prompt
-    document.addEventListener("keydown", (e) => {
-      if (e.ctrlKey && e.shiftKey && e.key === "I") {
-        localStorage.removeItem("hasSeenInstallPrompt");
-      }
-    });
-  }
 }
 
 let deferredInstallPrompt = null;
@@ -3902,10 +3693,6 @@ function playSound(type) {
 }
 
 // Utility Functions
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
 function scrollToBottom() {
   window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
 }
@@ -4668,234 +4455,9 @@ function switchChartTab(chartType) {
 }
 
 // ========================================
-// QIBLA COMPASS
+// QIBLA COMPASS (Extracted to js/modules/qibla.js)
 // ========================================
-
-let userLocation = null;
-let compassHeading = 0;
-const KAABA_LAT = 21.4225;
-const KAABA_LNG = 39.8262;
-
-function initializeQiblaCompass() {
-  const calibrateBtn = document.getElementById("qiblaCalibrateBtn");
-  if (calibrateBtn) {
-    calibrateBtn.addEventListener("click", () => {
-      requestQiblaPermissions();
-    });
-  }
-}
-
-// Open Qibla Compass Modal
-function openQiblaModal() {
-  const modal = document.getElementById("qiblaModal");
-  if (!modal) return;
-  modal.style.display = "flex";
-  document.body.style.overflow = "hidden";
-
-  // Use saved prayerLocation coords if userLocation not yet set
-  if (!userLocation) {
-    const saved = localStorage.getItem("prayerLocation");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        userLocation = { lat: parsed.latitude, lng: parsed.longitude };
-      } catch (e) {}
-    } else {
-      userLocation = { lat: 30.0444, lng: 31.2357 }; // Default Cairo
-    }
-  }
-
-  displayStaticQibla();
-  setupCompass();
-}
-
-// Close Qibla Compass Modal
-function closeQiblaModal() {
-  const modal = document.getElementById("qiblaModal");
-  if (!modal) return;
-  modal.style.display = "none";
-  document.body.style.overflow = "auto";
-
-  // Detach listeners to save device sensors/battery
-  if (typeof handleOrientation === "function") {
-    window.removeEventListener("deviceorientationabsolute", handleOrientation, true);
-    window.removeEventListener("deviceorientation", handleOrientation, true);
-  }
-}
-
-function initQibla() {
-  // Get user location
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        userLocation = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        calculateQiblaDirection();
-        setupCompass();
-      },
-      (error) => {
-        updateQiblaStatus("يرجى السماح بالوصول للموقع");
-        console.log("Geolocation error:", error);
-      },
-    );
-  } else {
-    updateQiblaStatus("المتصفح لا يدعم تحديد الموقع");
-  }
-}
-
-function requestQiblaPermissions() {
-  updateQiblaStatus("جاري تحديد الموقع...");
-
-  // Always try to get location first
-  if (!userLocation && navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        userLocation = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        displayStaticQibla();
-
-        // Then try compass
-        if (
-          typeof DeviceOrientationEvent !== "undefined" &&
-          typeof DeviceOrientationEvent.requestPermission === "function"
-        ) {
-          // iOS 13+ requires explicit permission
-          DeviceOrientationEvent.requestPermission()
-            .then((response) => {
-              if (response === "granted") {
-                setupCompass();
-              } else {
-                updateQiblaStatus(
-                  "اتجاه القبلة: " +
-                    Math.round(calculateQiblaDirection()) +
-                    "° من الشمال",
-                );
-              }
-            })
-            .catch(() => {
-              updateQiblaStatus(
-                "اتجاه القبلة: " +
-                  Math.round(calculateQiblaDirection()) +
-                  "° من الشمال",
-              );
-            });
-        } else {
-          setupCompass();
-        }
-      },
-      (error) => {
-        updateQiblaStatus("يرجى السماح بالوصول للموقع");
-        console.log("Geolocation error:", error);
-      },
-    );
-  } else if (userLocation) {
-    displayStaticQibla();
-    setupCompass();
-  } else {
-    updateQiblaStatus("المتصفح لا يدعم تحديد الموقع");
-  }
-}
-
-function calculateQiblaDirection() {
-  if (!userLocation) return 0;
-
-  const lat1 = userLocation.lat * (Math.PI / 180);
-  const lng1 = userLocation.lng * (Math.PI / 180);
-  const lat2 = KAABA_LAT * (Math.PI / 180);
-  const lng2 = KAABA_LNG * (Math.PI / 180);
-
-  const dLng = lng2 - lng1;
-
-  const x = Math.sin(dLng) * Math.cos(lat2);
-  const y =
-    Math.cos(lat1) * Math.sin(lat2) -
-    Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
-
-  let qibla = Math.atan2(x, y) * (180 / Math.PI);
-  qibla = (qibla + 360) % 360;
-
-  return qibla;
-}
-
-function setupCompass() {
-  // Always show the static degree first
-  displayStaticQibla();
-
-  if ("DeviceOrientationEvent" in window) {
-    window.addEventListener(
-      "deviceorientationabsolute",
-      handleOrientation,
-      true,
-    );
-    window.addEventListener("deviceorientation", handleOrientation, true);
-    updateQiblaStatus("البوصلة تعمل");
-  } else {
-    // Fallback for devices without compass
-    var dir = Math.round(calculateQiblaDirection());
-    updateQiblaStatus("اتجاه القبلة: " + dir + "° من الشمال");
-  }
-}
-
-function handleOrientation(event) {
-  let heading;
-
-  if (event.webkitCompassHeading) {
-    // iOS
-    heading = event.webkitCompassHeading;
-  } else if (event.alpha) {
-    // Android
-    heading = 360 - event.alpha;
-  } else {
-    return;
-  }
-
-  compassHeading = heading;
-  updateCompassDisplay();
-}
-
-function updateCompassDisplay() {
-  const needle = document.getElementById("compassNeedle");
-  const degreesEl = document.getElementById("qiblaDegrees");
-
-  if (!needle || !userLocation) return;
-
-  const qiblaDirection = calculateQiblaDirection();
-  const rotation = qiblaDirection - compassHeading;
-
-  needle.style.transform = `translate(-50%, -100%) rotate(${rotation}deg)`;
-
-  if (degreesEl) {
-    degreesEl.textContent = Math.round(qiblaDirection) + "°";
-  }
-}
-
-function displayStaticQibla() {
-  if (!userLocation) return;
-
-  const qiblaDirection = calculateQiblaDirection();
-  const degreesEl = document.getElementById("qiblaDegrees");
-  const needle = document.getElementById("compassNeedle");
-
-  if (degreesEl) {
-    degreesEl.textContent = Math.round(qiblaDirection) + "°";
-  }
-
-  // Rotate needle to point toward Qibla (static, no compass heading)
-  if (needle) {
-    needle.style.transform = `translate(-50%, -100%) rotate(${qiblaDirection}deg)`;
-  }
-}
-
-function updateQiblaStatus(message) {
-  const statusEl = document.getElementById("qiblaStatus");
-  if (statusEl) {
-    statusEl.textContent = message;
-  }
-}
+// Handled seamlessly via js/modules/qibla.js with AppRouter & SafeStorage
 
 // ========================================
 // READING MODES
@@ -6034,17 +5596,28 @@ function shareCurrentDuaa() {
 /**
  * Fasting Guide Modal Controller
  */
+function _closeFastingGuideModalInternal() {
+  const modal = document.getElementById("fastingGuideModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
 function openFastingGuideModal() {
   const modal = document.getElementById("fastingGuideModal");
   if (modal) {
     modal.style.display = "flex";
+    if (window.AppRouter && !window.AppRouter.isModalOpen("fastingGuide")) {
+      window.AppRouter.pushModal("fastingGuide", _closeFastingGuideModalInternal);
+    }
   }
 }
 
 function closeFastingGuideModal() {
-  const modal = document.getElementById("fastingGuideModal");
-  if (modal) {
-    modal.style.display = "none";
+  if (window.AppRouter && window.AppRouter.isModalOpen("fastingGuide")) {
+    window.AppRouter.closeModal("fastingGuide");
+  } else {
+    _closeFastingGuideModalInternal();
   }
 }
 
@@ -6163,221 +5736,9 @@ setTimeout(() => {
 }, 100);
 
 /* ================================================================
-   MISBAHA (Digital Prayer Beads) – JavaScript
+   MISBAHA (Digital Prayer Beads) — Extracted to js/modules/misbaha.js
    ================================================================ */
-
-// Misbaha state
-let misbahaCount = 0;
-let misbahaTarget = 33;
-let misbahaRounds = 0;
-let misbahaTotal = 0;
-let misbahaDhikr = "سبحان الله";
-const MISBAHA_CIRCUMFERENCE = 2 * Math.PI * 90; // 565.48
-
-// Load misbaha state from localStorage
-function loadMisbahaState() {
-  try {
-    const saved = localStorage.getItem("misbahaState");
-    if (saved) {
-      const state = JSON.parse(saved);
-      misbahaCount = state.count || 0;
-      misbahaTarget = state.target !== undefined ? state.target : 33;
-      misbahaRounds = state.rounds || 0;
-      misbahaTotal = state.total || 0;
-      misbahaDhikr = state.dhikr || "سبحان الله";
-    }
-  } catch (e) {
-    console.error("Error loading misbaha state:", e);
-  }
-}
-
-// Save misbaha state to localStorage
-function saveMisbahaState() {
-  try {
-    localStorage.setItem(
-      "misbahaState",
-      JSON.stringify({
-        count: misbahaCount,
-        target: misbahaTarget,
-        rounds: misbahaRounds,
-        total: misbahaTotal,
-        dhikr: misbahaDhikr,
-      }),
-    );
-  } catch (e) {
-    console.error("Error saving misbaha state:", e);
-  }
-}
-
-// Update misbaha UI
-function updateMisbahaUI() {
-  const countNum = document.getElementById("misbahaCountNum");
-  const countTarget = document.getElementById("misbahaCountTarget");
-  const roundsVal = document.getElementById("misbahaRoundsVal");
-  const totalValue = document.getElementById("misbahaTotalValue");
-  const ringFill = document.getElementById("misbahaRingFill");
-  const dhikrText = document.getElementById("mishbahaDhikrText");
-
-  if (countNum) countNum.textContent = toArabicNumerals(misbahaCount);
-  if (countTarget)
-    countTarget.textContent =
-      misbahaTarget > 0 ? "/ " + toArabicNumerals(misbahaTarget) : "∞";
-  if (roundsVal) roundsVal.textContent = toArabicNumerals(misbahaRounds);
-  if (totalValue) totalValue.textContent = toArabicNumerals(misbahaTotal);
-  if (dhikrText) dhikrText.textContent = misbahaDhikr;
-
-  // Update ring progress
-  if (ringFill) {
-    if (misbahaTarget > 0) {
-      const progress = misbahaCount / misbahaTarget;
-      const offset = MISBAHA_CIRCUMFERENCE * (1 - Math.min(progress, 1));
-      ringFill.style.strokeDashoffset = offset;
-    } else {
-      ringFill.style.strokeDashoffset = 0;
-    }
-  }
-
-  // Update preset active state
-  const presets = document.querySelectorAll(".misbaha-preset");
-  presets.forEach(function (btn) {
-    btn.classList.toggle("active", btn.dataset.dhikr === misbahaDhikr);
-  });
-
-  // Update target buttons active state
-  const targetBtns = document.querySelectorAll(".misbaha-target-btn");
-  targetBtns.forEach(function (btn) {
-    const btnTarget = parseInt(btn.dataset.target);
-    btn.classList.toggle("active", btnTarget === misbahaTarget);
-  });
-}
-
-// Open misbaha
-function openMisbaha() {
-  loadMisbahaState();
-  const overlay = document.getElementById("misbahaOverlay");
-  if (overlay) {
-    overlay.classList.remove("hidden");
-    updateMisbahaUI();
-
-    // Attach Tap Anywhere Mode for Misbaha
-    const card = overlay.querySelector(".misbaha-modal-card");
-    if (card && !card._hasTapAnywhere) {
-      card._hasTapAnywhere = true;
-      card.addEventListener("click", function (e) {
-        if (
-          e.target.closest(
-            "button, .misbaha-preset-btn, .misbaha-target-btn, .misbaha-close-btn, .misbaha-reset-btn, .misbaha-tap-btn",
-          )
-        )
-          return;
-        incrementMisbaha();
-        createTapRipple(e, card);
-      });
-    }
-  }
-}
-
-// Close misbaha
-function closeMisbaha() {
-  const overlay = document.getElementById("misbahaOverlay");
-  if (overlay) {
-    overlay.classList.add("hidden");
-  }
-}
-
-// Select target (33, 50, 100, 0 for infinite)
-function setMisbahaTarget(target) {
-  misbahaTarget = parseInt(target) || 0;
-  if (misbahaTarget > 0 && misbahaCount >= misbahaTarget) {
-    misbahaCount = 0;
-  }
-  saveMisbahaState();
-  updateMisbahaUI();
-}
-
-// Select a preset dhikr
-function selectMisbahaPreset(btn) {
-  misbahaDhikr = btn.dataset.dhikr;
-  saveMisbahaState();
-  updateMisbahaUI();
-}
-
-// Increment misbaha counter
-function incrementMisbaha() {
-  const tapBtn = document.getElementById("misbahaTapBtn");
-
-  if (misbahaTarget > 0) {
-    // If round was completed on last tap, begin fresh round
-    if (misbahaCount >= misbahaTarget) {
-      misbahaCount = 0;
-      if (tapBtn) tapBtn.classList.remove("completed-flash");
-    }
-
-    misbahaCount++;
-    misbahaTotal++;
-
-    // Reached target -> round completed!
-    if (misbahaCount === misbahaTarget) {
-      misbahaRounds++;
-      if (tapBtn) {
-        tapBtn.classList.add("completed-flash");
-        setTimeout(function () {
-          tapBtn.classList.remove("completed-flash");
-        }, 1200);
-      }
-      if (navigator.vibrate) {
-        navigator.vibrate([60, 60, 120]);
-      }
-      showNotification(`أتممت الدورة ${misbahaRounds}! بارك الله فيك 🌟`);
-    } else {
-      if (navigator.vibrate) {
-        navigator.vibrate(30);
-      }
-    }
-  } else {
-    // Infinite mode: continuously count
-    misbahaCount++;
-    misbahaTotal++;
-    if (navigator.vibrate) {
-      navigator.vibrate(30);
-    }
-  }
-
-  // Pulse animation
-  if (tapBtn) {
-    tapBtn.classList.remove("pulse");
-    void tapBtn.offsetWidth;
-    tapBtn.classList.add("pulse");
-  }
-
-  saveMisbahaState();
-  updateMisbahaUI();
-}
-
-// Reset misbaha counter
-function resetMisbaha() {
-  if (misbahaCount === 0 && misbahaTotal === 0 && misbahaRounds === 0) return;
-
-  if (confirm("هل تريد تصفير عداد المسبحة والدورات؟")) {
-    misbahaCount = 0;
-    misbahaTotal = 0;
-    misbahaRounds = 0;
-    const tapBtn = document.getElementById("misbahaTapBtn");
-    if (tapBtn) tapBtn.classList.remove("completed-flash");
-    saveMisbahaState();
-    updateMisbahaUI();
-  }
-}
-
-// Close misbaha on Escape key
-document.addEventListener("keydown", function (e) {
-  if (e.key === "Escape") {
-    const overlay = document.getElementById("misbahaOverlay");
-    if (overlay && !overlay.classList.contains("hidden")) {
-      closeMisbaha();
-    }
-  }
-});
+// Managed via js/modules/misbaha.js with Haptics, AppRouter & SafeStorage;
 
 // Carousel scroll listener for Quick Actions indicator dots
 document.addEventListener("DOMContentLoaded", function () {
