@@ -147,11 +147,21 @@
   global.exportUserData = function () {
     try {
       var data = {};
-      for (var i = 0; i < window.localStorage.length; i++) {
-        var key = window.localStorage.key(i);
-        data[key] = window.localStorage.getItem(key);
+      // 1. Export all persistent keys from localStorage
+      if (window.localStorage && window.localStorage.length > 0) {
+        for (var i = 0; i < window.localStorage.length; i++) {
+          var key = window.localStorage.key(i);
+          data[key] = window.localStorage.getItem(key);
+        }
       }
-      var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      // 2. Also export from in-memory fallback store if present
+      if (_memoryStore && _memoryStore.size > 0) {
+        _memoryStore.forEach(function (val, key) {
+          if (!data[key]) data[key] = val;
+        });
+      }
+
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
       var url = URL.createObjectURL(blob);
       var a = document.createElement("a");
       var now = new Date().toISOString().slice(0, 10);
@@ -188,29 +198,76 @@
     var reader = new FileReader();
     reader.onload = function (e) {
       try {
-        var data = JSON.parse(e.target.result);
+        var rawText = e.target.result;
+        if (!rawText || !rawText.trim()) {
+          throw new Error("الملف فارغ أو تالف");
+        }
+        // Strip BOM if present
+        if (rawText.charCodeAt(0) === 0xfeff) {
+          rawText = rawText.slice(1);
+        }
+
+        var data = JSON.parse(rawText);
         if (typeof data !== "object" || data === null) {
           throw new Error("تنسيق الملف غير صالح");
         }
+
+        // Unwrap potential root wrapper objects (e.g. { data: {...} }, { backup: {...} }, { tazkeer: {...} })
+        if (data.data && typeof data.data === "object" && !data.dailyProgress && !data.activeTab && !data.tazkeer_khatmah) {
+          data = data.data;
+        } else if (data.backup && typeof data.backup === "object") {
+          data = data.backup;
+        } else if (data.tazkeer && typeof data.tazkeer === "object") {
+          data = data.tazkeer;
+        } else if (data.storage && typeof data.storage === "object") {
+          data = data.storage;
+        }
+
         var count = 0;
         Object.keys(data).forEach(function (key) {
           try {
             var val = data[key];
-            window.localStorage.setItem(key, typeof val === "string" ? val : JSON.stringify(val));
+            var strVal = typeof val === "string" ? val : JSON.stringify(val);
+            if (isStorageAvailable) {
+              window.localStorage.setItem(key, strVal);
+            }
+            _memoryStore.set(key, strVal);
             count++;
-          } catch (itemErr) {}
+          } catch (itemErr) {
+            console.warn('[SafeStorage] Failed restoring key: "' + key + '"', itemErr);
+          }
         });
 
+        if (count === 0) {
+          throw new Error("لم يتم العثور على بيانات صالحة في الملف المختار");
+        }
+
+        // Instantly refresh in-memory state across active application modules
+        if (typeof global.refreshAllUserData === "function") {
+          global.refreshAllUserData();
+        } else {
+          try {
+            if (typeof global.loadProgress === "function") global.loadProgress();
+            if (typeof global.checkDailyProgress === "function") global.checkDailyProgress();
+            if (typeof global.updateStatsDashboard === "function") global.updateStatsDashboard();
+            if (typeof global.updateWeeklyChart === "function") global.updateWeeklyChart();
+            if (typeof global.updateProfileTab === "function") global.updateProfileTab();
+            if (typeof global.loadKhatmahState === "function") global.loadKhatmahState();
+          } catch (stErr) {
+            console.warn("[SafeStorage] Live state refresh error:", stErr);
+          }
+        }
+
         if (typeof global.showNotification === "function") {
-          global.showNotification("تم استيراد " + count + " عنصر بنجاح! جاري التحديث...");
+          global.showNotification("تمت استعادة " + count + " عنصر بنجاح! جاري التحديث...");
         }
 
         setTimeout(function () {
           window.location.reload();
-        }, 1200);
+        }, 800);
       } catch (err) {
         console.error("[SafeStorage] Import error:", err);
-        alert("فشل استيراد الملف: يرجى التأكد من اختيار ملف JSON صالح لتطبيق ذَكِّرْ.");
+        alert("فشل استيراد الملف: " + (err.message || "يرجى التأكد من اختيار ملف JSON صالح لتطبيق ذَكِّرْ."));
       }
       event.target.value = "";
     };

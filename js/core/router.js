@@ -115,6 +115,7 @@
       if (tabId === "tab-home") {
         if (typeof global.updateDynamicHeroCard === "function") global.updateDynamicHeroCard();
         if (typeof global.updateContinueReadingPill === "function") global.updateContinueReadingPill();
+        if (typeof global.initializePrayerTimes === "function") global.initializePrayerTimes();
       } else if (tabId === "tab-azkar") {
         var categoryPage = document.getElementById("categoryPage");
         var azkarListView = document.getElementById("azkarListView");

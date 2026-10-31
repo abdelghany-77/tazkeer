@@ -3175,6 +3175,19 @@ function updateInstallButtonVisibility() {
   }
 }
 
+function initializeInstallPrompt() {
+  updateInstallButtonVisibility();
+}
+
+function showInstallPrompt() {
+  if (typeof isStandaloneMode === "function" && isStandaloneMode()) return;
+  const hasSeen = localStorage.getItem("hasSeenInstallPrompt");
+  if (!hasSeen && deferredInstallPrompt && typeof showInstallModal === "function") {
+    localStorage.setItem("hasSeenInstallPrompt", "true");
+    showInstallModal();
+  }
+}
+
 async function showInstallModal() {
   if (isStandaloneMode()) {
     showNotification("التطبيق مثبت بالفعل على جهازك");
@@ -3788,7 +3801,7 @@ async function initializePrayerTimes() {
   const section = document.getElementById("prayerTimesSection");
   if (!section) return;
 
-  // 1. Instant Cache Check: Render immediately to eliminate FOEC
+  // 1. Instant Cache Check: Render immediately to eliminate FOEC and any '--:--' delay
   const cachedDataStr = localStorage.getItem("cachedPrayerTimes");
   const cachedCity = localStorage.getItem("cachedPrayerCity") || "القاهرة";
   if (cachedDataStr) {
@@ -3801,6 +3814,18 @@ async function initializePrayerTimes() {
     } catch (e) {
       console.warn("Cached prayer times error", e);
     }
+  } else if (!prayerTimesData) {
+    // Immediate Cairo baseline timings so countdown starts ticking immediately
+    prayerTimesData = {
+      Fajr: "04:30",
+      Sunrise: "06:00",
+      Dhuhr: "12:00",
+      Asr: "15:30",
+      Maghrib: "18:15",
+      Isha: "19:45",
+    };
+    displayPrayerTimes(cachedCity);
+    startCountdown();
   }
 
   // 2. Determine location: use saved or default to Cairo immediately
@@ -4179,16 +4204,37 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.style.fontSize = savedFontSize + "px";
   }
 
-  // Wait for the original initialization to complete
-  setTimeout(() => {
+  // Fast-boot prayer times & core UX immediately
+  try {
+    initializePrayerTimes();
+  } catch (err) {
+    console.error("Fast-boot prayer times error:", err);
+  }
+
+  try {
     initializeEnhancedFeatures();
-    initializeInstallPrompt();
-    initializeEnhancedUX(); // Add enhanced UX features
-    initializePrayerTimes(); // Initialize prayer times
-    initializeNewFeatures(); // Initialize all new features
-    // Show install prompt on first visit
-    showInstallPrompt();
-  }, 500);
+  } catch (err) {
+    console.error("Fast-boot enhanced features error:", err);
+  }
+
+  try {
+    initializeEnhancedUX();
+  } catch (err) {
+    console.error("Fast-boot enhanced UX error:", err);
+  }
+
+  try {
+    initializeNewFeatures();
+  } catch (err) {
+    console.error("Fast-boot new features error:", err);
+  }
+
+  // Delayed check for install prompt
+  setTimeout(() => {
+    try {
+      showInstallPrompt();
+    } catch (e) {}
+  }, 1000);
 });
 
 // ========================================
@@ -4196,11 +4242,61 @@ document.addEventListener("DOMContentLoaded", function () {
 // ========================================
 
 function initializeNewFeatures() {
-  initializeStatsDashboard();
-  initializeQiblaCompass();
-  initializeReadingModes();
-  initializeOfflineDetection();
+  try {
+    initializeStatsDashboard();
+  } catch (e) {
+    console.warn("initializeStatsDashboard error", e);
+  }
+
+  if (typeof initializeQiblaCompass === "function") {
+    try {
+      initializeQiblaCompass();
+    } catch (e) {
+      console.warn("initializeQiblaCompass error", e);
+    }
+  }
+
+  if (typeof initializeReadingModes === "function") {
+    try {
+      initializeReadingModes();
+    } catch (e) {
+      console.warn("initializeReadingModes error", e);
+    }
+  }
+
+  if (typeof initializeOfflineDetection === "function") {
+    try {
+      initializeOfflineDetection();
+    } catch (e) {
+      console.warn("initializeOfflineDetection error", e);
+    }
+  }
 }
+
+// Global hook to refresh all user data in memory after JSON import or restore
+function refreshAllUserData() {
+  try {
+    dailyProgress = JSON.parse(localStorage.getItem("dailyProgress")) || {
+      date: new Date().toDateString(),
+      completedZekr: [],
+      streak: parseInt(localStorage.getItem("dailyStreak")) || 0,
+      totalCompletions: parseInt(localStorage.getItem("totalCompletions")) || 0,
+    };
+    weeklyProgress = JSON.parse(localStorage.getItem("weeklyProgress")) || {};
+
+    if (typeof loadProgress === "function") loadProgress();
+    if (typeof checkDailyProgress === "function") checkDailyProgress();
+    if (typeof updateStatsDashboard === "function") updateStatsDashboard();
+    if (typeof updateWeeklyChart === "function") updateWeeklyChart();
+    if (typeof updateQuranWeeklyChart === "function") updateQuranWeeklyChart();
+    if (typeof updateProfileTab === "function") updateProfileTab();
+    if (typeof loadKhatmahState === "function") loadKhatmahState();
+    if (typeof initializePrayerTimes === "function") initializePrayerTimes();
+  } catch (e) {
+    console.warn("refreshAllUserData error", e);
+  }
+}
+window.refreshAllUserData = refreshAllUserData;
 
 // ========================================
 // STATISTICS DASHBOARD
