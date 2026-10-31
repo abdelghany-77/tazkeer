@@ -688,6 +688,19 @@
 
         </div>
 
+        <!-- Compact Data Backup & Restore (JSON) -->
+        <div class="dash-backup-bar">
+          <button class="dash-backup-btn" onclick="exportUserData()" title="تصدير وحفظ الإنجازات كملف JSON">
+            <i class="fas fa-file-export"></i>
+            <span>تصدير البيانات</span>
+          </button>
+          <button class="dash-backup-btn" onclick="triggerImportData()" title="استيراد واستعادة الإنجازات من ملف JSON">
+            <i class="fas fa-file-import"></i>
+            <span>استيراد البيانات</span>
+          </button>
+          <input type="file" id="importJsonInput" accept=".json,application/json" style="display: none;" onchange="importUserData(event)" />
+        </div>
+
         <!-- Sadaqa Jariyah -->
         <div class="dash-card dash-sadaqa">
           <p>اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد عَبْدالغَنِي

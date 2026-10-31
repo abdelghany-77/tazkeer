@@ -140,5 +140,81 @@
 
   global.SafeStorage = SafeStorage;
   global.safeStorage = SafeStorage;
+
+  /**
+   * Export all user progress and preferences as a downloadable JSON file
+   */
+  global.exportUserData = function () {
+    try {
+      var data = {};
+      for (var i = 0; i < window.localStorage.length; i++) {
+        var key = window.localStorage.key(i);
+        data[key] = window.localStorage.getItem(key);
+      }
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      var now = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = "tazkeer-backup-" + now + ".json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      if (typeof global.showNotification === "function") {
+        global.showNotification("تم تصدير الإنجازات والبيانات بنجاح 📁");
+      }
+    } catch (err) {
+      console.error("[SafeStorage] Export error:", err);
+      alert("تعذر تصدير البيانات: " + err.message);
+    }
+  };
+
+  /**
+   * Trigger the hidden file input for JSON import
+   */
+  global.triggerImportData = function () {
+    var input = document.getElementById("importJsonInput");
+    if (input) input.click();
+  };
+
+  /**
+   * Import and restore data from an uploaded JSON file
+   */
+  global.importUserData = function (event) {
+    var file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        var data = JSON.parse(e.target.result);
+        if (typeof data !== "object" || data === null) {
+          throw new Error("تنسيق الملف غير صالح");
+        }
+        var count = 0;
+        Object.keys(data).forEach(function (key) {
+          try {
+            var val = data[key];
+            window.localStorage.setItem(key, typeof val === "string" ? val : JSON.stringify(val));
+            count++;
+          } catch (itemErr) {}
+        });
+
+        if (typeof global.showNotification === "function") {
+          global.showNotification("تم استيراد " + count + " عنصر بنجاح! جاري التحديث...");
+        }
+
+        setTimeout(function () {
+          window.location.reload();
+        }, 1200);
+      } catch (err) {
+        console.error("[SafeStorage] Import error:", err);
+        alert("فشل استيراد الملف: يرجى التأكد من اختيار ملف JSON صالح لتطبيق ذَكِّرْ.");
+      }
+      event.target.value = "";
+    };
+    reader.readAsText(file);
+  };
 })(typeof window !== "undefined" ? window : this);
 
