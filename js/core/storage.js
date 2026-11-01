@@ -151,17 +151,31 @@
       if (window.localStorage && window.localStorage.length > 0) {
         for (var i = 0; i < window.localStorage.length; i++) {
           var key = window.localStorage.key(i);
-          data[key] = window.localStorage.getItem(key);
+          if (key && key !== "keys" && key !== "__tazkeer_probe__") {
+            data[key] = window.localStorage.getItem(key);
+          }
         }
       }
       // 2. Also export from in-memory fallback store if present
       if (_memoryStore && _memoryStore.size > 0) {
         _memoryStore.forEach(function (val, key) {
-          if (!data[key]) data[key] = val;
+          if (!data[key] && key !== "keys" && key !== "__tazkeer_probe__") {
+            data[key] = val;
+          }
         });
       }
 
-      var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+      var payload = {
+        app: "tazkeer",
+        type: "tazkeer-progress-backup",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        keys: data,
+      };
+
+      var blob = new Blob([JSON.stringify(payload, null, 2)], {
+        type: "application/json;charset=utf-8",
+      });
       var url = URL.createObjectURL(blob);
       var a = document.createElement("a");
       var now = new Date().toISOString().slice(0, 10);
@@ -185,17 +199,27 @@
    */
   global.triggerImportData = function () {
     var input = document.getElementById("importJsonInput");
-    if (input) input.click();
+    if (input) {
+      input.value = "";
+      input.click();
+    }
   };
 
   /**
    * Import and restore data from an uploaded JSON file
    */
   global.importUserData = function (event) {
-    var file = event.target.files && event.target.files[0];
+    var input = event.target;
+    var file = input && input.files && input.files[0];
     if (!file) return;
 
     var reader = new FileReader();
+    reader.onerror = function (err) {
+      console.error("[SafeStorage] FileReader error:", err);
+      alert("تعذر قراءة الملف المختار. يرجى المحاولة مرة أخرى.");
+      if (input) input.value = "";
+    };
+
     reader.onload = function (e) {
       try {
         var rawText = e.target.result;
@@ -212,21 +236,32 @@
           throw new Error("تنسيق الملف غير صالح");
         }
 
-        // Unwrap potential root wrapper objects (e.g. { data: {...} }, { backup: {...} }, { tazkeer: {...} })
-        if (data.data && typeof data.data === "object" && !data.dailyProgress && !data.activeTab && !data.tazkeer_khatmah) {
-          data = data.data;
-        } else if (data.backup && typeof data.backup === "object") {
-          data = data.backup;
-        } else if (data.tazkeer && typeof data.tazkeer === "object") {
-          data = data.tazkeer;
-        } else if (data.storage && typeof data.storage === "object") {
+        // Unwrap potential root wrapper objects (e.g. { keys: {...} }, { payload: {...} }, { backup: {...} }, { tazkeer: {...} }, { data: {...} })
+        if (data.keys && typeof data.keys === "object" && !Array.isArray(data.keys)) {
+          data = data.keys;
+        } else if (data.payload && typeof data.payload === "object" && !Array.isArray(data.payload)) {
+          data = data.payload.keys && typeof data.payload.keys === "object" ? data.payload.keys : data.payload;
+        } else if (data.backup && typeof data.backup === "object" && !Array.isArray(data.backup)) {
+          data = data.backup.keys && typeof data.backup.keys === "object" ? data.backup.keys : data.backup;
+        } else if (data.tazkeer && typeof data.tazkeer === "object" && !Array.isArray(data.tazkeer)) {
+          data = data.tazkeer.keys && typeof data.tazkeer.keys === "object" ? data.tazkeer.keys : data.tazkeer;
+        } else if (data.storage && typeof data.storage === "object" && !Array.isArray(data.storage)) {
           data = data.storage;
+        } else if (data.data && typeof data.data === "object" && !Array.isArray(data.data) && !data.dailyProgress && !data.activeTab && !data.tazkeer_khatmah) {
+          data = data.data.keys && typeof data.data.keys === "object" ? data.data.keys : data.data;
         }
+
+        // Clean up any stray "keys" entry that was previously incorrectly saved
+        try {
+          if (isStorageAvailable) window.localStorage.removeItem("keys");
+          _memoryStore.delete("keys");
+        } catch (cleanupErr) {}
 
         var count = 0;
         Object.keys(data).forEach(function (key) {
           try {
             var val = data[key];
+            if (val === null || val === undefined) return;
             var strVal = typeof val === "string" ? val : JSON.stringify(val);
             if (isStorageAvailable) {
               window.localStorage.setItem(key, strVal);
@@ -260,6 +295,8 @@
 
         if (typeof global.showNotification === "function") {
           global.showNotification("تمت استعادة " + count + " عنصر بنجاح! جاري التحديث...");
+        } else if (typeof global.showEnhancedNotification === "function") {
+          global.showEnhancedNotification("تمت استعادة " + count + " عنصر بنجاح! جاري التحديث...", "success", 3000);
         }
 
         setTimeout(function () {
@@ -268,8 +305,9 @@
       } catch (err) {
         console.error("[SafeStorage] Import error:", err);
         alert("فشل استيراد الملف: " + (err.message || "يرجى التأكد من اختيار ملف JSON صالح لتطبيق ذَكِّرْ."));
+      } finally {
+        if (input) input.value = "";
       }
-      event.target.value = "";
     };
     reader.readAsText(file);
   };
