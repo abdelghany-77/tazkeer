@@ -66,7 +66,11 @@
       });
       target.classList.add("active-tab");
 
-      // 4. Update bottom nav buttons
+      // 4. Update bottom nav buttons and guarantee bottom nav visibility
+      var bottomNav = document.getElementById("bottomNav");
+      if (bottomNav) {
+        bottomNav.style.display = "";
+      }
       document.querySelectorAll(".bottom-nav-item").forEach(function (btn) {
         btn.classList.toggle("active", btn.getAttribute("data-tab") === tabId);
       });

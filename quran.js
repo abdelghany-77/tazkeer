@@ -775,6 +775,7 @@ function showQuranPage() {
  * Render Khatmah Setup Screen
  */
 function renderKhatmahSetup() {
+  restoreBottomNav();
   quranViewerState.currentView = "setup";
   const container = document.getElementById("quranPageContent");
   if (!container) return;
@@ -1025,11 +1026,25 @@ function openKhatmahReader() {
 }
 
 /**
+ * Helper to ensure the bottom navigation bar is visible outside reader mode
+ */
+function restoreBottomNav() {
+  const bottomNav = document.getElementById("bottomNav");
+  if (bottomNav) bottomNav.style.display = "";
+}
+
+/**
  * Called when user finishes reading all pages in a wird
  */
 function completeWirdAndReturn() {
+  restoreBottomNav();
+
+  if (window.AppRouter && window.AppRouter.isModalOpen("quranReader")) {
+    window.AppRouter.closeModal("quranReader");
+  }
+
   if (typeof showNotification === "function") {
-    showNotification("أتممت الورد! بارك الله فيك ");
+    showNotification("أتممت الورد! بارك الله فيك 🌿");
   }
   renderKhatmahDashboard();
 }
@@ -1038,6 +1053,7 @@ function completeWirdAndReturn() {
  * Render Khatmah Dashboard
  */
 function renderKhatmahDashboard() {
+  restoreBottomNav();
   quranViewerState.currentView = "dashboard";
   const container = document.getElementById("quranPageContent");
   if (!container) return;
@@ -1899,14 +1915,13 @@ function openMushafViewer(page) {
 }
 
 function exitMushafViewer(syncRouter) {
+  // Always restore bottom nav immediately upon exiting
+  restoreBottomNav();
+
   if (syncRouter !== false && window.AppRouter && window.AppRouter.isModalOpen("quranReader")) {
     window.AppRouter.closeModal("quranReader");
     return;
   }
-
-  // Restore bottom nav visibility
-  const bottomNav = document.getElementById("bottomNav");
-  if (bottomNav) bottomNav.style.display = "";
 
   if (quranViewerState.mode === "khatmah" && khatmahState.isActive) {
     renderKhatmahDashboard();

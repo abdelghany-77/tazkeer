@@ -1135,22 +1135,22 @@ function updateProgressStats() {
   }
 }
 
-// Notification system
-function showNotification(message, type = "success") {
-  const notification = document.querySelector(".notification");
+// Notification system - centralized single toast manager
+let notificationTimer = null;
+
+function showNotification(message, type = "success", duration = 3000) {
+  const notification = document.getElementById("notification") || document.querySelector(".notification");
   if (!notification) return;
 
   const icon = notification.querySelector("i");
-  const textSpan = notification.querySelector("span");
+  const textSpan = document.getElementById("notificationText") || notification.querySelector("span");
 
   // Update icon based on type
   if (icon) {
-    icon.className =
-      type === "success"
-        ? "fas fa-check-circle"
-        : type === "warning"
-          ? "fas fa-exclamation-triangle"
-          : "fas fa-info-circle";
+    if (type === "success") icon.className = "fas fa-check-circle";
+    else if (type === "warning") icon.className = "fas fa-exclamation-triangle";
+    else if (type === "error") icon.className = "fas fa-circle-xmark";
+    else icon.className = "fas fa-info-circle";
   }
 
   // Update message
@@ -1158,18 +1158,24 @@ function showNotification(message, type = "success") {
 
   // Update colors
   if (type === "success") {
-    notification.style.background = "#b8860b";
+    notification.style.background = "linear-gradient(135deg, #1a8a5c, #2d9d6e)";
   } else if (type === "info") {
-    notification.style.background = "#1a8a5c";
+    notification.style.background = "linear-gradient(135deg, #2b6cb0, #3182ce)";
   } else if (type === "warning") {
-    notification.style.background = "#ed8936";
+    notification.style.background = "linear-gradient(135deg, #d4a847, #b8860b)";
+  } else if (type === "error") {
+    notification.style.background = "linear-gradient(135deg, #e53e3e, #c53030)";
   }
 
   notification.classList.add("show");
 
-  setTimeout(() => {
+  if (notificationTimer) {
+    clearTimeout(notificationTimer);
+  }
+
+  notificationTimer = setTimeout(() => {
     notification.classList.remove("show");
-  }, 3000);
+  }, duration || 3000);
 }
 
 // Celebration modal
@@ -3242,31 +3248,9 @@ function initializeEnhancedUX() {
   setupPerformanceOptimizations();
 }
 
-// Offline Detection
+// Offline Detection - Unified via initializeOfflineDetection
 function setupOfflineDetection() {
-  const offlineIndicator = document.createElement("div");
-  offlineIndicator.className = "offline-indicator";
-  offlineIndicator.innerHTML =
-    '<i class="fas fa-wifi-slash"></i> أنت غير متصل بالإنترنت';
-  offlineIndicator.style.display = "none";
-  document.body.appendChild(offlineIndicator);
-
-  window.addEventListener("online", () => {
-    isOnline = true;
-    offlineIndicator.style.display = "none";
-    showEnhancedNotification("تم استعادة الاتصال بالإنترنت", "success");
-  });
-
-  window.addEventListener("offline", () => {
-    isOnline = false;
-    offlineIndicator.style.display = "block";
-    showEnhancedNotification("فقد الاتصال بالإنترنت", "warning");
-
-    // Hide the offline indicator after 3 seconds
-    setTimeout(() => {
-      offlineIndicator.style.display = "none";
-    }, 3000);
-  });
+  // Handled cleanly and uniformly by initializeOfflineDetection to avoid overlapping banners
 }
 
 // Keyboard Shortcuts
@@ -3465,94 +3449,9 @@ function setupPerformanceOptimizations() {
   }
 }
 
-// Enhanced Notification System
+// Enhanced Notification System - Unified delegate to centralized showNotification
 function showEnhancedNotification(message, type = "success", duration = 3000) {
-  // Remove existing notifications
-  document
-    .querySelectorAll(".enhanced-notification")
-    .forEach((n) => n.remove());
-
-  const notification = document.createElement("div");
-  notification.className = `enhanced-notification ${type}`;
-  notification.innerHTML = `
-    <div class="notification-content">
-      <i class="fas ${getNotificationIcon(type)}"></i>
-      <span>${message}</span>
-    </div>
-    <button class="notification-close" onclick="this.parentElement.remove()">
-      <i class="fas fa-times"></i>
-    </button>
-  `;
-
-  // Calculate top position - push below offline banner if visible
-  const offlineBanner = document.getElementById("offlineBanner");
-  const topOffset =
-    offlineBanner && !offlineBanner.classList.contains("hidden")
-      ? offlineBanner.offsetHeight + 10
-      : 20;
-
-  // Add notification styles
-  notification.style.cssText = `
-    position: fixed;
-    top: ${topOffset}px;
-    right: 20px;
-    background: ${getNotificationColor(type)};
-    color: white;
-    padding: 15px 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    z-index: 10000;
-    max-width: 400px;
-    animation: slideInRight 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-  `;
-
-  document.body.appendChild(notification);
-
-  // Auto remove after duration
-  if (duration > 0) {
-    setTimeout(() => {
-      if (notification.parentElement) {
-        notification.style.animation = "slideOutRight 0.3s ease";
-        setTimeout(() => notification.remove(), 300);
-      }
-    }, duration);
-  }
-
-  // Add slideOutRight animation if not exists
-  if (!document.querySelector("#notification-styles")) {
-    const style = document.createElement("style");
-    style.id = "notification-styles";
-    style.textContent = `
-      @keyframes slideOutRight {
-        to {
-          transform: translateX(100%);
-          opacity: 0;
-        }
-      }
-      .enhanced-notification .notification-content {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .enhanced-notification .notification-close {
-        background: none;
-        border: none;
-        color: white;
-        cursor: pointer;
-        padding: 5px;
-        opacity: 0.7;
-        transition: opacity 0.3s;
-      }
-      .enhanced-notification .notification-close:hover {
-        opacity: 1;
-      }
-    `;
-    document.head.appendChild(style);
-  }
+  showNotification(message, type, duration);
 }
 
 function getNotificationIcon(type) {
@@ -3985,12 +3884,6 @@ async function fetchPrayerTimes(latitude, longitude, cityName) {
 
         if (loading) loading.style.display = "none";
         if (error) error.classList.add("hidden");
-
-        showEnhancedNotification(
-          "أنت غير متصل بالأنترنت. تم عرض مواقيت الصلاة المحفوظة مسبقاً.",
-          "warning",
-          5000,
-        );
       } catch (e) {
         showPrayerTimesError("تعذر تحميل مواقيت الصلاة");
       }
@@ -4761,31 +4654,48 @@ function updateNightReadingButton() {
 
 function initializeOfflineDetection() {
   const banner = document.getElementById("offlineBanner");
+  if (!banner) return;
 
   let offlineTimer = null;
 
-  function updateOnlineStatus() {
-    if (navigator.onLine) {
-      if (banner) banner.classList.add("hidden");
-      if (offlineTimer) {
-        clearTimeout(offlineTimer);
-        offlineTimer = null;
-      }
-    } else {
-      if (banner) banner.classList.remove("hidden");
-      if (offlineTimer) clearTimeout(offlineTimer);
-      offlineTimer = setTimeout(() => {
-        if (banner) banner.classList.add("hidden");
-        offlineTimer = null;
-      }, 5000);
-    }
+  function handleOffline() {
+    isOnline = false;
+    const span = banner.querySelector("span");
+    const icon = banner.querySelector("i");
+    if (span) span.textContent = "لا يوجد اتصال بالإنترنت - التطبيق يعمل بكامل وظائفه بدون اتصال";
+    if (icon) icon.className = "fas fa-wifi-slash";
+    banner.classList.remove("online-recovered");
+    banner.classList.remove("hidden");
+
+    if (offlineTimer) clearTimeout(offlineTimer);
+    offlineTimer = setTimeout(() => {
+      banner.classList.add("hidden");
+    }, 4000);
   }
 
-  window.addEventListener("online", updateOnlineStatus);
-  window.addEventListener("offline", updateOnlineStatus);
+  function handleOnline() {
+    isOnline = true;
+    const span = banner.querySelector("span");
+    const icon = banner.querySelector("i");
+    if (span) span.textContent = "تم استعادة الاتصال بالإنترنت بنجاح";
+    if (icon) icon.className = "fas fa-wifi";
+    banner.classList.add("online-recovered");
+    banner.classList.remove("hidden");
 
-  // Check initial status
-  updateOnlineStatus();
+    if (offlineTimer) clearTimeout(offlineTimer);
+    offlineTimer = setTimeout(() => {
+      banner.classList.add("hidden");
+      banner.classList.remove("online-recovered");
+    }, 2500);
+  }
+
+  window.addEventListener("offline", handleOffline);
+  window.addEventListener("online", handleOnline);
+
+  // Check initial status only if already offline on load
+  if (!navigator.onLine) {
+    handleOffline();
+  }
 }
 
 // Update stats when zikr is completed
