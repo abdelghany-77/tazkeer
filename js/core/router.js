@@ -120,6 +120,7 @@
         if (typeof global.updateDynamicHeroCard === "function") global.updateDynamicHeroCard();
         if (typeof global.updateContinueReadingPill === "function") global.updateContinueReadingPill();
         if (typeof global.initializePrayerTimes === "function") global.initializePrayerTimes();
+        if (typeof global.updateRamadanCountdown === "function") global.updateRamadanCountdown();
       } else if (tabId === "tab-azkar") {
         var categoryPage = document.getElementById("categoryPage");
         var azkarListView = document.getElementById("azkarListView");

@@ -4836,7 +4836,84 @@ function updateDailyInfo() {
   // 7. Dynamic Time-Aware Hero Card & Continue Reading Pill
   updateDynamicHeroCard(now);
   updateContinueReadingPill();
+
+  // 8. Ramadan Live Countdown
+  startRamadanCountdownTicker();
 }
+
+// ========================================
+// RAMADAN COUNTDOWN SYSTEM
+// ========================================
+
+let ramadanCountdownInterval = null;
+let cachedRamadanTarget = null;
+
+function getNextRamadanTarget(now) {
+  if (cachedRamadanTarget && cachedRamadanTarget > now) {
+    return cachedRamadanTarget;
+  }
+
+  let testDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  for (let i = 0; i <= 365; i++) {
+    const h = getHijriDate(testDate);
+    if (h.month === 9 && h.day === 1) {
+      testDate.setHours(0, 0, 0, 0);
+      cachedRamadanTarget = testDate;
+      return testDate;
+    }
+    testDate.setDate(testDate.getDate() + 1);
+  }
+
+  return null;
+}
+
+function updateRamadanCountdown() {
+  const card = document.getElementById("calRamadanCard");
+  if (!card) return;
+
+  const now = new Date();
+  const currentHijri = getHijriDate(now);
+
+  const daysOnlyEl = document.getElementById("ramadanDaysOnly");
+  const targetLabelEl = document.getElementById("ramadanTargetDateLabel");
+  const badgeTxt = card.querySelector(".ramadan-badge-txt");
+
+  // Check if we are currently in Ramadan (Month 9)
+  if (currentHijri.month === 9) {
+    if (daysOnlyEl) daysOnlyEl.textContent = toArabicDigits(currentHijri.day);
+    if (badgeTxt) badgeTxt.textContent = "رمضان المبارك";
+    if (targetLabelEl) targetLabelEl.textContent = "تقبل الله منا ومنكم الصيام والقيام";
+    return;
+  }
+
+  const target = getNextRamadanTarget(now);
+  if (!target) return;
+
+  const diffMs = target - now;
+  if (diffMs <= 0) return;
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+
+  if (daysOnlyEl) daysOnlyEl.textContent = toArabicDigits(days);
+  if (badgeTxt) badgeTxt.textContent = "يوم متبقي";
+  if (targetLabelEl) targetLabelEl.textContent = "اللهم بلغنا رمضان";
+}
+
+function toArabicDigits(num) {
+  const digits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+  return String(num).replace(/[0-9]/g, (w) => digits[+w]);
+}
+
+function startRamadanCountdownTicker() {
+  if (ramadanCountdownInterval) {
+    clearInterval(ramadanCountdownInterval);
+  }
+  updateRamadanCountdown();
+  ramadanCountdownInterval = setInterval(updateRamadanCountdown, 60000);
+}
+window.updateRamadanCountdown = updateRamadanCountdown;
 
 // ========================================
 // FASTING REMINDER & CALENDAR SYSTEM

@@ -1043,7 +1043,10 @@ function completeWirdAndReturn() {
     window.AppRouter.closeModal("quranReader");
   }
 
-  if (typeof showNotification === "function") {
+  const wird = getCurrentWird(khatmahState);
+  if (wird && wird.khatmahComplete) {
+    showKhatmahCompletion();
+  } else if (typeof showNotification === "function") {
     showNotification("أتممت الورد! بارك الله فيك 🌿");
   }
   renderKhatmahDashboard();
@@ -1137,8 +1140,11 @@ function renderKhatmahDashboard() {
           ? `
       <div class="khatmah-complete-card-dashboard">
         <div class="complete-icon">🎉</div>
-        <h3>أتممت الختمة!</h3>
-        <p>تقبل الله منك وجعلك من أهل القرآن</p>
+        <h3>أتممت الختمة بحمد الله!</h3>
+        <p>تقبل الله منك وجعلك من أهل القرآن وخاصته</p>
+        <button class="khatmah-dua-view-btn" onclick="showKhatmahDuaModal(false)">
+          <i class="fas fa-hands-praying"></i> دعاء ختم القرآن الكريم
+        </button>
       </div>`
           : ""
       }
@@ -1354,6 +1360,13 @@ function renderMushafViewer() {
         </button>`
             : ""
         }
+        ${
+          page === TOTAL_QURAN_PAGES
+            ? `<button class="khatmah-dua-nav-btn" onclick="showKhatmahDuaModal(false)" aria-label="دعاء ختم القرآن">
+          <i class="fas fa-hands-praying"></i> <span>دعاء الختمة</span>
+        </button>`
+            : ""
+        }
       </div>
     </div>
   `;
@@ -1517,6 +1530,22 @@ function navigateToPage(newPage, direction) {
         wirdBtn.onclick = completeWirdAndReturn;
         bottomBar.appendChild(wirdBtn);
       }
+    }
+
+    let duaBtn = bottomBar.querySelector(".khatmah-dua-nav-btn");
+    if (newPage === TOTAL_QURAN_PAGES) {
+      if (!duaBtn) {
+        duaBtn = document.createElement("button");
+        duaBtn.className = "khatmah-dua-nav-btn";
+        duaBtn.setAttribute("aria-label", "دعاء ختم القرآن");
+        duaBtn.innerHTML = '<i class="fas fa-hands-praying"></i> <span>دعاء الختمة</span>';
+        duaBtn.onclick = function () {
+          showKhatmahDuaModal(false);
+        };
+        bottomBar.appendChild(duaBtn);
+      }
+    } else if (duaBtn) {
+      duaBtn.remove();
     }
   }
 
@@ -1713,38 +1742,203 @@ function markPageAsRead(pageNumber) {
     // Check if Khatmah is complete
     const kStart = khatmahState.khatmahStartPage || 1;
     const kTotal = TOTAL_QURAN_PAGES - kStart + 1;
-    if (khatmahState.totalPagesRead >= kTotal) {
+    if (khatmahState.totalPagesRead >= kTotal && !khatmahState.isComplete) {
       showKhatmahCompletion();
     }
   }
 }
 
+// ===== KHATMAH DUA SYSTEM & CELEBRATION =====
+
+const KHATMAH_DUA_PLAIN = `اللَّهُمَّ ارْحَمْنِي بالقُرْءَانِ وَاجْعَلهُ لِي إِمَاماً وَنُوراً وَهُدًى وَرَحْمَةً ۞
+اللَّهُمَّ ذَكِّرْنِي مِنْهُ مَانَسِيتُ وَعَلِّمْنِي مِنْهُ مَاجَهِلْتُ وَارْزُقْنِي تِلاَوَتَهُ آنَاءَ اللَّيْلِ وَأَطْرَافَ النَّهَارِ وَاجْعَلْهُ لِي حُجَّةً يَارَبَّ العَالَمِينَ ۞
+اللَّهُمَّ أَصْلِحْ لِي دِينِي الَّذِي هُوَ عِصْمَةُ أَمْرِي وَأَصْلِحْ لِي دُنْيَايَ الَّتِي فِيهَا مَعَاشِي وَأَصْلِحْ لِي آخِرَتِي الَّتِي فِيهَا مَعَادِي وَاجْعَلِ الحَيَاةَ زِيَادَةً لِي فِي كُلِّ خَيْرٍ وَاجْعَلِ المَوْتَ رَاحَةً لِي مِنْ كُلِّ شَرٍّ ۞
+اللَّهُمَّ اجْعَلْ خَيْرَ عُمْرِي آخِرَهُ وَخَيْرَ عَمَلِي خَوَاتِمَهُ وَخَيْرَ أَيَّامِي يَوْمَ أَلْقَاكَ فِيهِ ۞
+اللَّهُمَّ إِنِّي أَسْأَلُكَ عِيشَةً هَنِيَّةً وَمِيتَةً سَوِيَّةً وَمَرَدًّا غَيْرَ مُخْزٍ وَلاَ فَاضِحٍ ۞
+اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ المَسْأَلةِ وَخَيْرَ الدُّعَاءِ وَخَيْرَ النَّجَاحِ وَخَيْرَ العِلْمِ وَخَيْرَ العَمَلِ وَخَيْرَ الثَّوَابِ وَخَيْرَ الحَيَاةِ وَخيْرَ المَمَاتِ وَثَبِّتْنِي وَثَقِّلْ مَوَازِينِي وَحَقِّقْ إِيمَانِي وَارْفَعْ دَرَجَتِي وَتَقَبَّلْ صَلاَتِي وَاغْفِرْ خَطِيئَاتِي وَأَسْأَلُكَ العُلَا مِنَ الجَنَّةِ ۞
+اللَّهُمَّ إِنِّي أَسْأَلُكَ مُوجِبَاتِ رَحْمَتِكَ وَعَزَائِمَ مَغْفِرَتِكَ وَالسَّلاَمَةَ مِنْ كُلِّ إِثْمٍ وَالغَنِيمَةَ مِنْ كُلِّ بِرٍّ وَالفَوْزَ بِالجَنَّةِ وَالنَّجَاةَ مِنَ النَّارِ ۞
+اللَّهُمَّ أَحْسِنْ عَاقِبَتَنَا فِي الأُمُورِ كُلِّهَا وَأجِرْنَا مِنْ خِزْيِ الدُّنْيَا وَعَذَابِ الآخِرَةِ ۞
+اللَّهُمَّ اقْسِمْ لَنَا مِنْ خَشْيَتِكَ مَاتَحُولُ بِهِ بَيْنَنَا وَبَيْنَ مَعْصِيَتِكَ وَمِنْ طَاعَتِكَ مَاتُبَلِّغُنَا بِهَا جَنَّتَكَ وَمِنَ اليَقِينِ مَاتُهَوِّنُ بِهِ عَلَيْنَا مَصَائِبَ الدُّنْيَا وَمَتِّعْنَا بِأَسْمَاعِنَا وَأَبْصَارِنَا وَقُوَّتِنَا مَاأَحْيَيْتَنَا وَاجْعَلْهُ الوَارِثَ مِنَّا وَاجْعَلْ ثَأْرَنَا عَلَى مَنْ ظَلَمَنَا وَانْصُرْنَا عَلَى مَنْ عَادَانَا وَلاَ تجْعَلْ مُصِيبَتَنَا فِي دِينِنَا وَلاَ تَجْعَلِ الدُّنْيَا أَكْبَرَ هَمِّنَا وَلَا مَبْلَغَ عِلْمِنَا وَلاَ تُسَلِّطْ عَلَيْنَا مَنْ لَا يَرْحَمُنَا ۞
+اللَّهُمَّ لَا تَدَعْ لَنَا ذَنْبًا إِلَّا غَفَرْتَهُ وَلَا هَمَّا إِلَّا فَرَّجْتَهُ وَلَا دَيْنًا إِلَّا قَضَيْتَهُ وَلَا حَاجَةً مِنْ حَوَائِجِ الدُّنْيَا وَالآخِرَةِ إِلَّا قَضَيْتَهَا يَاأَرْحَمَ الرَّاحِمِينَ ۞
+رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ وَصَلَّى اللهُ عَلَى سَيِّدِنَا وَنَبِيِّنَا مُحَمَّدٍ وَعَلَى آلِهِ وَأَصْحَابِهِ الأَخْيَارِ وَسَلَّمَ تَسْلِيمًا كَثِيراً.`;
+
 /**
- * Show Khatmah completion celebration
+ * Show Khatmah completion celebration and prompt Khatmah Duaa
  */
 function showKhatmahCompletion() {
-  // Increment completed khatmah count
-  var completedCount = parseInt(
-    localStorage.getItem("completedKhatmahCount") || "0",
-  );
-  completedCount++;
-  localStorage.setItem("completedKhatmahCount", String(completedCount));
+  if (!khatmahState.isComplete) {
+    khatmahState.isComplete = true;
+    saveKhatmahState(khatmahState);
+
+    // Increment completed khatmah count safely
+    var completedCount = parseInt(
+      (window.SafeStorage
+        ? window.SafeStorage.get("completedKhatmahCount")
+        : localStorage.getItem("completedKhatmahCount")) || "0",
+      10
+    );
+    completedCount++;
+    if (window.SafeStorage) {
+      window.SafeStorage.set("completedKhatmahCount", String(completedCount));
+    } else {
+      localStorage.setItem("completedKhatmahCount", String(completedCount));
+    }
+
+    if (typeof updateQuranProfileStats === "function") {
+      updateQuranProfileStats();
+    }
+  }
+
+  showKhatmahDuaModal(true);
+}
+
+/**
+ * Open the Khatmah Dua Modal
+ * @param {boolean} [isCelebration=false]
+ */
+function showKhatmahDuaModal(isCelebration) {
+  const existing = document.getElementById("khatmahDuaModalOverlay");
+  if (existing) existing.remove();
 
   const overlay = document.createElement("div");
-  overlay.className = "khatmah-complete-overlay";
+  overlay.id = "khatmahDuaModalOverlay";
+  overlay.className = "khatmah-dua-overlay";
+
   overlay.innerHTML = `
-    <div class="khatmah-complete-card">
-      <div class="complete-icon">🎉</div>
-      <h3>مبروك! أتممت الختمة</h3>
-      <p>تقبل الله منك وجعلك من أهل القرآن.<br>
-      اللهم اجعل القرآن ربيع قلوبنا ونور صدورنا وجلاء أحزاننا وذهاب همومنا.</p>
-      <button onclick="this.closest('.khatmah-complete-overlay').remove()">
-        <i class="fas fa-check"></i> الحمد لله
-      </button>
+    <div class="khatmah-dua-card" role="dialog" aria-modal="true" aria-labelledby="khatmahDuaTitle">
+      ${
+        isCelebration
+          ? `<div class="khatmah-celebration-ribbon">
+               <span>🎉</span>
+               <span>مبارك عليك إتمام ختمة القرآن الكريم! تقبل الله طاعتك</span>
+               <span>🎉</span>
+             </div>`
+          : ""
+      }
+      <div class="khatmah-dua-header">
+        <div class="khatmah-dua-badge">
+          <i class="fas fa-quran"></i> ختام مبارك
+        </div>
+        <h2 class="khatmah-dua-title" id="khatmahDuaTitle">دعاء ختم القرآن الكريم</h2>
+        <p class="khatmah-dua-subtitle">اللهم اجعل القرآن العظيم ربيع قلوبنا ونور صدورنا وجلاء أحزاننا</p>
+        <button class="khatmah-dua-close" onclick="closeKhatmahDuaModal()" aria-label="إغلاق">&times;</button>
+      </div>
+
+      <div class="khatmah-dua-body">
+        <p>اللَّهُمَّ ارْحَمْنِي بالقُرْءَانِ وَاجْعَلهُ لِي إِمَاماً وَنُوراً وَهُدًى وَرَحْمَةً <span class="dua-ayah-stop">۞</span></p>
+        <p>اللَّهُمَّ ذَكِّرْنِي مِنْهُ مَانَسِيتُ وَعَلِّمْنِي مِنْهُ مَاجَهِلْتُ وَارْزُقْنِي تِلاَوَتَهُ آنَاءَ اللَّيْلِ وَأَطْرَافَ النَّهَارِ وَاجْعَلْهُ لِي حُجَّةً يَارَبَّ العَالَمِينَ <span class="dua-ayah-stop">۞</span></p>
+        <p>اللَّهُمَّ أَصْلِحْ لِي دِينِي الَّذِي هُوَ عِصْمَةُ أَمْرِي وَأَصْلِحْ لِي دُنْيَايَ الَّتِي فِيهَا مَعَاشِي وَأَصْلِحْ لِي آخِرَتِي الَّتِي فِيهَا مَعَادِي وَاجْعَلِ الحَيَاةَ زِيَادَةً لِي فِي كُلِّ خَيْرٍ وَاجْعَلِ المَوْتَ رَاحَةً لِي مِنْ كُلِّ شَرٍّ <span class="dua-ayah-stop">۞</span></p>
+        <p>اللَّهُمَّ اجْعَلْ خَيْرَ عُمْرِي آخِرَهُ وَخَيْرَ عَمَلِي خَوَاتِمَهُ وَخَيْرَ أَيَّامِي يَوْمَ أَلْقَاكَ فِيهِ <span class="dua-ayah-stop">۞</span></p>
+        <p>اللَّهُمَّ إِنِّي أَسْأَلُكَ عِيشَةً هَنِيَّةً وَمِيتَةً سَوِيَّةً وَمَرَدًّا غَيْرَ مُخْزٍ وَلاَ فَاضِحٍ <span class="dua-ayah-stop">۞</span></p>
+        <p>اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ المَسْأَلةِ وَخَيْرَ الدُّعَاءِ وَخَيْرَ النَّجَاحِ وَخَيْرَ العِلْمِ وَخَيْرَ العَمَلِ وَخَيْرَ الثَّوَابِ وَخَيْرَ الحَيَاةِ وَخيْرَ المَمَاتِ وَثَبِّتْنِي وَثَقِّلْ مَوَازِينِي وَحَقِّقْ إِيمَانِي وَارْفَعْ دَرَجَتِي وَتَقَبَّلْ صَلاَتِي وَاغْفِرْ خَطِيئَاتِي وَأَسْأَلُكَ العُلَا مِنَ الجَنَّةِ <span class="dua-ayah-stop">۞</span></p>
+        <p>اللَّهُمَّ إِنِّي أَسْأَلُكَ مُوجِبَاتِ رَحْمَتِكَ وَعَزَائِمَ مَغْفِرَتِكَ وَالسَّلاَمَةَ مِنْ كُلِّ إِثْمٍ وَالغَنِيمَةَ مِنْ كُلِّ بِرٍّ وَالفَوْزَ بِالجَنَّةِ وَالنَّجَاةَ مِنَ النَّارِ <span class="dua-ayah-stop">۞</span></p>
+        <p>اللَّهُمَّ أَحْسِنْ عَاقِبَتَنَا فِي الأُمُورِ كُلِّهَا وَأجِرْنَا مِنْ خِزْيِ الدُّنْيَا وَعَذَابِ الآخِرَةِ <span class="dua-ayah-stop">۞</span></p>
+        <p>اللَّهُمَّ اقْسِمْ لَنَا مِنْ خَشْيَتِكَ مَاتَحُولُ بِهِ بَيْنَنَا وَبَيْنَ مَعْصِيَتِكَ وَمِنْ طَاعَتِكَ مَاتُبَلِّغُنَا بِهَا جَنَّتَكَ وَمِنَ اليَقِينِ مَاتُهَوِّنُ بِهِ عَلَيْنَا مَصَائِبَ الدُّنْيَا وَمَتِّعْنَا بِأَسْمَاعِنَا وَأَبْصَارِنَا وَقُوَّتِنَا مَاأَحْيَيْتَنَا وَاجْعَلْهُ الوَارِثَ مِنَّا وَاجْعَلْ ثَأْرَنَا عَلَى مَنْ ظَلَمَنَا وَانْصُرْنَا عَلَى مَنْ عَادَانَا وَلاَ تجْعَلْ مُصِيبَتَنَا فِي دِينِنَا وَلاَ تَجْعَلِ الدُّنْيَا أَكْبَرَ هَمِّنَا وَلَا مَبْلَغَ عِلْمِنَا وَلاَ تُسَلِّطْ عَلَيْنَا مَنْ لَا يَرْحَمُنَا <span class="dua-ayah-stop">۞</span></p>
+        <p>اللَّهُمَّ لَا تَدَعْ لَنَا ذَنْبًا إِلَّا غَفَرْتَهُ وَلَا هَمَّا إِلَّا فَرَّجْتَهُ وَلَا دَيْنًا إِلَّا قَضَيْتَهُ وَلَا حَاجَةً مِنْ حَوَائِجِ الدُّنْيَا وَالآخِرَةِ إِلَّا قَضَيْتَهَا يَاأَرْحَمَ الرَّاحِمِينَ <span class="dua-ayah-stop">۞</span></p>
+        <p class="dua-closing">رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ وَصَلَّى اللهُ عَلَى سَيِّدِنَا وَنَبِيِّنَا مُحَمَّدٍ وَعَلَى آلِهِ وَأَصْحَابِهِ الأَخْيَارِ وَسَلَّمَ تَسْلِيمًا كَثِيراً.</p>
+      </div>
+
+      <div class="khatmah-dua-footer">
+        <button class="khatmah-dua-btn primary" onclick="closeKhatmahDuaModal()">
+          <i class="fas fa-check"></i> تقبل الله منا ومنكم
+        </button>
+        <button class="khatmah-dua-btn secondary" id="copyKhatmahDuaBtn" onclick="copyKhatmahDua()">
+          <i class="fas fa-copy"></i> <span>نسخ الدعاء</span>
+        </button>
+        <button class="khatmah-dua-btn secondary" onclick="shareKhatmahDua()">
+          <i class="fas fa-share-alt"></i> <span>مشاركة</span>
+        </button>
+      </div>
     </div>
   `;
+
+  // Close when clicking backdrop
+  overlay.addEventListener("click", function (e) {
+    if (e.target === overlay) {
+      closeKhatmahDuaModal();
+    }
+  });
+
   document.body.appendChild(overlay);
+
+  // Register with AppRouter for mobile hardware back button
+  if (window.AppRouter && !window.AppRouter.isModalOpen("khatmahDuaModal")) {
+    window.AppRouter.pushModal("khatmahDuaModal", function () {
+      const el = document.getElementById("khatmahDuaModalOverlay");
+      if (el) el.remove();
+    });
+  }
 }
+
+function closeKhatmahDuaModal() {
+  const overlay = document.getElementById("khatmahDuaModalOverlay");
+  if (overlay) overlay.remove();
+
+  if (window.AppRouter && window.AppRouter.isModalOpen("khatmahDuaModal")) {
+    window.AppRouter.closeModal("khatmahDuaModal");
+  }
+}
+
+function copyKhatmahDua() {
+  const btn = document.getElementById("copyKhatmahDuaBtn");
+  const origHtml = btn ? btn.innerHTML : "";
+
+  function notifyCopied() {
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-check"></i> <span>تم النسخ!</span>';
+      setTimeout(() => {
+        if (btn) btn.innerHTML = origHtml;
+      }, 2000);
+    }
+    if (typeof showNotification === "function") {
+      showNotification("تم نسخ دعاء ختم القرآن الكريم بنجاح ✨");
+    }
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard
+      .writeText(KHATMAH_DUA_PLAIN)
+      .then(notifyCopied)
+      .catch(() => {
+        fallbackCopyText(KHATMAH_DUA_PLAIN);
+        notifyCopied();
+      });
+  } else {
+    fallbackCopyText(KHATMAH_DUA_PLAIN);
+    notifyCopied();
+  }
+}
+
+function fallbackCopyText(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand("copy");
+  } catch (e) {}
+  document.body.removeChild(ta);
+}
+
+function shareKhatmahDua() {
+  if (navigator.share) {
+    navigator
+      .share({
+        title: "دعاء ختم القرآن الكريم - تطبيق ذَكِّرْ",
+        text: KHATMAH_DUA_PLAIN,
+      })
+      .catch(() => {});
+  } else {
+    copyKhatmahDua();
+  }
+}
+
+window.showKhatmahDuaModal = showKhatmahDuaModal;
+window.closeKhatmahDuaModal = closeKhatmahDuaModal;
+window.copyKhatmahDua = copyKhatmahDua;
+window.shareKhatmahDua = shareKhatmahDua;
 
 // ===== USER INTERACTION HANDLERS =====
 

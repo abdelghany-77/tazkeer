@@ -1,4 +1,4 @@
-﻿/* ========================================
+/* ========================================
    QURAN & KHATMAH STYLES
    Pure Image-Based Mushaf Viewer
    ======================================== */
@@ -1649,6 +1649,307 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* ===== KHATMAH DUA MODAL ===== */
+.khatmah-dua-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 16, 26, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+  box-sizing: border-box;
+  animation: khatmahFadeIn 0.25s ease;
+}
+
+@keyframes khatmahFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.khatmah-dua-card {
+  position: relative;
+  background: #141c2b;
+  border: 1px solid rgba(212, 168, 71, 0.35);
+  border-radius: 20px;
+  max-width: 620px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 168, 71, 0.15);
+  color: #f7fafc;
+  animation: khatmahSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes khatmahSlideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.khatmah-celebration-ribbon {
+  background: linear-gradient(135deg, rgba(212, 168, 71, 0.25), rgba(26, 138, 92, 0.3));
+  border-bottom: 1px solid rgba(212, 168, 71, 0.3);
+  padding: 0.6rem 1rem;
+  text-align: center;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f6e05e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.khatmah-dua-header {
+  position: relative;
+  padding: 1.25rem 1.25rem 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.khatmah-dua-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(212, 168, 71, 0.15);
+  border: 1px solid rgba(212, 168, 71, 0.35);
+  color: #f6e05e;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  margin-bottom: 0.4rem;
+}
+
+.khatmah-dua-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0.2rem 0;
+  font-family: "Cairo", var(--font-sans);
+}
+
+.khatmah-dua-subtitle {
+  font-size: 0.85rem;
+  color: #a0aec0;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.khatmah-dua-close {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e0;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.khatmah-dua-close:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.khatmah-dua-body {
+  padding: 1.25rem 1.5rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  font-family: "Amiri", "Traditional Arabic", serif;
+  font-size: 1.15rem;
+  line-height: 2.2;
+  color: #f0f4f8;
+  text-align: justify;
+  text-align-last: center;
+  background: radial-gradient(circle at center, rgba(212, 168, 71, 0.03) 0%, transparent 70%);
+}
+
+.khatmah-dua-body p {
+  margin: 0 0 1rem;
+}
+
+.khatmah-dua-body .dua-closing {
+  font-weight: 700;
+  color: #f6e05e;
+  margin-top: 1.2rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed rgba(212, 168, 71, 0.3);
+}
+
+.dua-ayah-stop {
+  color: #d4a847;
+  font-size: 1.25rem;
+  margin: 0 0.25rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.khatmah-dua-footer {
+  padding: 0.9rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 16, 26, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.khatmah-dua-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-family: "Cairo", var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.khatmah-dua-btn.primary {
+  background: linear-gradient(135deg, #1a8a5c, #136a46);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(26, 138, 92, 0.35);
+  flex: 1 1 180px;
+}
+
+.khatmah-dua-btn.primary:hover {
+  background: linear-gradient(135deg, #1fa36d, #167a50);
+  transform: translateY(-1px);
+}
+
+.khatmah-dua-btn.secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.khatmah-dua-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+/* Light Mode Support */
+body.light-mode .khatmah-dua-card {
+  background: #ffffff;
+  color: #1a202c;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  border-color: rgba(184, 134, 11, 0.35);
+}
+
+body.light-mode .khatmah-dua-header {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .khatmah-dua-title {
+  color: #1a202c;
+}
+
+body.light-mode .khatmah-dua-subtitle {
+  color: #4a5568;
+}
+
+body.light-mode .khatmah-dua-close {
+  background: #edf2f7;
+  color: #4a5568;
+}
+
+body.light-mode .khatmah-dua-close:hover {
+  background: #e2e8f0;
+  color: #1a202c;
+}
+
+body.light-mode .khatmah-dua-body {
+  color: #2d3748;
+}
+
+body.light-mode .khatmah-dua-body .dua-closing {
+  color: #b8860b;
+  border-top-color: rgba(184, 134, 11, 0.3);
+}
+
+body.light-mode .khatmah-dua-footer {
+  background: #f7fafc;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .khatmah-dua-btn.secondary {
+  background: #edf2f7;
+  color: #2d3748;
+  border-color: #cbd5e0;
+}
+
+/* Button inside Khatmah Dashboard */
+.khatmah-dua-view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  padding: 0.65rem 1.4rem;
+  background: linear-gradient(135deg, rgba(212, 168, 71, 0.25), rgba(26, 138, 92, 0.25));
+  border: 1px solid rgba(212, 168, 71, 0.45);
+  border-radius: 12px;
+  color: #f6e05e;
+  font-family: "Cairo", var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.khatmah-dua-view-btn:hover {
+  background: linear-gradient(135deg, rgba(212, 168, 71, 0.35), rgba(26, 138, 92, 0.35));
+  transform: translateY(-1px);
+}
+
+body.light-mode .khatmah-dua-view-btn {
+  background: linear-gradient(135deg, rgba(184, 134, 11, 0.15), rgba(26, 138, 92, 0.15));
+  border-color: rgba(184, 134, 11, 0.4);
+  color: #78350f;
+}
+
+/* Nav button for Mushaf bottom bar */
+.khatmah-dua-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  background: linear-gradient(135deg, #d4a847, #b8860b);
+  color: #0b111e;
+  border: none;
+  border-radius: 999px;
+  font-family: "Cairo", var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(212, 168, 71, 0.35);
+  transition: transform 0.2s ease;
+}
+
+.khatmah-dua-nav-btn:hover {
+  transform: scale(1.05);
 }
 
 /* WIRD banner & button */
