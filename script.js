@@ -1714,11 +1714,12 @@ function _showHomePageInternal() {
   isHomePage = true;
   currentCategory = null;
 
-  // Clear and populate categories
-  categoriesContainer.innerHTML = "";
-  Object.keys(adhkarData).forEach((categoryKey, index) => {
-    createCategoryCard(categoryKey, adhkarData[categoryKey], index);
-  });
+  // Populate categories once to eliminate flicker on subsequent tab switches
+  if (categoriesContainer && categoriesContainer.children.length === 0) {
+    Object.keys(adhkarData).forEach((categoryKey, index) => {
+      createCategoryCard(categoryKey, adhkarData[categoryKey], index);
+    });
+  }
 }
 
 function showHomePage(syncRouter) {
@@ -1944,11 +1945,10 @@ const categoryIcons = {
   </svg>`,
 };
 
-// Create category card
+// Create category card (instant render with zero layout flicker)
 function createCategoryCard(categoryKey, categoryData, index) {
   const card = document.createElement("div");
-  card.className = "category-card fade-in";
-  card.style.animationDelay = `${index * 0.08}s`;
+  card.className = "category-card";
 
   const adhkarCount = categoryData.adhkar.length;
   const svgIcon = categoryIcons[categoryKey] || categoryIcons.general;

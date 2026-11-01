@@ -123,9 +123,11 @@
       } else if (tabId === "tab-azkar") {
         var categoryPage = document.getElementById("categoryPage");
         var azkarListView = document.getElementById("azkarListView");
-        if (categoryPage && categoryPage.classList.contains("hidden")) {
-          if (azkarListView) azkarListView.classList.remove("hidden");
+        var categoriesContainer = document.getElementById("categoriesContainer");
+        if (categoriesContainer && categoriesContainer.children.length === 0) {
           if (typeof global.showHomePage === "function") global.showHomePage();
+        } else if (categoryPage && categoryPage.classList.contains("hidden")) {
+          if (azkarListView) azkarListView.classList.remove("hidden");
         }
       } else if (tabId === "tab-quran") {
         if (typeof global.initQuranTab === "function") global.initQuranTab();
