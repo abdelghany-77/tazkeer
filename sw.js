@@ -1,4 +1,4 @@
-const CACHE_NAME = "tazkeer-v9.0.1";
+const CACHE_NAME = "tazkeer-v9.0.2";
 const QURAN_CACHE_NAME = "tazkeer-quran-pages-v1";
 const PROPHETS_CACHE_NAME = "tazkeer-prophets-v1";
 

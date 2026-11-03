@@ -4898,7 +4898,7 @@ function updateRamadanCountdown() {
 
   if (daysOnlyEl) daysOnlyEl.textContent = toArabicDigits(days);
   if (badgeTxt) badgeTxt.textContent = "يوم متبقي";
-  if (targetLabelEl) targetLabelEl.textContent = "اللهم بلغنا رمضان";
+  // if (targetLabelEl) targetLabelEl.textContent = "اللهم بلغنا رمضان";
 }
 
 function toArabicDigits(num) {
