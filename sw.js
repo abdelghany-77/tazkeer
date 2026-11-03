@@ -1,6 +1,7 @@
-const CACHE_NAME = "tazkeer-v9.0.1";
+const CACHE_NAME = "tazkeer-v10.0.0";
 const QURAN_CACHE_NAME = "tazkeer-quran-pages-v1";
 const PROPHETS_CACHE_NAME = "tazkeer-prophets-v1";
+const API_CACHE_NAME = "tazkeer-api-v1";
 
 // 1. Critical local app shell assets (cached atomically)
 const CORE_LOCAL_ASSETS = [
@@ -33,18 +34,11 @@ const EXTERNAL_CDN_ASSETS = [
 
 // Install event - cache resources with zero-failure resilience
 self.addEventListener("install", function (event) {
-  self.skipWaiting();
-
   event.waitUntil(
     caches
       .open(CACHE_NAME)
       .then(async function (cache) {
-        // A) Atomic cache for all local files
-        try {
-          await cache.addAll(CORE_LOCAL_ASSETS);
-        } catch (err) {
-          console.error("[SW] Core local assets cache failed:", err);
-        }
+        await cache.addAll(CORE_LOCAL_ASSETS);
 
         // B) Fault-tolerant cache for CDN assets
         await Promise.allSettled(
@@ -60,14 +54,16 @@ self.addEventListener("install", function (event) {
           })
         );
       })
-      .catch(function (error) {
-        console.error("[SW] Cache install failed:", error);
+      .then(function () {
+        return self.skipWaiting();
       })
   );
 });
 
 // Fetch event - Cache first for static assets, network first for API calls
 self.addEventListener("fetch", function (event) {
+  if (event.request.method !== "GET") return;
+
   const url = new URL(event.request.url);
 
   // Dedicated cache strategy for Quran page images
@@ -82,10 +78,16 @@ self.addEventListener("fetch", function (event) {
             return response;
           }
           return fetch(event.request).then(function (networkResponse) {
-            if (networkResponse && networkResponse.status === 200) {
-              quranCache.put(event.request, networkResponse.clone());
+            if (networkResponse && networkResponse.ok) {
+              return quranCache
+                .put(event.request, networkResponse.clone())
+                .then(function () {
+                  return networkResponse;
+                });
             }
             return networkResponse;
+          }).catch(function () {
+            return Response.error();
           });
         });
       }),
@@ -105,10 +107,19 @@ self.addEventListener("fetch", function (event) {
             return response;
           }
           return fetch(event.request).then(function (networkResponse) {
-            if (networkResponse && networkResponse.status === 200) {
-              prophetsCache.put(event.request, networkResponse.clone());
+            if (networkResponse && networkResponse.ok) {
+              return prophetsCache
+                .put(event.request, networkResponse.clone())
+                .then(function () {
+                  return networkResponse;
+                });
             }
             return networkResponse;
+          }).catch(function () {
+            return new Response("{}", {
+              status: 503,
+              headers: { "Content-Type": "application/json" },
+            });
           });
         });
       }),
@@ -118,15 +129,16 @@ self.addEventListener("fetch", function (event) {
 
   // For API calls (prayer times), use network first
   if (
-    url.hostname.includes("aladhan.com") ||
-    url.hostname.includes("alquran.cloud") ||
-    url.hostname.includes("api")
+    url.hostname === "api.aladhan.com" ||
+    url.hostname === "api.bigdatacloud.net" ||
+    url.hostname === "api.alquran.cloud"
   ) {
     event.respondWith(
       fetch(event.request)
         .then(function (response) {
+          if (!response.ok) throw new Error("API request failed");
           const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(function (cache) {
+          caches.open(API_CACHE_NAME).then(function (cache) {
             cache.put(event.request, responseClone);
           });
           return response;
@@ -143,7 +155,7 @@ self.addEventListener("fetch", function (event) {
           // Update cache in background
           fetch(event.request)
             .then(function (networkResponse) {
-              if (networkResponse && networkResponse.status === 200) {
+              if (networkResponse && networkResponse.ok) {
                 caches.open(CACHE_NAME).then(function (cache) {
                   cache.put(event.request, networkResponse.clone());
                 });
@@ -154,7 +166,7 @@ self.addEventListener("fetch", function (event) {
         }
 
         return fetch(event.request).then(function (networkResponse) {
-          if (!networkResponse || networkResponse.status !== 200) {
+          if (!networkResponse || !networkResponse.ok) {
             return networkResponse;
           }
 
@@ -181,7 +193,8 @@ self.addEventListener("activate", function (event) {
             if (
               cacheName !== CACHE_NAME &&
               cacheName !== QURAN_CACHE_NAME &&
-              cacheName !== PROPHETS_CACHE_NAME
+              cacheName !== PROPHETS_CACHE_NAME &&
+              cacheName !== API_CACHE_NAME
             ) {
               console.log("Deleting old cache:", cacheName);
               return caches.delete(cacheName);

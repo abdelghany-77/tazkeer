@@ -42,6 +42,9 @@
       if (typeof pushState !== "boolean") pushState = true;
       var target = document.getElementById(tabId);
       if (!target) return;
+      if (currentTab === tabId && target.classList.contains("active-tab")) {
+        return;
+      }
 
       // 1. Save scroll position of the outgoing tab
       if (currentTab) {
@@ -59,6 +62,7 @@
           console.warn("[AppRouter] Error auto-closing modal on tab switch:", e);
         }
       }
+      document.body.classList.remove("modal-open");
 
       // 3. Switch active classes
       document.querySelectorAll(".tab-content").forEach(function (section) {
@@ -86,10 +90,6 @@
       // 6. Persist to SafeStorage
       if (global.SafeStorage) {
         global.SafeStorage.set("activeTab", tabId);
-      } else {
-        try {
-          localStorage.setItem("activeTab", tabId);
-        } catch (e) {}
       }
 
       // 7. Update browser history (for Hardware Back button to work between tabs)
@@ -107,7 +107,7 @@
 
       window.scrollTo({
         top: savedScrollY,
-        behavior: "instant"
+        behavior: "auto"
       });
     },
 
@@ -153,6 +153,7 @@
       }
 
       modalStack.push({ id: modalId, closeFn: closeFn });
+      document.body.classList.add("modal-open");
 
       try {
         window.history.pushState(
@@ -181,7 +182,8 @@
 
       if (idx === -1) return;
 
-      var entry = modalStack.splice(idx, 1)[0];
+      if (idx !== modalStack.length - 1) return;
+      var entry = modalStack.pop();
 
       // Execute close callback directly
       if (entry && typeof entry.closeFn === "function") {
@@ -201,6 +203,9 @@
             isNavigatingViaHistory = false;
           }, 100);
         } catch (e) {}
+      }
+      if (modalStack.length === 0) {
+        document.body.classList.remove("modal-open");
       }
     },
 
@@ -249,6 +254,9 @@
               console.warn("[AppRouter] Popstate close error:", err);
             }
           }
+          if (modalStack.length === 0) {
+            document.body.classList.remove("modal-open");
+          }
           return;
         }
 
@@ -288,4 +296,3 @@
     AppRouter.init();
   }
 })(typeof window !== "undefined" ? window : this);
-
