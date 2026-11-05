@@ -5841,3 +5841,81 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+/* ================================================================
+   App-Mode: Lock Viewport & Prevent Zooming (Pinch, Double-Tap, Shortcuts)
+   ================================================================ */
+(function lockAppZoom() {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+
+  // 1. Prevent multi-touch pinch zoom
+  document.addEventListener(
+    "touchstart",
+    function (e) {
+      if (e.touches && e.touches.length > 1) {
+        e.preventDefault();
+      }
+    },
+    { passive: false }
+  );
+
+  document.addEventListener(
+    "touchmove",
+    function (e) {
+      if (e.touches && e.touches.length > 1) {
+        e.preventDefault();
+      }
+    },
+    { passive: false }
+  );
+
+  // 2. Prevent iOS Safari gesture zooming
+  document.addEventListener("gesturestart", function (e) {
+    e.preventDefault();
+  });
+  document.addEventListener("gesturechange", function (e) {
+    e.preventDefault();
+  });
+  document.addEventListener("gestureend", function (e) {
+    e.preventDefault();
+  });
+
+  // 3. Prevent double-tap to zoom (except inside text inputs)
+  var lastTouchEnd = 0;
+  document.addEventListener(
+    "touchend",
+    function (e) {
+      var tag = e.target && e.target.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target && e.target.isContentEditable)) {
+        return;
+      }
+      var now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    },
+    false
+  );
+
+  // 4. Prevent desktop Ctrl + mouse wheel / trackpad pinch zoom
+  document.addEventListener(
+    "wheel",
+    function (e) {
+      if (e.ctrlKey) {
+        e.preventDefault();
+      }
+    },
+    { passive: false }
+  );
+
+  // 5. Prevent desktop Ctrl/Cmd + (+, -, 0) keyboard zoom shortcuts
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey) {
+      var key = e.key;
+      if (key === "+" || key === "-" || key === "=" || key === "_" || key === "0") {
+        e.preventDefault();
+      }
+    }
+  });
+})();
