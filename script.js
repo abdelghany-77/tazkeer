@@ -1504,6 +1504,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function checkAndShowInstallInstructions() {
+  if (typeof isStandaloneMode === "function" && isStandaloneMode()) return;
+
   const dismissed = localStorage.getItem("installInstructionsDismissed");
   const dismissedDate = localStorage.getItem(
     "installInstructionsDismissedDate",
@@ -1531,111 +1533,116 @@ function checkAndShowInstallInstructions() {
   // Show instructions after a short delay for better UX
   setTimeout(() => {
     showManualInstallInstructions();
-  }, 1000);
+  }, 1200);
 }
 
 function showManualInstallInstructions() {
+  if (document.getElementById("installInstructionsModal")) return;
+
   const instructionsModal = document.createElement("div");
   instructionsModal.className = "modal";
   instructionsModal.style.display = "block";
   instructionsModal.id = "installInstructionsModal";
 
-  const userAgent = navigator.userAgent.toLowerCase();
-  let instructions = "";
-  let deviceIcon = "";
-  let deviceName = "";
+  // Allow clicking outside the modal content to dismiss
+  instructionsModal.addEventListener("click", function (e) {
+    if (e.target === instructionsModal) {
+      dismissInstallModal(false);
+    }
+  });
 
-  // Better device detection
+  const userAgent = navigator.userAgent.toLowerCase();
   const isIOS =
     /iphone|ipad|ipod/.test(userAgent) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const isAndroid = /android/.test(userAgent);
 
+  let deviceBadge = isAndroid ? "نسخة أندرويد" : (isIOS ? "نسخة iOS" : "تطبيق أندرويد والويب");
+  let contentHtml = "";
+
   if (isIOS) {
-    deviceName = "iOS";
-    instructions = `
+    contentHtml = `
       <div class="install-steps active">
         <div class="install-step">
-          <div class="step-icon"><i class="fas fa-download" style="color: #007AFF;"></i></div>
+          <div class="step-icon"><i class="fas fa-share-square" style="color: #007AFF;"></i></div>
           <div class="step-content">
-            <h5>تحميل التطبيق</h5>
-            <p>اضغط على زر <strong>تثبيت التطبيق</strong> في أعلى الشاشة، ثم اتبع التعليمات.</p>
+            <h5>الخطوة 1: اضغط على زر المشاركة</h5>
+            <p>من أسفل شاشة متصفح Safari، اضغط على أيقونة <strong>المشاركة</strong> <i class="fas fa-share"></i>.</p>
           </div>
         </div>
         <div class="install-step">
-          <div class="step-icon">📲</div>
+          <div class="step-icon"><i class="fas fa-plus-square" style="color: #007AFF;"></i></div>
           <div class="step-content">
-            <h5>أو يدوياً</h5>
-            <p>اضغط على زر <strong>المشاركة</strong> <i class="fas fa-share" style="color: #007AFF;"></i> ثم "<strong>إضافة إلى الشاشة الرئيسية</strong>"</p>
+            <h5>الخطوة 2: إضافة إلى الشاشة الرئيسية</h5>
+            <p>مرر للأسفل واختر <strong>"إضافة إلى الشاشة الرئيسية"</strong> (Add to Home Screen).</p>
           </div>
         </div>
       </div>
       <div class="install-note">
         <i class="fas fa-info-circle"></i>
-        <span>لأفضل تجربة، استخدم متصفح <strong>Safari</strong></span>
-      </div>
-    `;
-  } else if (isAndroid) {
-    deviceName = "Android";
-    instructions = `
-      <div class="install-steps active">
-        <div class="install-step">
-          <div class="step-icon"><i class="fas fa-download" style="color: #4CAF50;"></i></div>
-          <div class="step-content">
-            <h5>الخطوة 1</h5>
-            <p>اضغط على زر <strong>تثبيت التطبيق <i class="fas fa-download"></i></strong> في أعلى الشاشة.</p>
-          </div>
-        </div>
-        <div class="install-step">
-          <div class="step-icon">✅</div>
-          <div class="step-content">
-            <h5>الخطوة 2</h5>
-            <p>قم بتأكيد التحميل بالضغط على "<strong>تثبيت</strong>" للتمتع بالتطبيق بدون إنترنت.</p>
-          </div>
-        </div>
+        <span>لأفضل أداء على iOS، يُنصح باستخدام متصفح <strong>Safari</strong></span>
       </div>
     `;
   } else {
-    deviceIcon = "💻";
-    deviceName = "الحاسوب";
-    instructions = `
-      <div class="install-steps active">
-        <div class="install-step">
-          <div class="step-icon"><i class="fas fa-download" style="color: #4CAF50;"></i></div>
-          <div class="step-content">
-            <h5>الخطوة 1</h5>
-            <p>اضغط على زر <strong>تثبيت التطبيق <i class="fas fa-download"></i></strong> في أعلى الشاشة.</p>
-          </div>
+    // Android or Desktop: Provide Direct APK download!
+    contentHtml = `
+      <div class="apk-download-hero">
+        <div class="apk-badge-row">
+          <span class="apk-tag"><i class="fab fa-android"></i> تطبيق أندرويد الرسمي</span>
+          <span class="apk-tag-size"><i class="fas fa-cube"></i> بصيغة APK (~20MB)</span>
         </div>
-        <div class="install-step">
-          <div class="step-icon">✅</div>
-          <div class="step-content">
-            <h5>الخطوة 2</h5>
-            <p>قم بتأكيد التحميل لتثبيت التطبيق على جهازك والوصول إليه سريعاً.</p>
-          </div>
-        </div>
+        
+        <p class="apk-hero-desc">
+          تطبيق كامل وسريع يعمل بدون اتصال بالإنترنت، بدون إعلانات ومناسب لجميع أجهزة أندرويد.
+        </p>
+
+        <a href="APK/Zakr.apk" download="Zakr.apk" class="install-btn primary apk-download-btn" onclick="handleApkDownload(event)">
+          <i class="fas fa-download"></i>
+          <span>تحميل التطبيق مباشرة (APK)</span>
+        </a>
       </div>
+
+      ${
+        deferredInstallPrompt
+          ? `
+        <div class="pwa-install-alt">
+          <span class="pwa-alt-text">أو يمكنك التثبيت عبر المتصفح:</span>
+          <button type="button" class="install-btn secondary pwa-btn" onclick="triggerPwaPrompt()">
+            <i class="fas fa-globe"></i> تثبيت التطبيق السريع (PWA)
+          </button>
+        </div>
+      `
+          : `
+        <div class="apk-instructions-hint">
+          <i class="fas fa-info-circle"></i>
+          <span>بعد اكتمال التحميل، اضغط على الملف <strong>Zakr.apk</strong> في الإشعارات وثبّته مباشرة.</span>
+        </div>
+      `
+      }
     `;
   }
 
   instructionsModal.innerHTML = `
     <div class="modal-content install-modal-content">
-      <span class="close" onclick="dismissInstallModal(true)">&times;</span>
+      <button type="button" class="install-modal-close" onclick="dismissInstallModal(true)" aria-label="إغلاق">&times;</button>
       <div class="install-content">
         <div class="install-header">
-          <h3>قم بتحميل التطبيق الآن</h3>
-          <p class="install-subtitle">للوصول السريع والسهل لأذكارك اليومية بدون إنترنت</p>
+          <div class="install-icon-badge">
+            <i class="fas fa-quran"></i>
+          </div>
+          <h3>تحميل تطبيق "ذِكر"</h3>
+          <p class="install-subtitle">احفظ أذكارك اليومية واستمع إليها في أي وقت بدون إنترنت</p>
         </div>
         
-        <div class="device-badge">${deviceName}</div>
+        <div class="device-badge">${deviceBadge}</div>
         
-        ${instructions}
+        ${contentHtml}
         
         <div class="install-buttons">
-          <button onclick="dismissInstallModal(true)" class="install-btn primary">
+          <button type="button" onclick="dismissInstallModal(true)" class="install-btn secondary dismiss-btn">
             <i class="fas fa-check"></i> فهمت شكراً
           </button>
-          <button onclick="dismissInstallModal(false)" class="install-btn secondary">
+          <button type="button" onclick="dismissInstallModal(false)" class="install-btn secondary dismiss-btn">
             <i class="fas fa-clock"></i> ذكرني لاحقاً
           </button>
         </div>
@@ -1644,6 +1651,31 @@ function showManualInstallInstructions() {
   `;
 
   document.body.appendChild(instructionsModal);
+}
+
+function handleApkDownload(event) {
+  if (typeof showNotification === "function") {
+    showNotification("بدأ تحميل تطبيق ذكر (APK)...");
+  }
+  localStorage.setItem("installInstructionsDismissed", "true");
+  localStorage.setItem("installInstructionsDismissedDate", Date.now());
+  setTimeout(() => {
+    dismissInstallModal(true);
+  }, 1500);
+}
+
+async function triggerPwaPrompt() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  const choiceResult = await deferredInstallPrompt.userChoice;
+  if (choiceResult && choiceResult.outcome === "accepted") {
+    if (typeof showNotification === "function") {
+      showNotification("تم تثبيت التطبيق بنجاح");
+    }
+    dismissInstallModal(true);
+  }
+  deferredInstallPrompt = null;
+  updateInstallButtonVisibility();
 }
 
 function dismissInstallModal(understood) {
@@ -3174,11 +3206,8 @@ function updateInstallButtonVisibility() {
     return;
   }
 
-  if (deferredInstallPrompt || isIOSDevice()) {
-    installBtn.classList.remove("hidden");
-  } else {
-    installBtn.classList.add("hidden");
-  }
+  // Always keep visible so users can download APK or install PWA anytime
+  installBtn.classList.remove("hidden");
 }
 
 function initializeInstallPrompt() {
@@ -3188,28 +3217,15 @@ function initializeInstallPrompt() {
 function showInstallPrompt() {
   if (typeof isStandaloneMode === "function" && isStandaloneMode()) return;
   const hasSeen = localStorage.getItem("hasSeenInstallPrompt");
-  if (!hasSeen && deferredInstallPrompt && typeof showInstallModal === "function") {
+  if (!hasSeen && typeof showManualInstallInstructions === "function") {
     localStorage.setItem("hasSeenInstallPrompt", "true");
-    showInstallModal();
+    showManualInstallInstructions();
   }
 }
 
 async function showInstallModal() {
   if (isStandaloneMode()) {
     showNotification("التطبيق مثبت بالفعل على جهازك");
-    updateInstallButtonVisibility();
-    return;
-  }
-
-  if (deferredInstallPrompt) {
-    deferredInstallPrompt.prompt();
-    const choiceResult = await deferredInstallPrompt.userChoice;
-
-    if (choiceResult.outcome === "accepted") {
-      showNotification("تم بدء تثبيت التطبيق");
-    }
-
-    deferredInstallPrompt = null;
     updateInstallButtonVisibility();
     return;
   }
