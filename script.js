@@ -5202,14 +5202,14 @@ function updateCalendarFastingAlert(now) {
   if (todayEvents.length > 0) {
     const ev = todayEvents[0];
     alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--today";
-    titleEl.innerHTML = `<span class="cal-fasting-title-text">اليوم ${ev.name}</span><span class="cal-fasting-badge">${ev.badge}</span>`;
-    descEl.textContent = `${ev.detail} — تقبّل الله صيامكم وطاعتكم`;
+    titleEl.innerHTML = `<span class="cal-fasting-title-text">${ev.name}</span><span class="cal-fasting-badge">اليوم</span>`;
+    descEl.textContent = ev.detail;
     alertEl.style.display = "flex";
   } else if (tomorrowEvents.length > 0) {
     const ev = tomorrowEvents[0];
     alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--tomorrow";
-    titleEl.innerHTML = `<span class="cal-fasting-title-text">تذكير: غدًا ${ev.name}</span><span class="cal-fasting-badge">${ev.badge}</span>`;
-    descEl.textContent = `${ev.detail} — انوِ الصيام وجهّز سحورك تقبل الله منك`;
+    titleEl.innerHTML = `<span class="cal-fasting-title-text">${ev.name}</span><span class="cal-fasting-badge">غداً</span>`;
+    descEl.textContent = ev.detail;
     alertEl.style.display = "flex";
   } else {
     // Search next fasting day within 7 days
@@ -5229,18 +5229,9 @@ function updateCalendarFastingAlert(now) {
     }
 
     if (nextEv) {
-      const dayNames = [
-        "الأحد",
-        "الإثنين",
-        "الثلاثاء",
-        "الأربعاء",
-        "الخميس",
-        "الجمعة",
-        "السبت",
-      ];
       alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--upcoming";
-      titleEl.innerHTML = `<span class="cal-fasting-title-text">موعد الصيام القادم: يوم ${dayNames[nextDate.getDay()]}</span><span class="cal-fasting-badge">${nextEv.name}</span>`;
-      descEl.textContent = `متبقي ${diffDays} أيام — ${nextEv.detail}`;
+      titleEl.innerHTML = `<span class="cal-fasting-title-text">${nextEv.name}</span><span class="cal-fasting-badge">بعد ${diffDays} أيام</span>`;
+      descEl.textContent = nextEv.detail;
       alertEl.style.display = "flex";
     } else {
       alertEl.style.display = "none";
