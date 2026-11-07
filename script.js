@@ -1139,11 +1139,15 @@ function updateProgressStats() {
 let notificationTimer = null;
 
 function showNotification(message, type = "success", duration = 3000) {
-  const notification = document.getElementById("notification") || document.querySelector(".notification");
+  const notification =
+    document.getElementById("notification") ||
+    document.querySelector(".notification");
   if (!notification) return;
 
   const icon = notification.querySelector("i");
-  const textSpan = document.getElementById("notificationText") || notification.querySelector("span");
+  const textSpan =
+    document.getElementById("notificationText") ||
+    notification.querySelector("span");
 
   // Update icon based on type
   if (icon) {
@@ -1425,7 +1429,9 @@ function switchTab(tabId) {
   if (window.SafeStorage) {
     window.SafeStorage.set("activeTab", tabId);
   } else {
-    try { localStorage.setItem("activeTab", tabId); } catch (e) {}
+    try {
+      localStorage.setItem("activeTab", tabId);
+    } catch (e) {}
   }
 }
 
@@ -1505,6 +1511,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function checkAndShowInstallInstructions() {
   if (typeof isStandaloneMode === "function" && isStandaloneMode()) return;
+  if (localStorage.getItem("hasDownloadedApk") === "true") return;
 
   const dismissed = localStorage.getItem("installInstructionsDismissed");
   const dismissedDate = localStorage.getItem(
@@ -1557,11 +1564,31 @@ function showManualInstallInstructions() {
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const isAndroid = /android/.test(userAgent);
 
-  let deviceBadge = isAndroid ? "نسخة أندرويد" : (isIOS ? "نسخة iOS" : "تطبيق أندرويد والويب");
+  let deviceBadge = isAndroid
+    ? "نسخة أندرويد الرسمية"
+    : isIOS
+      ? "نسخة iOS"
+      : "تطبيق أندرويد والويب";
   let contentHtml = "";
 
   if (isIOS) {
     contentHtml = `
+      <div class="apk-download-hero">
+        <div class="adhan-feature-card">
+          <div class="adhan-card-icon">
+            <i class="fas fa-volume-up"></i>
+          </div>
+          <div class="adhan-card-body">
+            <div class="adhan-card-title">
+              <i class="fas fa-mosque"></i> صوت الأذان وتنبيهات الصلاة
+            </div>
+            <p class="adhan-card-text">
+              تنبيهات دقيقة لكل صلاة مع كامل الأذكار والمسبحة بدون الحاجة لإنترنت.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div class="install-steps active">
         <div class="install-step">
           <div class="step-icon"><i class="fas fa-share-square" style="color: #007AFF;"></i></div>
@@ -1584,22 +1611,58 @@ function showManualInstallInstructions() {
       </div>
     `;
   } else {
-    // Android or Desktop: Provide Direct APK download!
+    // Android or Desktop: Provide Direct APK download with Adhan features!
     contentHtml = `
       <div class="apk-download-hero">
         <div class="apk-badge-row">
-          <span class="apk-tag"><i class="fab fa-android"></i> تطبيق أندرويد الرسمي</span>
-          <span class="apk-tag-size"><i class="fas fa-cube"></i> بصيغة APK (~20MB)</span>
+          <span class="apk-tag"><i class="fab fa-android"></i> نسخة أندرويد الرسمية</span>
+          <span class="apk-tag-size"><i class="fas fa-file-archive"></i> APK ~20MB</span>
         </div>
-        
-        <p class="apk-hero-desc">
-          تطبيق كامل وسريع يعمل بدون اتصال بالإنترنت، بدون إعلانات ومناسب لجميع أجهزة أندرويد.
-        </p>
+
+        <!-- Adhan Audio & Prayer Spotlight -->
+        <div class="adhan-feature-card">
+          <div class="adhan-card-icon">
+            <i class="fas fa-volume-up"></i>
+          </div>
+          <div class="adhan-card-body">
+            <div class="adhan-card-title">
+              <i class="fas fa-mosque"></i> صوت الأذان وتنبيهات الصلاة
+            </div>
+            <p class="adhan-card-text">
+              تنبيهات دقيقة لكل صلاة بصوت الأذان العذب حتى والتطبيق مغلق، وتعمل بالكامل بدون إنترنت.
+            </p>
+          </div>
+        </div>
+
+        <!-- Key Features Grid -->
+        <div class="apk-features-grid">
+          <div class="apk-feat-chip">
+            <i class="fas fa-wifi-slash"></i>
+            <span>يعمل بدون إنترنت 100%</span>
+          </div>
+          <div class="apk-feat-chip">
+            <i class="fas fa-ban"></i>
+            <span>بدون إعلانات نهائياً</span>
+          </div>
+          <div class="apk-feat-chip">
+            <i class="fas fa-book-open"></i>
+            <span>أذكار وحصن المسلم والقرآن</span>
+          </div>
+          <div class="apk-feat-chip">
+            <i class="fas fa-fingerprint"></i>
+            <span>مسبحة إلكترونية ذكية</span>
+          </div>
+        </div>
 
         <a href="APK/Zakr.apk" download="Zakr.apk" class="install-btn primary apk-download-btn" onclick="handleApkDownload(event)">
           <i class="fas fa-download"></i>
           <span>تحميل التطبيق مباشرة (APK)</span>
         </a>
+
+        <div class="apk-download-meta">
+          <i class="fas fa-shield-alt"></i>
+          <span>نسخة آمنة ومجانية 100% • اضغط على الملف بعد التحميل للتثبيت</span>
+        </div>
       </div>
 
       ${
@@ -1630,8 +1693,8 @@ function showManualInstallInstructions() {
           <div class="install-icon-badge">
             <i class="fas fa-quran"></i>
           </div>
-          <h3>تحميل تطبيق "ذِكر"</h3>
-          <p class="install-subtitle">احفظ أذكارك اليومية واستمع إليها في أي وقت بدون إنترنت</p>
+          <h3>تحميل تطبيق "ذَكِّرْ" للأندرويد</h3>
+          <p class="install-subtitle">تطبيقك الشامل للأذكار ومواقيت الصلاة بصوت الأذان بدون إنترنت</p>
         </div>
         
         <div class="device-badge">${deviceBadge}</div>
@@ -1655,10 +1718,16 @@ function showManualInstallInstructions() {
 
 function handleApkDownload(event) {
   if (typeof showNotification === "function") {
-    showNotification("بدأ تحميل تطبيق ذكر (APK)...");
+    showNotification("بدأ تحميل تطبيق ذكر (APK) بصوت الأذان ومواقيت الصلاة...");
   }
+  // Mark as downloaded so top install button is hidden permanently
+  localStorage.setItem("hasDownloadedApk", "true");
   localStorage.setItem("installInstructionsDismissed", "true");
   localStorage.setItem("installInstructionsDismissedDate", Date.now());
+
+  // Hide the header download icon immediately
+  updateInstallButtonVisibility();
+
   setTimeout(() => {
     dismissInstallModal(true);
   }, 1500);
@@ -1755,7 +1824,11 @@ function _showHomePageInternal() {
 }
 
 function showHomePage(syncRouter) {
-  if (syncRouter !== false && window.AppRouter && window.AppRouter.isModalOpen("azkarCategory")) {
+  if (
+    syncRouter !== false &&
+    window.AppRouter &&
+    window.AppRouter.isModalOpen("azkarCategory")
+  ) {
     window.AppRouter.closeModal("azkarCategory");
     return;
   }
@@ -2258,7 +2331,7 @@ function createAdhkarSlide(zikr, index, category, track) {
             </svg>
             <div class="counter-btn-inner">
               <span class="counter-num">${isCompleted ? "✓" : toArabicNumerals(remainingCount)}</span>
-              <span class="counter-lbl">${isCompleted ? "مكتمل" : (zikr.count > 1 ? "متبقي" : "مرة")}</span>
+              <span class="counter-lbl">${isCompleted ? "مكتمل" : zikr.count > 1 ? "متبقي" : "مرة"}</span>
             </div>
           </button>
 
@@ -2579,8 +2652,14 @@ function updateCardProgress(category, index) {
     const hintEl = areaEl ? areaEl.querySelector(".counter-hint-text") : null;
 
     const remaining = Math.max(0, zikr.count - zikr.currentCount);
-    if (numEl) numEl.textContent = isCompleted ? "✓" : toArabicNumerals(remaining);
-    if (lblEl) lblEl.textContent = isCompleted ? "مكتمل" : (zikr.count > 1 ? "متبقي" : "مرة");
+    if (numEl)
+      numEl.textContent = isCompleted ? "✓" : toArabicNumerals(remaining);
+    if (lblEl)
+      lblEl.textContent = isCompleted
+        ? "مكتمل"
+        : zikr.count > 1
+          ? "متبقي"
+          : "مرة";
 
     // Circular SVG Progress Ring update
     if (ringEl) {
@@ -2801,7 +2880,10 @@ document.addEventListener("keydown", (e) => {
       if (track) {
         const slides = track.querySelectorAll(".azkar-slide");
         if (slides[_currentSwiperIndex]) {
-          createTapRipple({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 }, slides[_currentSwiperIndex]);
+          createTapRipple(
+            { clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 },
+            slides[_currentSwiperIndex],
+          );
         }
       }
     }
@@ -2883,7 +2965,7 @@ function applyCurrentSwiperFont() {
   const size = SWIPER_FONT_SIZES[swiperFontSizeIndex];
   document.querySelectorAll(".slide-zikr-text").forEach((el) => {
     if (el.classList.contains("long-text")) {
-      el.style.fontSize = (size * 0.88) + "rem";
+      el.style.fontSize = size * 0.88 + "rem";
     } else {
       el.style.fontSize = size + "rem";
     }
@@ -3022,7 +3104,10 @@ function initializeEnhancedFeatures() {
       showHomePage();
       switchTab("tab-azkar");
     });
-  if (installBtn) installBtn.addEventListener("click", showInstallModal);
+  if (installBtn) {
+    installBtn.addEventListener("click", showInstallModal);
+    updateInstallButtonVisibility();
+  }
 
   // Show/hide quick access buttons at end of page
   window.addEventListener("scroll", () => {
@@ -3201,12 +3286,13 @@ function updateInstallButtonVisibility() {
   const installBtn = document.getElementById("installBtn");
   if (!installBtn) return;
 
-  if (isStandaloneMode()) {
+  const hasDownloaded = localStorage.getItem("hasDownloadedApk") === "true";
+  if (isStandaloneMode() || hasDownloaded) {
     installBtn.classList.add("hidden");
     return;
   }
 
-  // Always keep visible so users can download APK or install PWA anytime
+  // Not downloaded yet -> show the small download icon at the top!
   installBtn.classList.remove("hidden");
 }
 
@@ -3216,6 +3302,7 @@ function initializeInstallPrompt() {
 
 function showInstallPrompt() {
   if (typeof isStandaloneMode === "function" && isStandaloneMode()) return;
+  if (localStorage.getItem("hasDownloadedApk") === "true") return;
   const hasSeen = localStorage.getItem("hasSeenInstallPrompt");
   if (!hasSeen && typeof showManualInstallInstructions === "function") {
     localStorage.setItem("hasSeenInstallPrompt", "true");
@@ -3224,8 +3311,11 @@ function showInstallPrompt() {
 }
 
 async function showInstallModal() {
-  if (isStandaloneMode()) {
-    showNotification("التطبيق مثبت بالفعل على جهازك");
+  if (
+    isStandaloneMode() ||
+    localStorage.getItem("hasDownloadedApk") === "true"
+  ) {
+    showNotification("تم تحميل وتثبيت التطبيق بالفعل");
     updateInstallButtonVisibility();
     return;
   }
@@ -3241,6 +3331,7 @@ window.addEventListener("beforeinstallprompt", (event) => {
 
 window.addEventListener("appinstalled", () => {
   deferredInstallPrompt = null;
+  localStorage.setItem("hasDownloadedApk", "true");
   localStorage.setItem("hasSeenInstallPrompt", "true");
   showNotification("تم تثبيت التطبيق بنجاح");
   updateInstallButtonVisibility();
@@ -4678,7 +4769,9 @@ function initializeOfflineDetection() {
     isOnline = false;
     const span = banner.querySelector("span");
     const icon = banner.querySelector("i");
-    if (span) span.textContent = "لا يوجد اتصال بالإنترنت - التطبيق يعمل بكامل وظائفه بدون اتصال";
+    if (span)
+      span.textContent =
+        "لا يوجد اتصال بالإنترنت - التطبيق يعمل بكامل وظائفه بدون اتصال";
     if (icon) icon.className = "fas fa-wifi-slash";
     banner.classList.remove("online-recovered");
     banner.classList.remove("hidden");
@@ -4899,7 +4992,8 @@ function updateRamadanCountdown() {
   if (currentHijri.month === 9) {
     if (daysOnlyEl) daysOnlyEl.textContent = toArabicDigits(currentHijri.day);
     if (badgeTxt) badgeTxt.textContent = "رمضان المبارك";
-    if (targetLabelEl) targetLabelEl.textContent = "تقبل الله منا ومنكم الصيام والقيام";
+    if (targetLabelEl)
+      targetLabelEl.textContent = "تقبل الله منا ومنكم الصيام والقيام";
     return;
   }
 
@@ -5217,13 +5311,15 @@ function updateCalendarFastingAlert(now) {
 
   if (todayEvents.length > 0) {
     const ev = todayEvents[0];
-    alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--today";
+    alertEl.className =
+      "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--today";
     titleEl.innerHTML = `<span class="cal-fasting-title-text">${ev.name}</span><span class="cal-fasting-badge">اليوم</span>`;
     descEl.textContent = ev.detail;
     alertEl.style.display = "flex";
   } else if (tomorrowEvents.length > 0) {
     const ev = tomorrowEvents[0];
-    alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--tomorrow";
+    alertEl.className =
+      "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--tomorrow";
     titleEl.innerHTML = `<span class="cal-fasting-title-text">${ev.name}</span><span class="cal-fasting-badge">غداً</span>`;
     descEl.textContent = ev.detail;
     alertEl.style.display = "flex";
@@ -5245,7 +5341,8 @@ function updateCalendarFastingAlert(now) {
     }
 
     if (nextEv) {
-      alertEl.className = "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--upcoming";
+      alertEl.className =
+        "cal-fasting-smart-card cal-fasting-alert cal-fasting-alert--upcoming";
       titleEl.innerHTML = `<span class="cal-fasting-title-text">${nextEv.name}</span><span class="cal-fasting-badge">بعد ${diffDays} أيام</span>`;
       descEl.textContent = nextEv.detail;
       alertEl.style.display = "flex";
@@ -5698,7 +5795,10 @@ function openFastingGuideModal() {
   if (modal) {
     modal.style.display = "flex";
     if (window.AppRouter && !window.AppRouter.isModalOpen("fastingGuide")) {
-      window.AppRouter.pushModal("fastingGuide", _closeFastingGuideModalInternal);
+      window.AppRouter.pushModal(
+        "fastingGuide",
+        _closeFastingGuideModalInternal,
+      );
     }
   }
 }
@@ -5863,7 +5963,7 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault();
       }
     },
-    { passive: false }
+    { passive: false },
   );
 
   document.addEventListener(
@@ -5873,7 +5973,7 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault();
       }
     },
-    { passive: false }
+    { passive: false },
   );
 
   // 2. Prevent iOS Safari gesture zooming
@@ -5893,7 +5993,11 @@ document.addEventListener("DOMContentLoaded", function () {
     "touchend",
     function (e) {
       var tag = e.target && e.target.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target && e.target.isContentEditable)) {
+      if (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        (e.target && e.target.isContentEditable)
+      ) {
         return;
       }
       var now = Date.now();
@@ -5902,7 +6006,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       lastTouchEnd = now;
     },
-    false
+    false,
   );
 
   // 4. Prevent desktop Ctrl + mouse wheel / trackpad pinch zoom
@@ -5913,14 +6017,20 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault();
       }
     },
-    { passive: false }
+    { passive: false },
   );
 
   // 5. Prevent desktop Ctrl/Cmd + (+, -, 0) keyboard zoom shortcuts
   document.addEventListener("keydown", function (e) {
     if (e.ctrlKey || e.metaKey) {
       var key = e.key;
-      if (key === "+" || key === "-" || key === "=" || key === "_" || key === "0") {
+      if (
+        key === "+" ||
+        key === "-" ||
+        key === "=" ||
+        key === "_" ||
+        key === "0"
+      ) {
         e.preventDefault();
       }
     }
