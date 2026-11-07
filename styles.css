@@ -1451,6 +1451,10 @@ body.dark-mode .nav-btn.misbaha-header-btn:hover {
   transition: transform 0.3s ease;
 }
 
+.settings-header-btn:hover i {
+  transform: rotate(45deg);
+}
+
 /* Dark Mode Styles */
 body.dark-mode::before {
   background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
