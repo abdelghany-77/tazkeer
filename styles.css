@@ -13,6 +13,11 @@
   box-sizing: border-box;
 }
 
+html {
+  background-color: #1a202c;
+  min-height: 100%;
+}
+
 html,
 body {
   touch-action: pan-x pan-y;
@@ -21,9 +26,24 @@ body {
   overscroll-behavior-y: none;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #1a8a5c 0%, #0d6b4e 100%);
+  z-index: -100;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
 body {
   font-family: var(--font-sans);
-  background: linear-gradient(135deg, #1a8a5c 0%, #0d6b4e 100%);
+  background-color: transparent;
   min-height: 100vh;
   color: #333;
   line-height: 1.6;
@@ -1446,8 +1466,12 @@ body.dark-mode .nav-btn.misbaha-header-btn:hover {
 }
 
 /* Dark Mode Styles */
-body.dark-mode {
+body.dark-mode::before {
   background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+}
+
+body.dark-mode {
+  background-color: transparent;
   color: #e2e8f0;
 }
 
