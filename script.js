@@ -1690,9 +1690,6 @@ function showManualInstallInstructions() {
       <button type="button" class="install-modal-close" onclick="dismissInstallModal(true)" aria-label="إغلاق">&times;</button>
       <div class="install-content">
         <div class="install-header">
-          <div class="install-icon-badge">
-            <i class="fas fa-quran"></i>
-          </div>
           <h3>تحميل تطبيق "ذَكِّرْ" للأندرويد</h3>
           <p class="install-subtitle">تطبيقك الشامل للأذكار ومواقيت الصلاة بصوت الأذان بدون إنترنت</p>
         </div>
