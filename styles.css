@@ -821,6 +821,54 @@ body.dark-mode .nav-btn.misbaha-header-btn:hover {
   gap: 0.35rem;
 }
 
+/* Already Downloaded Status Card */
+.installed-status-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.9rem 1rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.05) 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.4);
+  border-radius: 14px;
+  text-align: right;
+  direction: rtl;
+}
+
+.installed-status-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.installed-status-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.installed-status-info h4 {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #065f46;
+  margin: 0 0 0.2rem 0;
+}
+
+.installed-status-info p {
+  font-size: 0.82rem;
+  color: #374151;
+  line-height: 1.5;
+  margin: 0;
+}
+
 /* Adhan Feature Spotlight */
 .adhan-feature-card {
   display: flex;
@@ -1804,6 +1852,25 @@ body.dark-mode .apk-tag {
 
 body.dark-mode .apk-tag-size {
   background: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+body.dark-mode .installed-status-card {
+  background: linear-gradient(135deg, rgba(232, 197, 90, 0.14) 0%, rgba(30, 41, 59, 0.7) 100%);
+  border-color: rgba(232, 197, 90, 0.4);
+}
+
+body.dark-mode .installed-status-icon {
+  background: linear-gradient(135deg, #e8c55a 0%, #d4a847 100%);
+  color: #1a202c;
+  box-shadow: 0 4px 12px rgba(232, 197, 90, 0.3);
+}
+
+body.dark-mode .installed-status-info h4 {
+  color: #e8c55a;
+}
+
+body.dark-mode .installed-status-info p {
   color: #cbd5e1;
 }
 

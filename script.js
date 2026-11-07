@@ -1564,14 +1564,55 @@ function showManualInstallInstructions() {
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const isAndroid = /android/.test(userAgent);
 
-  let deviceBadge = isAndroid
-    ? "نسخة أندرويد الرسمية"
-    : isIOS
-      ? "نسخة iOS"
-      : "تطبيق أندرويد والويب";
+  const hasDownloaded =
+    localStorage.getItem("hasDownloadedApk") === "true" ||
+    (typeof isStandaloneMode === "function" && isStandaloneMode());
+
   let contentHtml = "";
 
-  if (isIOS) {
+  if (hasDownloaded) {
+    // User already downloaded the app: tell them it's already downloaded and allow downloading again
+    contentHtml = `
+      <div class="apk-download-hero">
+        <div class="installed-status-card">
+          <div class="installed-status-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="installed-status-info">
+            <h4>التطبيق مُحمّل على جهازك بالفعل</h4>
+            <p>
+              لقد قمت بتحميل تطبيق ذَكِّرْ سابقاً وهو متاح على هاتفك. يمكنك إعادة تنزيل ملف التثبيت (APK) لتحديثه أو تثبيته مجدداً في أي وقت.
+            </p>
+          </div>
+        </div>
+
+        <a href="APK/Zakr.apk" download="Zakr.apk" class="install-btn primary apk-download-btn redownload-btn" onclick="handleApkDownload(event)">
+          <i class="fas fa-redo-alt"></i>
+          <span>إعادة تحميل تطبيق ذَكِّرْ (APK)</span>
+        </a>
+
+        <!-- Key Features Grid Compact -->
+        <div class="apk-features-grid">
+          <div class="apk-feat-chip">
+            <i class="fas fa-volume-up"></i>
+            <span>الأذان ومواقيت الصلاة</span>
+          </div>
+          <div class="apk-feat-chip">
+            <i class="fas fa-wifi-slash"></i>
+            <span>يعمل بدون إنترنت 100%</span>
+          </div>
+          <div class="apk-feat-chip">
+            <i class="fas fa-ban"></i>
+            <span>بدون إعلانات نهائياً</span>
+          </div>
+          <div class="apk-feat-chip">
+            <i class="fas fa-fingerprint"></i>
+            <span>مسبحة إلكترونية ذكية</span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (isIOS) {
     contentHtml = `
       <div class="apk-download-hero">
         <div class="adhan-feature-card">
@@ -1656,10 +1697,6 @@ function showManualInstallInstructions() {
           <span>تحميل التطبيق مباشرة (APK)</span>
         </a>
 
-        <div class="apk-download-meta">
-          <i class="fas fa-shield-alt"></i>
-          <span>نسخة آمنة ومجانية 100% • اضغط على الملف بعد التحميل للتثبيت</span>
-        </div>
       </div>
 
       ${
@@ -1682,12 +1719,16 @@ function showManualInstallInstructions() {
     `;
   }
 
+  const modalTitle = hasDownloaded
+    ? 'تطبيق "ذَكِّرْ"'
+    : 'تحميل تطبيق "ذَكِّرْ"';
+
   instructionsModal.innerHTML = `
     <div class="modal-content install-modal-content">
       <button type="button" class="install-modal-close" onclick="dismissInstallModal(true)" aria-label="إغلاق">&times;</button>
       <div class="install-content">
         <div class="install-header">
-          <h3>تحميل تطبيق "ذَكِّرْ" </h3>
+          <h3>${modalTitle}</h3>
         </div>        
         ${contentHtml}
         
@@ -1708,14 +1749,14 @@ function showManualInstallInstructions() {
 
 function handleApkDownload(event) {
   if (typeof showNotification === "function") {
-    showNotification("بدأ تحميل تطبيق ذكر (APK) بصوت الأذان ومواقيت الصلاة...");
+    showNotification("بدأ تحميل تطبيق ذَكِّرْ (APK) بصوت الأذان ومواقيت الصلاة...");
   }
-  // Mark as downloaded so top install button is hidden permanently
+  // Mark as downloaded
   localStorage.setItem("hasDownloadedApk", "true");
   localStorage.setItem("installInstructionsDismissed", "true");
   localStorage.setItem("installInstructionsDismissedDate", Date.now());
 
-  // Hide the header download icon immediately
+  // Ensure button remains visible always after misbaha icon
   updateInstallButtonVisibility();
 
   setTimeout(() => {
@@ -3276,13 +3317,7 @@ function updateInstallButtonVisibility() {
   const installBtn = document.getElementById("installBtn");
   if (!installBtn) return;
 
-  const hasDownloaded = localStorage.getItem("hasDownloadedApk") === "true";
-  if (isStandaloneMode() || hasDownloaded) {
-    installBtn.classList.add("hidden");
-    return;
-  }
-
-  // Not downloaded yet -> show the small download icon at the top!
+  // Keep the download button visible always after the misbaha icon
   installBtn.classList.remove("hidden");
 }
 
@@ -3301,15 +3336,6 @@ function showInstallPrompt() {
 }
 
 async function showInstallModal() {
-  if (
-    isStandaloneMode() ||
-    localStorage.getItem("hasDownloadedApk") === "true"
-  ) {
-    showNotification("تم تحميل وتثبيت التطبيق بالفعل");
-    updateInstallButtonVisibility();
-    return;
-  }
-
   showManualInstallInstructions();
 }
 
