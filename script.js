@@ -1628,9 +1628,6 @@ function showManualInstallInstructions() {
             <div class="adhan-card-title">
               <i class="fas fa-mosque"></i> صوت الأذان وتنبيهات الصلاة
             </div>
-            <p class="adhan-card-text">
-              تنبيهات دقيقة لكل صلاة بصوت الأذان العذب حتى والتطبيق مغلق، وتعمل بالكامل بدون إنترنت.
-            </p>
           </div>
         </div>
 
@@ -1690,12 +1687,8 @@ function showManualInstallInstructions() {
       <button type="button" class="install-modal-close" onclick="dismissInstallModal(true)" aria-label="إغلاق">&times;</button>
       <div class="install-content">
         <div class="install-header">
-          <h3>تحميل تطبيق "ذَكِّرْ" للأندرويد</h3>
-          <p class="install-subtitle">تطبيقك الشامل للأذكار ومواقيت الصلاة بصوت الأذان بدون إنترنت</p>
-        </div>
-        
-        <div class="device-badge">${deviceBadge}</div>
-        
+          <h3>تحميل تطبيق "ذَكِّرْ" </h3>
+        </div>        
         ${contentHtml}
         
         <div class="install-buttons">
