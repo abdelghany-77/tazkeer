@@ -1,4 +1,4 @@
-const CACHE_NAME = "tazkeer-v10.0.1";
+const CACHE_NAME = "tazkeer-v11.2.0";
 const QURAN_CACHE_NAME = "tazkeer-quran-pages-v1";
 const PROPHETS_CACHE_NAME = "tazkeer-prophets-v1";
 const API_CACHE_NAME = "tazkeer-api-v1";
@@ -9,9 +9,20 @@ const CORE_LOCAL_ASSETS = [
   "./index.html",
   "./styles.css",
   "./quran.css",
+  "./adhan-native.css",
   "./manifest.json",
+  "./css/tokens.css",
+  "./css/base.css",
+  "./css/components.css",
+  "./css/pages/home.css",
+  "./css/pages/azkar.css",
+  "./css/pages/quran.css",
+  "./css/pages/prophets.css",
+  "./css/pages/profile.css",
+  "./css/pages/settings-modal.css",
   "./js/core/storage.js",
   "./js/core/router.js",
+  "./js/native/adhan-native.js",
   "./js/modules/qibla.js",
   "./js/modules/misbaha.js",
   "./dailyDuas.js",
@@ -19,6 +30,7 @@ const CORE_LOCAL_ASSETS = [
   "./quran.js",
   "./prophets.js",
   "./data/prophets-index.json",
+  "./images/pattern.svg",
   "./images/icon.png",
   "./images/icon-192.png",
   "./images/icon-512.png"

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
   <title>ذَكِّرْ | رفيق المسلم - القرآن الكريم، الأذكار، مواقيت الصلاة، وقصص الأنبياء</title>
 
@@ -28,25 +28,41 @@
   <link rel="apple-touch-icon" sizes="192x192" href="images/icon.png" />
   <link rel="apple-touch-icon" sizes="512x512" href="images/icon.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="ذَكِّرْ" />
-  <meta name="theme-color" content="#1a202cf2" />
+  <meta name="theme-color" content="#0b1418" />
   <link rel="manifest" href="manifest.json" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="quran.css" />
+  <link rel="stylesheet" href="adhan-native.css" />
+
+  <!-- Tazkeer v2 design system (loaded after the legacy sheets on purpose) -->
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/pages/home.css" />
+  <link rel="stylesheet" href="css/pages/azkar.css" />
+  <link rel="stylesheet" href="css/pages/quran.css" />
+  <link rel="stylesheet" href="css/pages/prophets.css" />
+  <link rel="stylesheet" href="css/pages/profile.css" />
+  <link rel="stylesheet" href="css/pages/settings-modal.css" />
+
   <link
-    href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Cairo:wght@300;400;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
 </head>
 
-<body>
-  <!-- Header -->
-  <header class="header">
+<body class="dark-mode">
+  <!-- ============================================================
+       Legacy header — kept only for backward-compatible IDs.
+       Every page renders its own title row now.
+       ============================================================ -->
+  <header class="header pt-legacy-header" aria-hidden="true">
     <div class="container">
       <div class="header-content">
         <h1 class="logo">
@@ -55,20 +71,18 @@
         </h1>
         <nav class="nav" id="nav">
           <button class="nav-btn misbaha-header-btn" onclick="openMisbaha()" title="المسبحة الإلكترونية"
-            aria-label="المسبحة الإلكترونية">
+            aria-label="المسبحة الإلكترونية" tabindex="-1">
             <i class="fas fa-fingerprint"></i>
-            <span class="nav-btn-text">المسبحة</span>
           </button>
-          <button class="nav-btn install-btn" id="installBtn" title="تطبيق ذَكِّرْ (APK)" aria-label="تحميل تطبيق ذَكِّرْ">
+          <button class="nav-btn install-btn hidden" id="installBtn" tabindex="-1">
             <i class="fas fa-download"></i>
-            <span class="nav-btn-text">تثبيت التطبيق</span>
           </button>
-          <button class="nav-btn theme-toggle-btn" id="themeToggle" title="تبديل المظهر" aria-label="تبديل المظهر">
-            <i class="fas fa-sun"></i>
+          <button class="nav-btn theme-toggle-btn settings-header-btn" id="settingsHeaderBtn"
+            onclick="openAdhanModal()" title="الإعدادات" aria-label="الإعدادات" tabindex="-1">
+            <i class="fas fa-cog"></i>
           </button>
-          <button class="nav-btn back-btn hidden" id="backBtn">
+          <button class="nav-btn back-btn hidden" id="backBtn" tabindex="-1">
             <i class="fas fa-arrow-right"></i>
-            <span>العودة</span>
           </button>
         </nav>
       </div>
@@ -81,337 +95,307 @@
 
       <!-- ==================== TAB: الرئيسية (Home) ==================== -->
       <section id="tab-home" class="tab-content active-tab">
+        <div class="pt-page">
 
-        <!-- Welcome Section -->
-        <!-- <div class="welcome-section">
-          <h2 class="welcome-title">أهلاً وسهلاً بك في تطبيق ذَكِّرْ</h2>
-          <p class="welcome-description">رفيقك اليومي في ذكر الله</p>
-        </div> -->
-
-        <!-- ==============================================
-             HERO ISLAMIC CALENDAR & FASTING SYSTEM
-             ============================================== -->
-        <!-- ==============================================
-             HERO ISLAMIC CALENDAR & SMART FASTING
-             ============================================== -->
-        <div class="calendar-hero-card" id="islamicCalendarCard">
-          <!-- Hero Main Date Display -->
-          <div class="cal-hero-main">
-            <div class="cal-day-badge-wrap">
-              <span class="cal-hero-day" id="dayName">اليوم</span>
-              <span class="cal-today-tag">اليوم</span>
-            </div>
-
-            <div class="cal-dates-column">
-              <div class="cal-hijri-row">
-                <span class="cal-hijri-text" id="hijriFullDate">
-                  <!-- backward compatible IDs -->
-                  <span id="hijriDate">التاريخ الهجري</span> <span id="hijriMonth"></span>
-                </span>
-              </div>
-              <div class="cal-greg-row">
-                <span class="cal-greg-text" id="gregorianFullDate">
-                  <!-- backward compatible IDs -->
-                  <span id="gregorianDate">التاريخ الميلادي</span> <span id="gregorianMonth"></span>
-                </span>
-              </div>
+          <!-- Title row + Hijri date -->
+          <div class="pt-topbar pt-topbar--stack" id="islamicCalendarCard">
+            <span class="pt-greet" id="dayName">السلام عليكم ورحمة الله</span>
+            <h1 class="pt-title pt-title--hijri" id="hijriFullDate">التاريخ الهجري</h1>
+            <span class="pt-sub" id="gregorianFullDate">التاريخ الميلادي</span>
+            <div class="pt-topbar__actions">
+              <button class="pt-iconbtn" onclick="openMisbaha()" title="المسبحة الإلكترونية"
+                aria-label="المسبحة الإلكترونية">
+                <i class="fas fa-fingerprint"></i>
+              </button>
+              <button class="pt-iconbtn" onclick="openAdhanModal()" title="الإعدادات" aria-label="الإعدادات">
+                <i class="fas fa-gear"></i>
+              </button>
             </div>
           </div>
 
-          <!-- Smart Compact Fasting Bar -->
-          <div class="cal-fasting-smart-card" id="calFastingAlert">
-            <div class="cal-fasting-smart-header">
-              <div class="cal-fasting-smart-main">
-                <div class="cal-fasting-smart-icon">
-                  <i class="far fa-calendar-alt"></i>
+          <!-- Hidden backward-compatible shims (JS still writes to them) -->
+          <div class="pt-shims" aria-hidden="true">
+            <span id="hijriDate"></span>
+            <span id="hijriMonth"></span>
+            <span id="gregorianDate"></span>
+            <span id="gregorianMonth"></span>
+            <div id="calWeekStrip"></div>
+            <div id="calDayDetailPanel"><div id="calDayDetailContent"></div></div>
+            <span id="ramadanTargetDateLabel"></span>
+            <div id="fridayBanner"><button id="fridayKahfBtn" onclick="openSurahAlKahf()"></button></div>
+          </div>
+
+          <!-- ==============================================
+               PRAYER TIMES: next-prayer hero + 6-prayer strip
+               ============================================== -->
+          <div class="prayer-times-section" id="prayerTimesSection">
+
+            <div class="pt-hero" id="nextPrayerCountdown">
+              <div class="pt-hero__top">
+                <div class="pt-hero__chips" id="prayerLocation">
+                  <button class="pt-chip pt-chip--glass" id="locationBtn" title="تحديث موقعي (GPS)">
+                    <i class="fas fa-location-crosshairs"></i>
+                    <span id="cityName">القاهرة</span>
+                  </button>
+                  <button class="pt-chip pt-chip--glass" onclick="openQiblaModal()" title="اتجاه القبلة">
+                    <i class="fas fa-compass"></i>
+                    <span>القبلة</span>
+                  </button>
                 </div>
-                <div class="cal-fasting-smart-title" id="calFastingAlertTitle">
-                  <span class="cal-fasting-title-text">صيام السنن والتطوع</span>
+              </div>
+
+              <div class="pt-hero__main">
+                <span class="pt-hero__label">الصلاة القادمة</span>
+                <div class="pt-hero__row">
+                  <div class="pt-hero__name" id="nextPrayerName">الفجر</div>
+                  <div class="pt-hero__time" id="nextPrayerTime">٤:٣٠ ص</div>
                 </div>
               </div>
-              <button class="cal-fasting-guide-btn" onclick="openFastingGuideModal()" title="دليل وفضائل صيام التطوع">
-                <i class="fas fa-info-circle"></i>
-                <span>دليل الصيام</span>
-              </button>
-            </div>
-            <div class="cal-fasting-smart-desc" id="calFastingAlertDesc">الإثنين والخميس والأيام البيض</div>
-          </div>
 
-          <!-- Ramadan Countdown Widget (Compact Strip) -->
-          <div class="cal-ramadan-card" id="calRamadanCard">
-            <div class="cal-ramadan-title-wrap">
-              <div class="cal-ramadan-icon">
-                <i class="fas fa-moon"></i>
+              <div class="pt-hero__bar">
+                <div class="pt-hero__bar-fill" id="prayerProgressFill"></div>
               </div>
-              <div class="cal-ramadan-text-wrap">
-                <span class="cal-ramadan-title">شهر رمضان المبارك</span>
-                <!-- <span class="cal-ramadan-sub" id="ramadanTargetDateLabel">اللهم بلغنا رمضان</span> -->
-              </div>
-            </div>
-            <div class="cal-ramadan-badge" id="ramadanDaysBadge">
-              <span class="ramadan-badge-num" id="ramadanDaysOnly">--</span>
-              <span class="ramadan-badge-txt">يوم متبقي</span>
-            </div>
-          </div>
 
-          <!-- Compatibility shim for 7-day strip (kept in DOM for JS calculation, minimal UI) -->
-          <div class="cal-week-strip hidden" id="calWeekStrip"></div>
-          <div class="cal-day-detail-panel hidden" id="calDayDetailPanel">
-            <div class="cal-day-detail-content" id="calDayDetailContent"></div>
-            <button class="cal-day-detail-close" onclick="closeCalDayDetail()" title="إغلاق">&times;</button>
-          </div>
-        </div>
+              <div class="pt-hero__meta">
+                <span class="pt-hero__remaining">
+                  <span class="pt-hero__meta-label">متبقي</span>
+                  <bdi dir="ltr" id="countdownTime">--:--:--</bdi>
+                </span>
+                <span class="pt-hero__meta-label" id="prayerElapsed">منذ الشروق</span>
+              </div>
+            </div>
 
-        <!-- ==============================================
-             PRAYER TIMES SECTION (PROMOTED TO TOP)
-             ============================================== -->
-        <div class="prayer-times-section" id="prayerTimesSection">
-          <div class="prayer-times-header">
-            <h3 class="prayer-times-title">
-              <i class="fas fa-mosque"></i>
-              مواقيت الصلاة
-            </h3>
-            <div class="prayer-times-header-actions" id="prayerLocation">
-              <button class="qibla-header-btn" onclick="openQiblaModal()" title="تحديد اتجاه القبلة">
-                <i class="fas fa-compass"></i>
-                <span>القبلة</span>
-              </button>
-              <button class="location-btn" id="locationBtn" title="تحديث موقعي (GPS)">
-                <i class="fas fa-location-crosshairs"></i>
-                <span id="cityName">القاهرة</span>
-              </button>
-            </div>
-          </div>
+            <div class="pt-prayers" id="prayerStrip">
+              <div class="prayer-times-grid" id="prayerTimesGrid">
+                <!-- Pre-filled defaults to eliminate flash of empty content -->
+                <div class="prayer-card" data-prayer="Fajr">
+                  <div class="prayer-icon"><i class="fas fa-cloud-sun"></i></div>
+                  <div class="prayer-info">
+                    <div class="prayer-name">الفجر</div>
+                    <div class="prayer-time">٤:٣٠ ص</div>
+                  </div>
+                </div>
+                <div class="prayer-card" data-prayer="Sunrise">
+                  <div class="prayer-icon"><i class="fas fa-sun"></i></div>
+                  <div class="prayer-info">
+                    <div class="prayer-name">الشروق</div>
+                    <div class="prayer-time">٦:٠٠ ص</div>
+                  </div>
+                </div>
+                <div class="prayer-card" data-prayer="Dhuhr">
+                  <div class="prayer-icon"><i class="fas fa-sun"></i></div>
+                  <div class="prayer-info">
+                    <div class="prayer-name">الظهر</div>
+                    <div class="prayer-time">١٢:٠٠ م</div>
+                  </div>
+                </div>
+                <div class="prayer-card" data-prayer="Asr">
+                  <div class="prayer-icon"><i class="fas fa-sun"></i></div>
+                  <div class="prayer-info">
+                    <div class="prayer-name">العصر</div>
+                    <div class="prayer-time">٣:٣٠ م</div>
+                  </div>
+                </div>
+                <div class="prayer-card" data-prayer="Maghrib">
+                  <div class="prayer-icon"><i class="fas fa-cloud-sun"></i></div>
+                  <div class="prayer-info">
+                    <div class="prayer-name">المغرب</div>
+                    <div class="prayer-time">٦:١٥ م</div>
+                  </div>
+                </div>
+                <div class="prayer-card" data-prayer="Isha">
+                  <div class="prayer-icon"><i class="fas fa-moon"></i></div>
+                  <div class="prayer-info">
+                    <div class="prayer-name">العشاء</div>
+                    <div class="prayer-time">٧:٤٥ م</div>
+                  </div>
+                </div>
+              </div>
 
-          <div class="next-prayer-countdown" id="nextPrayerCountdown">
-            <!-- <div class="countdown-pulse-icon">
-              <i class="far fa-clock"></i>
-            </div> -->
-            <div class="countdown-text-group">
-              <span class="countdown-label">الصلاة القادمة:</span>
-              <span class="countdown-prayer" id="nextPrayerName">الفجر</span>
-              <span class="countdown-time" id="countdownTime">--:--</span>
-            </div>
-          </div>
+              <div class="prayer-times-loading hidden" id="prayerTimesLoading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>جاري تحديث المواقيت...</p>
+              </div>
 
-          <div class="prayer-times-grid" id="prayerTimesGrid">
-            <!-- Pre-filled default prayer cards to eliminate Flash of Empty Content -->
-            <div class="prayer-card" data-prayer="Fajr">
-              <div class="prayer-icon"><i class="fas fa-cloud-sun"></i></div>
-              <div class="prayer-info">
-                <div class="prayer-name">الفجر</div>
-                <div class="prayer-time">04:30 ص</div>
-              </div>
-            </div>
-            <div class="prayer-card" data-prayer="Sunrise">
-              <div class="prayer-icon"><i class="fas fa-sun"></i></div>
-              <div class="prayer-info">
-                <div class="prayer-name">الشروق</div>
-                <div class="prayer-time">06:00 ص</div>
-              </div>
-            </div>
-            <div class="prayer-card" data-prayer="Dhuhr">
-              <div class="prayer-icon"><i class="fas fa-sun"></i></div>
-              <div class="prayer-info">
-                <div class="prayer-name">الظهر</div>
-                <div class="prayer-time">12:00 م</div>
-              </div>
-            </div>
-            <div class="prayer-card" data-prayer="Asr">
-              <div class="prayer-icon"><i class="fas fa-sun"></i></div>
-              <div class="prayer-info">
-                <div class="prayer-name">العصر</div>
-                <div class="prayer-time">03:30 م</div>
-              </div>
-            </div>
-            <div class="prayer-card" data-prayer="Maghrib">
-              <div class="prayer-icon"><i class="fas fa-cloud-moon"></i></div>
-              <div class="prayer-info">
-                <div class="prayer-name">المغرب</div>
-                <div class="prayer-time">06:15 م</div>
-              </div>
-            </div>
-            <div class="prayer-card" data-prayer="Isha">
-              <div class="prayer-icon"><i class="fas fa-moon"></i></div>
-              <div class="prayer-info">
-                <div class="prayer-name">العشاء</div>
-                <div class="prayer-time">07:45 م</div>
+              <div class="prayer-times-error hidden" id="prayerTimesError">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>تعذر تحديث المواقيت</p>
+                <button class="retry-btn" id="retryPrayerTimes">
+                  <i class="fas fa-redo"></i>
+                  إعادة المحاولة
+                </button>
               </div>
             </div>
           </div>
 
-          <div class="prayer-times-loading hidden" id="prayerTimesLoading">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>جاري تحديث المواقيت...</p>
-          </div>
+          <!-- ==============================================
+               REMINDERS CARD — Ramadan countdown + voluntary fasting
+               Unified card with dual-row layout matching reference
+               ============================================== -->
+          <div class="pt-card pt-remind-card" id="remindersStrip">
+            <!-- Row 1: Ramadan countdown -->
+            <button type="button" class="pt-remind-row" id="remindRamadanSeg"
+              onclick="openRemindersSheet('ramadan')" aria-label="تفاصيل رمضان">
+              <span class="pt-remind-tile is-gold"><i class="fas fa-moon"></i></span>
+              <span class="pt-remind-body">
+                <span class="pt-remind-sub" id="remindRamadanLabel">رمضان ١٤٤٨ · متوقع ٨ فبراير</span>
+                <span class="pt-remind-main" id="remindRamadanValue">بعد ٩٠ يوماً</span>
+                <span class="pt-remind-sub" id="remindRamadanDate" hidden></span>
+              </span>
+              <span class="pt-remind-arrow"><i class="fas fa-chevron-left"></i></span>
+            </button>
 
-          <div class="prayer-times-error hidden" id="prayerTimesError">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p>تعذر تحديث المواقيت</p>
-            <button class="retry-btn" id="retryPrayerTimes">
-              <i class="fas fa-redo"></i>
-              إعادة المحاولة
+            <!-- Divider with gold progress line -->
+            <div class="pt-remind-divider">
+              <div class="pt-remind-progress-fill" id="remindRamadanBar" style="width: 25%;"></div>
+            </div>
+
+            <!-- Row 2: Voluntary fasting reminder -->
+            <button type="button" class="pt-remind-row" id="remindFastingSeg"
+              onclick="openRemindersSheet('fasting')" aria-label="تذكير الصيام">
+              <span class="pt-remind-tile is-em"><i class="far fa-calendar-check" id="remindFastingIcon"></i></span>
+              <span class="pt-remind-body">
+                <span class="pt-remind-sub" id="remindFastingLabel">تذكير بالصيام · سنة أسبوعية</span>
+                <span class="pt-remind-main" id="remindFastingValue">السحور قبل الفجر ٤:٤٧ ص</span>
+              </span>
+              <span class="pt-remind-arrow"><i class="fas fa-chevron-left"></i></span>
             </button>
           </div>
-        </div>
 
-        <!-- ==============================================
-             DUAA CARD – COMPACT & SPIRITUAL
-             ============================================== -->
-        <div class="duaa-card-compact" id="dailyDuaaCard">
-          <div class="duaa-compact-head">
-            <div class="duaa-head-title">
-              <i class="fas fa-hands-praying duaa-head-icon"></i>
-              <span id="duaaHeader">دعاء اليوم</span>
-            </div>
-            <div class="duaa-actions">
-              <button class="duaa-action-btn" id="copyDuaaBtn" onclick="copyCurrentDuaa()" title="نسخ الدعاء">
-                <i class="far fa-copy"></i>
-                <span class="duaa-btn-label" id="copyDuaaLabel">نسخ</span>
-              </button>
-            </div>
-          </div>
-          <div class="duaa-body-wrap">
-            <p class="duaa-compact-text" id="dailyDuaaText">رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ
-              حَسَنَةً وَقِنَا عَذَابَ النَّارِ</p>
-          </div>
-          <div class="duaa-footer" id="duaaFooter">
-            <span class="duaa-source-badge" id="duaaSourceBadge">
-              <i class="fas fa-bookmark"></i>
-              <span id="duaaSourceText">سورة البقرة: ٢٠١</span>
-            </span>
-          </div>
-        </div>
-
-        <!-- Friday Banner (Surah Al-Kahf CTA) — shown only on Fridays -->
-        <!-- <div class="friday-banner hidden" id="fridayBanner">
-          <div class="friday-banner-glow"></div>
-          <div class="friday-banner-content">
-            <div class="friday-banner-info">
-              <div class="friday-banner-icon">
-                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="48" height="48">
-                  <defs>
-                    <linearGradient id="mosqueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style="stop-color:#00f5a0" />
-                      <stop offset="100%" style="stop-color:#00d9f5" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M32 8 C20 8 12 20 12 28 L52 28 C52 20 44 8 32 8Z" fill="url(#mosqueGrad)" opacity="0.9" />
-                  <circle cx="32" cy="10" r="3" fill="#FFD700" />
-                  <circle cx="33.5" cy="9.5" r="2.5" fill="#0a0f1a" />
-                  <rect x="12" y="28" width="40" height="24" rx="2" fill="url(#mosqueGrad)" opacity="0.7" />
-                  <path d="M27 52 L27 38 Q32 32 37 38 L37 52Z" fill="#0a0f1a" opacity="0.6" />
-                  <rect x="6" y="20" width="4" height="32" rx="2" fill="url(#mosqueGrad)" opacity="0.6" />
-                  <rect x="54" y="20" width="4" height="32" rx="2" fill="url(#mosqueGrad)" opacity="0.6" />
-                  <circle cx="8" cy="18" r="3" fill="#FFD700" opacity="0.8" />
-                  <circle cx="56" cy="18" r="3" fill="#FFD700" opacity="0.8" />
-                </svg>
+          <!-- ==============================================
+               DAILY DUA
+               ============================================== -->
+          <div class="pt-card pt-dua duaa-card-compact" id="dailyDuaaCard">
+            <div class="duaa-compact-head">
+              <div class="duaa-head-title">
+                <i class="fas fa-hands-praying duaa-head-icon"></i>
+                <span id="duaaHeader">دعاء اليوم</span>
               </div>
-              <div class="friday-banner-text">
-                <span class="friday-banner-label">يوم الجمعة المبارك</span>
-                <span class="friday-banner-subtitle">لا تنسَ قراءة سورة الكهف</span>
+              <div class="duaa-actions">
+                <button class="duaa-action-btn" id="copyDuaaBtn" onclick="copyCurrentDuaa()" title="نسخ الدعاء">
+                  <i class="far fa-copy"></i>
+                  <span class="duaa-btn-label" id="copyDuaaLabel">نسخ</span>
+                </button>
               </div>
             </div>
-            <button class="friday-banner-cta" id="fridayKahfBtn" onclick="openSurahAlKahf()">
-              <i class="fas fa-book-quran"></i>
-              <span>اقرأ سورة الكهف</span>
-            </button>
+            <div class="duaa-body-wrap">
+              <p class="duaa-compact-text" id="dailyDuaaText">«اللَّهُمَّ أَلْهِمْنِي رُشْدِي، وَأَعِذْنِي مِنْ شَرِّ نَفْسِي»</p>
+            </div>
+            <div class="duaa-footer" id="duaaFooter">
+              <span class="duaa-source-badge" id="duaaSourceBadge">
+                <i class="fas fa-bookmark"></i>
+                <span id="duaaSourceText">السنة النبوية</span>
+              </span>
+            </div>
           </div>
-        </div> -->
 
-        <!-- Dynamic Time-Aware Hero Card -->
-        <div class="dynamic-hero-card" id="dynamicHeroCard"></div>
+          <!-- Time-aware Azkar strip (rendered by JS) -->
+          <div id="dynamicHeroCard"></div>
 
-        <!-- Continue Reading Pill -->
-        <div class="continue-reading-pill hidden" id="continueReadingPill"></div>
+          <!-- Continue reading pill -->
+          <!-- <div class="continue-reading-pill hidden" id="continueReadingPill"></div> -->
 
+        </div>
       </section>
 
       <!-- ==================== TAB: الأذكار (Azkar) ==================== -->
       <section id="tab-azkar" class="tab-content">
+        <div class="pt-page pt-azkar">
 
-        <!-- Azkar Categories List -->
-        <div id="azkarListView">
-          <div class="welcome-section">
-            <h2 class="welcome-title">الأذكار والأدعية</h2>
-            <!-- <p class="welcome-description">اختر نوع الأذكار التي تريد قراءتها</p> -->
+          <div class="pt-topbar">
+            <div class="pt-topbar__titles">
+              <h1 class="pt-title">الأذكار</h1>
+              <span class="pt-sub">حصن المسلم · ١٣١ ذكرًا · ١٢ أقسام</span>
+            </div>
+            <div class="pt-topbar__actions">
+              <button class="pt-iconbtn" id="azkarSearchBtn" onclick="toggleAzkarSearch()" title="بحث في الأذكار"
+                aria-label="بحث">
+                <i class="fas fa-magnifying-glass"></i>
+              </button>
+              <button class="pt-iconbtn" onclick="openMisbaha()" title="المسبحة" aria-label="المسبحة">
+                <i class="fas fa-fingerprint"></i>
+              </button>
+            </div>
           </div>
-          <!-- Misbaha Button -->
-          <div class="misbaha-launch-wrap">
-            <button class="misbaha-launch-btn" id="misbahaLaunchBtn" onclick="openMisbaha()">
-              <div class="misbaha-launch-icon">
-                <svg viewBox="0 0 64 64" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2.5" opacity="0.3" />
-                  <circle cx="32" cy="6" r="5" fill="currentColor" opacity="0.9" />
-                  <circle cx="47" cy="10" r="4.5" fill="currentColor" opacity="0.8" />
-                  <circle cx="56" cy="22" r="4.5" fill="currentColor" opacity="0.7" />
-                  <circle cx="58" cy="37" r="4.5" fill="currentColor" opacity="0.65" />
-                  <circle cx="52" cy="50" r="4.5" fill="currentColor" opacity="0.6" />
-                  <circle cx="40" cy="58" r="4.5" fill="currentColor" opacity="0.55" />
-                  <circle cx="24" cy="58" r="4.5" fill="currentColor" opacity="0.55" />
-                  <circle cx="12" cy="50" r="4.5" fill="currentColor" opacity="0.6" />
-                  <circle cx="6" cy="37" r="4.5" fill="currentColor" opacity="0.65" />
-                  <circle cx="8" cy="22" r="4.5" fill="currentColor" opacity="0.7" />
-                  <circle cx="17" cy="10" r="4.5" fill="currentColor" opacity="0.8" />
-                  <!-- Tassel -->
-                  <line x1="32" y1="6" x2="32" y2="0" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                  <circle cx="32" cy="-2" r="2.5" fill="#d4a847" />
-                </svg>
+
+          <!-- Search (revealed by the search button) -->
+          <div class="pt-search" id="azkarSearchBox">
+            <i class="fas fa-magnifying-glass"></i>
+            <input type="text" id="azkarSearchInput" placeholder="ابحث عن نوع الذكر..." autocomplete="off"
+              oninput="filterAzkarCategories(this.value)" />
+            <button class="pt-iconbtn" style="width:32px;height:32px;min-width:32px;border:none;background:transparent"
+              onclick="toggleAzkarSearch()" aria-label="إغلاق البحث">
+              <i class="fas fa-xmark" style="font-size:13px"></i>
+            </button>
+          </div>
+
+          <div id="azkarListView">
+            <!-- Suggestion card -->
+            <div id="azkarSuggestion">
+              <div class="pt-suggest is-em">
+                <div class="pt-suggest__top">
+                  <span class="pt-suggest__now">الآن</span>
+                  <span class="pt-suggest__ico"><i class="fas fa-moon"></i></span>
+                </div>
+                <h2 class="pt-suggest__title">حان وقت أذكار المساء</h2>
+                <p class="pt-suggest__sub">من ٢٦ ذكرًا · نحو ٨ دقائق</p>
+                <button class="pt-suggest__cta" onclick="showCategoryPage('morning')">
+                  <i class="fas fa-play"></i>
+                  <span>ابدأ الأذكار</span>
+                </button>
               </div>
-              <span class="misbaha-launch-text">المسبحة </span>
-              <i class="fas fa-chevron-left misbaha-launch-arrow"></i>
+            </div>
+
+            <!-- Misbaha -->
+            <button class="pt-card pt-misbaha-row" id="misbahaLaunchBtn" onclick="openMisbaha()">
+              <span class="pt-tint pt-c-gold"><i class="fas fa-fingerprint"></i></span>
+              <span class="pt-misbaha-row__txt">
+                <span class="pt-misbaha-row__title">المسبحة الإلكترونية</span>
+                <span class="pt-misbaha-row__sub">عدّاد تسبيح يحفظ رقمك</span>
+              </span>
+              <span class="pt-chevron"><i class="fas fa-chevron-left"></i></span>
             </button>
+
+            <div class="pt-section-label">كل الأذكار</div>
+            <div class="categories-container pt-cats" id="categoriesContainer">
+              <!-- Category cards will be populated by JavaScript -->
+            </div>
           </div>
-          <div class="categories-container" id="categoriesContainer">
-            <!-- Category cards will be populated by JavaScript -->
+
+          <!-- Category Detail View -->
+          <div id="categoryPage" class="hidden">
+            <!-- Hidden compat elements (still referenced by JS) -->
+            <p id="categoryDescription" class="pt-shims"></p>
+            <div id="adhkarContainer" class="pt-shims"></div>
+
+            <div class="swiper-topbar">
+              <button class="sw-back-btn" onclick="showHomePage();switchTab('tab-azkar')">
+                <i class="fas fa-arrow-right"></i>
+              </button>
+              <h2 class="swiper-page-title" id="categoryTitle">أذكار الصباح</h2>
+              <span class="swiper-prog-badge" id="swiperProgressText">١ / ٢٠</span>
+              <button class="sw-settings-btn" id="swiperSettingsBtn" onclick="toggleSwiperSettings()">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+            </div>
+
+            <div class="swiper-floating-menu hidden" id="swiperFloatingMenu">
+              <button onclick="adjustSwiperFont(-1)" title="تصغير الخط">
+                <i class="fas fa-search-minus"></i>
+              </button>
+              <button onclick="adjustSwiperFont(1)" title="تكبير الخط">
+                <i class="fas fa-search-plus"></i>
+              </button>
+              <button onclick="resetAllAdhkar()" title="إعادة تعيين" id="resetAllBtn">
+                <i class="fas fa-redo-alt"></i>
+              </button>
+            </div>
+
+            <div class="azkar-swiper-track" id="azkarSwiperTrack"></div>
+            <div class="swiper-dots-wrap" id="swiperDotsWrap"></div>
           </div>
+
         </div>
-
-        <!-- Category Detail View -->
-        <div id="categoryPage" class="hidden">
-          <!-- Hidden compat elements (still referenced by JS) -->
-          <p id="categoryDescription"></p>
-          <div id="adhkarContainer"></div>
-
-          <!-- ── Thin progress line at very top ── -->
-          <!-- <div class="swiper-progress-line">
-            <div class="swiper-progress-fill" id="swiperProgressFill"></div>
-          </div> -->
-
-          <!-- ── Slim Top Bar ── -->
-          <div class="swiper-topbar">
-            <button class="sw-back-btn" onclick="showHomePage();switchTab('tab-azkar')">
-              <i class="fas fa-arrow-right"></i>
-            </button>
-            <h2 class="swiper-page-title" id="categoryTitle">أذكار الصباح</h2>
-            <span class="swiper-prog-badge" id="swiperProgressText">١ / ٢٠</span>
-            <button class="sw-settings-btn" id="swiperSettingsBtn" onclick="toggleSwiperSettings()">
-              <i class="fas fa-ellipsis-v"></i>
-            </button>
-          </div>
-
-          <!-- ── Floating Settings Menu ── -->
-          <div class="swiper-floating-menu hidden" id="swiperFloatingMenu">
-            <button onclick="adjustSwiperFont(-1)" title="تصغير الخط">
-              <i class="fas fa-search-minus"></i>
-            </button>
-            <button onclick="adjustSwiperFont(1)" title="تكبير الخط">
-              <i class="fas fa-search-plus"></i>
-            </button>
-            <button onclick="resetAllAdhkar()" title="إعادة تعيين" id="resetAllBtn">
-              <i class="fas fa-redo-alt"></i>
-            </button>
-          </div>
-
-          <!-- ── Swiper Track (CSS scroll-snap) ── -->
-          <div class="azkar-swiper-track" id="azkarSwiperTrack">
-            <!-- Slides injected by JS -->
-          </div>
-
-          <!-- ── Dots / Progress Indicator ── -->
-          <div class="swiper-dots-wrap" id="swiperDotsWrap"></div>
-        </div>
-
       </section>
 
       <!-- ==================== TAB: القرآن (Quran) ==================== -->
@@ -430,339 +414,215 @@
 
       <!-- ==================== TAB: الملف الشخصي (Profile) ==================== -->
       <section id="tab-profile" class="tab-content">
+        <div class="pt-page pt-profile">
 
-        <!-- ── Slim Profile Header ── -->
-        <!-- <div class="dash-header">
-          <div class="dash-avatar">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-              <path
-                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-            </svg>
-          </div>
-          <h2 class="dash-title">الملف الشخصي</h2>
-        </div> -->
-
-        <!-- ── Summary Cards (3 main KPIs) ── -->
-        <!-- <div class="dash-summary">
-          <div class="summary-card" id="summaryKhatmah">
-            <div class="summary-ring-wrap">
-              <svg class="summary-ring" viewBox="0 0 80 80">
-                <circle class="ring-bg" cx="40" cy="40" r="34" />
-                <circle class="ring-fill" id="khatmahRing" cx="40" cy="40" r="34" stroke-dasharray="213.6"
-                  stroke-dashoffset="213.6" />
-              </svg>
-              <span class="ring-pct" id="khatmahPct">0%</span>
+          <div class="pt-topbar pt-prof-top">
+            <div class="pt-topbar__actions">
+              <span class="pt-prof-avatar" aria-hidden="true">
+                <i class="fas fa-moon"></i>
+              </span>
             </div>
-            <span class="summary-label">الختمة</span>
-          </div>
-          <div class="summary-card" id="summaryAzkar">
-            <div class="summary-icon azkar-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                stroke-linejoin="round" width="28" height="28">
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-              </svg>
+            <div class="pt-topbar__titles">
+              <h1 class="pt-title">رحلتك مع ذَكِّرْ</h1>
+              <span class="pt-sub">استمر، فأحبُّ العملِ أدومه وإن قلّ</span>
             </div>
-            <span class="summary-value" id="summaryAzkarVal">0</span>
-            <span class="summary-label">أذكار اليوم</span>
-          </div>
-          <div class="summary-card" id="summaryStreak">
-            <div class="summary-icon streak-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                stroke-linejoin="round" width="28" height="28">
-                <path
-                  d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-              </svg>
-            </div>
-            <span class="summary-value" id="summaryStreakVal">0</span>
-            <span class="summary-label">أيام متتالية</span>
-          </div>
-        </div> -->
-
-        <!-- ── Unified Dashboard Card ── -->
-        <div class="dash-card" id="unifiedDashCard">
-
-          <!-- ─ Section: القرآن الكريم ─ -->
-          <div class="dash-section" id="profileKhatmahSection">
-            <div class="dash-card-head">
-              <svg class="dash-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15z" />
-              </svg>
-              <h3>القرآن الكريم</h3>
-            </div>
-            <div id="profileKhatmahContent">
-              <p class="dash-empty">لم تبدأ ختمة بعد. اذهب إلى تبويب القرآن لبدء ختمة جديدة.</p>
-            </div>
-            <div class="dash-stat-pills">
-              <div class="stat-pill pill-page">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                </svg>
-                <span id="profileCurrentPage">0</span>
-                <small>الصفحة الحالية</small>
-              </div>
-              <div class="stat-pill pill-read">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                  <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-                  <polyline points="16 7 22 7 22 13" />
-                </svg>
-                <span id="profilePagesRead">0</span>
-                <small>صفحة مقروءة</small>
-              </div>
-              <div class="stat-pill pill-days">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                <span id="profileTotalDays">0</span>
-                <small>أيام القراءة</small>
-              </div>
-              <div class="stat-pill pill-khatmah">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                  <circle cx="12" cy="8" r="7" />
-                  <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
-                </svg>
-                <span id="profileKhatmahCount">0</span>
-                <small>عدد الختمات</small>
-              </div>
-            </div>
-            <button class="dash-continue-btn" onclick="switchTab('tab-quran')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" width="18" height="18">
-                <polygon points="5 4 15 12 5 20 5 4" />
-                <line x1="19" y1="5" x2="19" y2="19" />
-              </svg>
-              متابعة القراءة
-            </button>
           </div>
 
-          <!-- ─ Divider ─ -->
-          <div class="dash-divider"></div>
+          <!-- ── Streak ── -->
+          <div class="pt-streak">
+            <span class="pt-streak__icon"><i class="fas fa-fire-flame-curved"></i></span>
+            <div class="pt-streak__body">
+              <div class="pt-streak__value" id="streakValueWrap">
+                <b id="streakCount">—</b><span id="streakSuffix">يومًا متتاليًا</span>
+              </div>
+              <div class="pt-streak__sub" id="streakSub">أطول سلسلة لك: <b id="bestStreakCount">—</b><span id="bestStreakSuffix"> يومًا</span></div>
+            </div>
+            <span class="pt-streak__badge" id="streakBadge" hidden>أحسنت</span>
+          </div>
 
-          <!-- ─ Section: إحصائيات الأذكار ─ -->
-          <div class="dash-section">
-            <div class="dash-card-head">
-              <svg class="dash-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                <line x1="18" y1="20" x2="18" y2="10" />
-                <line x1="12" y1="20" x2="12" y2="4" />
-                <line x1="6" y1="20" x2="6" y2="14" />
-              </svg>
-              <h3>إحصائيات الأذكار</h3>
+          <!-- ── Today rings ── -->
+          <div class="pt-mini-grid">
+            <div class="pt-mini-card">
+              <div class="pt-ring pt-ring--gd" id="khatmahRing" style="--p:0">
+                <span class="pt-ring__val" id="khatmahPct">٠٪</span>
+              </div>
+              <div class="pt-mini-card__body">
+                <div class="pt-mini-card__title">الختمة</div>
+                <div class="pt-mini-card__sub" id="khatmahPagesSub">لم تبدأ ختمة</div>
+              </div>
             </div>
 
-            <!-- 4 compact stat pills -->
-            <div class="dash-stat-pills" id="statsContent">
-              <div class="stat-pill pill-streak">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                  <path
-                    d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-                </svg>
-                <span id="streakCount">0</span>
-                <small>أيام</small>
+            <div class="pt-mini-card">
+              <div class="pt-ring pt-ring--em" id="azkarRing" style="--p:0">
+                <span class="pt-ring__val" id="azkarRingPct">٠٪</span>
               </div>
-              <div class="stat-pill pill-today">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span id="todayCount">0</span>
-                <small>اليوم</small>
-              </div>
-              <div class="stat-pill pill-week">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                <span id="weekCount">0</span>
-                <small>الأسبوع</small>
-              </div>
-              <div class="stat-pill pill-total">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7" />
-                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7" />
-                  <path d="M4 22h16" />
-                  <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22" />
-                  <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22" />
-                  <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
-                </svg>
-                <span id="totalCount">0</span>
-                <small>الإجمالي</small>
+              <div class="pt-mini-card__body">
+                <div class="pt-mini-card__title">أذكار اليوم</div>
+                <div class="pt-mini-card__sub" id="azkarSub">لم تبدأ بعد</div>
+                <span id="todayCount" hidden>—</span>
               </div>
             </div>
           </div>
 
-          <!-- ─ Divider ─ -->
-          <div class="dash-divider"></div>
+          <!-- ── Totals ── -->
+          <div class="pt-stat-grid pt-stat-grid--4" id="statsContent">
+            <div class="pt-stat pt-stat--tile">
+              <span class="pt-stat__ico pt-c-em"><i class="fas fa-book-open"></i></span>
+              <span class="pt-stat__val" id="profileTotalDays">٠</span>
+              <span class="pt-stat__label">أيام القراءة</span>
+            </div>
+            <div class="pt-stat pt-stat--tile">
+              <span class="pt-stat__ico pt-c-gold"><i class="fas fa-award"></i></span>
+              <span class="pt-stat__val" id="profileKhatmahCount">٠</span>
+              <span class="pt-stat__label">ختمات</span>
+            </div>
+            <div class="pt-stat pt-stat--tile">
+              <span class="pt-stat__ico pt-c-blue"><i class="fas fa-calendar-week"></i></span>
+              <span class="pt-stat__val" id="weekCount">٠</span>
+              <span class="pt-stat__label">أذكار الأسبوع</span>
+            </div>
+            <div class="pt-stat pt-stat--tile">
+              <span class="pt-stat__ico pt-c-purple"><i class="fas fa-trophy"></i></span>
+              <span class="pt-stat__val" id="totalCount">٠</span>
+              <span class="pt-stat__label">الإجمالي</span>
+            </div>
+          </div>
 
-          <!-- ─ Section: نشاط الأسبوع (Unified Chart) ─ -->
-          <div class="dash-section">
-            <div class="dash-chart-header">
-              <h4>نشاط الأسبوع</h4>
-              <div class="dash-chart-tabs">
-                <button class="chart-tab active" data-chart="azkar" onclick="switchChartTab('azkar')">الأذكار</button>
-                <button class="chart-tab" data-chart="quran" onclick="switchChartTab('quran')">القرآن</button>
+          <!-- Legacy hooks kept for quran.js (surfaced in the ring card) -->
+          <span id="profileCurrentPage" hidden>0</span>
+          <span id="profilePagesRead" hidden>0</span>
+          <span id="profileKhatmahContent" hidden></span>
+
+          <!-- ── Weekly activity ── -->
+          <div class="pt-chart-card pt-card">
+            <div class="pt-chart-head">
+              <h4 class="pt-chart-head__title">نشاط الأسبوع</h4>
+              <div class="pt-seg dash-chart-tabs">
+                <button class="pt-seg__btn chart-tab active" data-chart="azkar"
+                  onclick="switchChartTab('azkar')">الأذكار</button>
+                <button class="pt-seg__btn chart-tab" data-chart="quran"
+                  onclick="switchChartTab('quran')">القرآن</button>
               </div>
             </div>
-            <div class="dash-chart-container">
-              <!-- Azkar Chart -->
-              <div class="dash-modern-chart" id="azkarChart">
-                <div class="chart-bars" id="weeklyBars">
-                  <div class="chart-bar-col" data-day="6">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill" data-day="6"></div>
+
+              <div class="dash-chart-container">
+                <div class="dash-modern-chart" id="azkarChart">
+                  <div class="chart-bars" id="weeklyBars">
+                    <div class="chart-bar-col" data-day="6">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill" data-day="6"></div></div>
+                      <span>السبت</span>
                     </div>
-                    <span>السبت</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="0">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill" data-day="0"></div>
+                    <div class="chart-bar-col" data-day="0">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill" data-day="0"></div></div>
+                      <span>الأحد</span>
                     </div>
-                    <span>الأحد</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="1">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill" data-day="1"></div>
+                    <div class="chart-bar-col" data-day="1">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill" data-day="1"></div></div>
+                      <span>الإثنين</span>
                     </div>
-                    <span>الأثنين</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="2">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill" data-day="2"></div>
+                    <div class="chart-bar-col" data-day="2">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill" data-day="2"></div></div>
+                      <span>الثلاثاء</span>
                     </div>
-                    <span>الثلاثاء</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="3">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill" data-day="3"></div>
+                    <div class="chart-bar-col" data-day="3">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill" data-day="3"></div></div>
+                      <span>الأربعاء</span>
                     </div>
-                    <span>الأربعاء</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="4">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill" data-day="4"></div>
+                    <div class="chart-bar-col" data-day="4">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill" data-day="4"></div></div>
+                      <span>الخميس</span>
                     </div>
-                    <span>الخميس</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="5">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill" data-day="5"></div>
+                    <div class="chart-bar-col" data-day="5">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill" data-day="5"></div></div>
+                      <span>الجمعة</span>
                     </div>
-                    <span>الجمعة</span>
                   </div>
                 </div>
-              </div>
-              <!-- Quran Chart -->
-              <div class="dash-modern-chart hidden" id="quranChart">
-                <div class="chart-bars" id="quranWeeklyBars">
-                  <div class="chart-bar-col" data-day="6">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill quran-fill" data-day="6"></div>
+
+                <div class="dash-modern-chart hidden" id="quranChart">
+                  <div class="chart-bars" id="quranWeeklyBars">
+                    <div class="chart-bar-col" data-day="6">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill quran-fill" data-day="6"></div></div>
+                      <span>السبت</span>
                     </div>
-                    <span>السبت</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="0">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill quran-fill" data-day="0"></div>
+                    <div class="chart-bar-col" data-day="0">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill quran-fill" data-day="0"></div></div>
+                      <span>الأحد</span>
                     </div>
-                    <span>الأحد</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="1">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill quran-fill" data-day="1"></div>
+                    <div class="chart-bar-col" data-day="1">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill quran-fill" data-day="1"></div></div>
+                      <span>الإثنين</span>
                     </div>
-                    <span>الأثنين</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="2">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill quran-fill" data-day="2"></div>
+                    <div class="chart-bar-col" data-day="2">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill quran-fill" data-day="2"></div></div>
+                      <span>الثلاثاء</span>
                     </div>
-                    <span>الثلاثاء</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="3">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill quran-fill" data-day="3"></div>
+                    <div class="chart-bar-col" data-day="3">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill quran-fill" data-day="3"></div></div>
+                      <span>الأربعاء</span>
                     </div>
-                    <span>الأربعاء</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="4">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill quran-fill" data-day="4"></div>
+                    <div class="chart-bar-col" data-day="4">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill quran-fill" data-day="4"></div></div>
+                      <span>الخميس</span>
                     </div>
-                    <span>الخميس</span>
-                  </div>
-                  <div class="chart-bar-col" data-day="5">
-                    <div class="chart-bar-value"></div>
-                    <div class="chart-bar-track">
-                      <div class="chart-bar-fill quran-fill" data-day="5"></div>
+                    <div class="chart-bar-col" data-day="5">
+                      <div class="chart-bar-value"></div>
+                      <div class="chart-bar-track"><div class="chart-bar-fill quran-fill" data-day="5"></div></div>
+                      <span>الجمعة</span>
                     </div>
-                    <span>الجمعة</span>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- ─ Divider ─ -->
-          <div class="dash-divider"></div>
-
-          <!-- ─ Integrated Data Backup & Restore (JSON) ─ -->
-          <div class="dash-backup-integrated">
-            <div class="dash-backup-info">
-              <i class="fas fa-shield-halved dash-backup-icon"></i>
-              <div class="dash-backup-text">
-                <span class="dash-backup-title">حفظ واستعادة سجل الإنجازات</span>
-              </div>
-            </div>
-            <div class="dash-backup-actions">
-              <button class="dash-backup-btn" onclick="exportUserData()" title="تصدير وحفظ الإنجازات كملف JSON">
-                <i class="fas fa-file-export"></i>
-                <span>تصدير البيانات</span>
+            <!-- ── Settings & data ── -->
+            <div class="pt-section-label">الإعدادات والبيانات</div>
+            <div class="pt-settings pt-card pt-card--pad-sm">
+              <button class="pt-settings__row" onclick="exportUserData()" title="نسخ احتياطي كملف JSON">
+                <i class="fas fa-cloud-arrow-down pt-settings__ico is-gold"></i>
+                <span class="pt-settings__label">نسخ احتياطي للإنجازات</span>
+                <i class="fas fa-chevron-left pt-settings__chev"></i>
               </button>
-              <button class="dash-backup-btn" onclick="triggerImportData()"
-                title="استيراد واستعادة الإنجازات من ملف JSON">
-                <i class="fas fa-file-import"></i>
-                <span>استيراد البيانات</span>
+              <hr class="pt-hr" />
+              <button class="pt-settings__row" onclick="triggerImportData()" title="استيراد البيانات من ملف JSON">
+                <i class="fas fa-file-import pt-settings__ico is-gold"></i>
+                <span class="pt-settings__label">استيراد البيانات</span>
+                <i class="fas fa-chevron-left pt-settings__chev"></i>
               </button>
-              <input type="file" id="importJsonInput" accept=".json,application/json" style="display: none;"
+              <hr class="pt-hr" />
+              <button class="pt-settings__row" onclick="showInstallModal()" title="تثبيت تطبيق الأندرويد">
+                <i class="fab fa-android pt-settings__ico is-em"></i>
+                <span class="pt-settings__label">تثبيت تطبيق الأندرويد</span>
+                <i class="fas fa-chevron-left pt-settings__chev"></i>
+              </button>
+              <input type="file" id="importJsonInput" accept=".json,application/json" style="display:none"
                 onchange="importUserData(event)" />
             </div>
+
+          <!-- Sadaqa Jariyah -->
+          <div class="pt-card pt-sadaqa">
+            <span class="pt-sadaqa__txt">اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد عَبْدالغَنِي أَحْمَد
+              وَجَمِيعِ أَمْوَاتِ المُسْلِمِينَ</span>
           </div>
 
         </div>
-
-        <!-- Sadaqa Jariyah -->
-        <div class="dash-card dash-sadaqa">
-          <p>اللَّهُمَّ اجْعَلْهَا صَدَقَةً جَارِيَةً عَلَى رُوحِ أَحْمَد عَبْدالغَنِي
-            أَحْمَد وَجَمِيعِ أَمْوَاتِ
-            المُسْلِمِينَ</p>
-        </div>
-
       </section>
 
     </div>
   </main>
-
-
 
   <!-- Sunnah Fasting Guide Modal -->
   <div id="fastingGuideModal" class="modal fasting-guide-modal">
@@ -782,7 +642,6 @@
         </div>
 
         <div class="fasting-occasions-list">
-          <!-- عاشوراء وتاسوعاء -->
           <div class="fasting-occasion-card foc-card--gold">
             <div class="foc-head">
               <span class="foc-badge foc-badge--gold">سنة مؤكدة</span>
@@ -794,7 +653,6 @@
             </p>
           </div>
 
-          <!-- يوم عرفة -->
           <div class="fasting-occasion-card foc-card--gold">
             <div class="foc-head">
               <span class="foc-badge foc-badge--gold">سنة مؤكدة</span>
@@ -806,7 +664,6 @@
             </p>
           </div>
 
-          <!-- الأيام البيض -->
           <div class="fasting-occasion-card foc-card--green">
             <div class="foc-head">
               <span class="foc-badge foc-badge--green">سنة شهرية</span>
@@ -818,7 +675,6 @@
             </p>
           </div>
 
-          <!-- الإثنين والخميس -->
           <div class="fasting-occasion-card foc-card--green">
             <div class="foc-head">
               <span class="foc-badge foc-badge--green">سنة أسبوعية</span>
@@ -830,7 +686,6 @@
             </p>
           </div>
 
-          <!-- ستة أيام من شوال -->
           <div class="fasting-occasion-card foc-card--blue">
             <div class="foc-head">
               <span class="foc-badge foc-badge--blue">سنة سنوية</span>
@@ -842,7 +697,6 @@
             </p>
           </div>
 
-          <!-- عشر ذي الحجة -->
           <div class="fasting-occasion-card foc-card--purple">
             <div class="foc-head">
               <span class="foc-badge foc-badge--purple">مستحب</span>
@@ -854,7 +708,6 @@
             </p>
           </div>
 
-          <!-- شهر المحرم وشعبان -->
           <div class="fasting-occasion-card foc-card--purple">
             <div class="foc-head">
               <span class="foc-badge foc-badge--purple">مستحب</span>
@@ -869,14 +722,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Quick Access Toolbar -->
-  <!-- <div class="quick-access">
-    <button class="quick-btn" id="scrollTopBtn" title="العودة للأعلى" aria-label="العودة للأعلى">
-      <i class="fas fa-arrow-up"></i>
-      <span class="quick-btn-label">أعلى</span>
-    </button>
-  </div> -->
 
   <!-- Floating Notification -->
   <div class="notification" id="notification">
@@ -922,6 +767,221 @@
     </div>
   </div>
 
+  <!-- ============================================================
+       Adhan & App Settings (styled as a bottom sheet by v2 CSS)
+       ============================================================ -->
+  <div id="adhanModal" class="modal adhan-modal" role="dialog" aria-modal="true" aria-labelledby="adhanModalTitle">
+    <div class="modal-content adhan-modal-content">
+      <div class="adhan-modal-header">
+        <div class="adhan-modal-title" id="adhanModalTitle">
+          <i class="fas fa-cog"></i>
+          <span>الإعدادات</span>
+        </div>
+        <button type="button" class="adhan-close-btn" onclick="closeAdhanModal()" aria-label="إغلاق">&times;</button>
+      </div>
+
+      <div class="adhan-modal-body">
+        <!-- First Launch Welcome Banner -->
+        <!-- <div class="adhan-first-launch-banner" id="adhanFirstLaunchBanner"
+          style="display:none; background: linear-gradient(135deg, rgba(212,168,71,0.18), rgba(16,185,129,0.15)); border: 1px solid rgba(212,168,71,0.45); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.2rem; text-align: center;">
+          <div style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">✨ مرحباً بك في تطبيق ذَكِّرْ ✨</div>
+          <p style="font-size: 0.85rem; margin: 0; line-height: 1.6;">تم تفعيل الأذان وتذكيرات الأذكار تلقائياً لتكون
+            جاهزة لك مباشرة. يمكنك تخصيص اختياراتك أو تغيير المؤذن ومظهر التطبيق أدناه.</p>
+        </div> -->
+
+        <!-- Theme Mode Section -->
+        <div class="adhan-section-title">
+          <i class="fas fa-palette"></i>
+          <span>مظهر التطبيق</span>
+        </div>
+        <div class="adhan-theme-grid">
+          <button type="button" class="adhan-theme-card" id="themeDarkBtn" onclick="setAppTheme('dark')">
+            <div class="theme-card-icon"><i class="fas fa-moon"></i></div>
+            <div class="theme-card-details">
+              <strong>الوضع الداكن</strong>
+              <span>مريح للعين ويوفّر البطارية</span>
+            </div>
+            <div class="theme-card-check"><i class="fas fa-check-circle"></i></div>
+          </button>
+          <button type="button" class="adhan-theme-card" id="themeLightBtn" onclick="setAppTheme('light')">
+            <div class="theme-card-icon"><i class="fas fa-sun"></i></div>
+            <div class="theme-card-details">
+              <strong>الوضع الفاتح</strong>
+              <span>وضوح في الإضاءة القوية</span>
+            </div>
+            <div class="theme-card-check"><i class="fas fa-check-circle"></i></div>
+          </button>
+        </div>
+
+        <!-- Azkar Reminders Toggle -->
+        <div class="adhan-section-title" style="margin-top: 1.25rem;">
+          <i class="fas fa-clock"></i>
+          <span>تذكير الأذكار</span>
+        </div>
+        <div class="adhan-master">
+          <div>
+            <h4>إشعارات تذكير الأذكار</h4>
+            <p>تنبيهك عند حلول وقت أذكار الصباح والمساء والنوم وسورة الكهف يوم الجمعة</p>
+          </div>
+          <label class="adhan-switch">
+            <input type="checkbox" id="azkarReminderToggle" onchange="setAzkarReminderEnabled(this.checked)" checked />
+            <span class="adhan-slider"></span>
+          </label>
+        </div>
+        <div style="margin-top: 0.6rem; display: flex; justify-content: flex-end;">
+          <button type="button" class="adhan-action-btn is-ghost" onclick="testAzkarReminder()">
+            <i class="fas fa-volume-high"></i>
+            <span>تجربة صوت تنبيه الأذكار</span>
+          </button>
+        </div>
+
+        <div class="adhan-section-title" style="margin-top: 1.25rem;">
+          <i class="fas fa-bell"></i>
+          <span>إعدادات الأذان والتنبيهات</span>
+        </div>
+
+        <div class="adhan-web-notice" id="adhanWebNotice">
+          <i class="fas fa-circle-info"></i>
+          <span>المحرك الأصلي للأذان يعمل في تطبيق أندرويد. افتح التطبيق المثبّت لتفعيل الأذان في الخلفية ووضع
+            Doze.</span>
+        </div>
+
+        <!-- Master switch -->
+        <div class="adhan-master">
+          <div>
+            <h4>تشغيل الأذان تلقائياً</h4>
+            <p>يعمل حتى لو كان التطبيق مغلقاً أو الشاشة مقفلة</p>
+          </div>
+          <label class="adhan-switch">
+            <input type="checkbox" id="adhanEnabledToggle" onchange="AdhanNative.setEnabled(this.checked)" />
+            <span class="adhan-slider"></span>
+          </label>
+        </div>
+
+        <!-- Muezzin selection -->
+        <div class="adhan-section-title">
+          <i class="fas fa-microphone-lines"></i>
+          <span>اختر المؤذن</span>
+          <span class="adhan-section-hint">صوت مضمّن</span>
+        </div>
+        <div class="adhan-muezzin-list" id="adhanMuezzinList">
+          <!-- Rendered by adhan-native.js -->
+        </div>
+
+        <!-- Per-prayer toggles -->
+        <div class="adhan-section-title">
+          <i class="fas fa-mosque"></i>
+          <span>الصلوات التي يُرفع فيها الأذان</span>
+        </div>
+        <div class="adhan-prayer-grid" id="adhanPrayerGrid">
+          <!-- Rendered by adhan-native.js -->
+        </div>
+
+        <!-- Volume -->
+        <div class="adhan-section-title">
+          <i class="fas fa-volume-high"></i>
+          <span>مستوى صوت الأذان</span>
+          <span class="adhan-section-hint">يستخدم مسار المنبّه</span>
+        </div>
+        <div class="adhan-volume-row">
+          <i class="fas fa-volume-low"></i>
+          <input type="range" id="adhanVolume" min="5" max="100" step="5" value="100"
+            oninput="AdhanNative.setVolume(this.value)" aria-label="مستوى صوت الأذان" />
+          <span class="adhan-volume-value" id="adhanVolumeValue">100%</span>
+        </div>
+
+        <!-- Permissions diagnostic -->
+        <div class="adhan-section-title">
+          <i class="fas fa-shield-halved"></i>
+          <span>التشغيل الموثوق في الخلفية</span>
+        </div>
+        <div class="adhan-permissions" id="adhanPermissions">
+          <div class="adhan-perm-row" id="adhanPermNotif">
+            <span class="adhan-perm-badge"><i class="fas fa-exclamation"></i></span>
+            <span class="adhan-perm-text">
+              <span class="adhan-perm-title">إذن الإشعارات</span>
+              <span class="adhan-perm-desc">اسمح بالإشعارات ليظهر تنبيه الأذان</span>
+            </span>
+            <button type="button" class="adhan-perm-fix"
+              onclick="AdhanNative.fixPermission('notifications')">تفعيل</button>
+          </div>
+
+          <div class="adhan-perm-row" id="adhanPermExact">
+            <span class="adhan-perm-badge"><i class="fas fa-exclamation"></i></span>
+            <span class="adhan-perm-text">
+              <span class="adhan-perm-title">المنبهات الدقيقة</span>
+              <span class="adhan-perm-desc">لضبط الأذان في الثانية المحددة</span>
+            </span>
+            <button type="button" class="adhan-perm-fix" onclick="AdhanNative.fixPermission('exact')">تفعيل</button>
+          </div>
+
+          <div class="adhan-perm-row" id="adhanPermBattery">
+            <span class="adhan-perm-badge"><i class="fas fa-exclamation"></i></span>
+            <span class="adhan-perm-text">
+              <span class="adhan-perm-title">استثناء توفير البطارية</span>
+              <span class="adhan-perm-desc">يمنع النظام من إيقاف الأذان في الخلفية</span>
+            </span>
+            <button type="button" class="adhan-perm-fix" onclick="AdhanNative.fixPermission('battery')">تفعيل</button>
+          </div>
+        </div>
+
+        <!-- Next alarm status -->
+        <div class="adhan-next-info" id="adhanNextInfo">
+          <i class="fas fa-clock"></i>
+          <span>جاري قراءة جدول الأذان...</span>
+        </div>
+
+        <!-- Actions -->
+        <div class="adhan-action-row">
+          <button type="button" class="adhan-action-btn" onclick="AdhanNative.testNow(10)">
+            <i class="fas fa-play"></i>
+            <span>تجربة الأذان</span>
+          </button>
+          <button type="button" class="adhan-action-btn is-gold" onclick="AdhanNative.testFajr()">
+            <i class="fas fa-cloud-moon"></i>
+            <span>أذان الفجر</span>
+          </button>
+          <button type="button" class="adhan-action-btn is-ghost" onclick="AdhanNative.resync()">
+            <i class="fas fa-rotate"></i>
+            <span>إعادة المزامنة</span>
+          </button>
+          <button type="button" class="adhan-action-btn is-danger" onclick="AdhanNative.stopPlayback()">
+            <i class="fas fa-stop"></i>
+            <span>إيقاف الأذان</span>
+          </button>
+        </div>
+
+        <p class="adhan-footnote" id="adhanFootnote">
+          التسجيلات الصوتية مضمّنة داخل التطبيق وتعمل بدون إنترنت.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Khatmah setup bottom sheet -->
+  <div id="khatmahSheet" class="pt-sheet" role="dialog" aria-modal="true" aria-labelledby="khatmahSheetTitle">
+    <div class="pt-sheet__panel pt-ksheet">
+      <div class="pt-sheet__handle"></div>
+      <div class="pt-ksheet-head">
+        <h2 id="khatmahSheetTitle"><i class="fas fa-book-quran"></i> ختمة جديدة</h2>
+        <button type="button" class="pt-ksheet-close" onclick="closeKhatmahSheet()" aria-label="إغلاق">&times;</button>
+      </div>
+      <div id="khatmahSheetContent"></div>
+    </div>
+  </div>
+
+  <!-- Reminders bottom sheet (Ramadan + voluntary fasting) -->
+  <div id="remindersSheet" class="pt-sheet" role="dialog" aria-modal="true" aria-labelledby="remindersSheetTitle">
+    <div class="pt-sheet__panel pt-rsheet">
+      <div class="pt-sheet__handle"></div>
+      <div class="pt-ksheet-head">
+        <h2 id="remindersSheetTitle"><i class="fas fa-moon"></i> تذكير الصيام</h2>
+        <button type="button" class="pt-ksheet-close" onclick="closeRemindersSheet()" aria-label="إغلاق">&times;</button>
+      </div>
+      <div id="remindersSheetBody"></div>
+    </div>
+  </div>
+
   <!-- Offline Indicator -->
   <div class="offline-banner hidden" id="offlineBanner">
     <i class="fas fa-wifi-slash"></i>
@@ -931,74 +991,30 @@
   <!-- ===== Bottom Navigation ===== -->
   <nav class="bottom-nav" id="bottomNav">
     <button class="bottom-nav-item active" data-tab="tab-home" onclick="switchTab('tab-home')">
-      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-      </svg>
-      <span>الرئيسية</span>
+      <span class="pt-nav-ico"><i class="fas fa-house"></i></span>
+      <span class="pt-nav-label">الرئيسية</span>
     </button>
     <button class="bottom-nav-item" data-tab="tab-azkar" onclick="switchTab('tab-azkar')">
-      <svg viewBox="0 0 24 24" fill="none" width="24" height="24" class="nav-icon-svg">
-        <circle cx="12" cy="10" r="6" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2.5 2.5"
-          stroke-linecap="round" opacity="0.6" />
-        <circle cx="12" cy="3.8" r="1.5" fill="currentColor" />
-        <circle cx="16.3" cy="5.6" r="1.3" fill="currentColor" />
-        <circle cx="18.2" cy="10" r="1.3" fill="currentColor" />
-        <circle cx="16.3" cy="14.4" r="1.3" fill="currentColor" />
-        <circle cx="12" cy="16.2" r="1.5" fill="currentColor" />
-        <circle cx="7.7" cy="14.4" r="1.3" fill="currentColor" />
-        <circle cx="5.8" cy="10" r="1.3" fill="currentColor" />
-        <circle cx="7.7" cy="5.6" r="1.3" fill="currentColor" />
-        <path d="M12 16.2V18.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-        <path d="M10.2 21.8L12 19L13.8 21.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-          stroke-linejoin="round" />
-      </svg>
-      <span>الأذكار</span>
+      <span class="pt-nav-ico"><i class="fas fa-hands-praying"></i></span>
+      <span class="pt-nav-label">الأذكار</span>
     </button>
     <button class="bottom-nav-item" data-tab="tab-quran" onclick="switchTab('tab-quran')">
-      <svg viewBox="0 0 24 24" fill="none" width="24" height="24" class="nav-icon-svg">
-        <path d="M3.5 5C3.5 3.89543 4.39543 3 5.5 3H11.5V19.5H5.5C4.39543 19.5 3.5 18.6046 3.5 17.5V5Z"
-          fill="currentColor" fill-opacity="0.15" />
-        <path d="M20.5 5C20.5 3.89543 19.6046 3 18.5 3H12.5V19.5H18.5C19.6046 19.5 20.5 18.6046 20.5 17.5V5Z"
-          fill="currentColor" fill-opacity="0.15" />
-        <path d="M3.5 5C3.5 3.89543 4.39543 3 5.5 3H11.5V19.5H5.5C4.39543 19.5 3.5 18.6046 3.5 17.5V5Z"
-          stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-        <path d="M20.5 5C20.5 3.89543 19.6046 3 18.5 3H12.5V19.5H18.5C19.6046 19.5 20.5 18.6046 20.5 17.5V5Z"
-          stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
-        <path d="M12 3V20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
-        <rect x="6.5" y="8" width="3" height="3" transform="rotate(45 8 9.5)" fill="currentColor" />
-        <rect x="6.5" y="8" width="3" height="3" fill="currentColor" opacity="0.7" />
-        <path d="M12 19.5V22.5L13.75 21.25L15.5 22.5V19.5" fill="currentColor" />
-      </svg>
-      <span>القرآن الكريم</span>
+      <span class="pt-nav-ico"><i class="fas fa-book-quran"></i></span>
+      <span class="pt-nav-label">القرآن</span>
     </button>
     <button class="bottom-nav-item" data-tab="tab-prophets" onclick="switchTab('tab-prophets')">
-      <svg viewBox="0 0 24 24" fill="none" width="24" height="24" class="nav-icon-svg">
-        <path
-          d="M4 4C4 2.89543 4.89543 2 6 2H18C19.1046 2 20 2.89543 20 4V20C20 21.1046 19.1046 22 18 22H6C4.89543 22 4 21.1046 4 20V4Z"
-          fill="currentColor" fill-opacity="0.12" />
-        <path
-          d="M4 4C4 2.89543 4.89543 2 6 2H18C19.1046 2 20 2.89543 20 4V20C20 21.1046 19.1046 22 18 22H6C4.89543 22 4 21.1046 4 20V4Z"
-          stroke="currentColor" stroke-width="1.6" />
-        <path d="M8 7H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-        <path d="M8 11H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-        <path d="M8 15H13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-        <circle cx="12" cy="19" r="1.2" fill="currentColor" opacity="0.6" />
-      </svg>
-      <span>قصص الأنبياء</span>
+      <span class="pt-nav-ico"><i class="fas fa-book-open"></i></span>
+      <span class="pt-nav-label">قصص الأنبياء</span>
     </button>
     <button class="bottom-nav-item" data-tab="tab-profile" onclick="switchTab('tab-profile')">
-      <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-        <path
-          d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-      </svg>
-      <span>الملف الشخصي</span>
+      <span class="pt-nav-ico"><i class="fas fa-user"></i></span>
+      <span class="pt-nav-label">الملف الشخصي</span>
     </button>
   </nav>
 
   <!-- Misbaha (Digital Prayer Beads) Overlay -->
   <div class="misbaha-overlay hidden" id="misbahaOverlay">
     <div class="misbaha-container">
-      <!-- Top bar -->
       <div class="misbaha-topbar">
         <button class="misbaha-close-btn" onclick="closeMisbaha()">
           <i class="fas fa-times"></i>
@@ -1009,7 +1025,6 @@
         </button>
       </div>
 
-      <!-- Dhikr Presets -->
       <div class="misbaha-presets" id="misbahaPresets">
         <button class="misbaha-preset active" data-dhikr="سبحان الله" onclick="selectMisbahaPreset(this)">سبحان
           الله</button>
@@ -1026,7 +1041,6 @@
           onclick="selectMisbahaPreset(this)">سبحان الله وبحمده</button>
       </div>
 
-      <!-- Target Selection (33, 50, 100, ∞) -->
       <div class="misbaha-targets" id="misbahaTargets">
         <span class="misbaha-targets-label">الهدف:</span>
         <button class="misbaha-target-btn active" data-target="33" onclick="setMisbahaTarget(33)">33</button>
@@ -1035,10 +1049,8 @@
         <button class="misbaha-target-btn" data-target="0" onclick="setMisbahaTarget(0)">∞</button>
       </div>
 
-      <!-- Current Dhikr Display -->
       <div class="misbaha-dhikr-display" id="mishbahaDhikrText">سبحان الله</div>
 
-      <!-- Counter Circle -->
       <div class="misbaha-counter-wrap">
         <button class="misbaha-tap-btn" id="misbahaTapBtn" onclick="incrementMisbaha()" aria-label="تسبيح">
           <svg class="misbaha-ring-svg" viewBox="0 0 200 200">
@@ -1052,7 +1064,6 @@
         </button>
       </div>
 
-      <!-- Stats: عدد الدورات & الإجمالي الكلي -->
       <div class="misbaha-stats-grid">
         <div class="misbaha-stat-card">
           <span class="misbaha-stat-label"><i class="fas fa-sync-alt"></i> عدد الدورات</span>
@@ -1071,9 +1082,14 @@
   <script src="js/core/router.js"></script>
   <script src="js/modules/qibla.js"></script>
   <script src="js/modules/misbaha.js"></script>
+  <script src="js/features/prayer/daily-refresh.js"></script>
+
+  <!-- Native Adhan engine (Capacitor bridge + scheduling) -->
+  <script src="js/native/adhan-native.js"></script>
 
   <!-- Feature Engines -->
   <script src="dailyDuas.js"></script>
+  <script src="js/data/adhkar-data.js"></script>
   <script src="script.js"></script>
   <script src="quran.js"></script>
   <script src="prophets.js"></script>

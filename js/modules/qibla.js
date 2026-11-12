@@ -15,6 +15,9 @@
   var KAABA_LNG = 39.8262;
   var compassHeading = 0;
   var userLocation = null;
+  var nativeCompassListener = null;
+  var currentNeedleAngle = null;
+  var lastHapticAligned = false;
 
   function _closeQiblaInternal() {
     var modal = document.getElementById("qiblaModal");
@@ -22,9 +25,31 @@
     modal.style.display = "none";
     document.body.style.overflow = "auto";
 
-    // Detach sensor listeners to save battery
-    window.removeEventListener("deviceorientationabsolute", handleOrientation, true);
-    window.removeEventListener("deviceorientation", handleOrientation, true);
+    // 1. Detach native compass listener
+    if (
+      global.Capacitor &&
+      global.Capacitor.isNativePlatform &&
+      global.Capacitor.isNativePlatform() &&
+      global.Capacitor.Plugins &&
+      global.Capacitor.Plugins.AdhanScheduler
+    ) {
+      try {
+        if (typeof global.Capacitor.Plugins.AdhanScheduler.stopCompass === "function") {
+          global.Capacitor.Plugins.AdhanScheduler.stopCompass();
+        }
+      } catch (e) {}
+    }
+
+    if (nativeCompassListener && typeof nativeCompassListener.remove === "function") {
+      try {
+        nativeCompassListener.remove();
+      } catch (e) {}
+      nativeCompassListener = null;
+    }
+
+    // 2. Detach web sensor listeners
+    window.removeEventListener("deviceorientationabsolute", handleOrientationAbsolute, true);
+    window.removeEventListener("deviceorientation", handleOrientationStandard, true);
   }
 
   function openQiblaModal() {
@@ -34,14 +59,21 @@
     modal.style.display = "flex";
     document.body.style.overflow = "hidden";
 
-    // Fetch user location coords from SafeStorage/prayerLocation if available
-    if (!userLocation) {
-      var saved = global.SafeStorage ? global.SafeStorage.getJSON("prayerLocation") : null;
-      if (saved && saved.latitude && saved.longitude) {
-        userLocation = { lat: saved.latitude, lng: saved.longitude };
-      } else {
-        userLocation = { lat: 30.0444, lng: 31.2357 }; // Cairo default fallback
-      }
+    // Always fetch latest user location coords from storage or Cairo default
+    var saved = null;
+    if (global.SafeStorage && typeof global.SafeStorage.getJSON === "function") {
+      saved = global.SafeStorage.getJSON("prayerLocation");
+    }
+    if (!saved) {
+      try {
+        var raw = localStorage.getItem("prayerLocation");
+        if (raw) saved = JSON.parse(raw);
+      } catch (e) {}
+    }
+    if (saved && saved.latitude && saved.longitude) {
+      userLocation = { lat: parseFloat(saved.latitude), lng: parseFloat(saved.longitude) };
+    } else {
+      userLocation = { lat: 30.0444, lng: 31.2357 }; // Cairo default fallback
     }
 
     displayStaticQibla();
@@ -69,9 +101,9 @@
   }
 
   function requestQiblaPermissions() {
-    updateQiblaStatus("جاري تحديد الموقع...");
+    updateQiblaStatus("جاري تحديد الموقع بدقة ومعايرة البوصلة...");
 
-    if (!userLocation && navigator.geolocation) {
+    if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         function (position) {
           userLocation = {
@@ -101,15 +133,15 @@
           }
         },
         function (error) {
-          updateQiblaStatus("يرجى السماح بالوصول للموقع");
+          displayStaticQibla();
+          setupCompass();
           console.warn("[Qibla] Geolocation error:", error);
-        }
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
       );
-    } else if (userLocation) {
+    } else {
       displayStaticQibla();
       setupCompass();
-    } else {
-      updateQiblaStatus("المتصفح لا يدعم تحديد الموقع");
     }
   }
 
@@ -134,10 +166,47 @@
 
   function setupCompass() {
     displayStaticQibla();
+    currentNeedleAngle = null;
+    lastHapticAligned = false;
 
+    // 1. Try Native Capacitor Hardware Compass Plugin
+    if (
+      global.Capacitor &&
+      global.Capacitor.isNativePlatform &&
+      global.Capacitor.isNativePlatform() &&
+      global.Capacitor.Plugins &&
+      global.Capacitor.Plugins.AdhanScheduler &&
+      typeof global.Capacitor.Plugins.AdhanScheduler.startCompass === "function"
+    ) {
+      try {
+        var plugin = global.Capacitor.Plugins.AdhanScheduler;
+        plugin.startCompass();
+
+        if (!nativeCompassListener) {
+          plugin.addListener("compassHeading", function (data) {
+            if (data && typeof data.heading === "number") {
+              compassHeading = data.heading;
+              updateCompassDisplay();
+            }
+          }).then(function (listener) {
+            nativeCompassListener = listener;
+          });
+        }
+
+        updateQiblaStatus("البوصلة تعمل بالحساسات الأصلية - حرّك هاتفك بشكل أفقي");
+        return;
+      } catch (e) {
+        console.warn("[Qibla] Native compass initialization error:", e);
+      }
+    }
+
+    // 2. Web fallback (Browser / iOS)
     if ("DeviceOrientationEvent" in window) {
-      window.addEventListener("deviceorientationabsolute", handleOrientation, true);
-      window.addEventListener("deviceorientation", handleOrientation, true);
+      if ("ondeviceorientationabsolute" in window) {
+        window.addEventListener("deviceorientationabsolute", handleOrientationAbsolute, true);
+      } else {
+        window.addEventListener("deviceorientation", handleOrientationStandard, true);
+      }
       updateQiblaStatus("البوصلة تعمل - حرّك هاتفك بشكل أفقي");
     } else {
       var dir = Math.round(calculateQiblaDirection());
@@ -145,36 +214,79 @@
     }
   }
 
-  function handleOrientation(event) {
-    var heading;
-
-    if (event.webkitCompassHeading) {
-      // iOS
-      heading = event.webkitCompassHeading;
-    } else if (event.alpha !== null && event.alpha !== undefined) {
-      // Android
-      heading = 360 - event.alpha;
-    } else {
-      return;
+  function handleOrientationAbsolute(event) {
+    if (event.alpha !== null && event.alpha !== undefined) {
+      // 0 = North, 90 = West in deviceorientationabsolute on Android
+      compassHeading = (360 - event.alpha) % 360;
+      updateCompassDisplay();
     }
+  }
 
-    compassHeading = heading;
-    updateCompassDisplay();
+  function handleOrientationStandard(event) {
+    if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
+      // iOS webkitCompassHeading: 0 = North, 90 = East
+      compassHeading = event.webkitCompassHeading;
+      updateCompassDisplay();
+    } else if (event.alpha !== null && event.alpha !== undefined && event.absolute) {
+      compassHeading = (360 - event.alpha) % 360;
+      updateCompassDisplay();
+    }
   }
 
   function updateCompassDisplay() {
     var needle = document.getElementById("compassNeedle");
     var degreesEl = document.getElementById("qiblaDegrees");
+    var statusEl = document.getElementById("qiblaStatus");
 
     if (!needle || !userLocation) return;
 
     var qiblaDirection = calculateQiblaDirection();
-    var rotation = qiblaDirection - compassHeading;
+    var targetRotation = qiblaDirection - compassHeading;
 
-    needle.style.transform = "translate(-50%, -100%) rotate(" + rotation + "deg)";
+    // Normalize to range [0, 360)
+    targetRotation = ((targetRotation % 360) + 360) % 360;
+
+    // Smooth shortest angular distance interpolation
+    if (currentNeedleAngle === null) {
+      currentNeedleAngle = targetRotation;
+    } else {
+      var diff = ((targetRotation - currentNeedleAngle) % 360);
+      if (diff < -180) diff += 360;
+      if (diff > 180) diff -= 360;
+      currentNeedleAngle += diff;
+    }
+
+    needle.style.transform = "translate(-50%, -100%) rotate(" + currentNeedleAngle + "deg)";
 
     if (degreesEl) {
       degreesEl.textContent = Math.round(qiblaDirection) + "°";
+    }
+
+    // Alignment detection: check if needle points straight UP (within +/- 8 deg)
+    var alignmentOffset = Math.abs(((currentNeedleAngle % 360) + 540) % 360 - 180);
+    var isAligned = alignmentOffset <= 8;
+
+    if (statusEl) {
+      if (isAligned) {
+        statusEl.innerHTML = '<span style="color:#10b981;font-weight:bold;">🕋 أنت الآن تواجه القبلة الشريفة تماماً!</span>';
+        if (!lastHapticAligned) {
+          lastHapticAligned = true;
+          if (
+            global.Capacitor &&
+            global.Capacitor.Plugins &&
+            global.Capacitor.Plugins.Haptics
+          ) {
+            try {
+              global.Capacitor.Plugins.Haptics.vibrate({ duration: 150 });
+            } catch (e) {}
+          } else if (navigator.vibrate) {
+            try { navigator.vibrate(150); } catch (e) {}
+          }
+        }
+      } else {
+        lastHapticAligned = false;
+        statusEl.textContent = "وجّه هاتفك نحو الكعبة المشرفة (" + Math.round(qiblaDirection) + "°)";
+      }
     }
   }
 
@@ -190,6 +302,7 @@
     }
 
     if (needle) {
+      currentNeedleAngle = qiblaDirection;
       needle.style.transform = "translate(-50%, -100%) rotate(" + qiblaDirection + "deg)";
     }
   }

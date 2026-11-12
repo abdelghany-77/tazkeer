@@ -1,0 +1,42 @@
+{
+  "appId": "com.abdelghany.tazkeer",
+  "appName": "ذَكِّرْ",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false,
+    "backgroundColor": "#0b1418"
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#0b1418"
+  },
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "capacitor",
+    "hostname": "localhost"
+  },
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0b1418",
+      "overlaysWebView": false
+    },
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "launchAutoHide": true,
+      "backgroundColor": "#0b1418",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": true
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_adhan",
+      "iconColor": "#d4a847",
+      "sound": "adhan"
+    }
+  }
+}

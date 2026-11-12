@@ -183,7 +183,7 @@
 }
 .goal-type-btn .goal-desc {
   font-size: 0.8rem;
-  color: #718096;
+  color: var(--pt-mu);
   margin-top: 4px;
   display: block;
 }
@@ -2389,33 +2389,33 @@ body.light-mode .khatmah-setup-card {
 }
 
 body.light-mode .goal-type-btn {
-  background: #f8fafc !important;
-  border-color: #e2e8f0 !important;
-  color: #334155 !important;
+  background: var(--pt-s1) !important;
+  border-color: var(--pt-line) !important;
+  color: var(--pt-tx) !important;
 }
 
 body.light-mode .goal-type-btn.active {
-  background: rgba(26, 138, 92, 0.08) !important;
-  border-color: #1a8a5c !important;
+  background: var(--pt-em-bg) !important;
+  border-color: var(--pt-em) !important;
 }
 
 body.light-mode .goal-type-btn .goal-label {
-  color: #1e293b !important;
+  color: var(--pt-tx) !important;
 }
 
 body.light-mode .goal-type-btn .goal-desc {
-  color: #64748b !important;
+  color: var(--pt-mu) !important;
 }
 
 body.light-mode .quick-read-btn {
-  border-color: #1a8a5c !important;
-  color: #1a8a5c !important;
-  background: rgba(26, 138, 92, 0.06) !important;
+  border-color: var(--pt-em) !important;
+  color: var(--pt-em) !important;
+  background: var(--pt-em-bg) !important;
 }
 
 body.light-mode .quick-read-btn:hover {
-  background: #1a8a5c !important;
-  color: #ffffff !important;
+  background: var(--pt-em) !important;
+  color: var(--pt-tx) !important;
 }
 
 body.light-mode .progress-ring-circle {
@@ -2423,15 +2423,15 @@ body.light-mode .progress-ring-circle {
 }
 
 body.light-mode .progress-ring-text {
-  color: #1e293b !important;
+  color: var(--pt-tx) !important;
 }
 
 body.light-mode .progress-ring-percent {
-  color: #1e293b !important;
+  color: var(--pt-tx) !important;
 }
 
 body.light-mode .progress-ring-label {
-  color: #64748b !important;
+  color: var(--pt-mu) !important;
 }
 
 body.light-mode .khatmah-stat-card {
@@ -2441,11 +2441,11 @@ body.light-mode .khatmah-stat-card {
 }
 
 body.light-mode .khatmah-stat-value {
-  color: #1e293b !important;
+  color: var(--pt-tx) !important;
 }
 
 body.light-mode .khatmah-stat-label {
-  color: #64748b !important;
+  color: var(--pt-mu) !important;
 }
 
 body.light-mode .wird-card {

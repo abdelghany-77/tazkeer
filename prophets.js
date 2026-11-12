@@ -86,98 +86,344 @@
   };
 
   // ── Grid View ──────────────────────────────────────────────
-  function renderGrid(container) {
-    var html = '<div class="prophets-grid-view">';
-    html +=
-      '<div class="prophets-header-section"><h2 class="prophets-main-title"><i class="fas fa-book-open"></i> قصص الأنبياء</h2><p class="prophets-subtitle">ملخص قصص الأنبياء — قراءة موثقة ومفصلة من القرآن الكريم والسنة النبوية والتفسير</p></div>';
-    html += '<div class="prophets-cards-grid">';
+  var ULU_AZM = ["nuh", "ibrahim", "musa", "isa", "muhammad"];
+  var prophetsFilter = "all";
 
+  function arDigit(value) {
+    if (typeof window.toArabicDigits === "function") {
+      return window.toArabicDigits(value);
+    }
+    return String(value);
+  }
+
+  function shortName(name) {
+    return String(name).replace(/\s*عليه\s+السلام\s*$/, "").trim();
+  }
+
+  function normalizeText(text) {
+    return String(text)
+      .replace(/[\u064B-\u0652\u0670\u0640]/g, "")
+      .replace(/[أإآٱ]/g, "ا")
+      .replace(/ى/g, "ي")
+      .replace(/ة/g, "ه")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+  }
+
+  function readSavedPosition(slug) {
+    try {
+      if (window.SafeStorage) {
+        var safe = window.SafeStorage.getJSON(LS_POS_PFX + slug);
+        if (safe && typeof safe === "object") return safe;
+      }
+      var raw = localStorage.getItem(LS_POS_PFX + slug);
+      if (raw) return JSON.parse(raw);
+    } catch (e) { /* ignore */ }
+    return null;
+  }
+
+  function buildContinueCard() {
+    var best = null;
     prophetsIndex.forEach(function (p) {
+      if (!(p.chapterCount > 0)) return;
+      var read = getReadChapters(p.slug);
+      if (read.length >= p.chapterCount) return;
+      var pos = readSavedPosition(p.slug);
+      if (!pos) return;
+      if (!best || (pos.timestamp || 0) > (best.pos.timestamp || 0)) {
+        best = { prophet: p, pos: pos, readCount: read.length };
+      }
+    });
+    if (!best) return "";
+
+    var chap = parseInt(best.pos.chapterIdx || 0, 10) + 1;
+    var total = best.prophet.chapterCount;
+    var continuePct = Math.min(100, Math.round((chap / total) * 100));
+
+    return (
+      '<button class="pt-proph-continue" onclick="window._openProphet(\'' +
+      best.prophet.slug +
+      "', " +
+      parseInt(best.pos.chapterIdx || 0, 10) +
+      ')">' +
+      '<span class="pt-proph-continue__ico"><i class="fas fa-book-open-reader"></i></span>' +
+      '<span class="pt-proph-continue__body">' +
+      '<span class="pt-proph-continue__label">أكمل القراءة</span>' +
+      '<span class="pt-proph-continue__name">' +
+      best.prophet.name +
+      "</span>" +
+      '<span class="pt-proph-continue__meta">الفصل ' +
+      arDigit(chap) +
+      " من " +
+      arDigit(total) +
+      "</span>" +
+      "</span>" +
+      '<span class="pt-proph-continue__chev"><i class="fas fa-chevron-left"></i></span>' +
+      '<span class="pt-proph-continue__bar"><span style="width:' +
+      continuePct +
+      '%"></span></span>' +
+      "</button>"
+    );
+  }
+
+  function renderGrid(container) {
+    var html = '<div class="pt-page pt-prophets">';
+
+    // ── Top bar ──
+    html +=
+      '<div class="pt-topbar">' +
+      '<div class="pt-topbar__titles">' +
+      '<h1 class="pt-title">قصص الأنبياء</h1>' +
+      '<span class="pt-sub">' +
+      arDigit(prophetsIndex.length) +
+      " نبيًا · موثقة من القرآن والسنة</span>" +
+      "</div>" +
+      '<div class="pt-topbar__actions">' +
+      '<button class="pt-iconbtn" onclick="window.focusProphetSearch()" title="بحث" aria-label="بحث">' +
+      '<i class="fas fa-magnifying-glass"></i></button>' +
+      "</div>" +
+      "</div>";
+
+    // ── Continue reading ──
+    html += buildContinueCard();
+
+    // ── Search ──
+    html +=
+      '<div class="pt-proph-search">' +
+      '<i class="fas fa-magnifying-glass"></i>' +
+      '<input type="search" id="prophetSearchInput" placeholder="ابحث عن نبيّ أو قصة..." ' +
+      'autocomplete="off" oninput="window.filterProphets(this.value)" />' +
+      "</div>";
+
+    // ── Filters ──
+    var filters = [
+      { key: "all", label: "الكل" },
+      { key: "ulul", label: "أولو العزم" },
+      { key: "done", label: "مكتملة" },
+      { key: "unread", label: "لم تُقرأ" },
+    ];
+    html += '<div class="pt-proph-filters" id="prophetsFilters">';
+    filters.forEach(function (f) {
+      html +=
+        '<button class="pt-chip' +
+        (prophetsFilter === f.key ? " active" : "") +
+        '" data-filter="' +
+        f.key +
+        '" onclick="window.setProphetsFilter(\'' +
+        f.key +
+        "')\">" +
+        f.label +
+        "</button>";
+    });
+    html += "</div>";
+
+    // ── Cards ──
+    html += '<div class="pt-proph-grid" id="prophetsGrid">';
+
+    prophetsIndex.forEach(function (p, index) {
       var available = p.chapterCount > 0;
-      var cls = available
-        ? "prophets-card"
-        : "prophets-card prophets-card--locked";
-      var badge = available
-        ? '<span class="prophets-card-badge">' + p.chapterCount + " فصول</span>"
-        : '<span class="prophets-card-badge prophets-card-badge--soon">قريبًا</span>';
-
-      // Check if story is fully complete
+      var isUlul = ULU_AZM.indexOf(p.slug) !== -1;
       var storyComplete = available && isStoryComplete(p.slug, p.chapterCount);
-
-      // Check reading progress
       var readChapters = getReadChapters(p.slug);
-      var progressHTML = "";
+
+      // Progress: chapter read tracking, with scroll fallback
+      var pct = 0;
       if (readChapters.length > 0 && available) {
-        var pct = Math.round((readChapters.length / p.chapterCount) * 100);
-        progressHTML =
-          '<div class="prophets-card-progress"><div class="prophets-card-progress-fill" style="width:' +
-          Math.min(pct, 100) +
-          '%"></div></div>';
-      } else {
-        // fallback to old scroll-based progress
-        var savedPos = localStorage.getItem(LS_POS_PFX + p.slug);
-        if (savedPos && available) {
-          try {
-            var pos = JSON.parse(savedPos);
-            var pct2 = Math.round(((pos.chapterIdx || 0) / p.chapterCount) * 100);
-            progressHTML =
-              '<div class="prophets-card-progress"><div class="prophets-card-progress-fill" style="width:' +
-              Math.min(pct2, 100) +
-              '%"></div></div>';
-          } catch (e) { /* ignore */ }
+        pct = Math.round((readChapters.length / p.chapterCount) * 100);
+      } else if (available) {
+        var pos = readSavedPosition(p.slug);
+        if (pos) {
+          pct = Math.round(((pos.chapterIdx || 0) / p.chapterCount) * 100);
         }
       }
+      pct = Math.max(0, Math.min(pct, 100));
 
-      var iconHTML = "";
+      var iconHTML = '<i class="fas fa-book-open"></i>';
       if (p.icon) {
         if (p.icon.indexOf("<") === 0) {
           iconHTML = p.icon;
-        } else if (p.icon.indexOf("fa-") !== -1 || p.icon.indexOf("fa") === 0) {
+        } else if (p.icon.indexOf("fa-") !== -1) {
           iconHTML = '<i class="' + p.icon + '"></i>';
         } else {
           iconHTML = p.icon;
         }
       }
 
+      var orderNo = arDigit(p.order || index + 1);
+
       html +=
-        '<button class="' +
-        cls +
-        '" ' +
+        '<button class="pt-proph-row' +
+        (available ? "" : " pt-proph-row--soon") +
+        '"' +
+        ' data-slug="' +
+        p.slug +
+        '"' +
+        ' data-ulul="' +
+        (isUlul ? "1" : "0") +
+        '"' +
+        ' data-done="' +
+        (storyComplete ? "1" : "0") +
+        '"' +
+        ' data-read="' +
+        (pct > 0 ? "1" : "0") +
+        '"' +
+        ' data-search="' +
+        normalizeText(p.name + " " + p.title + " " + (p.brief || "")) +
+        '"' +
         (available
-          ? "onclick=\"window._openProphet('" + p.slug + "')\""
-          : "disabled") +
+          ? ' onclick="window._openProphet(\'' + p.slug + "')\""
+          : " disabled") +
         ">";
 
-      // Completed badge
+      // Start-side icon tile
+      html += '<span class="pt-proph-row__ico">' + iconHTML + "</span>";
+
+      // Body: name + subtitle + meta pills
+      html += '<span class="pt-proph-row__body">';
+      html +=
+        '<span class="pt-proph-row__head">' +
+        '<span class="pt-proph-row__num">' +
+        orderNo +
+        "</span>" +
+        '<span class="pt-proph-row__name">' +
+        shortName(p.name) +
+        ' <em>عليه السلام</em>' +
+        "</span>";
+
+      // End side of the head line: completion check or «أولو العزم» badge
       if (storyComplete) {
-        html += '<div class="prophets-card-completed-badge"><i class="fas fa-check"></i></div>';
+        html +=
+          '<span class="pt-proph-row__done" title="مكتملة"><i class="fas fa-check"></i></span>';
+      } else if (isUlul) {
+        html += '<span class="pt-proph-row__ulul">أولو العزم</span>';
+      }
+      html += "</span>";
+
+      if (p.title) {
+        html +=
+          '<span class="pt-proph-row__title">' + p.title + "</span>";
+      }
+      html += '<span class="pt-proph-row__meta">';
+      if (available) {
+        if (p.chapterCount > 0) {
+          html +=
+            '<span class="pt-proph-row__pill">' +
+            arDigit(p.chapterCount) +
+            " فصول</span>";
+        }
+        if (p.readingTimeMinutes) {
+          html +=
+            '<span class="pt-proph-row__pill"><i class="fas fa-clock"></i> ' +
+            arDigit(p.readingTimeMinutes) +
+            " د</span>";
+        }
+        if (p.quranMentions) {
+          html +=
+            '<span class="pt-proph-row__pill"><i class="fas fa-book-open"></i> ' +
+            arDigit(p.quranMentions) +
+            " ذكرًا</span>";
+        }
+      } else {
+        html += '<span class="pt-proph-row__pill">قريبًا</span>';
+      }
+      html += "</span>";
+      html += "</span>";
+
+      if (pct > 0) {
+        html +=
+          '<span class="pt-proph-row__progress"><span style="width:' +
+          pct +
+          '%"></span></span>';
       }
 
-      html += '<div class="prophets-card-icon">' + iconHTML + "</div>";
-      html += '<div class="prophets-card-body">';
-      html += '<h3 class="prophets-card-name">' + p.name + "</h3>";
-      html += '<p class="prophets-card-title">' + p.title + "</p>";
-      html += '<div class="prophets-card-meta">';
-      html +=
-        '<span class="prophets-card-quran"><i class="fas fa-quran"></i> ذُكر ' +
-        p.quranMentions +
-        " مرّة</span>";
-      if (available && p.readingTimeMinutes) {
-        html +=
-          '<span class="prophets-card-time"><i class="fas fa-clock"></i> ' +
-          p.readingTimeMinutes +
-          " دقيقة</span>";
-      }
-      html += "</div>";
-      html += progressHTML;
-      html += "</div>";
-      html += badge;
       html += "</button>";
     });
 
-    html += "</div></div>";
+    html += "</div>";
+
+    html +=
+      '<div class="pt-proph-empty hidden" id="prophetsEmpty">' +
+      '<span class="pt-proph-empty__ico"><i class="fas fa-magnifying-glass-minus"></i></span>' +
+      '<p class="pt-proph-empty__title">لا توجد نتائج مطابقة</p>' +
+      '<p class="pt-proph-empty__sub">جرّب كلمة أخرى أو غيّر الفلتر</p>' +
+      '<button class="pt-proph-empty__btn" onclick="window.resetProphetsSearch()">عرض الكل</button>' +
+      "</div>";
+
+    html += "</div>";
+
     container.innerHTML = html;
+    applyProphetsFilter();
   }
+
+  /**
+   * Apply the active filter chip + search query to the rendered cards.
+   */
+  function applyProphetsFilter() {
+    var grid = document.getElementById("prophetsGrid");
+    if (!grid) return;
+    var input = document.getElementById("prophetSearchInput");
+    var query = normalizeText(input ? input.value : "");
+    var visible = 0;
+
+    Array.prototype.forEach.call(grid.children, function (card) {
+      var okFilter = true;
+      if (prophetsFilter === "ulul") {
+        okFilter = card.getAttribute("data-ulul") === "1";
+      } else if (prophetsFilter === "done") {
+        okFilter = card.getAttribute("data-done") === "1";
+      } else if (prophetsFilter === "unread") {
+        okFilter = card.getAttribute("data-read") !== "1";
+      }
+      var okQuery =
+        !query || (card.getAttribute("data-search") || "").indexOf(query) !== -1;
+      var show = okFilter && okQuery;
+      card.classList.toggle("hidden", !show);
+      if (show) visible++;
+    });
+
+    var empty = document.getElementById("prophetsEmpty");
+    if (empty) empty.classList.toggle("hidden", visible !== 0);
+  }
+
+  window.filterProphets = function (value) {
+    applyProphetsFilter();
+  };
+
+  window.focusProphetSearch = function () {
+    var input = document.getElementById("prophetSearchInput");
+    if (!input) return;
+    input.scrollIntoView({ behavior: "smooth", block: "center" });
+    input.focus();
+  };
+
+  window.resetProphetsSearch = function () {
+    var input = document.getElementById("prophetSearchInput");
+    if (input) input.value = "";
+    prophetsFilter = "all";
+    var wrap = document.getElementById("prophetsFilters");
+    if (wrap) {
+      Array.prototype.forEach.call(wrap.children, function (chip) {
+        chip.classList.toggle("active", chip.getAttribute("data-filter") === "all");
+      });
+    }
+    applyProphetsFilter();
+    if (input) input.focus();
+  };
+
+  window.setProphetsFilter = function (key) {
+    prophetsFilter = key || "all";
+    var wrap = document.getElementById("prophetsFilters");
+    if (wrap) {
+      Array.prototype.forEach.call(wrap.children, function (chip) {
+        chip.classList.toggle(
+          "active",
+          chip.getAttribute("data-filter") === prophetsFilter,
+        );
+      });
+    }
+    applyProphetsFilter();
+  };
 
   // ── Open Prophet (lazy-load) ───────────────────────────────
   window._openProphet = function (slug, targetChapterIdx) {
@@ -403,6 +649,7 @@
     var html =
       '<article class="pr-article" style="font-size:' + readerFontSize + 'px">';
     html += '<h2 class="pr-chapter-title">' + ch.title + "</h2>";
+    html += '<div class="pr-basmala">بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ</div>';
 
     // Ornamental divider below title
     html += '<div class="pr-chapter-ornament"><span>❖</span></div>';

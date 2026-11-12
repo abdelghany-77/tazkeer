@@ -1,0 +1,1120 @@
+/* ============================================================================
+   Tazkeer v2 — Home page
+   ============================================================================ */
+
+/* ── Next-prayer hero ────────────────────────────────────────────────────── */
+.pt-hero {
+  background: var(--pt-hero-grad), var(--pt-s1);
+  border-radius: 20px;
+  padding: 12px 14px 13px;
+  color: #f4fffb;
+  box-shadow: var(--pt-hero-shadow);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.pt-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../../images/pattern.svg");
+  background-size: 44px 44px;
+  opacity: 0.9;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.pt-hero__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pt-hero__chips {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.pt-hero .pt-chip--glass {
+  min-height: 28px;
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.25) !important;
+  color: #d7f5ec !important;
+  border-color: transparent !important;
+}
+
+.pt-hero__main {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pt-hero__label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 500;
+}
+
+.pt-hero__row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pt-hero__name {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: -1px;
+}
+
+.pt-hero__time {
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1.1;
+  padding-bottom: 4px;
+  white-space: nowrap;
+  direction: rtl;
+}
+
+.pt-hero__bar {
+  margin-top: 10px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+
+.pt-hero__bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: #ffffff;
+  transition: width 1s linear;
+}
+
+.pt-hero__meta {
+  margin-top: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 500;
+}
+
+.pt-hero__meta b,
+.pt-hero__meta bdi {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.pt-hero__meta-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.pt-hero__remaining {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ── Six-prayer strip ────────────────────────────────────────────────────── */
+/* Legacy wrapper around hero + strip: strip its card skin so the hero and the
+   strip sit one page-gap apart instead of inside a second card (H3). */
+#prayerTimesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  overflow: visible !important;
+}
+
+.pt-prayers {
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
+  border-radius: 16px;
+  padding: 7px 4px;
+}
+
+.prayer-times-section.pt-hero {
+  border: none;
+}
+
+.pt-prayers .prayer-times-grid,
+.prayer-times-grid {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 2px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+.pt-prayers .prayer-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 14px !important;
+  padding: 6px 1px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 5px !important;
+  min-height: 66px;
+  justify-content: center;
+  cursor: default !important;
+  transition: opacity 0.3s ease, background 0.3s ease;
+}
+
+.pt-prayers .prayer-card .prayer-icon {
+  width: auto;
+  height: auto;
+  margin: 0;
+  font-size: 16px;
+  color: var(--pt-mu);
+  opacity: 0.85;
+}
+
+.pt-prayers .prayer-card .prayer-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.pt-prayers .prayer-card .prayer-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--pt-mu);
+  line-height: 1.2;
+}
+
+.pt-prayers .prayer-card .prayer-time {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--pt-tx);
+  line-height: 1.2;
+  direction: rtl;
+  white-space: nowrap;
+}
+
+.pt-prayers .prayer-card.is-past {
+  opacity: 0.45;
+}
+
+.pt-prayers .prayer-card.next-prayer {
+  background: rgba(18, 65, 60, 0.7) !important;
+  border-radius: 14px !important;
+  opacity: 1 !important;
+}
+
+body.light-mode .pt-prayers .prayer-card.next-prayer {
+  background: rgba(14, 143, 115, 0.14) !important;
+}
+
+.pt-prayers .prayer-card.next-prayer .prayer-icon,
+.pt-prayers .prayer-card.next-prayer .prayer-name,
+.pt-prayers .prayer-card.next-prayer .prayer-time {
+  color: var(--pt-em) !important;
+}
+
+/* Loading skeleton */
+.pt-prayers .prayer-times-loading {
+  display: block;
+  padding: 10px 6px 6px;
+  text-align: center;
+}
+
+.pt-prayers .prayer-times-loading i {
+  display: none;
+}
+
+.pt-prayers .prayer-times-loading p {
+  height: 46px;
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    var(--pt-s2) 25%,
+    var(--pt-s3) 37%,
+    var(--pt-s2) 63%
+  );
+  background-size: 400% 100%;
+  animation: ptSkeleton 1.4s ease infinite;
+  color: transparent;
+  font-size: 0;
+  margin: 0;
+}
+
+@keyframes ptSkeleton {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+.pt-prayers .prayer-times-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 4px 4px;
+  background: transparent;
+  border: none;
+  color: var(--pt-mu);
+  font-size: 12px;
+}
+
+.pt-prayers .prayer-times-error > i {
+  display: none;
+}
+
+.pt-prayers .prayer-times-error p {
+  margin: 0;
+  font-size: 12px;
+}
+
+.pt-prayers .prayer-times-error .retry-btn {
+  min-height: 34px;
+  padding: 4px 12px;
+  border-radius: 10px;
+  background: var(--pt-s2);
+  border: 1px solid var(--pt-line);
+  color: var(--pt-em);
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ── Reminders card (Ramadan + voluntary fasting) ───────────────────────── */
+/* Unified single card with stacked rows matching reference design */
+.pt-remind,
+.pt-remind-card {
+  display: flex !important;
+  flex-direction: column !important;
+  background: var(--pt-s1) !important;
+  border: 1px solid var(--pt-line) !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+}
+
+.pt-remind-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  color: var(--pt-tx);
+  font-family: var(--font-sans);
+  text-align: right;
+  width: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s ease;
+  min-height: 58px;
+}
+
+.pt-remind-row:active {
+  background: var(--pt-s2);
+}
+
+.pt-remind-tile {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+.pt-remind-tile.is-gold {
+  color: #e6bd62;
+  background: rgba(230, 189, 98, 0.14);
+}
+
+.pt-remind-tile.is-em {
+  color: #34d1a8;
+  background: rgba(52, 209, 168, 0.16);
+}
+
+.pt-remind-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: right;
+}
+
+.pt-remind-sub {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--pt-mu);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pt-remind-main {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--pt-tx);
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pt-remind-main em {
+  font-style: normal;
+  color: inherit;
+  font-weight: 700;
+}
+
+.pt-remind-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pt-mu-2);
+  font-size: 12px;
+  flex: 0 0 auto;
+  opacity: 0.75;
+}
+
+/* Horizontal divider with golden progress bar */
+.pt-remind-divider {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background: var(--pt-line);
+  overflow: hidden;
+}
+
+.pt-remind-progress-fill {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #c99a33, #e6bd62);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* Fallback legacy support for pt-remind__chip if referenced elsewhere */
+.pt-remind__chip {
+  display: none !important;
+}
+
+/* ── Reminders bottom sheet ──────────────────────────────────────────────── */
+.pt-rsheet {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pt-rsheet__block {
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
+}
+
+.pt-rsheet__block.is-gold {
+  background: var(--pt-gd-bg);
+  border-color: var(--pt-gd-line);
+}
+
+.pt-rsheet__block.is-em {
+  background: var(--pt-em-bg);
+  border-color: var(--pt-em-line);
+}
+
+.pt-rsheet__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pt-rsheet__kicker {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pt-mu);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pt-rsheet__block.is-gold .pt-rsheet__kicker i {
+  color: var(--pt-gd);
+}
+
+.pt-rsheet__block.is-em .pt-rsheet__kicker i {
+  color: var(--pt-em);
+}
+
+.pt-rsheet__chip {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--pt-s2);
+  color: var(--pt-mu);
+  white-space: nowrap;
+}
+
+.pt-rsheet__block.is-gold .pt-rsheet__chip {
+  background: rgba(230, 189, 98, 0.22);
+  color: var(--pt-gd);
+}
+
+.pt-rsheet__block.is-em .pt-rsheet__chip {
+  background: rgba(52, 209, 168, 0.2);
+  color: var(--pt-em);
+}
+
+.pt-rsheet__big {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pt-rsheet__num {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--pt-gd);
+  font-variant-numeric: tabular-nums;
+}
+
+.pt-rsheet__num.is-em {
+  color: var(--pt-em);
+}
+
+.pt-rsheet__unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pt-mu);
+}
+
+.pt-rsheet__date {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--pt-tx);
+}
+
+.pt-rsheet__hint {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--pt-mu);
+}
+
+.pt-rsheet__bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--pt-s3);
+  overflow: hidden;
+  margin-top: 11px;
+}
+
+.pt-rsheet__bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--pt-gd-grad);
+}
+
+.pt-rsheet__bar.is-em span {
+  background: var(--pt-em-grad);
+}
+
+.pt-rsheet__block.is-gold .pt-rsheet__bar {
+  background: rgba(230, 189, 98, 0.2);
+}
+
+.pt-rsheet__section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pt-tx);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.pt-rsheet__section-title i {
+  font-size: 12px;
+  color: var(--pt-em);
+}
+
+.pt-rsheet__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pt-rsheet__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 13px;
+  background: var(--pt-s2);
+}
+
+.pt-rsheet__item-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.pt-rsheet__item-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--pt-tx);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pt-rsheet__item-sub {
+  font-size: 10.5px;
+  color: var(--pt-mu);
+  display: block;
+  margin-top: 2px;
+}
+
+.pt-rsheet__item-chip {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pt-rsheet__item-chip.is-next {
+  background: var(--pt-gd-bg);
+  color: var(--pt-gd);
+}
+
+.pt-rsheet__rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.pt-rsheet__note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 9px 11px;
+  border-radius: 12px;
+  background: var(--pt-s2);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--pt-mu);
+}
+
+.pt-rsheet__note i {
+  color: var(--pt-gd);
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+.pt-rsheet__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--pt-em-line);
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pt-rsheet-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--pt-line);
+  border-radius: 16px;
+  background: var(--pt-s1);
+}
+
+.pt-rsheet-tabs button {
+  flex: 1;
+  min-height: 42px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--pt-mu);
+  font: 600 14px var(--font-sans);
+}
+
+.pt-rsheet-tabs button.is-active {
+  background: var(--pt-s2);
+  color: var(--pt-em);
+}
+
+.pt-rsheet-focus {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 20px;
+}
+
+.pt-rsheet-focus__heading,
+.pt-rsheet-focus__progress > div,
+.pt-rsheet-focus__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pt-rsheet-focus__heading h3 {
+  margin: 0;
+  color: var(--pt-tx);
+  font-size: 22px;
+}
+
+.pt-rsheet-focus__heading p,
+.pt-rsheet-focus__progress div,
+.pt-rsheet-focus__toggle span {
+  margin: 4px 0 0;
+  color: var(--pt-mu);
+  font-size: 12px;
+}
+
+.pt-rsheet-focus__moon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--pt-gd-bg);
+  color: var(--pt-gd);
+  font-size: 24px;
+}
+
+.pt-rsheet-focus__stats {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 10px;
+}
+
+.pt-rsheet-focus__stat {
+  display: flex;
+  min-height: 110px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--pt-line);
+  border-radius: 20px;
+  color: var(--pt-mu);
+}
+
+.pt-rsheet-focus__stat.is-gold {
+  border-color: var(--pt-gd-line);
+}
+
+.pt-rsheet-focus__stat strong {
+  color: var(--pt-tx);
+  font-size: 32px;
+  line-height: 1;
+}
+
+.pt-rsheet-focus__stat.is-gold strong {
+  color: var(--pt-gd);
+}
+
+.pt-rsheet-focus__stat span {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.pt-rsheet-focus__progress {
+  color: var(--pt-mu);
+  font-size: 11px;
+}
+
+.pt-rsheet-focus__progress-bar {
+  display: block;
+  height: 6px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: var(--pt-s3);
+  overflow: hidden;
+}
+
+.pt-rsheet-focus__progress-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--pt-gd);
+}
+
+.pt-rsheet-focus__toggle {
+  padding: 16px;
+  border: 1px solid var(--pt-line);
+  border-radius: 18px;
+  background: var(--pt-s1);
+}
+
+.pt-rsheet-focus__toggle strong {
+  display: block;
+  color: var(--pt-tx);
+  font-size: 16px;
+}
+
+.pt-toggle {
+  width: 52px;
+  height: 30px;
+  padding: 3px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pt-em);
+}
+
+.pt-toggle i {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--pt-bg);
+}
+
+.pt-rsheet-focus__dua {
+  margin: 2px 0 0;
+  color: var(--pt-tx);
+  font-family: var(--font-hadith);
+  font-size: 22px;
+  text-align: center;
+}
+
+/* ── Daily dua ───────────────────────────────────────────────────────────── */
+.pt-dua,
+#dailyDuaaCard.pt-dua,
+body.light-mode #dailyDuaaCard.pt-dua {
+  background: var(--pt-s1) !important;
+  background-image: none !important;
+  border: 1px solid var(--pt-line) !important;
+  border-radius: 20px !important;
+  padding: 16px 18px 14px !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.pt-dua .duaa-compact-head,
+.duaa-card-done.pt-dua .duaa-compact-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.pt-dua .duaa-head-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--pt-em);
+}
+
+.pt-dua .duaa-head-icon {
+  font-size: 16px;
+  color: var(--pt-em);
+}
+
+.pt-dua .duaa-actions {
+  display: inline-flex;
+  align-items: center;
+}
+
+.pt-dua .duaa-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--pt-s2);
+  border: 1px solid var(--pt-line);
+  color: var(--pt-mu);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.pt-dua .duaa-action-btn:hover,
+.pt-dua .duaa-action-btn:active {
+  background: var(--pt-s3);
+  color: var(--pt-tx);
+}
+
+.pt-dua .duaa-compact-text {
+  font-family: var(--font-hadith) !important;
+  font-size: 20px !important;
+  line-height: 1.9 !important;
+  text-align: center;
+  color: #ffffff !important;
+  margin: 10px 0 12px !important;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-rendering: optimizeLegibility;
+}
+
+body.light-mode .pt-dua .duaa-compact-text {
+  color: #10201d !important;
+}
+
+.pt-dua .duaa-footer {
+  display: flex;
+  justify-content: center;
+  border-top: none !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.pt-dua .duaa-source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--pt-line);
+  color: var(--pt-mu);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+body.light-mode .pt-dua .duaa-source-badge {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.pt-dua .duaa-source-badge i {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+/* ── Time-aware Azkar strip ──────────────────────────────────────────────── */
+.pt-azkar-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #3a2c1a, #1f2430);
+  border: 1px solid rgba(230, 189, 98, 0.25);
+  position: relative;
+  overflow: hidden;
+  min-height: 78px;
+}
+
+.pt-azkar-strip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../../images/pattern.svg");
+  background-size: 44px 44px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.pt-azkar-strip > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pt-azkar-strip__ico {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 14px;
+  background: var(--pt-warm-bg);
+  color: var(--pt-warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.pt-azkar-strip__txt {
+  flex: 1;
+  min-width: 0;
+  text-align: start;
+}
+
+.pt-azkar-strip__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--pt-tx);
+  line-height: 1.3;
+}
+
+.pt-azkar-strip__sub {
+  font-size: 11.5px;
+  color: var(--pt-mu);
+  margin-top: 2px;
+}
+
+.pt-azkar-strip__play {
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  border-radius: 50%;
+  border: none;
+  background: var(--pt-gd);
+  color: #2a1d05;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(230, 189, 98, 0.28);
+  transition: transform 0.15s ease;
+}
+
+.pt-azkar-strip__play:active {
+  transform: scale(0.93);
+}
+
+/* Continue reading pill */
+.pt-continue {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 14px;
+  border-radius: 16px;
+  background: var(--pt-em-bg);
+  border: 1px solid var(--pt-em-line);
+}
+
+.pt-continue .cr-icon-wrap {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 12px;
+  background: rgba(52, 209, 168, 0.2);
+  color: var(--pt-em);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.pt-continue .cr-info {
+  flex: 1;
+  min-width: 0;
+  text-align: start;
+}
+
+.pt-continue .cr-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pt-tx);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pt-continue .cr-sub {
+  font-size: 11px;
+  color: var(--pt-mu);
+  margin-top: 1px;
+}
+
+.pt-continue .cr-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pt-continue .cr-pct-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--pt-em);
+  background: rgba(52, 209, 168, 0.18);
+  padding: 3px 7px;
+  border-radius: 999px;
+}
+
+.pt-continue .cr-resume-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  border-radius: 10px;
+  background: var(--pt-em);
+  color: #05231c;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+body.light-mode .pt-continue .cr-resume-btn {
+  color: #fff;
+}
+
+/* Hide legacy month-strip/detail but keep them in the DOM for JS */
+#calWeekStrip,
+#calDayDetailPanel,
+.pt-shims {
+  display: none !important;
+}
+
+/* Fasting/hadith link style already covers this */

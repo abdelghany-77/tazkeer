@@ -1,0 +1,112 @@
+/* ============================================================================
+   Tazkeer v2 — Design tokens
+   All new variables use the `--pt-` prefix so they never collide with the
+   legacy `:root` block in styles.css.
+   ============================================================================ */
+
+:root,
+body.dark-mode {
+  --pt-bg: #0b1418;
+  --pt-s1: #111e24;
+  --pt-s2: #17272e;
+  --pt-s3: #1d3138;
+
+  --pt-line: rgba(255, 255, 255, 0.07);
+  --pt-line-2: rgba(255, 255, 255, 0.13);
+
+  --pt-tx: #eef4f2;
+  --pt-mu: #8da3a6;
+  --pt-mu-2: #6f8689;
+
+  --pt-em: #34d1a8;
+  --pt-em-2: #6ee7c4;
+  --pt-em-3: #12a383;
+  --pt-em-bg: rgba(52, 209, 168, 0.16);
+  --pt-em-line: rgba(52, 209, 168, 0.34);
+  --pt-em-grad: linear-gradient(135deg, #3dddb2, #12a383);
+
+  --pt-gd: #e6bd62;
+  --pt-gd-2: #c99a33;
+  --pt-gd-bg: rgba(230, 189, 98, 0.16);
+  --pt-gd-line: rgba(230, 189, 98, 0.34);
+  --pt-gd-grad: linear-gradient(135deg, #e6bd62, #c99a33);
+
+  --pt-ind: #8b9cf5;
+  --pt-ind-bg: rgba(139, 156, 245, 0.16);
+  --pt-ind-line: rgba(139, 156, 245, 0.32);
+  --pt-ind-grad: linear-gradient(150deg, #2b2f66, #1d2350 55%, #141833);
+
+  --pt-warm: #f59e6b;
+  --pt-warm-bg: rgba(245, 158, 107, 0.14);
+  --pt-warm-line: rgba(245, 158, 107, 0.34);
+  --pt-warm-grad: linear-gradient(150deg, #3d2a1c, #2a1f18 60%, #1c1712);
+
+  --pt-blue: #5cc8e8;
+  --pt-pink: #e58aa0;
+  --pt-purple: #c9a6f0;
+
+  --pt-r: 20px;
+  --pt-r-lg: 26px;
+  --pt-r-sm: 14px;
+  --pt-r-xs: 10px;
+
+  --pt-hero-grad: linear-gradient(150deg, #12997c, #0a4f47 60%, #0a2f33);
+  --pt-hero-shadow: 0 14px 34px rgba(18, 153, 124, 0.25);
+  --pt-page-glow: radial-gradient(120% 34% at 100% 0, #10382f, transparent 62%);
+
+  --pt-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
+  --pt-shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.2);
+
+  --pt-nav-h: 74px;
+  color-scheme: dark;
+}
+
+body.light-mode {
+  --pt-bg: #f4f7f5;
+  --pt-s1: #ffffff;
+  --pt-s2: #eaf1ee;
+  --pt-s3: #e0eae6;
+
+  --pt-line: rgba(0, 0, 0, 0.08);
+  --pt-line-2: rgba(0, 0, 0, 0.14);
+
+  --pt-tx: #10201d;
+  --pt-mu: #5d7270;
+  --pt-mu-2: #7a8c8a;
+
+  --pt-em: #0e8f73;
+  --pt-em-2: #0b745e;
+  --pt-em-3: #096651;
+  --pt-em-bg: rgba(14, 143, 115, 0.12);
+  --pt-em-line: rgba(14, 143, 115, 0.3);
+  --pt-em-grad: linear-gradient(135deg, #12a383, #0b745e);
+
+  --pt-gd: #b8891f;
+  --pt-gd-2: #9c7216;
+  --pt-gd-bg: rgba(184, 137, 31, 0.14);
+  --pt-gd-line: rgba(184, 137, 31, 0.3);
+  --pt-gd-grad: linear-gradient(135deg, #c99a33, #9c7216);
+
+  --pt-ind: #4f5fd6;
+  --pt-ind-bg: rgba(79, 95, 214, 0.12);
+  --pt-ind-line: rgba(79, 95, 214, 0.28);
+  --pt-ind-grad: linear-gradient(150deg, #3d438f, #2b2f66 55%, #1d2350);
+
+  --pt-warm: #d9692f;
+  --pt-warm-bg: rgba(217, 105, 47, 0.12);
+  --pt-warm-line: rgba(217, 105, 47, 0.28);
+  --pt-warm-grad: linear-gradient(150deg, #ffe9d9, #fff1e6 60%, #fff7f1);
+
+  --pt-blue: #1d90b5;
+  --pt-pink: #c25a75;
+  --pt-purple: #8a5fbd;
+
+  --pt-hero-grad: linear-gradient(150deg, #17a184, #0e6c5e 60%, #0d4a4a);
+  --pt-hero-shadow: 0 14px 30px rgba(14, 143, 115, 0.22);
+  --pt-page-glow: radial-gradient(120% 34% at 100% 0, #dff3ec, transparent 62%);
+
+  --pt-shadow: 0 10px 24px rgba(16, 48, 42, 0.08);
+  --pt-shadow-sm: 0 4px 14px rgba(16, 48, 42, 0.06);
+
+  color-scheme: light;
+}

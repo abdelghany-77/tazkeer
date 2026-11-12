@@ -10,6 +10,8 @@
 (function (global) {
   "use strict";
 
+  var BACKUP_SCHEMA_VERSION = 1;
+
   var isStorageAvailable = (function () {
     try {
       var testKey = "__tazkeer_probe__";
@@ -144,7 +146,7 @@
   /**
    * Export all user progress and preferences as a downloadable JSON file
    */
-  global.exportUserData = function () {
+  global.exportUserData = async function () {
     try {
       var data = {};
       // 1. Export all persistent keys from localStorage
@@ -168,19 +170,49 @@
       var payload = {
         app: "tazkeer",
         type: "tazkeer-progress-backup",
-        version: 1,
+        version: BACKUP_SCHEMA_VERSION,
         exportedAt: new Date().toISOString(),
         keys: data,
       };
+      var fileName = "tazkeer-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+      var json = JSON.stringify(payload, null, 2);
+      var capacitor = global.Capacitor;
+      var nativePlugins = capacitor && capacitor.Plugins;
 
-      var blob = new Blob([JSON.stringify(payload, null, 2)], {
+      if (
+        capacitor &&
+        typeof capacitor.isNativePlatform === "function" &&
+        capacitor.isNativePlatform() &&
+        nativePlugins &&
+        nativePlugins.Filesystem &&
+        nativePlugins.Share
+      ) {
+        var savedFile = await nativePlugins.Filesystem.writeFile({
+          path: fileName,
+          data: json,
+          directory: "DOCUMENTS",
+          encoding: "utf8",
+          recursive: true,
+        });
+        await nativePlugins.Share.share({
+          title: "نسخة احتياطية من إنجازات ذَكِّرْ",
+          text: "ملف النسخة الاحتياطية لإنجازات وبيانات ذَكِّرْ",
+          url: savedFile.uri,
+          dialogTitle: "حفظ النسخة الاحتياطية",
+        });
+        if (typeof global.showNotification === "function") {
+          global.showNotification("تم تجهيز النسخة الاحتياطية للمشاركة أو الحفظ 📁");
+        }
+        return;
+      }
+
+      var blob = new Blob([json], {
         type: "application/json;charset=utf-8",
       });
       var url = URL.createObjectURL(blob);
       var a = document.createElement("a");
-      var now = new Date().toISOString().slice(0, 10);
       a.href = url;
-      a.download = "tazkeer-backup-" + now + ".json";
+      a.download = fileName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -232,8 +264,25 @@
         }
 
         var data = JSON.parse(rawText);
-        if (typeof data !== "object" || data === null) {
+        if (typeof data !== "object" || data === null || Array.isArray(data)) {
           throw new Error("تنسيق الملف غير صالح");
+        }
+
+        var hasEnvelope =
+          data.type !== undefined ||
+          data.version !== undefined ||
+          data.app !== undefined ||
+          data.exportedAt !== undefined;
+        if (hasEnvelope) {
+          if (
+            data.type !== "tazkeer-progress-backup" ||
+            data.version !== BACKUP_SCHEMA_VERSION ||
+            typeof data.keys !== "object" ||
+            data.keys === null ||
+            Array.isArray(data.keys)
+          ) {
+            throw new Error("إصدار أو نوع النسخة الاحتياطية غير مدعوم");
+          }
         }
 
         // Unwrap potential root wrapper objects (e.g. { keys: {...} }, { payload: {...} }, { backup: {...} }, { tazkeer: {...} }, { data: {...} })
@@ -251,31 +300,66 @@
           data = data.data.keys && typeof data.data.keys === "object" ? data.data.keys : data.data;
         }
 
-        // Clean up any stray "keys" entry that was previously incorrectly saved
-        try {
-          if (isStorageAvailable) window.localStorage.removeItem("keys");
-          _memoryStore.delete("keys");
-        } catch (cleanupErr) {}
+        if (typeof data !== "object" || data === null || Array.isArray(data)) {
+          throw new Error("لا توجد بيانات قابلة للاستعادة");
+        }
 
-        var count = 0;
+        var entries = [];
         Object.keys(data).forEach(function (key) {
-          try {
-            var val = data[key];
-            if (val === null || val === undefined) return;
-            var strVal = typeof val === "string" ? val : JSON.stringify(val);
-            if (isStorageAvailable) {
-              window.localStorage.setItem(key, strVal);
-            }
-            _memoryStore.set(key, strVal);
-            count++;
-          } catch (itemErr) {
-            console.warn('[SafeStorage] Failed restoring key: "' + key + '"', itemErr);
+          var val = data[key];
+          if (!key || val === null || val === undefined) return;
+          var strVal = typeof val === "string" ? val : JSON.stringify(val);
+          if (typeof strVal !== "string") {
+            throw new Error('قيمة غير صالحة للمفتاح "' + key + '"');
           }
+          entries.push({ key: key, value: strVal });
         });
 
-        if (count === 0) {
+        if (entries.length === 0) {
           throw new Error("لم يتم العثور على بيانات صالحة في الملف المختار");
         }
+
+        if (!isStorageAvailable) {
+          throw new Error("التخزين الدائم غير متاح؛ لم يتم تعديل بياناتك");
+        }
+
+        var previous = {};
+        entries.forEach(function (entry) {
+          previous[entry.key] = window.localStorage.getItem(entry.key);
+        });
+
+        try {
+          entries.forEach(function (entry) {
+            window.localStorage.setItem(entry.key, entry.value);
+          });
+        } catch (writeErr) {
+          entries.forEach(function (entry) {
+            try {
+              if (previous[entry.key] === null) {
+                window.localStorage.removeItem(entry.key);
+              } else {
+                window.localStorage.setItem(entry.key, previous[entry.key]);
+              }
+            } catch (rollbackErr) {
+              console.error("[SafeStorage] Backup rollback failed:", rollbackErr);
+            }
+          });
+          throw new Error("تعذر حفظ النسخة كاملة؛ تم التراجع عن الاستعادة");
+        }
+
+        entries.forEach(function (entry) {
+          _memoryStore.set(entry.key, entry.value);
+        });
+
+        // Clean up any stray "keys" entry that was previously incorrectly saved.
+        try {
+          window.localStorage.removeItem("keys");
+          _memoryStore.delete("keys");
+        } catch (cleanupErr) {
+          console.warn("[SafeStorage] Could not remove legacy keys entry:", cleanupErr);
+        }
+
+        var count = entries.length;
 
         // Instantly refresh in-memory state across active application modules
         if (typeof global.refreshAllUserData === "function") {
@@ -312,4 +396,3 @@
     reader.readAsText(file);
   };
 })(typeof window !== "undefined" ? window : this);
-

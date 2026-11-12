@@ -1,0 +1,1102 @@
+/* ============================================================================
+   Tazkeer v2 — Quran page (home view, khatmah sheet, lists)
+   ============================================================================ */
+
+.pt-quran {
+  gap: 14px;
+}
+
+/* ── Continue-reading hero ───────────────────────────────────────────────── */
+.pt-qhero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  padding: 12px 16px 14px;
+  background: var(--pt-hero-grad), var(--pt-s1);
+  color: #f4fffb;
+  box-shadow: var(--pt-hero-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  isolation: isolate;
+}
+
+.pt-qhero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("../../images/pattern.svg");
+  background-size: 44px 44px;
+  z-index: -1;
+}
+
+.pt-qhero__label {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 500;
+  text-align: start;
+}
+
+.pt-qhero__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pt-qhero__name {
+  font-family: var(--font-quran);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.35;
+  padding-bottom: 0;
+  margin-bottom: 2px;
+  text-align: start;
+}
+
+.pt-qhero__glyph {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #d9fff3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.pt-qhero__meta {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.82);
+  text-align: start;
+}
+
+.pt-qhero__bar {
+  margin-top: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.pt-qhero__bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.pt-qhero__cta {
+  margin-top: 6px;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 6px 18px;
+  border: none;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #0b3b33;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pt-qhero__cta:active {
+  transform: scale(0.97);
+}
+
+/* ── Khatma card ─────────────────────────────────────────────────────────── */
+.pt-khatma {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 16px;
+}
+
+.pt-khatma__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: start;
+}
+
+.pt-khatma__title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+.pt-khatma__sub {
+  font-size: 11.5px;
+  color: var(--pt-mu);
+}
+
+.pt-khatma__ring {
+  --track: rgba(255, 255, 255, 0.1);
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
+}
+
+.pt-khatma__ring-num {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--pt-gd);
+  direction: ltr;
+  unicode-bidi: plaintext;
+}
+
+.pt-khatma__cta {
+  align-self: flex-start;
+  margin-top: 2px;
+  min-height: 34px;
+  padding: 5px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--pt-gd-line);
+  background: var(--pt-gd-bg);
+  color: var(--pt-gd);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pt-khatma__tile {
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
+  border-radius: 20px;
+  font-size: 26px;
+}
+
+/* ── Khatmah dashboard ───────────────────────────────────────────────────── */
+.pt-kdash-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 18px;
+}
+
+.pt-kdash-hero__ring {
+  --track: var(--pt-line-2);
+  --c: var(--pt-gd);
+  width: 92px;
+  height: 92px;
+  min-width: 92px;
+}
+
+.pt-kdash-hero__pct {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--pt-gd);
+  direction: ltr;
+  unicode-bidi: plaintext;
+}
+
+.pt-kdash-hero__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: start;
+}
+
+.pt-kdash-hero__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+.pt-kdash-hero__meta {
+  font-size: 11.5px;
+  color: var(--pt-mu);
+}
+
+.pt-wird {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+}
+
+.pt-wird__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pt-wird__titles {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: start;
+}
+
+.pt-wird__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+.pt-wird__sub {
+  font-size: 11.5px;
+  color: var(--pt-mu);
+}
+
+.pt-wird__surahs {
+  font-size: 12.5px;
+  color: var(--pt-em);
+  text-align: start;
+}
+
+.pt-wird__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--pt-mu);
+}
+
+.pt-kdash-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 22px 18px;
+  text-align: center;
+}
+
+.pt-kdash-done__ico {
+  font-size: 34px;
+  line-height: 1;
+}
+
+.pt-kdash-done__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+.pt-kdash-done__sub {
+  font-size: 12px;
+  color: var(--pt-mu);
+  margin-bottom: 6px;
+}
+
+.pt-kdash-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pt-kdash-reset {
+  min-height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--pt-mu);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.pt-kdash-reset:active {
+  color: var(--pt-tx);
+}
+
+/* ── Offline download card (compacted) ───────────────────────────────────── */
+#quranOfflineSlot .quran-offline-widget {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+#quranOfflineSlot .quran-offline-main-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 46px;
+  padding: 8px 15px;
+  border-radius: 14px;
+  border: 1px dashed var(--pt-line-2);
+  background: var(--pt-s1);
+  color: var(--pt-mu);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#quranOfflineSlot .quran-offline-main-btn i {
+  color: var(--pt-em);
+  font-size: 15px;
+}
+
+#quranOfflineSlot .quran-offline-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: var(--pt-em-bg);
+  border: 1px solid var(--pt-em-line);
+  color: var(--pt-em);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#quranOfflineSlot .quran-offline-mini-del {
+  margin-inline-start: auto;
+  background: none;
+  border: none;
+  color: var(--pt-mu);
+  font-size: 13px;
+}
+
+#quranOfflineSlot .quran-offline-progress-box {
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 11.5px;
+  color: var(--pt-mu);
+}
+
+#quranOfflineSlot .quran-offline-progress-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+#quranOfflineSlot .quran-offline-prog-title {
+  color: var(--pt-tx);
+  font-weight: 600;
+}
+
+#quranOfflineSlot .quran-offline-progress-track {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--pt-s2);
+  overflow: hidden;
+}
+
+#quranOfflineSlot .quran-offline-progress-fill {
+  height: 100%;
+  background: var(--pt-em);
+}
+
+#quranOfflineSlot .quran-offline-prog-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+#quranOfflineSlot .quran-offline-btn-start,
+#quranOfflineSlot .quran-offline-btn-pause {
+  min-height: 34px;
+  padding: 4px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s2);
+  color: var(--pt-em);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+/* ── Search field ────────────────────────────────────────────────────────── */
+.pt-qsearch {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 0 15px;
+  border-radius: 14px;
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
+}
+
+.pt-qsearch i {
+  color: var(--pt-mu);
+  font-size: 14px;
+}
+
+.pt-qsearch input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--pt-tx);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  text-align: start;
+}
+
+.pt-qsearch input::placeholder {
+  color: var(--pt-mu-2);
+}
+
+/* ── Surah list ──────────────────────────────────────────────────────────── */
+.pt-surah-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.pt-surah {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 16px;
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
+  color: var(--pt-tx);
+  font-family: var(--font-sans);
+  text-align: start;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.pt-surah:active {
+  transform: scale(0.99);
+  background: var(--pt-s2);
+}
+
+/* The Mushaf reader can force `mushaf-dark-mode` on the whole body; the
+   index rows must still follow the app theme, so out-specify the legacy
+   `.mushaf-dark-mode .surah-list-*` rules without touching the reader. */
+.pt-surah.pt-surah {
+  background: var(--pt-s1);
+  border-color: var(--pt-line);
+  box-shadow: none;
+}
+
+.pt-surah.pt-surah:hover,
+.pt-surah.pt-surah:active {
+  background: var(--pt-s2);
+  border-color: var(--pt-line);
+  box-shadow: none;
+}
+
+.pt-surah__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pt-surah__name {
+  font-family: var(--font-quran);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--pt-tx);
+}
+
+.pt-surah__meta {
+  font-size: 11.5px;
+  color: var(--pt-mu);
+}
+
+.pt-surah__page {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--pt-mu);
+  background: var(--pt-s2);
+  border: 1px solid var(--pt-line);
+  border-radius: 999px;
+  padding: 4px 9px;
+  white-space: nowrap;
+}
+
+.pt-surah__num {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.pt-surah__num::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1.5px solid var(--pt-em-line);
+  border-radius: 9px;
+  transform: rotate(45deg);
+  background: var(--pt-em-bg);
+}
+
+.pt-surah__num span {
+  position: relative;
+  z-index: 1;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pt-em);
+}
+
+.pt-surah-search-empty {
+  text-align: center;
+  padding: 26px 10px;
+  color: var(--pt-mu);
+  font-size: 13px;
+}
+
+.pt-surah-search-empty i {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+/* ── Juz list / bookmark list ────────────────────────────────────────────── */
+.pt-juz {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
+  color: var(--pt-tx);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.pt-juz__num {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 10px;
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pt-juz__page {
+  margin-inline-start: auto;
+  color: var(--pt-mu);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* ── Khatmah bottom sheet ────────────────────────────────────────────────── */
+.pt-ksheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.pt-ksheet-head h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--pt-tx);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pt-ksheet-head h2 i {
+  color: var(--pt-em);
+}
+
+.pt-ksheet-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s2);
+  color: var(--pt-tx);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.pt-ksheet .khatmah-setup-card,
+#khatmahSheetContent .khatmah-setup-card {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+#khatmahSheetContent .goal-type-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+#khatmahSheetContent .goal-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  color: var(--pt-mu);
+  font-family: var(--font-sans);
+  text-align: start;
+  cursor: pointer;
+}
+
+#khatmahSheetContent .goal-type-btn i {
+  font-size: 15px;
+  color: var(--pt-em);
+}
+
+#khatmahSheetContent .goal-type-btn.active {
+  border-color: var(--pt-em-line);
+  background: var(--pt-em-bg);
+}
+
+#khatmahSheetContent .goal-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+#khatmahSheetContent .goal-desc {
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+#khatmahSheetContent .goal-input-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pt-mu);
+  margin-bottom: 7px;
+}
+
+#khatmahSheetContent .goal-input-number-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#khatmahSheetContent .goal-adjust-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s2);
+  color: var(--pt-tx);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#khatmahSheetContent .goal-number-input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  color: var(--pt-tx);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+}
+
+#khatmahSheetContent .goal-unit-label {
+  font-size: 12px;
+  color: var(--pt-mu);
+  font-weight: 600;
+}
+
+#khatmahSheetContent .pt-preset-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 9px;
+}
+
+#khatmahSheetContent .pt-preset-chip {
+  min-height: 34px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  color: var(--pt-mu);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#khatmahSheetContent .pt-preset-chip.active {
+  background: var(--pt-em-bg);
+  border-color: var(--pt-em-line);
+  color: var(--pt-em);
+}
+
+#khatmahSheetContent .juz-start-picker {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#khatmahSheetContent .juz-start-btn {
+  min-height: 42px;
+  padding: 6px 13px;
+  border-radius: 12px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  color: var(--pt-mu);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+#khatmahSheetContent .juz-start-btn.active {
+  border-color: var(--pt-em-line);
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
+}
+
+#khatmahSheetContent .juz-start-select-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+#khatmahSheetContent .juz-start-select {
+  width: 100%;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  color: var(--pt-tx);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  padding: 0 8px;
+}
+
+#khatmahSheetContent .calculation-preview {
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
+  border-radius: 14px;
+  padding: 4px 14px;
+}
+
+#khatmahSheetContent .calc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+  font-size: 12px;
+  color: var(--pt-mu);
+  border-bottom: 1px solid var(--pt-line);
+}
+
+#khatmahSheetContent .calc-row:last-child {
+  border-bottom: none;
+}
+
+#khatmahSheetContent .calc-value {
+  color: var(--pt-tx);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+#khatmahSheetContent .khatmah-start-btn {
+  min-height: 48px;
+  border-radius: 14px;
+  border: none;
+  background: var(--pt-em);
+  color: #05231c;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+body.light-mode #khatmahSheetContent .khatmah-start-btn {
+  color: #fff;
+}
+
+#khatmahSheetContent .quick-read-btn {
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  color: var(--pt-mu);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* ── Khatmah dashboard (kept functional, re-themed) ──────────────────────── */
+.khatmah-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.khatmah-progress-ring-container {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.progress-ring-wrapper {
+  position: relative;
+  width: 190px;
+  height: 190px;
+}
+
+.progress-ring-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.progress-ring-bg {
+  fill: none;
+  stroke: var(--pt-s2);
+  stroke-width: 12;
+}
+
+.progress-ring-fill {
+  fill: none;
+  stroke: var(--pt-gd);
+  stroke-width: 12;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s ease;
+}
+
+.progress-ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.progress-ring-percent {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--pt-gd);
+}
+
+.progress-ring-label {
+  font-size: 11px;
+  color: var(--pt-mu);
+}
+
+.wird-card,
+.khatmah-complete-card-dashboard,
+.khatmah-stat-card {
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
+  border-radius: 18px;
+  padding: 15px;
+  color: var(--pt-tx);
+  box-shadow: none;
+}
+
+.wird-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.wird-card-header h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+.wird-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--pt-gd-bg);
+  color: var(--pt-gd);
+}
+
+.wird-card-pages {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+.wird-card-surahs {
+  font-size: 12px;
+  color: var(--pt-mu);
+  margin-bottom: 8px;
+}
+
+.wird-card-progress {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 8px;
+}
+
+.wird-card-progress-bar {
+  flex: 1;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--pt-s2);
+  overflow: hidden;
+}
+
+.wird-card-progress-fill {
+  height: 100%;
+  background: var(--pt-em);
+}
+
+.wird-card-progress-text {
+  font-size: 11px;
+  color: var(--pt-mu);
+}
+
+.khatmah-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.khatmah-stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 13px;
+  text-align: center;
+}
+
+.khatmah-stat-card i {
+  color: var(--pt-em);
+  font-size: 15px;
+}
+
+.khatmah-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+.khatmah-stat-label {
+  font-size: 11px;
+  color: var(--pt-mu);
+}
+
+.khatmah-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.khatmah-read-btn,
+.khatmah-free-read-btn,
+.khatmah-reset-btn,
+.khatmah-dua-view-btn {
+  min-height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--pt-line);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  background: var(--pt-s1);
+  color: var(--pt-tx);
+}
+
+.khatmah-read-btn {
+  background: var(--pt-em);
+  border-color: transparent;
+  color: #05231c;
+}
+
+body.light-mode .khatmah-read-btn {
+  color: #fff;
+}
+
+.khatmah-reset-btn {
+  color: var(--pt-warm);
+  border-color: var(--pt-warm-line);
+}
+
+.khatmah-complete-card-dashboard {
+  text-align: center;
+}
+
+.khatmah-complete-card-dashboard .complete-icon {
+  font-size: 30px;
+}
+
+.khatmah-complete-card-dashboard h3 {
+  color: var(--pt-gd);
+  font-size: 16px;
+  margin: 4px 0;
+}
+
+.khatmah-complete-card-dashboard p {
+  font-size: 12px;
+  color: var(--pt-mu);
+}

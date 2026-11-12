@@ -1,0 +1,551 @@
+/* ============================================================================
+   Tazkeer v2 — Profile page
+   ============================================================================ */
+
+.pt-profile {
+  gap: 12px;
+  padding-top: 2px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.pt-prof-top {
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  direction: rtl;
+}
+
+.pt-profile .pt-title {
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.pt-profile .pt-sub {
+  font-size: 14px;
+  color: var(--pt-mu);
+}
+
+.pt-prof-avatar {
+  width: 58px;
+  height: 58px;
+  min-width: 58px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--pt-em-grad);
+  color: #ffffff;
+  font-size: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(18, 163, 131, 0.14);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pt-prof-avatar i {
+  line-height: 1;
+}
+
+/* ── Streak card ─────────────────────────────────────────────────────────── */
+.pt-streak {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 80px;
+  min-height: 80px;
+  padding: 10px 18px;
+  border-radius: var(--pt-r-lg);
+  background: var(--pt-warm-grad);
+  border: 1px solid var(--pt-warm-line);
+  overflow: hidden;
+  direction: rtl;
+}
+
+.pt-streak__icon {
+  flex-shrink: 0;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--pt-warm);
+}
+
+.pt-streak__body {
+  flex: 0 1 auto;
+  min-width: 0;
+  text-align: start;
+}
+
+.pt-streak__value {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 6px;
+  color: var(--pt-tx);
+}
+
+.pt-streak__value b {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pt-streak__value span {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.pt-streak__value.is-zero {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.pt-streak__sub {
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--pt-mu);
+}
+
+.pt-streak__sub b {
+  color: var(--pt-tx);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pt-streak__badge {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--pt-warm-bg);
+  border: 1px solid var(--pt-warm-line);
+  color: var(--pt-warm);
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pt-streak__badge[hidden] {
+  display: none;
+}
+
+/* ── Today rings ─────────────────────────────────────────────────────────── */
+.pt-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  height: 98px;
+}
+
+.pt-mini-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 98px;
+  min-height: 98px;
+  padding: 12px;
+  border-radius: var(--pt-r);
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
+  min-width: 0;
+}
+
+.pt-mini-card__body {
+  min-width: 0;
+}
+
+.pt-mini-card__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+.pt-mini-card__sub {
+  margin-top: 3px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--pt-mu);
+}
+
+.pt-mini-card__sub.is-zero {
+  color: var(--pt-mu-2);
+}
+
+.pt-mini-card .pt-ring {
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
+}
+
+.pt-mini-card .pt-ring::after {
+  inset: 4px;
+}
+
+@media (min-width: 400px) {
+  .pt-mini-card {
+    padding: 15px;
+  }
+
+  .pt-mini-card .pt-ring {
+    width: 68px;
+    height: 68px;
+    min-width: 68px;
+  }
+}
+
+.pt-ring--em {
+  --c: var(--pt-em);
+}
+
+.pt-ring--gd {
+  --c: var(--pt-gd);
+}
+
+.pt-ring__val {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--pt-tx);
+  white-space: nowrap;
+}
+
+@media (min-width: 400px) {
+  .pt-ring__val {
+    font-size: 15px;
+  }
+}
+
+/* ── Stat tiles ──────────────────────────────────────────────────────────── */
+.pt-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pt-stat {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 13px;
+  border-radius: 16px;
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
+  min-height: 66px;
+}
+
+.pt-stat__txt {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.pt-stat__val {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--pt-tx);
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.pt-stat__val.is-zero {
+  color: var(--pt-mu-2);
+  font-weight: 600;
+}
+
+.pt-stat__label {
+  font-size: 10.5px;
+  color: var(--pt-mu);
+  font-weight: 500;
+}
+
+.pt-stat-grid--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  height: 98px;
+}
+
+.pt-stat--tile {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  padding: 12px 4px;
+  height: 98px;
+  min-height: 98px;
+}
+
+.pt-stat__ico {
+  font-size: 15px;
+  line-height: 1;
+  color: var(--pt-em);
+}
+
+.pt-stat__ico.pt-c-gold {
+  color: var(--pt-gd);
+}
+
+.pt-stat__ico.pt-c-blue {
+  color: #7fb7f0;
+}
+
+.pt-stat__ico.pt-c-purple {
+  color: #b39cf0;
+}
+
+.pt-stat__ico.pt-c-em {
+  color: var(--pt-em);
+}
+
+.pt-stat--tile .pt-stat__val {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.pt-stat--tile .pt-stat__label {
+  font-size: 13px;
+  line-height: 1.25;
+  color: var(--pt-mu);
+}
+
+/* ── Weekly chart card ───────────────────────────────────────────────────── */
+.pt-chart-card {
+  height: 205px;
+  padding: 12px;
+}
+
+.pt-chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pt-chart-head__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+.pt-chart-card .pt-seg {
+  flex: 0 0 auto;
+  border: none;
+  background: var(--pt-s2);
+  padding: 3px;
+}
+
+.pt-chart-card .pt-seg__btn {
+  flex: 0 0 auto;
+  min-height: 30px;
+  font-size: 11px;
+  padding: 0 12px;
+}
+
+.pt-chart-card .dash-chart-container {
+  margin-top: 14px;
+}
+
+.pt-chart-card .chart-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 5px;
+  height: 122px;
+  padding: 0 2px;
+}
+
+.pt-chart-card .chart-bar-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+/* The legacy stylesheet hides every value until hover and forces a 4px
+   "stub" for empty days, so the chart skin below is explicit. */
+.pt-chart-card .chart-bar-value {
+  min-height: 12px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--pt-mu) !important;
+  opacity: 1 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.pt-chart-card .chart-bar-col .chart-bar-track {
+  width: 100%;
+  max-width: 24px;
+  height: 88px;
+  flex: 0 0 88px;
+  border: none !important;
+  border-radius: 8px;
+  background: var(--pt-s2) !important;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.pt-chart-card .chart-bar-col .chart-bar-fill {
+  width: 100%;
+  height: 0;
+  min-height: 0 !important;
+  border-radius: 8px;
+  background: var(--pt-em) !important;
+  transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pt-chart-card .chart-bar-col .chart-bar-fill.quran-fill {
+  background: var(--pt-gd) !important;
+}
+
+.pt-chart-card .chart-bar-col span {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--pt-mu-2) !important;
+  white-space: nowrap;
+}
+
+/* Future days in the current week read as an empty dashed slot. */
+.pt-chart-card .chart-bar-col.is-future .chart-bar-track {
+  background: transparent !important;
+  border: 1px dashed var(--pt-line-2) !important;
+  opacity: 0.6;
+}
+
+.pt-chart-card .chart-bar-col.today .chart-bar-value,
+.pt-chart-card .chart-bar-col.today span {
+  color: var(--pt-em) !important;
+  font-weight: 700;
+}
+
+.pt-chart-card .chart-bar-col.today .chart-bar-fill {
+  background: var(--pt-em) !important;
+}
+
+#quranChart .chart-bar-col.today .chart-bar-value {
+  color: var(--pt-gd) !important;
+}
+
+#quranChart .chart-bar-col.today span {
+  color: var(--pt-gd) !important;
+}
+
+#quranChart .chart-bar-col.today .chart-bar-fill {
+  background: var(--pt-gd) !important;
+}
+
+/* ── Settings rows ───────────────────────────────────────────────────────── */
+.pt-settings {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 18px;
+  overflow: hidden;
+}
+
+.pt-settings .pt-hr {
+  margin: 0;
+  border: none;
+  border-top: 1px solid var(--pt-line);
+  height: 0;
+}
+
+.pt-settings__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: var(--pt-tx);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pt-settings__row:active {
+  background: var(--pt-s2);
+}
+
+.pt-settings__row--theme {
+  cursor: default;
+}
+
+.pt-settings__ico {
+  width: 22px;
+  min-width: 22px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--pt-em);
+}
+
+.pt-settings__ico.is-em {
+  color: var(--pt-em);
+}
+
+.pt-settings__ico.is-gold {
+  color: var(--pt-gd);
+}
+
+.pt-settings__label {
+  flex: 1;
+  font-size: 17px;
+  min-width: 0;
+}
+
+.pt-settings__chev {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--pt-mu-2);
+}
+
+.pt-theme-seg {
+  flex-shrink: 0;
+  margin-inline-start: auto;
+}
+
+/* ── Sadaqa card ─────────────────────────────────────────────────────────── */
+.pt-sadaqa,
+#tab-profile .pt-sadaqa {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--pt-s1) !important;
+  background-image: url("../../images/pattern.svg") !important;
+  background-size: 44px 44px !important;
+  border: 1px solid var(--pt-line) !important;
+  color: #dfeae6;
+  font-family: var(--font-hadith);
+  font-size: 19px;
+  line-height: 2;
+  text-align: center;
+}
+
+body.light-mode #tab-profile .pt-sadaqa {
+  color: var(--pt-tx);
+}
+
+.pt-sadaqa__txt {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+/* No heart watermark on the sadaqa card any more. */
+.pt-sadaqa::before {
+  content: none;
+}

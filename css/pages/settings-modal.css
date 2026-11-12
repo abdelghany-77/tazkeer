@@ -1,0 +1,461 @@
+/* ============================================================================
+   Tazkeer v2 — Settings bottom sheet (#adhanModal)
+   Overrides adhan-native.css without touching the native bridge.
+   ============================================================================ */
+
+#adhanModal.adhan-modal {
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.58);
+  /* The shell bottom-nav sits at z-index 9999; modal layers use 10000+. */
+  z-index: 10050;
+}
+
+#adhanModal .adhan-modal-content {
+  width: 100%;
+  max-width: 520px;
+  max-height: 94vh;
+  border-radius: 26px 26px 0 0;
+  border: 1px solid var(--pt-line);
+  border-bottom: none;
+  background: var(--pt-bg);
+  color: var(--pt-tx);
+  box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.4);
+  animation: ptSheetUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#adhanModal .adhan-modal-header {
+  position: relative;
+  padding: 18px 18px 12px;
+  border-bottom: 1px solid var(--pt-line);
+  background: var(--pt-bg);
+}
+
+#adhanModal .adhan-modal-header::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 42px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--pt-line-2);
+}
+
+#adhanModal .adhan-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--pt-tx);
+  gap: 8px;
+}
+
+#adhanModal .adhan-modal-title i {
+  color: var(--pt-em);
+  font-size: 15px;
+}
+
+#adhanModal .adhan-close-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s2);
+  color: var(--pt-tx);
+  font-size: 18px;
+}
+
+#adhanModal .adhan-modal-body {
+  padding: 4px 18px calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ── Section headings ────────────────────────────────────────────────────── */
+#adhanModal .adhan-section-title {
+  margin: 18px 0 9px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pt-mu);
+  gap: 7px;
+}
+
+#adhanModal .adhan-section-title i {
+  color: var(--pt-em);
+  font-size: 11px;
+}
+
+#adhanModal .adhan-section-title .adhan-section-hint {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--pt-mu-2);
+}
+
+/* ── Theme cards ─────────────────────────────────────────────────────────── */
+#adhanModal .adhan-theme-grid {
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+#adhanModal .adhan-theme-card {
+  padding: 12px;
+  border-radius: 16px;
+  border: 1.5px solid var(--pt-line);
+  background: var(--pt-s1);
+  color: var(--pt-tx);
+  gap: 10px;
+}
+
+#adhanModal .adhan-theme-card.active,
+#adhanModal .adhan-theme-card.is-active {
+  border-color: var(--pt-em-line);
+  background: var(--pt-em-bg);
+}
+
+#adhanModal .theme-card-icon {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pt-s2);
+  color: var(--pt-em);
+  font-size: 15px;
+}
+
+#adhanModal .adhan-theme-card.active .theme-card-icon {
+  background: rgba(52, 209, 168, 0.22);
+}
+
+#adhanModal .theme-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+#adhanModal .theme-card-details strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+#adhanModal .theme-card-details span {
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--pt-mu);
+}
+
+#adhanModal .theme-card-check {
+  color: var(--pt-mu-2);
+  font-size: 13px;
+}
+
+#adhanModal .adhan-theme-card.active .theme-card-check {
+  color: var(--pt-em);
+}
+
+/* ── Master toggle rows ──────────────────────────────────────────────────── */
+#adhanModal .adhan-master {
+  border-radius: 16px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  padding: 13px 14px;
+  margin-bottom: 10px;
+}
+
+#adhanModal .adhan-master h4 {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--pt-tx);
+  margin-bottom: 3px;
+}
+
+#adhanModal .adhan-master p {
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: var(--pt-mu);
+}
+
+#adhanModal .adhan-switch {
+  width: 46px;
+  height: 26px;
+}
+
+#adhanModal .adhan-slider {
+  background: var(--pt-s3);
+}
+
+#adhanModal .adhan-slider::before {
+  width: 20px;
+  height: 20px;
+  left: 3px;
+  top: 3px;
+  background: #ffffff;
+}
+
+#adhanModal .adhan-switch input:checked + .adhan-slider {
+  background: var(--pt-em);
+}
+
+#adhanModal .adhan-switch input:checked + .adhan-slider::before {
+  transform: translateX(20px);
+}
+
+/* ── Muezzin cards ───────────────────────────────────────────────────────── */
+#adhanModal .adhan-muezzin-list {
+  gap: 8px;
+}
+
+#adhanModal .adhan-muezzin-card {
+  border-radius: 14px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  padding: 10px 11px;
+  gap: 10px;
+}
+
+#adhanModal .adhan-muezzin-card.is-selected {
+  border-color: var(--pt-gd-line);
+  background: var(--pt-gd-bg);
+}
+
+#adhanModal .adhan-muezzin-icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 10px;
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
+  font-size: 13px;
+}
+
+#adhanModal .adhan-muezzin-card.is-selected .adhan-muezzin-icon {
+  background: var(--pt-gd);
+  color: #2a1d05;
+}
+
+#adhanModal .adhan-muezzin-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+#adhanModal .adhan-muezzin-desc {
+  font-size: 10px;
+  color: var(--pt-mu);
+}
+
+#adhanModal .adhan-muezzin-check {
+  color: var(--pt-gd);
+}
+
+/* ── Per prayer grid ─────────────────────────────────────────────────────── */
+#adhanModal .adhan-prayer-grid {
+  gap: 8px;
+}
+
+#adhanModal .adhan-prayer-item,
+#adhanModal .adhan-prayer-card {
+  border-radius: 14px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  padding: 10px;
+}
+
+/* ── Volume ──────────────────────────────────────────────────────────────── */
+#adhanModal .adhan-volume-row {
+  border-radius: 14px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  padding: 11px 13px;
+  gap: 10px;
+  color: var(--pt-mu);
+}
+
+#adhanModal .adhan-volume-row input[type="range"] {
+  accent-color: var(--pt-em);
+}
+
+#adhanModal .adhan-volume-value {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pt-em);
+  background: var(--pt-em-bg);
+  border-radius: 999px;
+  padding: 3px 9px;
+  min-width: 46px;
+  text-align: center;
+}
+
+/* ── Permissions ─────────────────────────────────────────────────────────── */
+#adhanModal .adhan-permissions {
+  gap: 8px;
+}
+
+#adhanModal .adhan-perm-row {
+  border-radius: 14px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  padding: 10px 12px;
+  gap: 10px;
+}
+
+#adhanModal .adhan-perm-badge {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 10px;
+  background: var(--pt-warm-bg);
+  color: var(--pt-warm);
+  font-size: 12px;
+}
+
+#adhanModal .adhan-perm-badge.is-ok {
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
+}
+
+#adhanModal .adhan-perm-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pt-tx);
+}
+
+#adhanModal .adhan-perm-desc {
+  font-size: 10px;
+  color: var(--pt-mu);
+}
+
+#adhanModal .adhan-perm-fix {
+  min-height: 32px;
+  padding: 4px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--pt-em-line);
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#adhanModal .adhan-perm-fix:disabled {
+  opacity: 0.5;
+  border-color: var(--pt-line);
+  background: var(--pt-s2);
+  color: var(--pt-mu);
+}
+
+/* ── Next alarm & actions ────────────────────────────────────────────────── */
+#adhanModal .adhan-next-info {
+  border-radius: 14px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s1);
+  padding: 11px 13px;
+  font-size: 11px;
+  color: var(--pt-mu);
+  gap: 8px;
+}
+
+#adhanModal .adhan-next-info i {
+  color: var(--pt-gd);
+}
+
+#adhanModal .adhan-next-info strong {
+  color: var(--pt-tx);
+}
+
+#adhanModal .adhan-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+#adhanModal .adhan-action-btn {
+  min-height: 42px;
+  border-radius: 12px;
+  border: 1px solid var(--pt-line);
+  background: var(--pt-s2);
+  color: var(--pt-tx);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+#adhanModal .adhan-action-btn i {
+  font-size: 11px;
+}
+
+#adhanModal .adhan-action-btn.is-gold {
+  background: var(--pt-gd-bg);
+  border-color: var(--pt-gd-line);
+  color: var(--pt-gd);
+}
+
+#adhanModal .adhan-action-btn.is-ghost {
+  background: transparent;
+  color: var(--pt-mu);
+}
+
+#adhanModal .adhan-action-btn.is-danger {
+  background: rgba(229, 115, 115, 0.12);
+  border-color: rgba(229, 115, 115, 0.28);
+  color: #e57373;
+}
+
+#adhanModal .adhan-footnote {
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--pt-mu-2);
+  text-align: center;
+  margin-top: 14px;
+}
+
+#adhanModal .adhan-web-notice {
+  border-radius: 12px;
+  background: var(--pt-gd-bg);
+  border: 1px solid var(--pt-gd-line);
+  color: var(--pt-gd);
+  font-size: 10.5px;
+  line-height: 1.7;
+  margin-bottom: 2px;
+}
+
+#adhanModal #adhanFirstLaunchBanner {
+  border-radius: 14px !important;
+  border-color: var(--pt-gd-line) !important;
+  background: linear-gradient(135deg, rgba(230, 189, 98, 0.14), rgba(52, 209, 168, 0.1)) !important;
+}
+
+#adhanModal #adhanFirstLaunchBanner > div:first-child {
+  color: var(--pt-gd) !important;
+  font-size: 14px !important;
+}
+
+#adhanModal #adhanFirstLaunchBanner p {
+  color: var(--pt-mu) !important;
+  font-size: 11px !important;
+}
+
+/* Tidy the small “test reminder” ghost button */
+#adhanModal .adhan-action-btn[onclick="testAzkarReminder()"] {
+  min-height: 34px;
+  font-size: 10.5px !important;
+  padding: 4px 12px !important;
+}
+
+/* ── Accordion groupings on small screens ────────────────────────────────── */
+@media (max-width: 380px) {
+  #adhanModal .adhan-theme-grid {
+    grid-template-columns: 1fr;
+  }
+}

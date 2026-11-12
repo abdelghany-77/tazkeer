@@ -731,6 +731,20 @@ body.dark-mode .nav-btn.misbaha-header-btn:hover {
   box-sizing: border-box;
 }
 
+.install-icon-badge {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+  font-size: 1.75rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
 .install-header {
   margin-bottom: 0.5rem;
   text-align: center;
@@ -819,54 +833,6 @@ body.dark-mode .nav-btn.misbaha-header-btn:hover {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-}
-
-/* Already Downloaded Status Card */
-.installed-status-card {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.9rem 1rem;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.05) 100%);
-  border: 1.5px solid rgba(16, 185, 129, 0.4);
-  border-radius: 14px;
-  text-align: right;
-  direction: rtl;
-}
-
-.installed-status-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.35rem;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-}
-
-.installed-status-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.installed-status-info h4 {
-  font-size: 0.96rem;
-  font-weight: 700;
-  color: #065f46;
-  margin: 0 0 0.2rem 0;
-}
-
-.installed-status-info p {
-  font-size: 0.82rem;
-  color: #374151;
-  line-height: 1.5;
-  margin: 0;
 }
 
 /* Adhan Feature Spotlight */
@@ -1067,7 +1033,7 @@ body.dark-mode .nav-btn.misbaha-header-btn:hover {
   font-size: 1.75rem;
   min-width: 45px;
   text-align: center;
-  background: linear-gradient(135deg, #1a8a5c 0%, #0d6b4e 100%);
+  background: var(--pt-em-grad);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1620,7 +1586,7 @@ body.dark-mode .adhkar-card:hover {
 }
 
 body.dark-mode .category-title {
-  color: #e2e8f0;
+  color: var(--pt-tx);
 }
 
 body.dark-mode .adhkar-text {
@@ -1701,24 +1667,24 @@ body.dark-mode .modal {
 }
 
 body.dark-mode .modal-content {
-  background: #2d3748;
-  border: 1px solid #4a5568;
+  background: var(--pt-s2);
+  border: 1px solid var(--pt-line);
 }
 
 body.dark-mode .modal-header {
-  border-bottom-color: #4a5568;
+  border-bottom-color: var(--pt-line);
 }
 
 body.dark-mode .modal-header h3 {
-  color: #e2e8f0;
+  color: var(--pt-tx);
 }
 
 body.dark-mode .close {
-  color: #a0aec0;
+  color: var(--pt-mu);
 }
 
 body.dark-mode .close:hover {
-  color: #e2e8f0;
+  color: var(--pt-tx);
 }
 
 body.dark-mode .count-number {
@@ -1802,8 +1768,8 @@ body.dark-mode .adhkar-count {
 
 /* Dark Mode Install Modal */
 body.dark-mode .install-modal-content {
-  background: #1e293b;
-  border: 1px solid rgba(232, 197, 90, 0.25);
+  background: var(--pt-s2);
+  border: 1px solid var(--pt-gd-bg);
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
 }
 
@@ -1824,8 +1790,8 @@ body.dark-mode .install-icon-badge {
 }
 
 body.dark-mode .install-header h3 {
-  color: #e2e8f0;
-  background: linear-gradient(135deg, #e8c55a 0%, #d4a847 100%);
+  color: var(--pt-tx);
+  background: var(--pt-gd-grad);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1836,7 +1802,7 @@ body.dark-mode .install-subtitle {
 }
 
 body.dark-mode .device-badge {
-  background: linear-gradient(135deg, #e8c55a 0%, #d4a847 100%);
+  background: var(--pt-gd-grad);
   box-shadow: 0 4px 15px rgba(232, 197, 90, 0.3);
 }
 
@@ -1852,25 +1818,6 @@ body.dark-mode .apk-tag {
 
 body.dark-mode .apk-tag-size {
   background: rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
-}
-
-body.dark-mode .installed-status-card {
-  background: linear-gradient(135deg, rgba(232, 197, 90, 0.14) 0%, rgba(30, 41, 59, 0.7) 100%);
-  border-color: rgba(232, 197, 90, 0.4);
-}
-
-body.dark-mode .installed-status-icon {
-  background: linear-gradient(135deg, #e8c55a 0%, #d4a847 100%);
-  color: #1a202c;
-  box-shadow: 0 4px 12px rgba(232, 197, 90, 0.3);
-}
-
-body.dark-mode .installed-status-info h4 {
-  color: #e8c55a;
-}
-
-body.dark-mode .installed-status-info p {
   color: #cbd5e1;
 }
 
@@ -1934,17 +1881,17 @@ body.dark-mode .pwa-alt-text {
 }
 
 body.dark-mode .install-step {
-  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-  border-color: #4a5568;
+  background: none; background-color: var(--pt-s2);
+  border-color: var(--pt-line);
 }
 
 body.dark-mode .install-step:hover {
-  border-color: #e8c55a;
+  border-color: var(--pt-gd);
   box-shadow: 0 4px 15px rgba(232, 197, 90, 0.2);
 }
 
 body.dark-mode .install-step h5 {
-  color: #e2e8f0;
+  color: var(--pt-tx);
 }
 
 body.dark-mode .install-step p {
@@ -1952,11 +1899,11 @@ body.dark-mode .install-step p {
 }
 
 body.dark-mode .install-step strong {
-  color: #e8c55a;
+  color: var(--pt-gd);
 }
 
 body.dark-mode .install-step .step-icon {
-  background: linear-gradient(135deg, #e8c55a 0%, #d4a847 100%);
+  background: var(--pt-gd-grad);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1973,7 +1920,7 @@ body.dark-mode .install-note i {
 }
 
 body.dark-mode .install-btn.primary {
-  background: linear-gradient(135deg, #e8c55a 0%, #d4a847 100%);
+  background: var(--pt-gd-grad);
   box-shadow: 0 4px 15px rgba(232, 197, 90, 0.3);
 }
 
@@ -1982,14 +1929,14 @@ body.dark-mode .install-btn.primary:hover {
 }
 
 body.dark-mode .install-btn.secondary {
-  background: #4a5568;
-  color: #e2e8f0;
-  border-color: #718096;
+  background: var(--pt-s2);
+  color: var(--pt-tx);
+  border-color: var(--pt-line);
 }
 
 body.dark-mode .install-btn.secondary:hover {
-  background: #2d3748;
-  border-color: #4a5568;
+  background: var(--pt-s2);
+  border-color: var(--pt-line);
 }
 
 body.dark-mode .install-icon {
@@ -2206,19 +2153,19 @@ body.light-mode .modal-content {
 }
 
 body.light-mode .modal-header {
-  border-bottom-color: #e2e8f0;
+  border-bottom-color: var(--pt-line);
 }
 
 body.light-mode .modal-header h3 {
-  color: #1a202c;
+  color: var(--pt-tx);
 }
 
 body.light-mode .close {
-  color: #a0aec0;
+  color: var(--pt-mu);
 }
 
 body.light-mode .close:hover {
-  color: #4a5568;
+  color: var(--pt-tx);
 }
 
 body.light-mode .count-number {
@@ -2297,46 +2244,275 @@ body.light-mode .footer p {
 
 /* ── Install Modal ── */
 body.light-mode .install-header h3 {
-  color: #1a202c;
-  background: linear-gradient(135deg, #1a8a5c 0%, #0d6b4e 100%);
+  color: var(--pt-tx);
+  background: var(--pt-em-grad);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 body.light-mode .install-subtitle {
-  color: #4a5568;
+  color: var(--pt-tx);
 }
 
 body.light-mode .device-badge {
-  background: linear-gradient(135deg, #1a8a5c 0%, #0d6b4e 100%);
+  background: var(--pt-em-grad);
   box-shadow: 0 4px 15px rgba(26, 138, 92, 0.2);
 }
 
 body.light-mode .install-step {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
 }
 
 body.light-mode .install-step:hover {
-  border-color: #1a8a5c;
+  border-color: var(--pt-em);
   box-shadow: 0 4px 15px rgba(26, 138, 92, 0.1);
 }
 
+/* ── v2 visual identity: install/download window ── */
+.install-modal-content {
+  width: min(92vw, 390px);
+  max-width: 390px;
+  margin: 4vh auto;
+  border: 1px solid var(--pt-line-2);
+  border-radius: 22px;
+  background: var(--pt-s2);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+  color: var(--pt-tx);
+}
+
+.install-modal-content > .close {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--pt-gd-bg);
+  color: var(--pt-gd);
+  font-size: 1.25rem;
+  line-height: 26px;
+  text-align: center;
+}
+
+.install-modal-content > .close:hover {
+  color: var(--pt-tx);
+  background: var(--pt-gd-line);
+}
+
+.install-content {
+  padding: 1.2rem 0.75rem 0.8rem;
+}
+
+.install-header {
+  margin: 0 0 0.65rem;
+}
+
+.install-header h3 {
+  font-size: 1.18rem;
+  line-height: 1.35;
+  margin-bottom: 0.3rem;
+  color: var(--pt-gd);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.install-subtitle {
+  color: var(--pt-mu);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+.apk-download-hero {
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.7rem 0.6rem;
+  border: 1px dashed var(--pt-gd-line);
+  border-radius: 14px;
+  background: rgba(230, 189, 98, 0.05);
+}
+
+.apk-badge-row {
+  gap: 0.35rem;
+}
+
+.apk-tag,
+.apk-tag-size {
+  padding: 0.24rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.63rem;
+}
+
+.apk-tag {
+  background: var(--pt-gd-bg);
+  color: var(--pt-gd);
+}
+
+.apk-tag-size {
+  background: var(--pt-line);
+  color: var(--pt-mu);
+}
+
+.apk-features-grid {
+  gap: 0.35rem;
+}
+
+.apk-feat-chip {
+  justify-content: center;
+  padding: 0.4rem 0.25rem;
+  border-radius: 8px;
+  background: var(--pt-s3);
+  color: var(--pt-mu);
+  font-size: 0.61rem;
+}
+
+.apk-feat-chip i {
+  color: var(--pt-gd);
+  font-size: 0.7rem;
+}
+
+.apk-download-btn {
+  min-height: 40px;
+  padding: 0.65rem 0.8rem !important;
+  border-radius: 10px !important;
+  background: var(--pt-gd-grad) !important;
+  color: #2a1d05 !important;
+  box-shadow: 0 6px 16px rgba(230, 189, 98, 0.22) !important;
+  font-size: 0.82rem !important;
+}
+
+.apk-download-btn:hover {
+  box-shadow: 0 8px 20px rgba(230, 189, 98, 0.34) !important;
+}
+
+.apk-download-meta {
+  color: var(--pt-mu-2);
+  font-size: 0.56rem;
+  line-height: 1.5;
+}
+
+.device-badge {
+  margin: 0.65rem 0 0.6rem;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  background: var(--pt-gd-grad);
+  color: #2a1d05;
+  font-size: 0.65rem;
+  box-shadow: 0 4px 12px rgba(230, 189, 98, 0.2);
+}
+
+.install-steps {
+  margin: 0 0 0.6rem;
+}
+
+.install-step {
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 58px;
+  box-sizing: border-box;
+  padding: 0.65rem 0.6rem;
+  margin-bottom: 0.45rem;
+  border: 1px solid var(--pt-line);
+  border-radius: 11px;
+  background: var(--pt-s2);
+}
+
+.install-step:hover {
+  transform: none;
+  border-color: var(--pt-gd-line);
+  box-shadow: none;
+}
+
+.install-step .step-icon {
+  order: 0;
+  min-width: 28px;
+  font-size: 1.25rem;
+  color: var(--pt-gd);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.install-step .step-content {
+  text-align: right;
+}
+
+.install-step h5 {
+  margin-bottom: 0.1rem;
+  color: var(--pt-tx);
+  font-size: 0.75rem;
+}
+
+.install-step p {
+  color: var(--pt-mu);
+  font-size: 0.62rem;
+  line-height: 1.55;
+}
+
+.install-step strong {
+  color: var(--pt-gd);
+}
+
+.install-note {
+  padding: 0.55rem 0.65rem;
+  margin: 0.5rem 0;
+  border: 1px solid var(--pt-gd-line);
+  border-radius: 10px;
+  background: var(--pt-gd-bg);
+  color: var(--pt-gd);
+  font-size: 0.65rem;
+}
+
+.install-note i {
+  color: var(--pt-gd);
+}
+
+.install-buttons {
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+
+.install-btn {
+  min-height: 38px;
+  padding: 0.55rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+}
+
+.install-btn.primary {
+  background: var(--pt-gd-grad);
+  color: #2a1d05;
+  box-shadow: 0 4px 14px rgba(230, 189, 98, 0.22);
+}
+
+.install-btn.secondary {
+  background: var(--pt-s3);
+  color: var(--pt-tx);
+  border: 1px solid var(--pt-line);
+}
+
+@media (max-width: 420px) {
+  .install-modal-content {
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+}
+
 body.light-mode .install-step h5 {
-  color: #1a202c;
+  color: var(--pt-tx);
 }
 
 body.light-mode .install-step p {
-  color: #4a5568;
+  color: var(--pt-tx);
 }
 
 body.light-mode .install-step strong {
-  color: #1a8a5c;
+  color: var(--pt-em);
 }
 
 body.light-mode .install-step .step-icon {
-  color: #1a8a5c;
+  color: var(--pt-em);
 }
 
 body.light-mode .install-note {
@@ -2350,7 +2526,7 @@ body.light-mode .install-note i {
 }
 
 body.light-mode .install-btn.primary {
-  background: linear-gradient(135deg, #1a8a5c 0%, #0d6b4e 100%);
+  background: var(--pt-em-grad);
   color: white;
   box-shadow: 0 4px 15px rgba(26, 138, 92, 0.2);
 }
@@ -2360,14 +2536,14 @@ body.light-mode .install-btn.primary:hover {
 }
 
 body.light-mode .install-btn.secondary {
-  background: #f1f5f9;
-  color: #475569;
-  border-color: #e2e8f0;
+  background: var(--pt-s1);
+  color: var(--pt-tx);
+  border-color: var(--pt-line);
 }
 
 body.light-mode .install-btn.secondary:hover {
-  background: #e2e8f0;
-  border-color: #cbd5e0;
+  background: var(--pt-s1);
+  border-color: var(--pt-line);
 }
 
 body.light-mode .install-icon {
@@ -6180,8 +6356,8 @@ body.light-mode .cal-fasting-guide-btn:hover {
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #d4a847, #b8860b);
-  color: #0b111e;
+  background: var(--pt-gd-grad);
+  color: var(--pt-tx);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6766,14 +6942,18 @@ body.light-mode .qmc-dir {
   transform: translate(-50%, -100%);
   transform-origin: bottom center;
   z-index: 3;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.1s ease-out;
+}
+.qibla-mini-needle.qibla-aligned .qmn-tip {
+  border-bottom-color: #10b981;
+  filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.85));
 }
 .qmn-tip {
   width: 0;
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-bottom: 30px solid #d4a847;
+  border-bottom: 30px solid var(--pt-gd);
   position: absolute;
   top: 0;
   left: 50%;
@@ -6800,12 +6980,12 @@ body.light-mode .qmc-dir {
   z-index: 4;
   width: 8px;
   height: 8px;
-  background: #d4a847;
+  background: var(--pt-gd);
   border-radius: 50%;
   box-shadow: 0 0 6px rgba(212, 168, 71, 0.5);
 }
 body.light-mode .qibla-mini-center {
-  background: #b8860b;
+  background: var(--pt-gd);
   box-shadow: 0 0 6px rgba(184, 134, 11, 0.4);
 }
 
@@ -6850,20 +7030,20 @@ body.light-mode .qibla-compact-deg {
 .qibla-modal-content {
   width: 100%;
   max-width: 420px;
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-  border: 1px solid rgba(212, 168, 71, 0.28);
+  background: linear-gradient(180deg, var(--pt-s2) 0%, var(--pt-s2) 100%);
+  border: 1px solid var(--pt-gd-bg);
   border-radius: 24px;
   padding: 1.4rem;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
-  color: #e2e8f0;
+  color: var(--pt-tx);
   animation: qiblaModalAnim 0.3s ease;
 }
 
 body.light-mode .qibla-modal-content {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  border-color: rgba(26, 138, 92, 0.22);
+  background: none; background-color: var(--pt-s1);
+  border-color: var(--pt-em-bg);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-  color: #1e293b;
+  color: var(--pt-tx);
 }
 
 @keyframes qiblaModalAnim {
@@ -6903,18 +7083,18 @@ body.light-mode .qibla-modal-content {
 .qibla-deg-badge {
   font-size: 2.2rem;
   font-weight: 800;
-  color: #d4a847;
+  color: var(--pt-gd);
   font-family: "Cairo", sans-serif;
   line-height: 1;
 }
 
 body.light-mode .qibla-deg-badge {
-  color: #1a8a5c;
+  color: var(--pt-em);
 }
 
 .qibla-modal-status {
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: var(--pt-mu);
   margin: 0;
   text-align: center;
   font-family: "Cairo", sans-serif;
@@ -6928,9 +7108,9 @@ body.light-mode .qibla-modal-status {
   margin-top: 0.5rem;
   padding: 0.55rem 1.3rem;
   border-radius: 20px;
-  border: 1px solid rgba(212, 168, 71, 0.35);
-  background: rgba(212, 168, 71, 0.12);
-  color: #ffd700;
+  border: 1px solid var(--pt-gd);
+  background: var(--pt-gd-bg);
+  color: var(--pt-gd);
   font-family: "Cairo", sans-serif;
   font-size: 0.88rem;
   font-weight: 700;
@@ -6942,8 +7122,8 @@ body.light-mode .qibla-modal-status {
 }
 
 .qibla-calibrate-action-btn:hover {
-  background: #d4a847;
-  color: #0f172a;
+  background: var(--pt-gd);
+  color: var(--pt-tx);
   transform: translateY(-1px);
 }
 
@@ -7009,7 +7189,7 @@ body.light-mode .duaa-head-title {
 
 .duaa-head-icon {
   font-size: 1.05rem;
-  color: #34d399;
+  color: var(--pt-em);
 }
 
 body.light-mode .duaa-head-icon {
@@ -7113,7 +7293,7 @@ body.light-mode .duaa-source-badge {
 
 .duaa-source-badge i {
   font-size: 0.7rem;
-  color: #ffd700;
+  color: var(--pt-gd);
 }
 
 body.light-mode .duaa-source-badge i {
@@ -7336,12 +7516,12 @@ body.light-mode .fasting-modal-content {
 }
 
 .modal-gold-icon {
-  color: #ffd700;
+  color: var(--pt-gd);
   font-size: 1.15rem;
 }
 
 body.light-mode .modal-gold-icon {
-  color: #b8860b;
+  color: var(--pt-gd);
 }
 
 .fasting-modal-body {
@@ -7367,26 +7547,26 @@ body.light-mode .fasting-guide-intro {
 }
 
 .intro-quote {
-  color: #ffd700;
+  color: var(--pt-gd);
   font-size: 1.1rem;
   flex-shrink: 0;
   margin-top: 0.2rem;
 }
 
 body.light-mode .intro-quote {
-  color: #b8860b;
+  color: var(--pt-gd);
 }
 
 .fasting-guide-intro p {
   font-family: "Amiri", serif;
   font-size: 1.1rem;
   line-height: 1.8;
-  color: #f1f5f9;
+  color: var(--pt-tx);
   margin: 0;
 }
 
 body.light-mode .fasting-guide-intro p {
-  color: #1e293b;
+  color: var(--pt-tx);
 }
 
 .fasting-occasions-list {
@@ -7405,7 +7585,7 @@ body.light-mode .fasting-guide-intro p {
 }
 
 body.light-mode .fasting-occasion-card {
-  background: #f8fafc;
+  background: var(--pt-s1);
   border-color: rgba(0, 0, 0, 0.06);
 }
 
@@ -7425,11 +7605,11 @@ body.light-mode .fasting-occasion-card {
   font-family: "Cairo", sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--pt-tx);
 }
 
 body.light-mode .foc-head h4 {
-  color: #1e293b;
+  color: var(--pt-tx);
 }
 
 .foc-badge {
@@ -7442,25 +7622,25 @@ body.light-mode .foc-head h4 {
 }
 
 .foc-badge--gold {
-  background: rgba(255, 215, 0, 0.2);
-  color: #ffd700;
-  border: 1px solid rgba(255, 215, 0, 0.4);
+  background: var(--pt-gd-bg);
+  color: var(--pt-gd);
+  border: 1px solid var(--pt-gd);
 }
 
 body.light-mode .foc-badge--gold {
-  background: rgba(184, 134, 11, 0.15);
-  color: #b8860b;
+  background: var(--pt-gd-bg);
+  color: var(--pt-gd);
 }
 
 .foc-badge--green {
-  background: rgba(16, 185, 129, 0.2);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.4);
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
+  border: 1px solid var(--pt-em);
 }
 
 body.light-mode .foc-badge--green {
-  background: rgba(16, 185, 129, 0.15);
-  color: #059669;
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
 }
 
 .foc-badge--blue {
@@ -7489,24 +7669,24 @@ body.light-mode .foc-badge--purple {
   font-family: "Amiri", serif;
   font-size: 1.02rem;
   line-height: 1.8;
-  color: #cbd5e1;
+  color: var(--pt-tx);
   margin: 0;
 }
 
 body.light-mode .foc-hadith {
-  color: #334155;
+  color: var(--pt-tx);
 }
 
 .hadith-ref {
   font-family: "Cairo", sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--pt-mu);
   margin-right: 0.25rem;
 }
 
 body.light-mode .hadith-ref {
-  color: #64748b;
+  color: var(--pt-mu);
 }
 
 /* ── Legacy (keep for compatibility) ── */
@@ -8249,11 +8429,11 @@ body.light-mode .dash-divider {
 .dash-chart-header h4 {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #a0aec0;
+  color: var(--pt-mu);
   margin: 0;
 }
 body.light-mode .dash-chart-header h4 {
-  color: #4a5568;
+  color: var(--pt-tx);
 }
 
 /* Chart Tabs */
@@ -8380,14 +8560,14 @@ body.light-mode .chart-bar-track {
   font-weight: 500;
 }
 body.light-mode .chart-bar-col span {
-  color: #a0aec0;
+  color: var(--pt-mu);
 }
 .chart-bar-col.today span {
   color: #68d391;
   font-weight: 700;
 }
 body.light-mode .chart-bar-col.today span {
-  color: #1a8a5c;
+  color: var(--pt-em);
 }
 
 /* Legacy dash-weekly (keep for old references) */
@@ -8474,7 +8654,7 @@ body.light-mode .dash-bar-col span {
 .dash-backup-title {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--pt-tx);
   font-family: var(--font-sans);
 }
 
@@ -8526,7 +8706,7 @@ body.light-mode .dash-bar-col span {
 }
 
 body.light-mode .dash-backup-title {
-  color: #2d3748;
+  color: var(--pt-tx);
 }
 
 body.light-mode .dash-backup-desc {
@@ -8653,7 +8833,7 @@ body.light-mode .dash-sadaqa {
   flex-direction: column;
   overflow: hidden;
   z-index: 50;
-  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  background: none;
 }
 
 /* Light Mode Category Cards */
@@ -8682,14 +8862,14 @@ body.light-mode .category-card:hover {
 }
 
 body.light-mode .category-title {
-  color: #2d3748;
+  color: var(--pt-tx);
   text-shadow: none;
 }
 
 body.light-mode .category-count-badge {
-  background: rgba(26, 138, 92, 0.1);
-  border: 1px solid rgba(26, 138, 92, 0.2);
-  color: #1a8a5c;
+  background: var(--pt-em-bg);
+  border: 1px solid var(--pt-em-bg);
+  color: var(--pt-em);
 }
 
 body.light-mode #categoryPage {
@@ -8968,11 +9148,11 @@ body.light-mode .swiper-floating-menu button {
   width: 100%;
   max-width: 580px;
   margin: 0.25rem auto;
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.82) 0%, rgba(15, 23, 42, 0.9) 100%);
+  background: linear-gradient(180deg, var(--pt-s2) 0%, var(--pt-s1) 100%);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(212, 168, 71, 0.22);
-  border-top: 3.5px solid #d4a847;
+  border: 1px solid var(--pt-line);
+  border-top: 3.5px solid var(--pt-gd);
   border-radius: 24px;
   padding: 1rem 1.15rem 0.85rem;
   box-shadow:
@@ -8993,11 +9173,11 @@ body.light-mode .swiper-floating-menu button {
 }
 
 body.light-mode .slide-body {
-  background: linear-gradient(180deg, #ffffff 0%, #faf8f5 100%);
+  background: linear-gradient(180deg, var(--pt-s2) 0%, var(--pt-s2) 100%);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(26, 138, 92, 0.16);
-  border-top: 3.5px solid #1a8a5c;
+  border: 1px solid var(--pt-em-bg);
+  border-top: 3.5px solid var(--pt-em);
   border-radius: 24px;
   box-shadow:
     0 10px 30px rgba(26, 138, 92, 0.08),
@@ -9046,14 +9226,14 @@ body.light-mode .slide-text-container {
 }
 
 body.light-mode .slide-zikr-text {
-  color: #1a202c;
+  color: var(--pt-tx);
   text-shadow: none;
 }
 
 .bismillah-header {
   font-family: "Amiri Quran", "Amiri", serif;
   font-size: 1.15em;
-  color: #e8c55a;
+  color: var(--pt-gd);
   margin-bottom: 0.65rem;
   position: relative;
   display: inline-block;
@@ -9068,7 +9248,7 @@ body.light-mode .slide-zikr-text {
   left: 20%;
   right: 20%;
   height: 1.5px;
-  background: linear-gradient(90deg, transparent, rgba(232, 197, 90, 0.65), transparent);
+  background: linear-gradient(90deg, transparent, var(--pt-gd), transparent);
 }
 
 body.light-mode .bismillah-header {
@@ -9080,7 +9260,7 @@ body.light-mode .bismillah-header::after {
 }
 
 .quran-aya-num {
-  color: #e8c55a;
+  color: var(--pt-gd);
   font-weight: 700;
   font-size: 0.9em;
   padding: 0 3px;
@@ -9112,11 +9292,11 @@ body.light-mode .slide-meta-row {
 
 .slide-source-label {
   font-size: 0.78rem;
-  color: #d4a847;
+  color: var(--pt-gd);
   font-family: "Cairo", sans-serif;
   font-weight: 600;
-  background: rgba(212, 168, 71, 0.12);
-  border: 1px solid rgba(212, 168, 71, 0.25);
+  background: var(--pt-gd-bg);
+  border: 1px solid var(--pt-gd-bg);
   padding: 3px 10px;
   border-radius: 20px;
   display: inline-flex;
@@ -9176,9 +9356,9 @@ body.light-mode .slide-copy-btn:hover {
   font-size: 0.78rem;
   font-family: "Cairo", sans-serif;
   font-weight: 700;
-  color: #e8c55a;
-  background: rgba(232, 197, 90, 0.12);
-  border: 1px solid rgba(232, 197, 90, 0.25);
+  color: var(--pt-gd);
+  background: var(--pt-gd-bg);
+  border: 1px solid var(--pt-gd-bg);
   padding: 3px 10px;
   border-radius: 20px;
   display: inline-flex;
@@ -9191,7 +9371,7 @@ body.light-mode .slide-copy-btn:hover {
 }
 
 .slide-fadl-toggle:hover {
-  background: rgba(232, 197, 90, 0.22);
+  background: var(--pt-gd-bg);
 }
 
 .slide-fadl-toggle .arrow-indicator {
@@ -9238,7 +9418,7 @@ body.light-mode .slide-fadl-box {
 .slide-fadl-content {
   padding: 0.5rem 0.85rem;
   font-size: 0.84rem;
-  color: #e2e8f0;
+  color: var(--pt-tx);
   line-height: 1.7;
 }
 
@@ -9247,7 +9427,7 @@ body.light-mode .slide-fadl-box {
 }
 
 body.light-mode .slide-fadl-content {
-  color: #334155;
+  color: var(--pt-tx);
 }
 
 /* ── Counter area & Controls (Thumb-friendly ergonomics) ── */
@@ -9310,16 +9490,16 @@ body.light-mode .slide-fadl-content {
 }
 
 body.light-mode .slide-nav-arrow {
-  background: #ffffff;
-  border: 1.5px solid #cbd5e1;
-  color: #1a8a5c;
+  background: var(--pt-s2);
+  border: 1.5px solid var(--pt-line);
+  color: var(--pt-em);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 body.light-mode .slide-nav-arrow:hover:not(.disabled) {
-  background: #1a8a5c;
-  border-color: #1a8a5c;
-  color: #ffffff;
+  background: var(--pt-em);
+  border-color: var(--pt-em);
+  color: var(--pt-tx);
 }
 
 /* ── Circular Counter with SVG Progress Ring ── */
@@ -9397,7 +9577,7 @@ body.light-mode .counter-ring-svg .ring-bg {
   font-family: "Cairo", sans-serif;
   font-size: 0.68rem;
   font-weight: 600;
-  color: #a0aec0;
+  color: var(--pt-mu);
   letter-spacing: 0.02em;
 }
 
@@ -9461,7 +9641,7 @@ body.light-mode .slide-counter-btn.completed .counter-btn-inner .counter-lbl {
 
 .counter-hint-text {
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--pt-mu);
   font-family: "Cairo", sans-serif;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -10090,11 +10270,11 @@ body.light-mode .misbaha-overlay {
 .misbaha-title {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--pt-tx);
   margin: 0;
 }
 body.light-mode .misbaha-title {
-  color: #2d3748;
+  color: var(--pt-tx);
 }
 .misbaha-close-btn,
 .misbaha-reset-btn {
@@ -10103,7 +10283,7 @@ body.light-mode .misbaha-title {
   border: none;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.06);
-  color: #a0aec0;
+  color: var(--pt-mu);
   font-size: 1rem;
   cursor: pointer;
   display: flex;
@@ -10119,7 +10299,7 @@ body.light-mode .misbaha-title {
 body.light-mode .misbaha-close-btn,
 body.light-mode .misbaha-reset-btn {
   background: rgba(0, 0, 0, 0.05);
-  color: #718096;
+  color: var(--pt-mu);
 }
 body.light-mode .misbaha-close-btn:hover,
 body.light-mode .misbaha-reset-btn:hover {
@@ -10138,10 +10318,10 @@ body.light-mode .misbaha-reset-btn:hover {
 }
 .misbaha-preset {
   padding: 0.45rem 0.9rem;
-  border: 1.5px solid rgba(212, 168, 71, 0.2);
+  border: 1.5px solid var(--pt-gd-bg);
   border-radius: 20px;
-  background: rgba(212, 168, 71, 0.06);
-  color: #a0aec0;
+  background: var(--pt-gd-bg);
+  color: var(--pt-mu);
   font-family: "Cairo", sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
@@ -10150,24 +10330,24 @@ body.light-mode .misbaha-reset-btn:hover {
   white-space: nowrap;
 }
 .misbaha-preset:hover {
-  background: rgba(212, 168, 71, 0.12);
-  border-color: rgba(212, 168, 71, 0.35);
+  background: var(--pt-gd-bg);
+  border-color: var(--pt-gd);
 }
 .misbaha-preset.active {
-  background: linear-gradient(135deg, rgba(212, 168, 71, 0.2), rgba(212, 168, 71, 0.12));
-  border-color: #d4a847;
-  color: #d4a847;
+  background: linear-gradient(135deg, var(--pt-gd-bg), var(--pt-gd-bg));
+  border-color: var(--pt-gd);
+  color: var(--pt-gd);
   box-shadow: 0 2px 10px rgba(212, 168, 71, 0.15);
 }
 body.light-mode .misbaha-preset {
-  border-color: rgba(184, 134, 11, 0.15);
-  background: rgba(184, 134, 11, 0.04);
-  color: #718096;
+  border-color: var(--pt-gd-bg);
+  background: var(--pt-gd-bg);
+  color: var(--pt-mu);
 }
 body.light-mode .misbaha-preset.active {
-  background: rgba(184, 134, 11, 0.12);
-  border-color: #b8860b;
-  color: #8b6914;
+  background: var(--pt-gd-bg);
+  border-color: var(--pt-gd);
+  color: var(--pt-tx);
 }
 
 /* ── Target Selection Bar ── */
@@ -10181,12 +10361,12 @@ body.light-mode .misbaha-preset.active {
 }
 .misbaha-targets-label {
   font-size: 0.85rem;
-  color: #a0aec0;
+  color: var(--pt-mu);
   font-weight: 600;
   margin-left: 0.35rem;
 }
 body.light-mode .misbaha-targets-label {
-  color: #718096;
+  color: var(--pt-mu);
 }
 .misbaha-target-btn {
   padding: 0.35rem 0.85rem;
@@ -10207,20 +10387,20 @@ body.light-mode .misbaha-targets-label {
   color: #d4a847;
 }
 .misbaha-target-btn.active {
-  background: linear-gradient(135deg, #d4a847, #b8860b);
-  border-color: #ffd700;
-  color: #0f172a;
+  background: var(--pt-gd-grad);
+  border-color: var(--pt-gd);
+  color: var(--pt-tx);
   box-shadow: 0 2px 10px rgba(212, 168, 71, 0.35);
 }
 body.light-mode .misbaha-target-btn {
   border-color: rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.04);
-  color: #4a5568;
+  color: var(--pt-tx);
 }
 body.light-mode .misbaha-target-btn.active {
-  background: linear-gradient(135deg, #b8860b, #d4a847);
-  border-color: #b8860b;
-  color: #ffffff;
+  background: var(--pt-gd-grad);
+  border-color: var(--pt-gd);
+  color: var(--pt-tx);
 }
 
 /* ── Dhikr Display ── */
@@ -10228,7 +10408,7 @@ body.light-mode .misbaha-target-btn.active {
   font-family: "Amiri", serif;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--pt-tx);
   text-align: center;
   margin-bottom: 1.5rem;
   line-height: 1.6;
@@ -10238,7 +10418,7 @@ body.light-mode .misbaha-target-btn.active {
   justify-content: center;
 }
 body.light-mode .misbaha-dhikr-display {
-  color: #2d3748;
+  color: var(--pt-tx);
 }
 
 /* ── Counter Circle ── */
@@ -10315,16 +10495,16 @@ body.light-mode .misbaha-ring-fill {
 .misbaha-count-num {
   font-size: 3.5rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--pt-tx);
   line-height: 1;
   font-family: "Cairo", sans-serif;
 }
 body.light-mode .misbaha-count-num {
-  color: #2d3748;
+  color: var(--pt-tx);
 }
 .misbaha-count-target {
   font-size: 0.95rem;
-  color: #718096;
+  color: var(--pt-mu);
   font-weight: 600;
   font-family: "Cairo", sans-serif;
 }
@@ -10354,7 +10534,7 @@ body.light-mode .misbaha-stat-card {
 }
 .misbaha-stat-label {
   font-size: 0.8rem;
-  color: #a0aec0;
+  color: var(--pt-mu);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -10362,21 +10542,21 @@ body.light-mode .misbaha-stat-card {
   margin-bottom: 0.25rem;
 }
 body.light-mode .misbaha-stat-label {
-  color: #718096;
+  color: var(--pt-mu);
 }
 .misbaha-stat-label i {
-  color: #d4a847;
+  color: var(--pt-gd);
   font-size: 0.75rem;
 }
 .misbaha-stat-val {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #d4a847;
+  color: var(--pt-gd);
   font-family: "Cairo", sans-serif;
   line-height: 1.1;
 }
 body.light-mode .misbaha-stat-val {
-  color: #b8860b;
+  color: var(--pt-gd);
 }
 
 /* ── Misbaha completion animation ── */
@@ -10728,7 +10908,7 @@ body.light-mode .misbaha-stat-val {
 .pr-toc-btn {
   background: none;
   border: none;
-  color: #1a8a5c;
+  color: var(--pt-em);
   font-size: 1.1rem;
   cursor: pointer;
   padding: 0.4rem;
@@ -10754,7 +10934,7 @@ body.light-mode .misbaha-stat-val {
   font-family: "Cairo", sans-serif;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--pt-tx);
   line-height: 1.2;
 }
 
@@ -10762,7 +10942,7 @@ body.light-mode .misbaha-stat-val {
   display: block;
   font-family: "Cairo", sans-serif;
   font-size: 0.68rem;
-  color: #64748b;
+  color: var(--pt-mu);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -10810,9 +10990,9 @@ body.light-mode .misbaha-stat-val {
 }
 
 .pr-ctrl-btn {
-  background: rgba(26, 138, 92, 0.08);
-  border: 1px solid rgba(26, 138, 92, 0.15);
-  color: #1a8a5c;
+  background: var(--pt-em-bg);
+  border: 1px solid var(--pt-em-bg);
+  color: var(--pt-em);
   padding: 0.35rem 0.7rem;
   border-radius: 10px;
   cursor: pointer;
@@ -10822,7 +11002,7 @@ body.light-mode .misbaha-stat-val {
 }
 
 .pr-ctrl-btn:hover {
-  background: rgba(26, 138, 92, 0.15);
+  background: var(--pt-em-bg);
   transform: scale(1.05);
 }
 
@@ -10839,7 +11019,7 @@ body.light-mode .misbaha-stat-val {
 .pr-reading-time {
   font-family: "Cairo", sans-serif;
   font-size: 0.72rem;
-  color: #94a3b8;
+  color: var(--pt-mu);
   margin-right: auto;
 }
 
@@ -10857,7 +11037,7 @@ body.light-mode .misbaha-stat-val {
 .pr-article {
   font-family: "Amiri", "Cairo", serif;
   line-height: 2.25;
-  color: #1e293b;
+  color: var(--pt-tx);
   animation: prFadeInUp 0.6s ease both;
 }
 
@@ -10871,7 +11051,7 @@ body.light-mode .misbaha-stat-val {
   font-family: "Cairo", sans-serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #1a8a5c;
+  color: var(--pt-em);
   text-align: center;
   margin: 2rem 0 0.5rem;
   padding-bottom: 0.75rem;
@@ -10883,7 +11063,7 @@ body.light-mode .misbaha-stat-val {
   display: block;
   font-family: "Amiri", serif;
   font-size: 1.6rem;
-  color: rgba(26, 138, 92, 0.25);
+  color: var(--pt-em-bg);
   margin-top: 0.5rem;
   line-height: 1;
   letter-spacing: 0.02em;
@@ -10914,7 +11094,7 @@ body.light-mode .misbaha-stat-val {
   gap: 1rem;
   font-family: "Cairo", sans-serif;
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--pt-mu);
   margin-bottom: 1.5rem;
 }
 
@@ -10969,7 +11149,7 @@ body.light-mode .misbaha-stat-val {
 .pr-ornament-divider span {
   font-family: "Amiri", serif;
   font-size: 1.2rem;
-  color: #1a8a5c;
+  color: var(--pt-em);
   line-height: 1;
 }
 
@@ -10983,7 +11163,7 @@ body.light-mode .misbaha-stat-val {
   font-family: "Cairo", sans-serif;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #1a8a5c;
+  color: var(--pt-em);
   margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
@@ -10996,8 +11176,8 @@ body.light-mode .misbaha-stat-val {
   padding: 1.5rem 1.75rem;
   background: linear-gradient(135deg, rgba(251, 191, 36, 0.07), rgba(245, 158, 11, 0.03), rgba(252, 211, 77, 0.05));
   border-radius: 16px;
-  border: 1px solid rgba(212, 168, 71, 0.18);
-  border-right: 4px solid #d4a847;
+  border: 1px solid var(--pt-gd-bg);
+  border-right: 4px solid var(--pt-gd);
   overflow: hidden;
 }
 
@@ -11007,7 +11187,7 @@ body.light-mode .misbaha-stat-val {
   top: -8px;
   right: 12px;
   font-size: 3rem;
-  color: rgba(212, 168, 71, 0.12);
+  color: var(--pt-gd-bg);
   font-family: serif;
   line-height: 1;
 }
@@ -11044,10 +11224,10 @@ body.light-mode .misbaha-stat-val {
   position: relative;
   margin: 1rem 0;
   padding: 1.5rem 1.75rem;
-  background: linear-gradient(135deg, rgba(26, 138, 92, 0.05), rgba(16, 185, 129, 0.03), rgba(52, 211, 153, 0.04));
+  background: linear-gradient(135deg, var(--pt-em-bg), var(--pt-em-bg), var(--pt-em-bg));
   border-radius: 16px;
-  border: 1px solid rgba(26, 138, 92, 0.14);
-  border-right: 4px solid #1a8a5c;
+  border: 1px solid var(--pt-em-bg);
+  border-right: 4px solid var(--pt-em);
   overflow: hidden;
 }
 
@@ -11057,7 +11237,7 @@ body.light-mode .misbaha-stat-val {
   top: -8px;
   right: 12px;
   font-size: 3rem;
-  color: rgba(26, 138, 92, 0.08);
+  color: var(--pt-em-bg);
   font-family: serif;
   line-height: 1;
 }
@@ -11066,7 +11246,7 @@ body.light-mode .misbaha-stat-val {
   font-family: "Amiri", serif;
   font-size: 1.08em;
   line-height: 2.1;
-  color: #065f46;
+  color: var(--pt-em);
   margin: 0;
   position: relative;
   z-index: 1;
@@ -11077,12 +11257,12 @@ body.light-mode .misbaha-stat-val {
   text-align: left;
   font-family: "Cairo", sans-serif;
   font-size: 0.72rem;
-  color: #047857;
+  color: var(--pt-em);
   margin-top: 0.75rem;
   font-style: normal;
   font-weight: 600;
   padding-top: 0.5rem;
-  border-top: 1px solid rgba(26, 138, 92, 0.1);
+  border-top: 1px solid var(--pt-em-bg);
 }
 
 .pr-hadith-source::before {
@@ -11102,7 +11282,7 @@ body.light-mode .misbaha-stat-val {
   font-family: "Cairo", sans-serif;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #64748b;
+  color: var(--pt-mu);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -11121,11 +11301,11 @@ body.light-mode .misbaha-stat-val {
 .pr-sources-list li {
   font-family: "Cairo", sans-serif;
   font-size: 0.7rem;
-  color: #94a3b8;
-  background: rgba(26, 138, 92, 0.06);
+  color: var(--pt-mu);
+  background: var(--pt-em-bg);
   padding: 0.2rem 0.6rem;
   border-radius: 8px;
-  border: 1px solid rgba(26, 138, 92, 0.08);
+  border: 1px solid var(--pt-em-bg);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -11504,7 +11684,7 @@ body.light-mode .misbaha-stat-val {
   font-family: "Cairo", sans-serif;
   font-size: 1rem;
   font-weight: 700;
-  color: #1a8a5c;
+  color: var(--pt-em);
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -11514,7 +11694,7 @@ body.light-mode .misbaha-stat-val {
 .pr-drawer-close {
   background: none;
   border: none;
-  color: #94a3b8;
+  color: var(--pt-mu);
   font-size: 1.1rem;
   cursor: pointer;
   padding: 0.3rem;
@@ -11551,7 +11731,7 @@ body.light-mode .misbaha-stat-val {
 .pr-drawer-progress-text {
   font-family: "Cairo", sans-serif;
   font-size: 0.68rem;
-  color: #94a3b8;
+  color: var(--pt-mu);
   text-align: center;
 }
 
@@ -11592,8 +11772,8 @@ body.light-mode .misbaha-stat-val {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(26, 138, 92, 0.1);
-  color: #1a8a5c;
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
   border-radius: 8px;
   font-size: 0.75rem;
   font-weight: 700;
@@ -11602,8 +11782,8 @@ body.light-mode .misbaha-stat-val {
 }
 
 .pr-drawer-item--active .pr-drawer-num {
-  background: #1a8a5c;
-  color: #fff;
+  background: var(--pt-em);
+  color: var(--pt-tx);
 }
 
 /* ── Drawer Read Check Icon ────────────────────────────────── */
@@ -11623,13 +11803,13 @@ body.light-mode .misbaha-stat-val {
   flex: 1;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--pt-tx);
   line-height: 1.3;
 }
 
 .pr-drawer-time {
   font-size: 0.65rem;
-  color: #94a3b8;
+  color: var(--pt-mu);
   flex-shrink: 0;
 }
 
@@ -11713,7 +11893,7 @@ body.light-mode .misbaha-stat-val {
   font-family: "Cairo", sans-serif;
   font-size: 0.6rem;
   font-weight: 700;
-  color: #1a8a5c;
+  color: var(--pt-em);
 }
 
 /* ================================================================
@@ -11793,7 +11973,7 @@ body.dark-mode .pr-topbar {
 
 body.dark-mode .pr-back-btn,
 body.dark-mode .pr-toc-btn {
-  color: #68d391;
+  color: var(--pt-em);
 }
 
 body.dark-mode .pr-back-btn:hover,
@@ -11802,11 +11982,11 @@ body.dark-mode .pr-toc-btn:hover {
 }
 
 body.dark-mode .pr-topbar-name {
-  color: #e2e8f0;
+  color: var(--pt-tx);
 }
 
 body.dark-mode .pr-topbar-chapter {
-  color: #94a3b8;
+  color: var(--pt-mu);
 }
 
 /* ── Dark: Progress Bar ──────────────────────────────── */
@@ -11825,13 +12005,13 @@ body.dark-mode .pr-controls {
 }
 
 body.dark-mode .pr-ctrl-btn {
-  background: rgba(104, 211, 145, 0.1);
-  border-color: rgba(104, 211, 145, 0.15);
-  color: #68d391;
+  background: var(--pt-em-bg);
+  border-color: var(--pt-em-bg);
+  color: var(--pt-em);
 }
 
 body.dark-mode .pr-ctrl-btn:hover {
-  background: rgba(104, 211, 145, 0.18);
+  background: var(--pt-em-bg);
 }
 
 /* ── Dark: Article ───────────────────────────────────── */
@@ -11840,11 +12020,11 @@ body.dark-mode .pr-article {
 }
 
 body.dark-mode .pr-chapter-title {
-  color: #68d391;
+  color: var(--pt-em);
 }
 
 body.dark-mode .pr-chapter-title::after {
-  color: rgba(104, 211, 145, 0.2);
+  color: var(--pt-em-bg);
 }
 
 body.dark-mode .pr-chapter-ornament {
@@ -11857,7 +12037,7 @@ body.dark-mode .pr-chapter-ornament::after {
 }
 
 body.dark-mode .pr-chapter-meta {
-  color: #718096;
+  color: var(--pt-mu);
 }
 
 body.dark-mode .pr-paragraph--first::first-letter {
@@ -11870,18 +12050,18 @@ body.dark-mode .pr-ornament-divider::after {
 }
 
 body.dark-mode .pr-ornament-divider span {
-  color: #68d391;
+  color: var(--pt-em);
 }
 
 /* ── Dark: Quran Verse ───────────────────────────────── */
 body.dark-mode .pr-quran-verse {
   background: linear-gradient(135deg, rgba(251, 191, 36, 0.06), rgba(245, 158, 11, 0.03));
-  border-color: rgba(212, 168, 71, 0.15);
-  border-right-color: #d4a847;
+  border-color: var(--pt-gd-bg);
+  border-right-color: var(--pt-gd);
 }
 
 body.dark-mode .pr-quran-verse::before {
-  color: rgba(212, 168, 71, 0.1);
+  color: var(--pt-gd-bg);
 }
 
 body.dark-mode .pr-quran-text {
@@ -11895,13 +12075,13 @@ body.dark-mode .pr-quran-cite {
 
 /* ── Dark: Hadith ────────────────────────────────────── */
 body.dark-mode .pr-hadith-box {
-  background: linear-gradient(135deg, rgba(104, 211, 145, 0.05), rgba(16, 185, 129, 0.03));
-  border-color: rgba(104, 211, 145, 0.12);
-  border-right-color: #10b981;
+  background: linear-gradient(135deg, var(--pt-em-bg), var(--pt-em-bg));
+  border-color: var(--pt-em-bg);
+  border-right-color: var(--pt-em);
 }
 
 body.dark-mode .pr-hadith-box::before {
-  color: rgba(104, 211, 145, 0.06);
+  color: var(--pt-em-bg);
 }
 
 body.dark-mode .pr-hadith-text {
@@ -11909,8 +12089,8 @@ body.dark-mode .pr-hadith-text {
 }
 
 body.dark-mode .pr-hadith-source {
-  color: #34d399;
-  border-top-color: rgba(104, 211, 145, 0.08);
+  color: var(--pt-em);
+  border-top-color: var(--pt-em-bg);
 }
 
 /* ── Dark: Sources ───────────────────────────────────── */
@@ -11920,13 +12100,13 @@ body.dark-mode .pr-sources-section {
 }
 
 body.dark-mode .pr-sources-title {
-  color: #94a3b8;
+  color: var(--pt-mu);
 }
 
 body.dark-mode .pr-sources-list li {
-  color: #718096;
-  background: rgba(104, 211, 145, 0.06);
-  border-color: rgba(104, 211, 145, 0.08);
+  color: var(--pt-mu);
+  background: var(--pt-em-bg);
+  border-color: var(--pt-em-bg);
 }
 
 /* ── Dark: Complete Button ───────────────────────────── */
@@ -11991,11 +12171,11 @@ body.dark-mode .pr-drawer-header {
 }
 
 body.dark-mode .pr-drawer-header h3 {
-  color: #68d391;
+  color: var(--pt-em);
 }
 
 body.dark-mode .pr-drawer-close {
-  color: #718096;
+  color: var(--pt-mu);
 }
 
 body.dark-mode .pr-drawer-close:hover {
@@ -12011,7 +12191,7 @@ body.dark-mode .pr-drawer-progress-bar {
 }
 
 body.dark-mode .pr-drawer-progress-text {
-  color: #718096;
+  color: var(--pt-mu);
 }
 
 body.dark-mode .pr-drawer-item:hover {
@@ -12023,13 +12203,13 @@ body.dark-mode .pr-drawer-item--active {
 }
 
 body.dark-mode .pr-drawer-num {
-  background: rgba(104, 211, 145, 0.1);
-  color: #68d391;
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
 }
 
 body.dark-mode .pr-drawer-item--active .pr-drawer-num {
-  background: #10b981;
-  color: #fff;
+  background: var(--pt-em);
+  color: var(--pt-tx);
 }
 
 body.dark-mode .pr-drawer-item--read .pr-drawer-num {
@@ -12046,7 +12226,7 @@ body.dark-mode .pr-drawer-title {
 }
 
 body.dark-mode .pr-drawer-time {
-  color: #718096;
+  color: var(--pt-mu);
 }
 
 /* ── Dark: Resume Toast ──────────────────────────────── */
@@ -12064,7 +12244,7 @@ body.dark-mode .pr-scroll-progress-fill {
 }
 
 body.dark-mode .pr-scroll-pct {
-  color: #68d391;
+  color: var(--pt-em);
 }
 
 /* ================================================================
@@ -12136,9 +12316,9 @@ body.dark-mode .pr-chapter-pill-bar {
 
 .pr-pill-btn--prev,
 .pr-pill-btn--next {
-  background: rgba(26, 138, 92, 0.08);
-  color: #1a8a5c;
-  border: 1px solid rgba(26, 138, 92, 0.18);
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
+  border: 1px solid var(--pt-em-bg);
 }
 
 .pr-pill-btn--prev:hover,
@@ -12150,8 +12330,8 @@ body.dark-mode .pr-chapter-pill-bar {
 body.dark-mode .pr-pill-btn--prev,
 body.dark-mode .pr-pill-btn--next {
   background: rgba(255, 255, 255, 0.06);
-  color: #34d399;
-  border-color: rgba(52, 211, 153, 0.2);
+  color: var(--pt-em);
+  border-color: var(--pt-em-bg);
 }
 
 body.dark-mode .pr-pill-btn--prev:hover,
@@ -12160,8 +12340,8 @@ body.dark-mode .pr-pill-btn--next:hover {
 }
 
 .pr-pill-btn--complete {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #ffffff;
+  background: var(--pt-em-grad);
+  color: var(--pt-tx);
   box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
   padding: 0.55rem 1.15rem;
 }
@@ -12187,12 +12367,12 @@ body.dark-mode .pr-pill-btn--done {
   font-family: "Cairo", sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #64748b;
+  color: var(--pt-mu);
   line-height: 1;
 }
 
 body.dark-mode .pr-pill-indicator {
-  color: #94a3b8;
+  color: var(--pt-mu);
 }
 
 /* Bottom Sheet for Drawer on Mobile */
@@ -12818,6 +12998,5 @@ body.light-mode .cr-pct-badge {
     margin-bottom: 0;
   }
 }
-
 
 

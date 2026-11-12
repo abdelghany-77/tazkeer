@@ -1,0 +1,287 @@
+/* ============================================================================
+   Tazkeer v2 — Base layout & the application shell
+   ============================================================================ */
+
+html {
+  background-color: transparent !important;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  height: auto;
+  z-index: -1 !important;
+  pointer-events: none;
+  background: var(--pt-page-glow) !important;
+  transform: none;
+}
+
+body.dark-mode::before,
+body.light-mode::before {
+  background: var(--pt-page-glow) !important;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--pt-tx);
+  background-color: var(--pt-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+body.dark-mode,
+body.light-mode {
+  color: var(--pt-tx);
+  background-color: var(--pt-bg);
+}
+
+/* Everything except the bottom nav must let the page glow show through. */
+.app,
+#app,
+.app-container,
+#appContainer,
+.main,
+main,
+.tab-content,
+.tab-pane,
+.page,
+.pt-page,
+#tab-home,
+#tab-azkar,
+#tab-quran,
+#tab-prophets,
+#tab-profile,
+.prophets-page,
+.profile-page {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* The old fixed header is gone: each page renders its own title row. */
+.pt-legacy-header,
+.header.pt-legacy-header {
+  display: none !important;
+}
+
+.container {
+  max-width: 520px;
+  padding-inline: 18px;
+}
+
+.main {
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(var(--pt-nav-h) + 30px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+@media (max-width: 559px) {
+  .main {
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  }
+}
+
+@media (min-width: 560px) {
+  .main {
+    padding-top: calc(18px + env(safe-area-inset-top, 0px));
+  }
+}
+
+/* ── Page scaffolding ────────────────────────────────────────────────────── */
+.pt-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 2px;
+}
+
+.pt-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 2px 2px;
+}
+
+.pt-topbar__titles {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: start;
+}
+
+.pt-greet {
+  font-size: 13px;
+  color: var(--pt-mu);
+  font-weight: 500;
+}
+
+.pt-title {
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--pt-tx);
+  letter-spacing: -0.2px;
+}
+
+.pt-title--hijri {
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* The home header stacks the small day label + actions above a full-width
+   Hijri date, so the whole date fits on a single line on 390px screens. */
+.pt-topbar--stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "greet actions"
+    "title title"
+    "sub sub";
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 2px;
+}
+
+.pt-topbar--stack .pt-greet {
+  grid-area: greet;
+}
+
+.pt-topbar--stack .pt-topbar__actions {
+  grid-area: actions;
+  padding-top: 0;
+}
+
+.pt-topbar--stack .pt-title {
+  grid-area: title;
+}
+
+.pt-topbar--stack .pt-sub {
+  grid-area: sub;
+}
+
+.pt-sub {
+  font-size: 12px;
+  color: var(--pt-mu);
+  font-weight: 500;
+}
+
+.pt-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.pt-section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pt-mu);
+  margin: 8px 2px 2px;
+  padding: 0;
+}
+
+.pt-empty {
+  font-size: 13px;
+  color: var(--pt-mu);
+  line-height: 1.9;
+  text-align: center;
+  padding: 18px 10px;
+}
+
+/* ── Bottom navigation ───────────────────────────────────────────────────── */
+.bottom-nav {
+  height: calc(var(--pt-nav-h) + env(safe-area-inset-bottom, 0px)) !important;
+  min-height: calc(var(--pt-nav-h) + env(safe-area-inset-bottom, 0px)) !important;
+  padding: 6px 6px max(6px, env(safe-area-inset-bottom, 0px)) !important;
+  background: rgba(11, 20, 24, 0.94) !important;
+  border-top: 1px solid var(--pt-line) !important;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.28) !important;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+body.light-mode .bottom-nav {
+  background: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: 0 -8px 24px rgba(16, 48, 42, 0.07) !important;
+}
+
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  .bottom-nav {
+    background: var(--pt-s1) !important;
+  }
+}
+
+.bottom-nav-item {
+  flex: 1;
+  gap: 4px !important;
+  padding: 4px 0 !important;
+  color: var(--pt-mu) !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  border-radius: 16px;
+}
+
+.bottom-nav-item::before,
+.bottom-nav-item.active::before {
+  display: none !important;
+  content: none !important;
+}
+
+.pt-nav-ico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 30px;
+  border-radius: 15px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.pt-nav-ico i {
+  font-size: 19px;
+  line-height: 1;
+}
+
+.bottom-nav-item span.pt-nav-label {
+  line-height: 1.1;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 365px) {
+  .bottom-nav-item span.pt-nav-label,
+  .bottom-nav-item {
+    font-size: 10.5px !important;
+  }
+}
+
+.bottom-nav-item.active {
+  color: var(--pt-em) !important;
+}
+
+.bottom-nav-item.active .pt-nav-ico {
+  background: var(--pt-em-bg);
+  color: var(--pt-em);
+}
+
+.bottom-nav-item.active span.pt-nav-label {
+  color: var(--pt-em);
+  font-weight: 700;
+}
+
+.bottom-nav-item:active .pt-nav-ico {
+  transform: scale(0.94);
+}
+
+/* Keep floating legacy widgets above the taller nav */
+.quick-access,
+.quick-home {
+  bottom: calc(var(--pt-nav-h) + 16px) !important;
+}

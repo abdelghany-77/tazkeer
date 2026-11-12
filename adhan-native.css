@@ -1,0 +1,928 @@
+/* ============================================================================
+   Tazkeer — Native shell polish, app lockdown & Adhan settings UI
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   1. App-like lockdown (no zoom, no rubber-band, no text inflation)
+   ---------------------------------------------------------------------------- */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: pan-x pan-y;
+  height: 100%;
+}
+
+body {
+  touch-action: pan-x pan-y;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
+/* Make controls respond instantly and never trigger double-tap zoom */
+button,
+a,
+input,
+select,
+textarea,
+label,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+/* Avoid long-press callouts on decorative icons */
+img,
+svg,
+.fas,
+.far,
+.fa-solid,
+.fa-regular {
+  -webkit-touch-callout: none;
+}
+
+/* The native shell already provides installation */
+.capacitor-native .install-btn,
+.capacitor-native #installBtn {
+  display: none !important;
+}
+
+/* Respect the status bar / notch inside the webview */
+.capacitor-native .header {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}
+
+.capacitor-native .bottom-nav {
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+}
+
+/* ----------------------------------------------------------------------------
+   2. Adhan entry button in the prayer-times header
+   ---------------------------------------------------------------------------- */
+.adhan-header-btn {
+  position: relative;
+  padding: 0.22rem 0.45rem !important;
+  min-width: 28px;
+  justify-content: center;
+}
+
+.adhan-header-btn.is-active {
+  background: #1a8a5c;
+  border-color: #1a8a5c;
+  color: #ffffff;
+}
+
+body.dark-mode .adhan-header-btn.is-active {
+  background: #2f855a;
+  border-color: #2f855a;
+  color: #f0fff4;
+}
+
+.adhan-header-btn .adhan-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f6c453;
+  box-shadow: 0 0 0 3px rgba(246, 196, 83, 0.22);
+  display: none;
+}
+
+.adhan-header-btn.is-active .adhan-dot {
+  display: inline-block;
+}
+
+/* ----------------------------------------------------------------------------
+   3. Profile dashboard card
+   ---------------------------------------------------------------------------- */
+.adhan-dash-head {
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.adhan-status-pill {
+  margin-inline-start: auto;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+  color: #64748b;
+  white-space: nowrap;
+}
+
+body.dark-mode .adhan-status-pill {
+  background: rgba(148, 163, 184, 0.16);
+  color: #cbd5e1;
+}
+
+.adhan-status-pill.is-on {
+  background: rgba(26, 138, 92, 0.14);
+  color: #1a8a5c;
+}
+
+body.dark-mode .adhan-status-pill.is-on {
+  background: rgba(104, 211, 145, 0.16);
+  color: #68d391;
+}
+
+.adhan-summary-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #475569;
+  margin: 0.35rem 0 0.6rem;
+  line-height: 1.6;
+}
+
+body.dark-mode .adhan-summary-line {
+  color: #cbd5e1;
+}
+
+.adhan-summary-line i {
+  color: #d4a847;
+  font-size: 0.8rem;
+}
+
+.adhan-quick-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.adhan-quick-btn {
+  border: 1.5px solid rgba(26, 138, 92, 0.22);
+  background: rgba(26, 138, 92, 0.07);
+  color: #1a8a5c;
+  border-radius: 12px;
+  padding: 0.55rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.adhan-quick-btn:active {
+  transform: scale(0.97);
+}
+
+.adhan-quick-btn.is-gold {
+  border-color: rgba(212, 168, 71, 0.35);
+  background: rgba(212, 168, 71, 0.1);
+  color: #a97b1f;
+}
+
+body.dark-mode .adhan-quick-btn {
+  border-color: rgba(104, 211, 145, 0.22);
+  background: rgba(104, 211, 145, 0.08);
+  color: #68d391;
+}
+
+body.dark-mode .adhan-quick-btn.is-gold {
+  border-color: rgba(246, 196, 83, 0.3);
+  background: rgba(246, 196, 83, 0.1);
+  color: #f6c453;
+}
+
+/* ----------------------------------------------------------------------------
+   4. Adhan modal
+   ---------------------------------------------------------------------------- */
+.adhan-modal {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.adhan-modal-content {
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  margin: 0;
+  padding: 0;
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(212, 168, 71, 0.28);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  color: #e2e8f0;
+  animation: adhanModalIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.light-mode .adhan-modal-content,
+body:not(.dark-mode) .adhan-modal-content {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-color: rgba(26, 138, 92, 0.22);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+  color: #1e293b;
+}
+
+@keyframes adhanModalIn {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.adhan-modal-header {
+  padding: 1rem 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.35);
+}
+
+body.light-mode .adhan-modal-header,
+body:not(.dark-mode) .adhan-modal-header {
+  background: rgba(248, 250, 252, 0.85);
+  border-bottom-color: rgba(15, 23, 42, 0.08);
+}
+
+.adhan-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.adhan-modal-title i {
+  color: #f6c453;
+}
+
+.adhan-close-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: transparent;
+  color: inherit;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adhan-close-btn:active {
+  transform: scale(0.94);
+}
+
+.adhan-modal-body {
+  padding: 0.95rem 1.1rem 1.35rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  text-align: start;
+}
+
+.adhan-web-notice {
+  display: none;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.7rem 0.8rem;
+  border-radius: 12px;
+  background: rgba(246, 196, 83, 0.1);
+  border: 1px solid rgba(246, 196, 83, 0.3);
+  color: #a97b1f;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  margin-bottom: 0.9rem;
+}
+
+body.dark-mode .adhan-web-notice {
+  color: #f6c453;
+}
+
+.adhan-web-notice.is-visible {
+  display: flex;
+}
+
+/* Theme Mode Selector */
+.adhan-theme-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 420px) {
+  .adhan-theme-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adhan-theme-card {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 14px;
+  border: 1.5px solid rgba(148, 163, 184, 0.25);
+  background: rgba(148, 163, 184, 0.06);
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: start;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.adhan-theme-card:active {
+  transform: scale(0.98);
+}
+
+.adhan-theme-card.active {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+body.dark-mode .adhan-theme-card.active {
+  border-color: #f6c453;
+  background: rgba(246, 196, 83, 0.12);
+}
+
+.theme-card-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 138, 92, 0.12);
+  color: #1a8a5c;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .theme-card-icon {
+  background: rgba(246, 196, 83, 0.12);
+  color: #f6c453;
+}
+
+.adhan-theme-card.active .theme-card-icon {
+  background: #10b981;
+  color: #ffffff;
+}
+
+body.dark-mode .adhan-theme-card.active .theme-card-icon {
+  background: #f6c453;
+  color: #1a202c;
+}
+
+.theme-card-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.theme-card-details strong {
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.theme-card-details span {
+  font-size: 0.67rem;
+  color: #64748b;
+  line-height: 1.3;
+  margin-top: 0.1rem;
+}
+
+body.dark-mode .theme-card-details span {
+  color: #94a3b8;
+}
+
+.theme-card-check {
+  font-size: 0.95rem;
+  color: #cbd5e1;
+  transition: color 0.2s ease;
+}
+
+.adhan-theme-card.active .theme-card-check {
+  color: #10b981;
+}
+
+body.dark-mode .adhan-theme-card.active .theme-card-check {
+  color: #f6c453;
+}
+
+/* Master toggle */
+.adhan-master {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 16px;
+  background: rgba(26, 138, 92, 0.08);
+  border: 1px solid rgba(26, 138, 92, 0.18);
+  margin-bottom: 1rem;
+}
+
+body.dark-mode .adhan-master {
+  background: rgba(104, 211, 145, 0.08);
+  border-color: rgba(104, 211, 145, 0.2);
+}
+
+.adhan-master h4 {
+  font-size: 0.9rem;
+  font-weight: 800;
+  margin: 0 0 0.15rem;
+  color: inherit;
+}
+
+.adhan-master p {
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: #64748b;
+  margin: 0;
+}
+
+body.dark-mode .adhan-master p {
+  color: #94a3b8;
+}
+
+/* Switch */
+.adhan-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.adhan-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.adhan-slider {
+  position: absolute;
+  inset: 0;
+  background: #cbd5e1;
+  border-radius: 999px;
+  transition: background 0.25s ease;
+}
+
+.adhan-slider::before {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  left: 3px;
+  top: 3px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+  transition: transform 0.25s ease;
+}
+
+.adhan-switch input:checked + .adhan-slider {
+  background: #1a8a5c;
+}
+
+.adhan-switch input:checked + .adhan-slider::before {
+  transform: translateX(22px);
+}
+
+body.dark-mode .adhan-slider {
+  background: #475569;
+}
+
+body.dark-mode .adhan-switch input:checked + .adhan-slider {
+  background: #2f855a;
+}
+
+/* Section titles */
+.adhan-section-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  margin: 1.05rem 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: inherit;
+}
+
+.adhan-section-title i {
+  color: #d4a847;
+  font-size: 0.78rem;
+}
+
+.adhan-section-title .adhan-section-hint {
+  margin-inline-start: auto;
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+body.dark-mode .adhan-section-title .adhan-section-hint {
+  color: #94a3b8;
+}
+
+/* Muezzin list */
+.adhan-muezzin-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.45rem;
+}
+
+.adhan-muezzin-card {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.62rem 0.7rem;
+  border-radius: 14px;
+  border: 1.5px solid rgba(148, 163, 184, 0.25);
+  background: rgba(148, 163, 184, 0.06);
+  color: inherit;
+  font-family: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.12s ease;
+}
+
+.adhan-muezzin-card:active {
+  transform: scale(0.99);
+}
+
+.adhan-muezzin-card.is-selected {
+  border-color: #d4a847;
+  background: rgba(212, 168, 71, 0.12);
+}
+
+body.dark-mode .adhan-muezzin-card {
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+body.dark-mode .adhan-muezzin-card.is-selected {
+  border-color: #f6c453;
+  background: rgba(246, 196, 83, 0.12);
+}
+
+.adhan-muezzin-icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 138, 92, 0.12);
+  color: #1a8a5c;
+  font-size: 0.85rem;
+}
+
+.adhan-muezzin-card.is-selected .adhan-muezzin-icon {
+  background: #d4a847;
+  color: #1a202c;
+}
+
+body.dark-mode .adhan-muezzin-icon {
+  background: rgba(104, 211, 145, 0.12);
+  color: #68d391;
+}
+
+.adhan-muezzin-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+  min-width: 0;
+}
+
+.adhan-muezzin-name {
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.adhan-muezzin-desc {
+  font-size: 0.66rem;
+  color: #64748b;
+}
+
+body.dark-mode .adhan-muezzin-desc {
+  color: #94a3b8;
+}
+
+.adhan-muezzin-check {
+  margin-inline-start: auto;
+  color: #d4a847;
+  opacity: 0;
+  font-size: 0.9rem;
+}
+
+.adhan-muezzin-card.is-selected .adhan-muezzin-check {
+  opacity: 1;
+}
+
+/* Prayer chips */
+.adhan-prayer-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.adhan-prayer-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.18rem;
+  padding: 0.48rem 0.2rem;
+  border-radius: 12px;
+  border: 1.5px solid rgba(148, 163, 184, 0.25);
+  background: rgba(148, 163, 184, 0.05);
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.adhan-prayer-chip i {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.adhan-prayer-chip.is-on {
+  border-color: rgba(26, 138, 92, 0.5);
+  background: rgba(26, 138, 92, 0.1);
+}
+
+.adhan-prayer-chip.is-on i {
+  color: var(--pt-em);
+}
+
+body.dark-mode .adhan-prayer-chip.is-on {
+  border-color: rgba(104, 211, 145, 0.45);
+  background: rgba(104, 211, 145, 0.1);
+}
+
+body.dark-mode .adhan-prayer-chip.is-on i {
+  color: var(--pt-em);
+}
+
+/* Volume */
+.adhan-volume-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.adhan-volume-row i {
+  color: var(--pt-gd);
+  font-size: 0.85rem;
+}
+
+.adhan-volume-row input[type="range"] {
+  flex: 1;
+  accent-color: #1a8a5c;
+  height: 22px;
+}
+
+body.dark-mode .adhan-volume-row input[type="range"] {
+  accent-color: #68d391;
+}
+
+.adhan-volume-value {
+  font-size: 0.7rem;
+  font-weight: 800;
+  min-width: 34px;
+  text-align: center;
+  color: #64748b;
+}
+
+body.dark-mode .adhan-volume-value {
+  color: #cbd5e1;
+}
+
+/* Permissions */
+.adhan-permissions {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.adhan-perm-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 12px;
+  background: rgba(148, 163, 184, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.adhan-perm-badge {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  background: rgba(246, 196, 83, 0.16);
+  color: #b7791f;
+}
+
+.adhan-perm-badge.is-ok {
+  background: rgba(26, 138, 92, 0.16);
+  color: #1a8a5c;
+}
+
+body.dark-mode .adhan-perm-badge {
+  background: rgba(246, 196, 83, 0.16);
+  color: #f6c453;
+}
+
+body.dark-mode .adhan-perm-badge.is-ok {
+  background: rgba(104, 211, 145, 0.16);
+  color: #68d391;
+}
+
+.adhan-perm-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+  min-width: 0;
+}
+
+.adhan-perm-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.adhan-perm-desc {
+  font-size: 0.65rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+body.dark-mode .adhan-perm-desc {
+  color: #94a3b8;
+}
+
+.adhan-perm-fix {
+  margin-inline-start: auto;
+  flex: 0 0 auto;
+  border: 1px solid rgba(26, 138, 92, 0.35);
+  background: transparent;
+  color: #1a8a5c;
+  border-radius: 999px;
+  padding: 0.28rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.66rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.adhan-perm-fix:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+body.dark-mode .adhan-perm-fix {
+  border-color: rgba(104, 211, 145, 0.35);
+  color: #68d391;
+}
+
+/* Next alarm box */
+.adhan-next-info {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 0.7rem;
+  margin-top: 0.9rem;
+  border-radius: 12px;
+  background: rgba(212, 168, 71, 0.08);
+  border: 1px solid rgba(212, 168, 71, 0.25);
+  font-size: 0.74rem;
+  line-height: 1.6;
+  color: inherit;
+}
+
+.adhan-next-info i {
+  color: #d4a847;
+}
+
+.adhan-next-info strong {
+  font-weight: 800;
+}
+
+/* Action row */
+.adhan-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.adhan-action-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 0.62rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.2s ease;
+  background: #1a8a5c;
+  color: #ffffff;
+}
+
+.adhan-action-btn:active {
+  transform: scale(0.98);
+}
+
+.adhan-action-btn.is-gold {
+  background: #d4a847;
+  color: #1a202c;
+}
+
+.adhan-action-btn.is-ghost {
+  background: transparent;
+  border: 1.5px solid rgba(148, 163, 184, 0.35);
+  color: inherit;
+}
+
+.adhan-action-btn.is-danger {
+  background: rgba(229, 62, 62, 0.12);
+  border: 1.5px solid rgba(229, 62, 62, 0.35);
+  color: #e53e3e;
+}
+
+body.dark-mode .adhan-action-btn.is-danger {
+  color: #fc8181;
+  border-color: rgba(252, 129, 129, 0.35);
+}
+
+.adhan-action-row.is-single {
+  grid-template-columns: 1fr;
+}
+
+/* Footer note */
+.adhan-footnote {
+  margin-top: 0.85rem;
+  font-size: 0.64rem;
+  line-height: 1.7;
+  color: #64748b;
+  text-align: center;
+}
+
+body.dark-mode .adhan-footnote {
+  color: #94a3b8;
+}
+
+/* ----------------------------------------------------------------------------
+   5. Small-screen tuning
+   ---------------------------------------------------------------------------- */
+@media (max-width: 360px) {
+  .adhan-prayer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .adhan-quick-row {
+    grid-template-columns: 1fr;
+  }
+
+  .adhan-modal-body {
+    padding-inline: 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adhan-modal-content {
+    animation: none;
+  }
+}
+
+/* Suppress all web install prompts and banners in native app */
+body.capacitor-native .install-btn,
+body.is-native-app .install-btn,
+body.capacitor-native #installInstructionsModal,
+body.is-native-app #installInstructionsModal,
+body.capacitor-native .install-modal,
+body.is-native-app .install-modal {
+  display: none !important;
+}
