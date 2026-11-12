@@ -473,74 +473,184 @@ document.addEventListener("DOMContentLoaded", function () {
 function checkAndShowInstallInstructions() {
   if (isStandaloneMode()) return;
 
+  const hasDownloaded = localStorage.getItem("hasDownloadedApk") === "true";
+  // If user already downloaded the app, don't auto-show popup on page load
+  if (hasDownloaded) return;
+
   const dismissed = localStorage.getItem("installInstructionsDismissed");
   const dismissedDate = localStorage.getItem(
     "installInstructionsDismissedDate",
   );
   const remindLater = localStorage.getItem("installInstructionsRemindLater");
 
-  // If user clicked "understood", don't show again for 30 days
+  // If user clicked dismissed / understood, don't show again for 14 days
   if (dismissed && dismissedDate) {
     const daysSinceDismissed =
       (Date.now() - parseInt(dismissedDate)) / (1000 * 60 * 60 * 24);
-    if (daysSinceDismissed < 30) {
+    if (daysSinceDismissed < 14) {
       return; // Don't show
     }
   }
 
-  // If user clicked "remind later", don't show for 3 days
+  // If user clicked "remind later", don't show for 2 days
   if (remindLater) {
     const daysSinceRemind =
       (Date.now() - parseInt(remindLater)) / (1000 * 60 * 60 * 24);
-    if (daysSinceRemind < 3) {
+    if (daysSinceRemind < 2) {
       return; // Don't show
     }
   }
 
-  // Show instructions after a short delay for better UX
+  // Show instructions smoothly after a short delay for better UX
   setTimeout(() => {
-    showManualInstallInstructions();
-  }, 1000);
+    showManualInstallInstructions(false);
+  }, 1200);
 }
 
-function showManualInstallInstructions() {
-  if (isStandaloneMode()) return;
+function handleApkDownload(event) {
+  try {
+    localStorage.setItem("hasDownloadedApk", "true");
+    localStorage.setItem("installInstructionsDismissed", "true");
+    localStorage.setItem("installInstructionsDismissedDate", Date.now().toString());
+  } catch (err) {
+    console.error("Storage error:", err);
+  }
+
+  showNotification("جارٍ بدء تحميل تطبيق ذَكِّرْ للأندرويد... 🎉");
+
+  setTimeout(() => {
+    dismissInstallModal(true);
+  }, 1200);
+}
+
+function showManualInstallInstructions(forceShow = false) {
+  // If running in standalone and not manually requested, skip
+  if (!forceShow && isStandaloneMode()) return;
+
+  // Prevent duplicate modals
+  const existing = document.getElementById("installInstructionsModal");
+  if (existing) existing.remove();
+
+  const hasDownloaded = localStorage.getItem("hasDownloadedApk") === "true";
 
   const instructionsModal = document.createElement("div");
   instructionsModal.className = "modal";
   instructionsModal.style.display = "block";
   instructionsModal.id = "installInstructionsModal";
 
-  const userAgent = navigator.userAgent.toLowerCase();
+  let modalContentHtml = "";
+
+  if (hasDownloaded) {
+    modalContentHtml = `
+      <div class="install-header">
+        <div class="install-logo-wrap">
+          <img src="images/icon-192.png" alt="شعار ذَكِّرْ" class="install-app-logo" />
+        </div>
+        <h3 class="install-title">تطبيق <span class="install-brand-name">«ذَكِّرْ»</span> للأندرويد</h3>
+        <div class="installed-status-chip">
+          <i class="fas fa-circle-check"></i>
+          <span>التطبيق مُحمّل على جهازك بالفعل</span>
+        </div>
+        <p class="install-subtitle" style="margin-top: 0.6rem;">
+          يمكنك إعادة تحميل التطبيق بصيغة APK في أي وقت لتحديثه أو تثبيته مجدداً:
+        </p>
+      </div>
+
+      <div class="apk-download-hero">
+        <div class="apk-badge-row">
+          <span class="pt-chip pt-chip--em"><i class="fab fa-android"></i> نسخة أندرويد الرسمية</span>
+          <span class="pt-chip pt-chip--gd"><i class="fas fa-file-arrow-down"></i> 20 ميجابايت</span>
+        </div>
+
+        <a class="apk-download-btn apk-download-btn--re" href="Download-APK/Zakr.apk" download="Zakr.apk" onclick="handleApkDownload(event)">
+          <i class="fas fa-redo-alt"></i>
+          إعادة تحميل التطبيق (APK)
+        </a>
+        <span class="apk-download-meta">
+          <i class="fas fa-bolt"></i>
+          تحميل مباشر وسريع
+        </span>
+      </div>
+
+      <div class="install-buttons">
+        <button onclick="dismissInstallModal(true)" class="install-btn secondary">
+          <i class="fas fa-xmark"></i> إغلاق
+        </button>
+      </div>
+    `;
+  } else {
+    modalContentHtml = `
+      <div class="install-header">
+        <div class="install-logo-wrap">
+          <img src="images/icon-192.png" alt="شعار ذَكِّرْ" class="install-app-logo" />
+        </div>
+        <h3 class="install-title">حمّل تطبيق <span class="install-brand-name">«ذَكِّرْ»</span> الآن</h3>
+        <p class="install-subtitle">احصل على التطبيق الكامل لتفعيل المؤذن وكافة المميزات بدون إنترنت</p>
+      </div>
+
+      <div class="adhan-feature-card">
+        <div class="adhan-card-icon">
+          <i class="fas fa-volume-high"></i>
+        </div>
+        <div class="adhan-card-body">
+          <div class="adhan-card-title">
+            <i class="fas fa-mosque"></i>
+            تفعيل صوت الأذان والمؤذن
+          </div>
+          <p class="adhan-card-text">
+            سماع الأذان لكل صلاة في موعدها الدقيق بأجمل الأصوات، مع تنبيهات تعمل في الخلفية وبدون إنترنت.
+          </p>
+        </div>
+      </div>
+
+      <div class="apk-download-hero">
+        <div class="apk-badge-row">
+          <span class="pt-chip pt-chip--em"><i class="fab fa-android"></i> تطبيق أندرويد (APK)</span>
+          <span class="pt-chip pt-chip--gd"><i class="fas fa-shield-halved"></i> مجاني وبدون إعلانات</span>
+        </div>
+
+        <div class="apk-features-grid">
+          <div class="apk-feat-chip">
+            <i class="fas fa-wifi-slash"></i>
+            <span>يعمل 100% بدون نت</span>
+          </div>
+          <div class="apk-feat-chip">
+            <i class="fas fa-bell"></i>
+            <span>تنبيهات الصلاة والأذكار</span>
+          </div>
+          <div class="apk-feat-chip">
+            <i class="fas fa-book-quran"></i>
+            <span>القرآن وتتبع الختمات</span>
+          </div>
+          <div class="apk-feat-chip">
+            <i class="fas fa-hand-holding-heart"></i>
+            <span>صدقة جارية بلا إعلانات</span>
+          </div>
+        </div>
+
+        <a class="apk-download-btn" href="Download-APK/Zakr.apk" download="Zakr.apk" onclick="handleApkDownload(event)">
+          <i class="fas fa-download"></i>
+          تحميل التطبيق مباشرة (APK)
+        </a>
+        <span class="apk-download-meta">
+          <i class="fas fa-bolt"></i>
+          تحميل سريع ومباشر بحجم خفيف
+        </span>
+      </div>
+
+      <div class="install-buttons">
+        <button onclick="dismissInstallModal(false)" class="install-btn secondary">
+          <i class="fas fa-xmark"></i> سأقوم بالتحميل لاحقاً
+        </button>
+      </div>
+    `;
+  }
+
   instructionsModal.innerHTML = `
     <div class="modal-content install-modal-content">
       <span class="close" onclick="dismissInstallModal(true)">&times;</span>
       <div class="install-content">
-        <div class="install-header">
-          <h3>حمّل تطبيق ذَكِّرْ الآن</h3>
-          <p class="install-subtitle">اضغط الزر بالأسفل لتحميل التطبيق مباشرة</p>
-        </div>
-
-        <div class="apk-download-hero">
-          <div class="apk-badge-row">
-            <span class="apk-tag"><i class="fab fa-android"></i> تطبيق أندرويد</span>
-            <span class="apk-tag-size"><i class="fas fa-file-arrow-down"></i> APK</span>
-          </div>
-          <a class="apk-download-btn" href="Download-APK/Zakr.apk" download="Zakr.apk">
-            <i class="fas fa-download"></i>
-            اضغط هنا لتحميل التطبيق مباشرة
-          </a>
-          <span class="apk-download-meta">
-            <i class="fas fa-bolt"></i>
-            تحميل سريع ومباشر
-          </span>
-        </div>
-
-        <div class="install-buttons">
-          <button onclick="dismissInstallModal(false)" class="install-btn secondary">
-            <i class="fas fa-xmark"></i> ليس الآن
-          </button>
-        </div>
+        ${modalContentHtml}
       </div>
     </div>
   `;
@@ -554,14 +664,14 @@ function dismissInstallModal(understood) {
     modal.remove();
   }
 
-  // If user clicked "understood", don't show again for 30 days
+  // If user clicked "understood" or closed, don't show again for 14 days
   if (understood) {
     localStorage.setItem("installInstructionsDismissed", "true");
-    localStorage.setItem("installInstructionsDismissedDate", Date.now());
+    localStorage.setItem("installInstructionsDismissedDate", Date.now().toString());
   }
-  // If "remind me later", don't show for 3 days
+  // If "remind me later", don't show for 2 days
   else {
-    localStorage.setItem("installInstructionsRemindLater", Date.now());
+    localStorage.setItem("installInstructionsRemindLater", Date.now().toString());
   }
 }
 
@@ -2214,17 +2324,12 @@ function isIOSDevice() {
 
 function updateInstallButtonVisibility() {
   const installBtn = document.getElementById("installBtn");
-  if (!installBtn) return;
-
-  if (isStandaloneMode()) {
-    installBtn.classList.add("hidden");
-    return;
-  }
-
-  if (deferredInstallPrompt || isIOSDevice()) {
+  if (installBtn) {
     installBtn.classList.remove("hidden");
-  } else {
-    installBtn.classList.add("hidden");
+  }
+  const topbarBtn = document.getElementById("topbarDownloadBtn");
+  if (topbarBtn) {
+    topbarBtn.classList.remove("hidden");
   }
 }
 
@@ -2233,35 +2338,12 @@ function initializeInstallPrompt() {
 }
 
 function showInstallPrompt() {
-  if (typeof isStandaloneMode === "function" && isStandaloneMode()) return;
-  const hasSeen = localStorage.getItem("hasSeenInstallPrompt");
-  if (!hasSeen && deferredInstallPrompt && typeof showInstallModal === "function") {
-    localStorage.setItem("hasSeenInstallPrompt", "true");
-    showInstallModal();
-  }
+  showManualInstallInstructions(false);
 }
 
 async function showInstallModal() {
-  if (isStandaloneMode()) {
-    showNotification("التطبيق مثبت بالفعل على جهازك");
-    updateInstallButtonVisibility();
-    return;
-  }
-
-  if (deferredInstallPrompt) {
-    deferredInstallPrompt.prompt();
-    const choiceResult = await deferredInstallPrompt.userChoice;
-
-    if (choiceResult.outcome === "accepted") {
-      showNotification("تم بدء تثبيت التطبيق");
-    }
-
-    deferredInstallPrompt = null;
-    updateInstallButtonVisibility();
-    return;
-  }
-
-  showManualInstallInstructions();
+  // Always open the full APK download / re-download modal
+  showManualInstallInstructions(true);
 }
 
 window.addEventListener("beforeinstallprompt", (event) => {

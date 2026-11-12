@@ -74,7 +74,7 @@
             aria-label="المسبحة الإلكترونية" tabindex="-1">
             <i class="fas fa-fingerprint"></i>
           </button>
-          <button class="nav-btn install-btn hidden" id="installBtn" tabindex="-1">
+          <button class="nav-btn install-btn" id="installBtn" onclick="showInstallModal()" title="تحميل التطبيق" tabindex="-1">
             <i class="fas fa-download"></i>
           </button>
           <button class="nav-btn theme-toggle-btn settings-header-btn" id="settingsHeaderBtn"
@@ -106,6 +106,10 @@
               <button class="pt-iconbtn" onclick="openMisbaha()" title="المسبحة الإلكترونية"
                 aria-label="المسبحة الإلكترونية">
                 <i class="fas fa-fingerprint"></i>
+              </button>
+              <button class="pt-iconbtn pt-iconbtn--download" id="topbarDownloadBtn" onclick="showInstallModal()"
+                title="تحميل تطبيق ذَكِّرْ للأندرويد" aria-label="تحميل تطبيق ذَكِّرْ للأندرويد">
+                <i class="fas fa-download"></i>
               </button>
               <button class="pt-iconbtn" onclick="openAdhanModal()" title="الإعدادات" aria-label="الإعدادات">
                 <i class="fas fa-gear"></i>

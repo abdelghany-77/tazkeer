@@ -686,120 +686,160 @@ body.dark-mode .nav-btn.misbaha-header-btn:hover {
   text-align: center;
 }
 
-/* Install Modal Styles */
+/* Install Modal Styles — Tazkeer v2 Design System */
 .install-modal-content {
   position: relative;
-  max-width: 500px;
-  width: 92%;
-  margin: 3% auto;
+  max-width: 440px;
+  width: 90%;
+  margin: 4vh auto;
   text-align: center;
   padding: 0;
-  border-radius: 24px;
+  border-radius: var(--pt-r-lg, 24px);
   overflow: hidden;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
-  background: #ffffff;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--pt-line);
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line-2);
+  color: var(--pt-tx);
 }
 
 .install-modal-close {
   position: absolute;
   top: 14px;
-  left: 16px;
-  width: 36px;
-  height: 36px;
+  left: 14px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.06);
-  color: #64748b;
-  font-size: 1.5rem;
+  background: var(--pt-s2);
+  color: var(--pt-mu);
+  font-size: 1.15rem;
   line-height: 1;
-  border: none;
+  border: 1px solid var(--pt-line);
   cursor: pointer;
   z-index: 10;
   transition: all 0.2s ease;
 }
 
 .install-modal-close:hover {
-  background: rgba(0, 0, 0, 0.12);
-  color: #1e293b;
+  background: var(--pt-s3);
+  color: var(--pt-tx);
+  border-color: var(--pt-line-2);
   transform: scale(1.05);
 }
 
 .install-content {
-  padding: 2rem 1.5rem 1.75rem;
+  padding: 1.6rem 1.25rem 1.35rem;
   box-sizing: border-box;
+  background-image: radial-gradient(circle at 50% 0%, rgba(52, 209, 168, 0.08) 0%, transparent 65%);
 }
 
-.install-icon-badge {
-  width: 60px;
-  height: 60px;
-  border-radius: 18px;
+.install-logo-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 0.75rem;
-  font-size: 1.75rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+  margin: 0 auto 0.65rem;
 }
 
-.install-header {
-  margin-bottom: 0.5rem;
-  text-align: center;
+.install-app-logo {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  object-fit: cover;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--pt-line-2);
+  transition: transform 0.2s ease;
 }
 
-@keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+.install-app-logo:hover {
+  transform: scale(1.05);
 }
 
-.install-header h3 {
-  font-size: 1.5rem;
-  color: #2d3748;
-  margin: 0 0 0.4rem 0;
+.install-title {
+  font-size: 1.28rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #1a8a5c 0%, #0d6b4e 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--pt-tx);
+  margin: 0 0 0.25rem 0;
+  line-height: 1.35;
+}
+
+.install-brand-name {
+  color: var(--pt-gd);
+  font-weight: 800;
 }
 
 .install-subtitle {
-  font-size: 0.9rem;
-  color: #718096;
+  font-size: 0.84rem;
+  color: var(--pt-mu);
   line-height: 1.5;
-  margin: 0;
+  margin: 0 0 0.85rem;
 }
 
-.device-badge {
-  display: inline-block;
-  background: linear-gradient(135deg, #1a8a5c 0%, #0d6b4e 100%);
-  color: white;
-  padding: 0.35rem 1.25rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin: 0.85rem 0 1rem;
-  box-shadow: 0 4px 12px rgba(26, 138, 92, 0.25);
+/* Adhan Feature Spotlight */
+.adhan-feature-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  background: var(--pt-s2);
+  border: 1px solid var(--pt-line-2);
+  border-radius: 16px;
+  text-align: right;
+  direction: rtl;
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+
+.adhan-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--pt-em-bg);
+  border: 1px solid var(--pt-em-line);
+  color: var(--pt-em);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(52, 209, 168, 0.15);
+}
+
+.adhan-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.adhan-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--pt-em);
+  margin-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.adhan-card-text {
+  font-size: 0.8rem;
+  color: var(--pt-mu);
+  line-height: 1.55;
+  margin: 0;
 }
 
 /* APK Direct Download Hero Card */
 .apk-download-hero {
-  background: linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.03) 100%);
-  border: 1.5px dashed rgba(16, 185, 129, 0.4);
+  background: var(--pt-s2);
+  border: 1px solid var(--pt-line-2);
   border-radius: 18px;
-  padding: 1.25rem 1rem;
-  margin: 0.75rem 0 1rem;
+  padding: 12px 12px 14px;
+  margin: 0.6rem 0 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.75rem;
   align-items: center;
 }
 
@@ -811,98 +851,11 @@ body.dark-mode .nav-btn.misbaha-header-btn:hover {
   flex-wrap: wrap;
 }
 
-.apk-tag {
-  background: rgba(16, 185, 129, 0.15);
-  color: #047857;
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.apk-tag-size {
-  background: rgba(0, 0, 0, 0.06);
-  color: #475569;
-  padding: 0.3rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-/* Adhan Feature Spotlight */
-.adhan-feature-card {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.85rem 1rem;
-  background: linear-gradient(135deg, rgba(232, 197, 90, 0.18) 0%, rgba(16, 185, 129, 0.12) 100%);
-  border: 1.5px solid rgba(232, 197, 90, 0.5);
-  border-radius: 14px;
-  text-align: right;
-  direction: rtl;
-}
-
-.adhan-card-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  animation: pulseAdhan 2.5s infinite ease-in-out;
-}
-
-@keyframes pulseAdhan {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  }
-  50% {
-    transform: scale(1.08);
-    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.5);
-  }
-}
-
-.adhan-card-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.adhan-card-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #065f46;
-  margin-bottom: 0.2rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.adhan-card-text {
-  font-size: 0.82rem;
-  color: #374151;
-  line-height: 1.5;
-  margin: 0;
-}
-
-/* App Features Grid */
+/* Features Grid */
 .apk-features-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
+  gap: 6px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -910,56 +863,114 @@ body.dark-mode .nav-btn.misbaha-header-btn:hover {
 .apk-feat-chip {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.5rem 0.65rem;
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 10px;
-  font-size: 0.8rem;
+  gap: 7px;
+  padding: 8px 10px;
+  background: var(--pt-s1);
+  border: 1px solid var(--pt-line);
+  border-radius: 12px;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--pt-tx);
   text-align: right;
   direction: rtl;
 }
 
 .apk-feat-chip i {
-  color: #10b981;
-  font-size: 0.9rem;
+  color: var(--pt-em);
+  font-size: 0.88rem;
   flex-shrink: 0;
-}
-
-.apk-download-meta {
-  font-size: 0.78rem;
-  color: #6b7280;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
 }
 
 .apk-download-btn {
   width: 100% !important;
   box-sizing: border-box !important;
-  padding: 0.95rem 1.25rem !important;
-  font-size: 1.05rem !important;
+  padding: 12px 18px !important;
+  font-size: 1rem !important;
   font-weight: 700 !important;
   border-radius: 14px !important;
   text-decoration: none !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 0.65rem !important;
+  gap: 8px !important;
   cursor: pointer;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-  color: #ffffff !important;
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35) !important;
-  transition: all 0.25s ease !important;
+  background: var(--pt-em-grad, linear-gradient(135deg, #3dddb2, #12a383)) !important;
+  color: #05231c !important;
+  box-shadow: 0 8px 24px rgba(52, 209, 168, 0.3) !important;
+  transition: all 0.2s ease !important;
   border: none !important;
 }
 
 .apk-download-btn:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5) !important;
+  box-shadow: 0 10px 28px rgba(52, 209, 168, 0.45) !important;
+}
+
+.apk-download-btn--re {
+  background: var(--pt-gd-grad, linear-gradient(135deg, #e6bd62, #c99a33)) !important;
+  color: #2a1d05 !important;
+  box-shadow: 0 8px 24px rgba(230, 189, 98, 0.3) !important;
+}
+
+.apk-download-btn--re:hover {
+  box-shadow: 0 10px 28px rgba(230, 189, 98, 0.45) !important;
+}
+
+.apk-download-meta {
+  font-size: 0.76rem;
+  color: var(--pt-mu);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.apk-download-meta i {
+  color: var(--pt-em);
+}
+
+.installed-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: var(--pt-em-bg);
+  border: 1px solid var(--pt-em-line);
+  color: var(--pt-em);
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin: 0.3rem auto 0.2rem;
+}
+
+.installed-status-chip i {
+  color: var(--pt-em);
+}
+
+.install-buttons {
+  margin-top: 0.4rem;
+}
+
+.install-buttons .install-btn.secondary {
+  background: transparent;
+  color: var(--pt-mu);
+  border: 1px solid var(--pt-line);
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.install-buttons .install-btn.secondary:hover {
+  background: var(--pt-s2);
+  color: var(--pt-tx);
+  border-color: var(--pt-line-2);
 }
 
 .apk-instructions-hint {
@@ -981,6 +992,19 @@ body.dark-mode .nav-btn.misbaha-header-btn:hover {
   color: #10b981;
   font-size: 1rem;
   flex-shrink: 0;
+}
+
+.pt-iconbtn--download {
+  color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  position: relative;
+}
+
+.pt-iconbtn--download:hover {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #059669 !important;
+  transform: translateY(-1px);
 }
 
 .pwa-install-alt {
@@ -1766,110 +1790,17 @@ body.dark-mode .adhkar-count {
   color: #e8c55a;
 }
 
-/* Dark Mode Install Modal */
-body.dark-mode .install-modal-content {
-  background: var(--pt-s2);
-  border: 1px solid var(--pt-gd-bg);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+/* Dark Mode Install Modal — inherited seamlessly from Tazkeer v2 design tokens */
+
+body.dark-mode .pt-iconbtn--download {
+  color: #34d399 !important;
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
 }
 
-body.dark-mode .install-modal-close {
-  background: rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
-}
-
-body.dark-mode .install-modal-close:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-}
-
-body.dark-mode .install-icon-badge {
-  background: linear-gradient(135deg, #e8c55a 0%, #d4a847 100%);
-  color: #1a202c;
-  box-shadow: 0 8px 20px rgba(232, 197, 90, 0.3);
-}
-
-body.dark-mode .install-header h3 {
-  color: var(--pt-tx);
-  background: var(--pt-gd-grad);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-body.dark-mode .install-subtitle {
-  color: #cbd5e0;
-}
-
-body.dark-mode .device-badge {
-  background: var(--pt-gd-grad);
-  box-shadow: 0 4px 15px rgba(232, 197, 90, 0.3);
-}
-
-body.dark-mode .apk-download-hero {
-  background: linear-gradient(145deg, rgba(232, 197, 90, 0.09) 0%, rgba(212, 168, 71, 0.03) 100%);
-  border-color: rgba(232, 197, 90, 0.35);
-}
-
-body.dark-mode .apk-tag {
-  background: rgba(232, 197, 90, 0.18);
-  color: #e8c55a;
-}
-
-body.dark-mode .apk-tag-size {
-  background: rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
-}
-
-body.dark-mode .adhan-feature-card {
-  background: linear-gradient(135deg, rgba(232, 197, 90, 0.16) 0%, rgba(30, 41, 59, 0.8) 100%);
-  border-color: rgba(232, 197, 90, 0.4);
-}
-
-body.dark-mode .adhan-card-icon {
-  background: linear-gradient(135deg, #e8c55a 0%, #d4a847 100%);
-  color: #1a202c;
-  box-shadow: 0 4px 12px rgba(232, 197, 90, 0.3);
-}
-
-body.dark-mode .adhan-card-title {
-  color: #e8c55a;
-}
-
-body.dark-mode .adhan-card-text {
-  color: #cbd5e1;
-}
-
-body.dark-mode .apk-feat-chip {
-  background: rgba(255, 255, 255, 0.06);
-  color: #cbd5e1;
-}
-
-body.dark-mode .apk-feat-chip i {
-  color: #e8c55a;
-}
-
-body.dark-mode .apk-download-meta {
-  color: #94a3b8;
-}
-
-body.dark-mode .apk-download-btn {
-  background: linear-gradient(135deg, #e8c55a 0%, #d4a847 100%) !important;
-  color: #1a202c !important;
-  box-shadow: 0 6px 20px rgba(232, 197, 90, 0.35) !important;
-}
-
-body.dark-mode .apk-download-btn:hover {
-  box-shadow: 0 8px 25px rgba(232, 197, 90, 0.5) !important;
-}
-
-body.dark-mode .apk-instructions-hint {
-  background: rgba(255, 255, 255, 0.05);
-  color: #94a3b8;
-}
-
-body.dark-mode .apk-instructions-hint i {
-  color: #e8c55a;
+body.dark-mode .pt-iconbtn--download:hover {
+  background: rgba(16, 185, 129, 0.25) !important;
+  color: #6ee7b7 !important;
 }
 
 body.dark-mode .pwa-install-alt {
