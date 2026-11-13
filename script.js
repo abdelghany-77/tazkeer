@@ -559,7 +559,7 @@ function showManualInstallInstructions(forceShow = false) {
       <div class="apk-download-hero">
         <div class="apk-badge-row">
           <span class="pt-chip pt-chip--em"><i class="fab fa-android"></i> نسخة أندرويد الرسمية</span>
-          <span class="pt-chip pt-chip--gd"><i class="fas fa-file-arrow-down"></i> 20 ميجابايت</span>
+          <span class="pt-chip pt-chip--gd"><i class="fas fa-file-arrow-down"></i> 8 ميجابايت</span>
         </div>
 
         <a class="apk-download-btn apk-download-btn--re" href="Download-APK/Zakr.apk" download="Zakr.apk" onclick="handleApkDownload(event)">
